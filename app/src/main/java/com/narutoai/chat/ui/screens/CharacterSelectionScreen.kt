@@ -150,14 +150,15 @@ fun CharacterCard(
 ) {
     var thumbnailUrl by remember { mutableStateOf(character.thumbnailUrl) }
     
-    // Générer la vignette au premier affichage si elle n'existe pas
-    LaunchedEffect(character.id) {
-        if (thumbnailUrl.isEmpty() && character.physicalDescription.isNotEmpty() && viewModel != null) {
-            viewModel.generateCharacterThumbnail(character) { url ->
-                thumbnailUrl = url
-            }
-        }
-    }
+    // DÉSACTIVÉ: Les vignettes sont maintenant des images locales (R.drawable.xxx)
+    // Plus besoin de générer dynamiquement
+    // LaunchedEffect(character.id) {
+    //     if (thumbnailUrl.isEmpty() && character.physicalDescription.isNotEmpty() && viewModel != null) {
+    //         viewModel.generateCharacterThumbnail(character) { url ->
+    //             thumbnailUrl = url
+    //         }
+    //     }
+    // }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -216,6 +217,40 @@ fun CharacterCard(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+                
+                // Galerie d'images (aperçu 3 premières images)
+                if (character.gallery.isNotEmpty()) {
+                    androidx.compose.foundation.lazy.LazyRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(character.gallery.take(3)) { imageUri ->
+                            val imageModel = if (imageUri.startsWith("drawable://")) {
+                                // Extraire le nom du fichier (sans .jpg)
+                                val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
+                                // Construire l'ID de ressource dynamiquement
+                                val resId = try {
+                                    val context = androidx.compose.ui.platform.LocalContext.current
+                                    context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                                } catch (e: Exception) {
+                                    0
+                                }
+                                if (resId != 0) resId else imageUri
+                            } else {
+                                imageUri
+                            }
+                            
+                            AsyncImage(
+                                model = imageModel,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
