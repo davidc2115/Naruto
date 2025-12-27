@@ -224,6 +224,7 @@ fun CharacterCard(
                 
                 // Galerie d'images (aperçu 3 premières images)
                 if (character.gallery.isNotEmpty()) {
+                    val context = androidx.compose.ui.platform.LocalContext.current
                     androidx.compose.foundation.lazy.LazyRow(
                         modifier = Modifier.padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -233,12 +234,7 @@ fun CharacterCard(
                                 // Extraire le nom du fichier (sans .jpg)
                                 val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
                                 // Construire l'ID de ressource dynamiquement
-                                val resId = try {
-                                    val context = androidx.compose.ui.platform.LocalContext.current
-                                    context.resources.getIdentifier(fileName, "drawable", context.packageName)
-                                } catch (e: Exception) {
-                                    0
-                                }
+                                val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
                                 if (resId != 0) resId else imageUri
                             } else {
                                 imageUri
