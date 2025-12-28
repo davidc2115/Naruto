@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.narutoai.chat.api.GroqClient
 import com.narutoai.chat.api.ImageGenerationClient
 import com.narutoai.chat.api.VideoGenerationClient
-import com.narutoai.chat.api.FreeboxMediaClient
 import com.narutoai.chat.api.PollinationAIClient
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.ChatMessage
@@ -56,7 +55,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val groqClient = GroqClient(application.applicationContext)
     private val imageClient = ImageGenerationClient(application.applicationContext)
     private val videoClient = VideoGenerationClient(application.applicationContext)
-    private val freeboxMediaClient = FreeboxMediaClient()
     private val pollinationAIClient = PollinationAIClient()
     
     init {
@@ -302,48 +300,27 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         return@launch
                     }
                 
-                // Test de connexion Freebox
-                val pingResult = freeboxMediaClient.ping()
-                val usePollination = pingResult.isFailure
+                // Utiliser UNIQUEMENT Pollination AI (Freebox retirée)
+                // Délai pour éviter rate limit après Groq
+                kotlinx.coroutines.delay(5000)
                 
-                if (usePollination) {
-                    // Update status message
-                    _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                        content = "🎨 Freebox non accessible, utilisation de Pollination AI...",
-                        isUser = false
-                    )
-                }
-                
-                // Générer l'image (Freebox si dispo, sinon Pollination AI)
                 val style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic"
                 
-                val result = if (usePollination) {
-                    // IMPORTANT: Attendre 3s AVANT d'appeler Pollination après Groq
-                    kotlinx.coroutines.delay(3000)
-                    
-                    // Fallback: Pollination AI (TOUJOURS disponible)
-                    pollinationAIClient.generateImage(
-                        prompt = imagePrompt,
-                        model = if (style == "anime") "flux" else "flux-realism",
-                        enhance = true
-                    )
-                } else {
-                    // Primary: Freebox Stable Diffusion (local)
-                    freeboxMediaClient.generateImage(
-                        prompt = imagePrompt,
-                        style = style
-                    )
-                }
+                // Générer avec Pollination AI
+                val result = pollinationAIClient.generateImage(
+                    prompt = imagePrompt,
+                    model = if (style == "anime") "flux" else "flux-realism",
+                    enhance = true
+                )
                 
                 result.fold(
                     onSuccess = { imageUrl ->
                         _generatedImageUrl.value = imageUrl
                         _isGeneratingImage.value = false
                         
-                        val source = if (usePollination) "Pollination AI" else "Freebox"
                         // Remplacer le message de statut par l'image AVEC URL
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ Image générée avec succès ($source)",
+                            content = "✅ Image générée avec succès (Pollination AI)",
                             isUser = false,
                             imageUrl = imageUrl // AJOUT: Inclure l'URL de l'image
                         )
@@ -433,37 +410,17 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         return@launch
                     }
                 
-                // Test de connexion Freebox
-                val pingResult = freeboxMediaClient.ping()
-                val usePollination = pingResult.isFailure
+                // Utiliser UNIQUEMENT Pollination AI (Freebox retirée)
+                // Délai pour éviter rate limit après Groq
+                kotlinx.coroutines.delay(5000)
                 
-                if (usePollination) {
-                    // Update status message
-                    _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                        content = "🎬 Freebox non accessible, génération de frames avec Pollination AI...",
-                        isUser = false
-                    )
-                }
-                
-                // Générer la vidéo (Freebox si dispo, sinon frames Pollination)
-                val result = if (usePollination) {
-                    // IMPORTANT: Attendre 3s AVANT d'appeler Pollination après Groq
-                    kotlinx.coroutines.delay(3000)
-                    
-                    // Fallback: Générer plusieurs frames avec Pollination AI
-                    pollinationAIClient.generateImage(
-                        prompt = "$videoPrompt, animated, cinematic movement",
-                        model = "flux",
-                        enhance = true
-                    ).map { url ->
-                        url // Pour l'instant, retourner une seule frame comme "vidéo"
-                    }
-                } else {
-                    // Primary: Freebox Stable Diffusion (local)
-                    freeboxMediaClient.generateVideoFromPrompt(
-                        prompt = videoPrompt,
-                        duration = 2
-                    )
+                // Générer une frame avec Pollination AI (pas de vraie vidéo)
+                val result = pollinationAIClient.generateImage(
+                    prompt = "$videoPrompt, animated, cinematic movement, dynamic scene",
+                    model = "flux",
+                    enhance = true
+                ).map { url ->
+                    url // Une seule frame animée comme "vidéo"
                 }
                 
                 result.fold(
@@ -471,9 +428,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         _generatedVideoUrl.value = videoUrl
                         _isGeneratingVideo.value = false
                         
-                        val source = if (usePollination) "Pollination AI" else "Freebox"
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ ${if (usePollination) "Image animée" else "Vidéo"} générée ($source)",
+                            content = "✅ Image animée générée (Pollination AI)",
                             isUser = false,
                             videoUrl = videoUrl // AJOUT: Inclure l'URL de la vidéo
                         )

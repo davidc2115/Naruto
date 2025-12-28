@@ -52,12 +52,12 @@ class PollinationAIClient {
         enhance: Boolean = true
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            // Delay LONG pour éviter rate limit 429 (augmenté à 5s)
-            delay(5000)
+            // Delay TRÈS LONG pour éviter rate limit 429/500 (augmenté à 10s)
+            delay(10000)
             
-            // Retry avec backoff exponentiel pour gérer 502 Bad Gateway
+            // Retry avec backoff exponentiel pour gérer 500/502/503
             var lastException: Exception? = null
-            val maxRetries = 3
+            val maxRetries = 5 // Augmenté à 5 tentatives
             
             for (attempt in 1..maxRetries) {
                 try {
@@ -93,26 +93,26 @@ class PollinationAIClient {
                         when (response.code) {
                             200 -> return@withContext Result.success(imageUrl)
                             429 -> {
-                                // Rate limit - attendre plus longtemps
+                                // Rate limit - attendre TRÈS longtemps
                                 if (attempt < maxRetries) {
-                                    delay(10000L * attempt) // 10s, 20s, 30s
+                                    delay(20000L * attempt) // 20s, 40s, 60s, 80s, 100s
                                     lastException = IOException("Rate limit 429 (tentative $attempt/$maxRetries)")
                                     // Continue to next retry
                                 } else {
                                     return@withContext Result.failure(
-                                        IOException("❌ Rate limit 429 - Trop de requêtes. Veuillez réessayer dans 1 minute.")
+                                        IOException("❌ Rate limit 429 - Trop de requêtes. Réessayez dans 2 minutes.")
                                     )
                                 }
                             }
                             500, 502, 503, 504 -> {
                                 // Internal Server Error / Bad Gateway / Service Unavailable - retry
                                 if (attempt < maxRetries) {
-                                    delay(5000L * attempt) // 5s, 10s, 15s
+                                    delay(15000L * attempt) // 15s, 30s, 45s, 60s, 75s
                                     lastException = IOException("Erreur serveur ${response.code} (tentative $attempt/$maxRetries)")
                                     // Continue to next retry
                                 } else {
                                     return@withContext Result.failure(
-                                        IOException("❌ Erreur ${response.code} - Service Pollinations AI temporairement indisponible. Réessayez dans quelques minutes.")
+                                        IOException("❌ Erreur ${response.code} - Service Pollinations AI surchargé. Réessayez dans quelques minutes.")
                                     )
                                 }
                             }
