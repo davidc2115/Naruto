@@ -6,6 +6,7 @@ import com.narutoai.chat.ui.screens.CharacterProfileScreen
 import com.narutoai.chat.ui.screens.CharacterSelectionScreen
 import com.narutoai.chat.ui.screens.ChatScreen
 import com.narutoai.chat.ui.screens.SettingsScreen
+import com.narutoai.chat.ui.screens.UserProfileScreen
 import com.narutoai.chat.viewmodel.ChatViewModel
 
 sealed class Screen {
