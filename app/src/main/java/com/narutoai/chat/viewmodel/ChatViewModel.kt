@@ -12,9 +12,16 @@ import com.narutoai.chat.api.FreeboxMediaClient
 import com.narutoai.chat.api.PollinationAIClient
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.ChatMessage
+import com.narutoai.chat.models.UserProfile
+import com.narutoai.chat.models.Gender
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
+    
+    private val sharedPreferences = application.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+    
+    private val _userProfile = mutableStateOf(loadUserProfile())
+    val userProfile: State<UserProfile> = _userProfile
     
     private val _selectedCharacter = mutableStateOf<Character?>(null)
     val selectedCharacter: State<Character?> = _selectedCharacter
@@ -56,6 +63,56 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             groqClient.initialize()
         }
+    }
+    
+    private fun loadUserProfile(): UserProfile {
+        val pseudo = sharedPreferences.getString("user_pseudo", "") ?: ""
+        val age = sharedPreferences.getInt("user_age", -1).takeIf { it >= 0 }
+        val genderOrdinal = sharedPreferences.getInt("user_gender", Gender.NOT_SPECIFIED.ordinal)
+        val gender = Gender.entries.getOrNull(genderOrdinal) ?: Gender.NOT_SPECIFIED
+        val bio = sharedPreferences.getString("user_bio", "") ?: ""
+        
+        return UserProfile(pseudo, age, gender, bio)
+    }
+    
+    fun saveUserProfile(profile: UserProfile) {
+        sharedPreferences.edit().apply {
+            putString("user_pseudo", profile.pseudo)
+            if (profile.age != null) {
+                putInt("user_age", profile.age)
+            } else {
+                putInt("user_age", -1)
+            }
+            putInt("user_gender", profile.gender.ordinal)
+            putString("user_bio", profile.bio)
+            apply()
+        }
+        _userProfile.value = profile
+    }
+    
+    private fun getUserContext(): String {
+        val profile = _userProfile.value
+        if (profile.pseudo.isEmpty()) return ""
+        
+        val parts = mutableListOf<String>()
+        parts.add("L'utilisateur s'appelle ${profile.pseudo}")
+        
+        if (profile.gender != Gender.NOT_SPECIFIED) {
+            parts.add("Genre: ${profile.gender.displayName}")
+            if (profile.gender.pronoun.isNotEmpty()) {
+                parts.add("Pronom: ${profile.gender.pronoun}")
+            }
+        }
+        
+        if (profile.age != null) {
+            parts.add("Âge: ${profile.age} ans")
+        }
+        
+        if (profile.bio.isNotBlank()) {
+            parts.add("Bio: ${profile.bio}")
+        }
+        
+        return parts.joinToString(". ") + "."
     }
     
     fun selectCharacter(character: Character) {
@@ -101,10 +158,18 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         
         viewModelScope.launch {
             try {
-                val systemPrompt = if (_isNSFWMode.value) {
+                val baseSystemPrompt = if (_isNSFWMode.value) {
                     character.systemPromptNSFW
                 } else {
                     character.systemPromptSFW
+                }
+                
+                // Ajouter contexte utilisateur au prompt
+                val userContext = getUserContext()
+                val systemPrompt = if (userContext.isNotEmpty()) {
+                    "$baseSystemPrompt\n\n[CONTEXTE UTILISATEUR]\n$userContext\nUtilise ces informations pour personnaliser tes réponses."
+                } else {
+                    baseSystemPrompt
                 }
                 
                 // Build conversation history

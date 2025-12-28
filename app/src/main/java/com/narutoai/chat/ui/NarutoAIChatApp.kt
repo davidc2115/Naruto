@@ -8,16 +8,17 @@ import com.narutoai.chat.ui.screens.ChatScreen
 import com.narutoai.chat.ui.screens.SettingsScreen
 import com.narutoai.chat.viewmodel.ChatViewModel
 
-enum class Screen {
-    CHARACTER_SELECTION,
-    CHARACTER_DETAIL,
-    CHAT,
-    SETTINGS
+sealed class Screen {
+    object CHARACTER_SELECTION : Screen()
+    object CHARACTER_DETAIL : Screen()
+    object CHAT : Screen()
+    object SETTINGS : Screen()
+    object USER_PROFILE : Screen()
 }
 
 @Composable
 fun NarutoAIChatApp(viewModel: ChatViewModel) {
-    var currentScreen by remember { mutableStateOf(Screen.CHARACTER_SELECTION) }
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.CHARACTER_SELECTION) }
     var characterForDetail by remember { mutableStateOf<Character?>(null) }
     val selectedCharacter = viewModel.selectedCharacter.value
     
@@ -30,6 +31,9 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 },
                 onSettingsClick = {
                     currentScreen = Screen.SETTINGS
+                },
+                onUserProfileClick = {
+                    currentScreen = Screen.USER_PROFILE
                 },
                 viewModel = viewModel
             )
@@ -69,6 +73,19 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
             SettingsScreen(
                 viewModel = viewModel,
                 onBackClick = {
+                    currentScreen = Screen.CHARACTER_SELECTION
+                }
+            )
+        }
+        
+        Screen.USER_PROFILE -> {
+            UserProfileScreen(
+                currentProfile = viewModel.userProfile.value,
+                onBackClick = {
+                    currentScreen = Screen.CHARACTER_SELECTION
+                },
+                onSaveProfile = { profile ->
+                    viewModel.saveUserProfile(profile)
                     currentScreen = Screen.CHARACTER_SELECTION
                 }
             )

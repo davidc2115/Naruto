@@ -87,23 +87,6 @@ object Characters {
             "drawable://narutonsfw14.jpg",
             "drawable://narutonsfw15.jpg"
         ),
-        galleryNSFW = listOf(
-            "drawable://narutonsfw1.jpg",
-            "drawable://narutonsfw2.jpg",
-            "drawable://narutonsfw3.jpg",
-            "drawable://narutonsfw4.jpg",
-            "drawable://narutonsfw5.jpg",
-            "drawable://narutonsfw6.jpg",
-            "drawable://narutonsfw7.jpg",
-            "drawable://narutonsfw8.jpg",
-            "drawable://narutonsfw9.jpg",
-            "drawable://narutonsfw10.jpg",
-            "drawable://narutonsfw11.jpg",
-            "drawable://narutonsfw12.jpg",
-            "drawable://narutonsfw13.jpg",
-            "drawable://narutonsfw14.jpg",
-            "drawable://narutonsfw15.jpg"
-        ),
         
         systemPromptSFW = """Tu es Naruto Uzumaki, ninja de 18-22 ans de Konoha.
 
@@ -251,13 +234,6 @@ RESTE énergique mais montre plus d'émotions et de vulnérabilité."""
             "drawable://sasukensfw14.jpg",
             "drawable://sasukensfw15.jpg"
         ),
-        galleryNSFW = listOf(
-            "drawable://sasukensfw1.jpg",
-            "drawable://sasukensfw2.jpg",
-            "drawable://sasukensfw3.jpg",
-            "drawable://sasukensfw4.jpg",
-            "drawable://sasukensfw5.jpg"
-        ),
         systemPromptSFW = """Tu es Sasuke Uchiha, ninja de 18-22 ans de Konoha.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -388,23 +364,6 @@ RESTE distant mais montre des micro-fissures dans ton masque."""
             "drawable://sakuragallery8.jpg",
             "drawable://sakuragallery9.jpg",
             "drawable://sakuragallery10.jpg"
-        ),
-        galleryNSFW = listOf(
-            "drawable://sakuransfw1.jpg",
-            "drawable://sakuransfw2.jpg",
-            "drawable://sakuransfw3.jpg",
-            "drawable://sakuransfw4.jpg",
-            "drawable://sakuransfw5.jpg",
-            "drawable://sakuransfw6.jpg",
-            "drawable://sakuransfw7.jpg",
-            "drawable://sakuransfw8.jpg",
-            "drawable://sakuransfw9.jpg",
-            "drawable://sakuransfw10.jpg",
-            "drawable://sakuransfw11.jpg",
-            "drawable://sakuransfw12.jpg",
-            "drawable://sakuransfw13.jpg",
-            "drawable://sakuransfw14.jpg",
-            "drawable://sakuransfw15.jpg"
         ),
         galleryNSFW = listOf(
             "drawable://sakuransfw1.jpg",

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,6 +29,7 @@ import com.narutoai.chat.models.CharacterCategory
 fun CharacterSelectionScreen(
     onCharacterSelected: (Character) -> Unit,
     onSettingsClick: () -> Unit = {},
+    onUserProfileClick: () -> Unit = {},
     viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var selectedCategory by remember { mutableStateOf<CharacterCategory?>(null) }
@@ -50,6 +52,9 @@ fun CharacterSelectionScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onUserProfileClick) {
+                        Icon(Icons.Default.Person, "Mon Profil")
+                    }
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, "Paramètres")
                     }
