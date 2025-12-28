@@ -11,8 +11,8 @@ android {
         applicationId = "com.narutoai.chat"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 24
+        versionName = "2.14.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -95,6 +95,9 @@ dependencies {
     
     // Coil pour images
     implementation("io.coil-kt:coil-compose:2.5.0")
+    
+    // Gson pour sérialisation
+    implementation("com.google.code.gson:gson:2.10.1")
     
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")

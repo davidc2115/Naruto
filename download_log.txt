@@ -1,0 +1,137 @@
+🖼️  Téléchargement et optimisation des 130 images...
+⚡ En parallèle pour accélérer...
+
+✓ naruto_2 (68KB)
+✓ naruto_5 (93KB)
+✓ naruto_1 (80KB)
+✓ naruto_3 (91KB)
+✓ naruto_4 (86KB)
+✓ naruto_7 (91KB)
+✓ naruto_9 (93KB)
+✓ naruto_6 (84KB)
+✓ naruto_8 (83KB)
+✓ naruto_10 (81KB)
+✓ sasuke_1 (63KB)
+✓ sasuke_2 (58KB)
+✓ sasuke_3 (59KB)
+✓ sasuke_5 (86KB)
+✓ sasuke_4 (57KB)
+✓ sasuke_6 (65KB)
+✓ sasuke_7 (81KB)
+✓ sasuke_8 (56KB)
+✗ sasuke_9: The read operation timed out
+✗ sasuke_10: The read operation timed out
+✗ sakura_1: The read operation timed out
+✗ sakura_2: The read operation timed out
+✗ sakura_3: The read operation timed out
+✗ sakura_4: The read operation timed out
+✗ sakura_5: The read operation timed out
+✗ sakura_6: The read operation timed out
+✗ sakura_7: The read operation timed out
+✗ sakura_8: The read operation timed out
+✗ sakura_9: The read operation timed out
+✗ sakura_10: The read operation timed out
+✗ kakashi_1: The read operation timed out
+✗ kakashi_2: The read operation timed out
+✗ kakashi_3: The read operation timed out
+✗ kakashi_4: The read operation timed out
+✗ kakashi_5: The read operation timed out
+✗ kakashi_6: The read operation timed out
+✗ kakashi_7: The read operation timed out
+✗ kakashi_8: The read operation timed out
+✗ kakashi_10: HTTP Error 502: Bad Gateway
+✗ hinata_1: HTTP Error 502: Bad Gateway
+✗ kakashi_9: HTTP Error 502: Bad Gateway
+✗ hinata_3: HTTP Error 502: Bad Gateway
+✗ hinata_4: HTTP Error 502: Bad Gateway
+✓ hinata_6 (74KB)
+✗ hinata_2: HTTP Error 502: Bad Gateway
+✗ hinata_5: HTTP Error 502: Bad Gateway
+✓ hinata_7 (74KB)
+✗ hinata_9: HTTP Error 502: Bad Gateway
+✓ hinata_10 (73KB)
+✓ itachi_1 (66KB)
+✓ hinata_8 (78KB)
+✗ itachi_2: HTTP Error 502: Bad Gateway
+✗ itachi_3: HTTP Error 502: Bad Gateway
+✗ itachi_4: HTTP Error 502: Bad Gateway
+✗ itachi_5: HTTP Error 502: Bad Gateway
+✗ itachi_7: HTTP Error 502: Bad Gateway
+✗ itachi_9: HTTP Error 502: Bad Gateway
+✗ itachi_6: HTTP Error 502: Bad Gateway
+✗ bradPitt_1: HTTP Error 502: Bad Gateway
+✗ itachi_10: HTTP Error 502: Bad Gateway
+✗ itachi_8: HTTP Error 502: Bad Gateway
+✗ bradPitt_2: HTTP Error 502: Bad Gateway
+✗ bradPitt_3: HTTP Error 502: Bad Gateway
+✗ bradPitt_4: HTTP Error 502: Bad Gateway
+✗ bradPitt_5: HTTP Error 502: Bad Gateway
+✗ bradPitt_6: HTTP Error 502: Bad Gateway
+✗ bradPitt_8: HTTP Error 502: Bad Gateway
+✗ bradPitt_7: HTTP Error 502: Bad Gateway
+✗ bradPitt_10: HTTP Error 502: Bad Gateway
+✗ bradPitt_9: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_1: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_2: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_4: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_3: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_5: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_6: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_7: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_9: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_8: HTTP Error 502: Bad Gateway
+✗ leoDiCaprio_10: HTTP Error 502: Bad Gateway
+✗ theRock_1: HTTP Error 502: Bad Gateway
+✗ theRock_2: HTTP Error 502: Bad Gateway
+✗ theRock_4: HTTP Error 502: Bad Gateway
+✗ theRock_3: HTTP Error 502: Bad Gateway
+✗ theRock_6: HTTP Error 502: Bad Gateway
+✗ theRock_5: HTTP Error 502: Bad Gateway
+✗ theRock_7: HTTP Error 502: Bad Gateway
+✗ theRock_9: HTTP Error 502: Bad Gateway
+✗ theRock_8: HTTP Error 502: Bad Gateway
+✗ theRock_10: HTTP Error 502: Bad Gateway
+✗ scarlett_1: HTTP Error 502: Bad Gateway
+✗ scarlett_2: HTTP Error 502: Bad Gateway
+✗ scarlett_4: HTTP Error 502: Bad Gateway
+✗ scarlett_3: HTTP Error 502: Bad Gateway
+✗ scarlett_5: HTTP Error 502: Bad Gateway
+✗ scarlett_6: HTTP Error 502: Bad Gateway
+✗ scarlett_7: HTTP Error 502: Bad Gateway
+✗ scarlett_9: HTTP Error 502: Bad Gateway
+✗ scarlett_8: HTTP Error 502: Bad Gateway
+✗ scarlett_10: HTTP Error 502: Bad Gateway
+✗ margot_1: HTTP Error 502: Bad Gateway
+✗ margot_2: HTTP Error 502: Bad Gateway
+✗ margot_3: HTTP Error 502: Bad Gateway
+✗ margot_4: HTTP Error 502: Bad Gateway
+✗ margot_6: HTTP Error 502: Bad Gateway
+✗ margot_5: HTTP Error 502: Bad Gateway
+✗ margot_7: HTTP Error 502: Bad Gateway
+✗ margot_8: HTTP Error 502: Bad Gateway
+✗ margot_9: HTTP Error 502: Bad Gateway
+✗ emma_1: HTTP Error 502: Bad Gateway
+✗ margot_10: HTTP Error 502: Bad Gateway
+✗ emma_2: HTTP Error 502: Bad Gateway
+✗ emma_3: HTTP Error 502: Bad Gateway
+✗ emma_4: HTTP Error 502: Bad Gateway
+✗ emma_5: HTTP Error 502: Bad Gateway
+✗ emma_6: HTTP Error 502: Bad Gateway
+✗ emma_7: HTTP Error 502: Bad Gateway
+✗ emma_9: HTTP Error 502: Bad Gateway
+✗ emma_8: HTTP Error 502: Bad Gateway
+✗ zendaya_1: HTTP Error 502: Bad Gateway
+✗ zendaya_2: HTTP Error 502: Bad Gateway
+✗ emma_10: HTTP Error 502: Bad Gateway
+✗ zendaya_4: HTTP Error 502: Bad Gateway
+✗ zendaya_3: HTTP Error 502: Bad Gateway
+✗ zendaya_5: HTTP Error 502: Bad Gateway
+✗ zendaya_6: HTTP Error 502: Bad Gateway
+✗ zendaya_7: HTTP Error 502: Bad Gateway
+✗ zendaya_8: HTTP Error 502: Bad Gateway
+✗ zendaya_9: HTTP Error 502: Bad Gateway
+✗ zendaya_10: HTTP Error 502: Bad Gateway
+
+✅ 23/130 images téléchargées
+❌ 107 échecs
+📦 Taille totale: 1.7 MB

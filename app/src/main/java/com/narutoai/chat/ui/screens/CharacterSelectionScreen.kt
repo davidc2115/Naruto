@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +27,10 @@ import com.narutoai.chat.models.CharacterCategory
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterSelectionScreen(
-    onCharacterSelected: (Character) -> Unit
+    onCharacterSelected: (Character) -> Unit,
+    onSettingsClick: () -> Unit = {},
+    onUserProfileClick: () -> Unit = {},
+    viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var selectedCategory by remember { mutableStateOf<CharacterCategory?>(null) }
     
@@ -44,6 +50,14 @@ fun CharacterSelectionScreen(
                         text = "Naruto AI Chat",
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = onUserProfileClick) {
+                        Icon(Icons.Default.Person, "Mon Profil")
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, "Paramètres")
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -95,7 +109,8 @@ fun CharacterSelectionScreen(
                 items(characters) { character ->
                     CharacterCard(
                         character = character,
-                        onClick = { onCharacterSelected(character) }
+                        onClick = { onCharacterSelected(character) },
+                        viewModel = viewModel
                     )
                 }
             }
@@ -135,8 +150,20 @@ fun CategoryChip(
 @Composable
 fun CharacterCard(
     character: Character,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
+    var thumbnailUrl by remember { mutableStateOf(character.thumbnailUrl) }
+    
+    // DÉSACTIVÉ: Les vignettes sont maintenant des images locales (R.drawable.xxx)
+    // Plus besoin de générer dynamiquement
+    // LaunchedEffect(character.id) {
+    //     if (thumbnailUrl.isEmpty() && character.physicalDescription.isNotEmpty() && viewModel != null) {
+    //         viewModel.generateCharacterThumbnail(character) { url ->
+    //             thumbnailUrl = url
+    //         }
+    //     }
+    // }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,9 +177,13 @@ fun CharacterCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar avec image locale
+            // Avatar avec vignette Pollination AI ou image locale
             AsyncImage(
-                model = if (character.imageResId != 0) character.imageResId else character.avatarEmoji,
+                model = when {
+                    thumbnailUrl.isNotEmpty() -> thumbnailUrl
+                    character.imageResId != 0 -> character.imageResId
+                    else -> character.avatarEmoji
+                },
                 contentDescription = character.name,
                 modifier = Modifier
                     .size(80.dp)
@@ -191,6 +222,36 @@ fun CharacterCard(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+                
+                // Galerie d'images (aperçu 3 premières images)
+                if (character.gallery.isNotEmpty()) {
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    androidx.compose.foundation.lazy.LazyRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(character.gallery.take(3)) { imageUri ->
+                            val imageModel = if (imageUri.startsWith("drawable://")) {
+                                // Extraire le nom du fichier (sans .jpg)
+                                val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
+                                // Construire l'ID de ressource dynamiquement
+                                val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                                if (resId != 0) resId else imageUri
+                            } else {
+                                imageUri
+                            }
+                            
+                            AsyncImage(
+                                model = imageModel,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }

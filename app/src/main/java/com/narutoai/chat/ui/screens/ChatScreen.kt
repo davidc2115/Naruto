@@ -47,8 +47,11 @@ fun ChatScreen(
     val isNSFWMode by viewModel.isNSFWMode
     val isLoading by viewModel.isLoading
     val error by viewModel.error
+    val isGeneratingImage by viewModel.isGeneratingImage
+    val isGeneratingVideo by viewModel.isGeneratingVideo
     
     var inputText by remember { mutableStateOf("") }
+    var showMediaMenu by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -93,6 +96,53 @@ fun ChatScreen(
                     }
                 },
                 actions = {
+                    // Bouton nouvelle conversation
+                    IconButton(onClick = {
+                        viewModel.startNewConversation()
+                    }) {
+                        Icon(Icons.Default.Refresh, "Nouvelle conversation")
+                    }
+                    
+                    // Bouton génération de média
+                    IconButton(onClick = { showMediaMenu = !showMediaMenu }) {
+                        Icon(Icons.Default.PhotoLibrary, "Générer image/vidéo")
+                    }
+                    DropdownMenu(
+                        expanded = showMediaMenu,
+                        onDismissRequest = { showMediaMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("📸 Générer Image") },
+                            onClick = {
+                                showMediaMenu = false
+                                viewModel.generateImageFromConversation()
+                            },
+                            leadingIcon = {
+                                if (isGeneratingImage) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                } else {
+                                    Icon(Icons.Default.Image, null)
+                                }
+                            },
+                            enabled = !isGeneratingImage && !isGeneratingVideo
+                        )
+                        DropdownMenuItem(
+                            text = { Text("🎬 Générer Vidéo") },
+                            onClick = {
+                                showMediaMenu = false
+                                viewModel.generateVideoFromConversation()
+                            },
+                            leadingIcon = {
+                                if (isGeneratingVideo) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                } else {
+                                    Icon(Icons.Default.VideoLibrary, null)
+                                }
+                            },
+                            enabled = !isGeneratingImage && !isGeneratingVideo
+                        )
+                    }
+                    
                     IconButton(
                         onClick = { viewModel.toggleNSFWMode() }
                     ) {
@@ -320,30 +370,100 @@ fun MessageBubble(message: ChatMessage, character: Character) {
             },
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            Row(
+            Column(
                 modifier = Modifier.padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (!message.isUser) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (!message.isUser) {
+                        Text(
+                            text = character.avatarEmoji,
+                            fontSize = 20.sp
+                        )
+                    }
+                    
                     Text(
-                        text = character.avatarEmoji,
-                        fontSize = 20.sp
+                        text = if (message.isUser) {
+                            AnnotatedString(message.content)
+                        } else {
+                            formatRoleplayText(message.content)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (message.isUser) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        }
                     )
                 }
                 
-                Text(
-                    text = if (message.isUser) {
-                        AnnotatedString(message.content)
-                    } else {
-                        formatRoleplayText(message.content)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (message.isUser) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSecondaryContainer
+                // Afficher l'image générée si présente
+                message.imageUrl?.let { imageUrl ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 200.dp, max = 300.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        AsyncImage(
+                            model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                                .data(imageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Image générée",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            placeholder = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                            error = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.errorContainer)
+                        )
                     }
-                )
+                }
+                
+                // Afficher la vidéo générée si présente
+                message.videoUrl?.let { videoUrl ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        // Afficher l'aperçu (image si c'est Pollination AI)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 150.dp, max = 200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            AsyncImage(
+                                model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                                    .data(videoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Vidéo générée",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                placeholder = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.primaryContainer),
+                                error = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.errorContainer)
+                            )
+                        }
+                        
+                        // Bouton pour ouvrir le lien
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        androidx.compose.material3.TextButton(
+                            onClick = {
+                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(videoUrl))
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Ouvrir dans le navigateur", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
             }
         }
     }
