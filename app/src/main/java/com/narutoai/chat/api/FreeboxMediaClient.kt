@@ -20,7 +20,7 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
     companion object {
         private const val FREEBOX_URL = "http://88.174.155.230:7860"
         private const val PING_TIMEOUT = 3000L // 3s pour ping
-        private const val GENERATION_TIMEOUT = 60000L // 60s pour génération
+        private const val GENERATION_TIMEOUT = 120000L // 120s pour génération (augmenté pour CPU)
     }
     
     private val pingClient = OkHttpClient.Builder()
@@ -55,7 +55,8 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
     
     /**
      * Génère une image via Stable Diffusion WebUI sur Freebox
-     * Fallback automatique sur Pollination AI si Freebox inaccessible
+     * PRIORITÉ 1: Freebox SD WebUI (local, illimité, sans censure)
+     * PRIORITÉ 2 (Fallback): Pollination AI (si Freebox inaccessible)
      */
     suspend fun generateImage(
         prompt: String,
@@ -67,11 +68,17 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
         isNSFW: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
+            // PRIORITÉ 1: Essayer Freebox en premier
+            android.util.Log.d("FreeboxMedia", "🎯 PRIORITÉ 1: Tentative génération via Freebox SD WebUI...")
+            
             // Vérifier disponibilité Freebox
             if (!isAvailable()) {
-                android.util.Log.w("FreeboxMedia", "Freebox non accessible, utilisation Pollination AI fallback")
+                android.util.Log.w("FreeboxMedia", "⚠️ Freebox non accessible (timeout 3s)")
+                android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI")
                 return@withContext pollinationFallback.generateImage(prompt, width, height, enhance = true)
             }
+            
+            android.util.Log.d("FreeboxMedia", "✅ Freebox accessible! Génération locale en cours...")
             
             // Construire requête Stable Diffusion
             val requestBody = JSONObject().apply {
@@ -115,23 +122,26 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
                 // Extraire base64 de la première image
                 val base64Image = imagesArray.getString(0)
                 
-                // Uploader sur service temporaire ou retourner data URL
+                // Retourner data URL (Freebox source)
                 val imageUrl = "data:image/png;base64,$base64Image"
                 
-                android.util.Log.d("FreeboxMedia", "✓ Image générée (${base64Image.length} chars)")
+                android.util.Log.d("FreeboxMedia", "✅ Image générée via FREEBOX (${base64Image.length / 1024}KB)")
+                android.util.Log.d("FreeboxMedia", "📍 Source: Freebox Stable Diffusion (local)")
                 Result.success(imageUrl)
             }
             
         } catch (e: Exception) {
-            android.util.Log.e("FreeboxMedia", "Erreur Freebox: ${e.message}, fallback Pollination AI")
-            // Fallback sur Pollination AI
+            android.util.Log.e("FreeboxMedia", "❌ Erreur Freebox: ${e.message}")
+            android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI")
+            // FALLBACK automatique sur Pollination AI
             pollinationFallback.generateImage(prompt, width, height, enhance = true)
         }
     }
     
     /**
      * Génère une "vidéo" (GIF animé) via img2img sur Freebox
-     * Fallback automatique sur Pollination AI
+     * PRIORITÉ 1: Freebox SD WebUI (local, illimité, sans censure)
+     * PRIORITÉ 2 (Fallback): Pollination AI
      */
     suspend fun generateVideo(
         prompt: String,
@@ -141,9 +151,13 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
         isNSFW: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
+            // PRIORITÉ 1: Essayer Freebox en premier
+            android.util.Log.d("FreeboxMedia", "🎯 PRIORITÉ 1: Tentative génération vidéo via Freebox...")
+            
             // Vérifier disponibilité
             if (!isAvailable()) {
-                android.util.Log.w("FreeboxMedia", "Freebox non accessible, utilisation Pollination AI fallback")
+                android.util.Log.w("FreeboxMedia", "⚠️ Freebox non accessible")
+                android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI pour GIF")
                 // Pollination AI génère GIF via paramètre &nologo=true&motion=true
                 return@withContext pollinationFallback.generateImage(
                     prompt = "$prompt, animated gif, motion blur, dynamic",
@@ -153,12 +167,15 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
                 )
             }
             
+            android.util.Log.d("FreeboxMedia", "✅ Freebox accessible! Génération vidéo locale...")
+            
             // Pour l'instant, générer une image simple
             // TODO: Implémenter vraie génération vidéo/GIF avec AnimateDiff
             generateImage(prompt, negativePrompt, width, height, isNSFW = isNSFW)
             
         } catch (e: Exception) {
-            android.util.Log.e("FreeboxMedia", "Erreur vidéo Freebox: ${e.message}")
+            android.util.Log.e("FreeboxMedia", "❌ Erreur vidéo Freebox: ${e.message}")
+            android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI")
             pollinationFallback.generateImage(
                 prompt = "$prompt, animated style",
                 width = width,
