@@ -213,7 +213,20 @@ fun CharacterProfileScreen(
                         val imageUri = currentGallery[index]
                         val imageModel = if (imageUri.startsWith("drawable://")) {
                             val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
-                            val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                            // Essayer d'abord avec le type "drawable"
+                            var resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                            
+                            // Si pas trouvé, essayer avec reflection sur R.drawable
+                            if (resId == 0) {
+                                try {
+                                    val rDrawable = Class.forName("${context.packageName}.R\$drawable")
+                                    val field = rDrawable.getField(fileName)
+                                    resId = field.getInt(null)
+                                } catch (e: Exception) {
+                                    android.util.Log.e("CharacterProfile", "Failed to load $fileName: ${e.message}")
+                                }
+                            }
+                            
                             android.util.Log.d("CharacterProfile", "Loading NSFW: $fileName -> resId=$resId")
                             if (resId != 0) resId else imageUri
                         } else {
@@ -296,7 +309,20 @@ fun CharacterProfileScreen(
                 val imageUri = currentGallery[index]
                 val imageModel = if (imageUri.startsWith("drawable://")) {
                     val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
-                    val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                    // Essayer d'abord avec le type "drawable"
+                    var resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                    
+                    // Si pas trouvé, essayer avec reflection sur R.drawable
+                    if (resId == 0) {
+                        try {
+                            val rDrawable = Class.forName("${context.packageName}.R\$drawable")
+                            val field = rDrawable.getField(fileName)
+                            resId = field.getInt(null)
+                        } catch (e: Exception) {
+                            android.util.Log.e("CharacterProfile", "Failed to load fullscreen $fileName: ${e.message}")
+                        }
+                    }
+                    
                     if (resId != 0) resId else imageUri
                 } else {
                     imageUri
