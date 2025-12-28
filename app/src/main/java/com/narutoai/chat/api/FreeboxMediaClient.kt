@@ -131,16 +131,4 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
             )
         }
     }
-    
-    /**
-     * Génère une vidéo via ComfyUI (pour l'instant, génère une image)
-     * TODO: Implémenter AnimateDiff pour vraies vidéos
-     */
-    suspend fun generateVideo(
-        prompt: String,
-        negativePrompt: String = "low quality, blurry",
-        width: Int = 512,
-        height: Int = 512,
-        isNSFW: Boolean = false
-    ): Result<String> = generateImage(prompt, negativePrompt, width, height, isNSFW = isNSFW)
 }
