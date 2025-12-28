@@ -201,15 +201,21 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 
                 // Créer un prompt d'image avec Groq
+                val nsfwContext = if (_isNSFWMode.value) {
+                    "\n\nIMPORTANT: Generate an EXPLICIT NSFW/adult/erotic scene. Include nudity, sensual poses, intimate details, sexual content if contextually appropriate."
+                } else {
+                    ""
+                }
+                
                 val promptRequest = """
                     Based on this conversation with ${character.name}:
                     $context
                     
                     Physical description of ${character.name}:
-                    ${character.physicalDescription}
+                    ${character.physicalDescription}$nsfwContext
                     
-                    Create a detailed prompt in ENGLISH (max 75 words) for generating a hyper-realistic image of this scene.
-                    Include: character's physical features, setting, mood, lighting, and action.
+                    Create a detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of this scene.
+                    Include: character's physical features, setting, mood, lighting, and action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 
