@@ -394,49 +394,20 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                 
                 // Afficher l'image générée si présente
                 message.imageUrl?.let { imageUrl ->
-                    coil.compose.SubcomposeAsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Image générée",
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 200.dp, max = 300.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentScale = ContentScale.Crop,
-                        loading = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        },
-                        error = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.errorContainer),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Default.ImageNotSupported,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(48.dp)
-                                    )
-                                    Text(
-                                        "Erreur chargement",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            }
-                        }
-                    )
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        AsyncImage(
+                            model = imageUrl,
+                            contentDescription = "Image générée",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
                 
                 // Afficher la vidéo générée si présente
@@ -446,39 +417,20 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         // Afficher l'aperçu (image si c'est Pollination AI)
-                        coil.compose.SubcomposeAsyncImage(
-                            model = videoUrl,
-                            contentDescription = "Vidéo générée",
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(min = 150.dp, max = 200.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentScale = ContentScale.Crop,
-                            loading = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            },
-                            error = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.errorContainer),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        Icons.Default.ImageNotSupported,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                }
-                            }
-                        )
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            AsyncImage(
+                                model = videoUrl,
+                                contentDescription = "Vidéo générée",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                         
                         // Bouton pour ouvrir le lien
                         val context = androidx.compose.ui.platform.LocalContext.current
