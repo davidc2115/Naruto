@@ -95,7 +95,7 @@ systemPromptNSFW = """Tu es [Personnage], 18 ans (adulte), ...
 
 ### Status: ❌ NON INSTALLÉ
 
-**URL Cible:** `http://88.174.155.230:7860`  
+**URL Cible:** `http://88.174.155.230:33437`  
 **Status Actuel:** Inaccessible (timeout connexion)
 
 ### Option 1: Installer SD WebUI sur Freebox (Recommandé pour production)
@@ -122,14 +122,14 @@ ssh -p 33000 root@88.174.155.230
 cd /root
 git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 cd stable-diffusion-webui
-./webui.sh --listen --port 7860
+./webui.sh --listen --port 33437
 
 # 3. Créer service systemd
 sudo systemctl enable sd-webui
 sudo systemctl start sd-webui
 
 # 4. Vérifier
-curl http://88.174.155.230:7860
+curl http://88.174.155.230:33437
 ```
 
 ### Option 2: Continuer avec Pollination AI uniquement
@@ -180,10 +180,10 @@ python3 generate_nsfw_all_characters.py
 
 ```bash
 # Ping simple
-curl -I http://88.174.155.230:7860
+curl -I http://88.174.155.230:33437
 
 # Test génération
-curl -X POST http://88.174.155.230:7860/sdapi/v1/txt2img \
+curl -X POST http://88.174.155.230:33437/sdapi/v1/txt2img \
   -H "Content-Type: application/json" \
   -d '{"prompt": "test", "steps": 10, "width": 512, "height": 512}'
 ```

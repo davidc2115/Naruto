@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
     
     companion object {
-        private const val FREEBOX_URL = "http://88.174.155.230:7860"
+        private const val FREEBOX_URL = "http://88.174.155.230:33437"
         private const val PING_TIMEOUT = 3000L // 3s pour ping
         private const val GENERATION_TIMEOUT = 120000L // 120s pour génération (augmenté pour CPU)
     }

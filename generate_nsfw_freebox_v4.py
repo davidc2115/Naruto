@@ -11,7 +11,7 @@ import os
 import base64
 import json
 
-FREEBOX_URL = "http://88.174.155.230:7860"
+FREEBOX_URL = "http://88.174.155.230:33437"
 OUTPUT_DIR = "/workspace/app/src/main/res/drawable-nodpi"
 
 # Définir personnages avec descriptions ULTRA DÉTAILLÉES

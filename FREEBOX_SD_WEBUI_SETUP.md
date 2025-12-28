@@ -2,11 +2,11 @@
 
 ## ⚠️ STATUS ACTUEL
 
-**Freebox SD WebUI** n'est actuellement **PAS accessible** à `http://88.174.155.230:7860`
+**Freebox SD WebUI** n'est actuellement **PAS accessible** à `http://88.174.155.230:33437`
 
 Cela peut être dû à :
 - Service non démarré sur la Freebox
-- Port 7860 fermé/bloqué
+- Port 33437 fermé/bloqué
 - Installation manquante
 
 ---
@@ -64,7 +64,7 @@ cat > webui-user.sh << 'EOF'
 #!/bin/bash
 
 # Configuration Freebox (CPU ARM/x86)
-export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --no-half --precision full --medvram --opt-sub-quad-attention"
+export COMMANDLINE_ARGS="--listen --port 33437 --skip-torch-cuda-test --no-half --precision full --medvram --opt-sub-quad-attention"
 
 # Si très peu de RAM (< 2GB)
 # export COMMANDLINE_ARGS="$COMMANDLINE_ARGS --lowvram --always-batch-cond-uncond"
@@ -98,14 +98,14 @@ cd ../..
 
 **Première exécution** : Téléchargement de ~4GB de dépendances (10-30 min)
 
-### Étape 7: Ouvrir le Port 7860
+### Étape 7: Ouvrir le Port 33437
 
 ```bash
 # Vérifier si le service est actif
-netstat -tulpn | grep 7860
+netstat -tulpn | grep 33437
 
 # Autoriser port dans firewall (si nécessaire)
-iptables -A INPUT -p tcp --dport 7860 -j ACCEPT
+iptables -A INPUT -p tcp --dport 33437 -j ACCEPT
 ```
 
 ### Étape 8: Créer Service Systemd (Démarrage Auto)
@@ -144,19 +144,19 @@ systemctl status sd-webui
 ### Test 1: Accès Local (depuis Freebox)
 
 ```bash
-curl http://localhost:7860
+curl http://localhost:33437
 ```
 
 ### Test 2: Accès Externe (depuis votre PC)
 
 ```bash
-curl http://88.174.155.230:7860
+curl http://88.174.155.230:33437
 ```
 
 ### Test 3: Génération d'Image
 
 ```bash
-curl -X POST http://88.174.155.230:7860/sdapi/v1/txt2img \
+curl -X POST http://88.174.155.230:33437/sdapi/v1/txt2img \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "a beautiful landscape, mountains, sunset, 8k",
@@ -183,13 +183,13 @@ python3 /workspace/generate_nsfw_freebox_v4.py
 Dans `webui-user.sh` :
 
 ```bash
-export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --no-half --precision full --lowvram --medvram --opt-sub-quad-attention --xformers"
+export COMMANDLINE_ARGS="--listen --port 33437 --skip-torch-cuda-test --no-half --precision full --lowvram --medvram --opt-sub-quad-attention --xformers"
 ```
 
 ### Pour Freebox avec 4GB+ RAM
 
 ```bash
-export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --no-half --precision full --medvram --opt-sub-quad-attention"
+export COMMANDLINE_ARGS="--listen --port 33437 --skip-torch-cuda-test --no-half --precision full --medvram --opt-sub-quad-attention"
 ```
 
 ### Modèles Recommandés par Taille
@@ -240,7 +240,7 @@ Pour accélérer :
 - Réduire résolution (768 → 512)
 - Utiliser modèle plus léger
 
-### Port 7860 Bloqué
+### Port 33437 Bloqué
 
 ```bash
 # Changer port dans webui-user.sh
@@ -285,11 +285,11 @@ $ systemctl status sd-webui
    Active: active (running)
 
 # Port ouvert
-$ netstat -tulpn | grep 7860
-tcp  0.0.0.0:7860  LISTEN  12345/python3
+$ netstat -tulpn | grep 33437
+tcp  0.0.0.0:33437  LISTEN  12345/python3
 
 # API accessible
-$ curl http://88.174.155.230:7860
+$ curl http://88.174.155.230:33437
 <html>...</html>
 ```
 
@@ -313,7 +313,7 @@ python3 generate_nsfw_freebox_v4.py
 Si problèmes persistent :
 
 1. Vérifier logs : `journalctl -u sd-webui -n 100`
-2. Tester localement : `curl http://localhost:7860`
+2. Tester localement : `curl http://localhost:33437`
 3. Vérifier RAM : `free -h`
 4. Vérifier espace : `df -h`
 

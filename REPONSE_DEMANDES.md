@@ -12,7 +12,7 @@
 
 **Vérification effectuée:**
 ```bash
-curl http://88.174.155.230:7860
+curl http://88.174.155.230:33437
 → TIMEOUT (pas de réponse après 5 secondes)
 ```
 
