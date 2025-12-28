@@ -57,6 +57,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val imageClient = ImageGenerationClient(application.applicationContext)
     private val videoClient = VideoGenerationClient(application.applicationContext)
     private val pollinationAIClient = PollinationAIClient()
+    private val freeboxMediaClient = com.narutoai.chat.api.FreeboxMediaClient(pollinationAIClient)
     
     init {
         viewModelScope.launch {
@@ -339,17 +340,20 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         return@launch
                     }
                 
-                // Utiliser UNIQUEMENT Pollination AI (Freebox retirée)
+                // Utiliser Freebox (fallback automatique sur Pollination AI si inaccessible)
                 // Délai pour éviter rate limit après Groq
-                kotlinx.coroutines.delay(5000)
+                kotlinx.coroutines.delay(2000)
                 
                 val style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic"
                 
-                // Générer avec Pollination AI
-                val result = pollinationAIClient.generateImage(
+                // Générer avec Freebox (fallback Pollination AI intégré)
+                val result = freeboxMediaClient.generateImage(
                     prompt = imagePrompt,
-                    model = if (style == "anime") "flux" else "flux-realism",
-                    enhance = true
+                    width = 768,
+                    height = 768,
+                    steps = 25,
+                    cfgScale = 7.5,
+                    isNSFW = _isNSFWMode.value
                 )
                 
                 result.fold(
@@ -358,8 +362,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         _isGeneratingImage.value = false
                         
                         // Remplacer le message de statut par l'image AVEC URL
+                        val source = if (imageUrl.startsWith("data:image")) "Freebox" else "Pollination AI"
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ Image générée avec succès (Pollination AI)",
+                            content = "✅ Image générée avec succès ($source)",
                             isUser = false,
                             imageUrl = imageUrl // AJOUT: Inclure l'URL de l'image
                         )
@@ -449,26 +454,26 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         return@launch
                     }
                 
-                // Utiliser UNIQUEMENT Pollination AI (Freebox retirée)
+                // Utiliser Freebox (fallback automatique sur Pollination AI si inaccessible)
                 // Délai pour éviter rate limit après Groq
-                kotlinx.coroutines.delay(5000)
+                kotlinx.coroutines.delay(2000)
                 
-                // Générer une frame avec Pollination AI (pas de vraie vidéo)
-                val result = pollinationAIClient.generateImage(
+                // Générer une vidéo/GIF animé avec Freebox (fallback Pollination AI intégré)
+                val result = freeboxMediaClient.generateVideo(
                     prompt = "$videoPrompt, animated, cinematic movement, dynamic scene",
-                    model = "flux",
-                    enhance = true
-                ).map { url ->
-                    url // Une seule frame animée comme "vidéo"
-                }
+                    width = 512,
+                    height = 512,
+                    isNSFW = _isNSFWMode.value
+                )
                 
                 result.fold(
                     onSuccess = { videoUrl ->
                         _generatedVideoUrl.value = videoUrl
                         _isGeneratingVideo.value = false
                         
+                        val source = if (videoUrl.startsWith("data:image")) "Freebox" else "Pollination AI"
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ Image animée générée (Pollination AI)",
+                            content = "✅ Vidéo/animation générée ($source)",
                             isUser = false,
                             videoUrl = videoUrl // AJOUT: Inclure l'URL de la vidéo
                         )
