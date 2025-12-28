@@ -52,12 +52,12 @@ class PollinationAIClient {
         enhance: Boolean = true
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            // Delay TRÈS LONG pour éviter rate limit 429/500 (augmenté à 10s)
-            delay(10000)
+            // Délai minimal pour éviter spam (2s au lieu de 10s pour meilleure UX)
+            delay(2000)
             
             // Retry avec backoff exponentiel pour gérer 500/502/503
             var lastException: Exception? = null
-            val maxRetries = 5 // Augmenté à 5 tentatives
+            val maxRetries = 5 // 5 tentatives avec backoff long
             
             for (attempt in 1..maxRetries) {
                 try {
@@ -83,15 +83,23 @@ class PollinationAIClient {
                         append("&seed=${System.currentTimeMillis()}")
                     }
                     
-                    // Vérifier que l'image est accessible avec timeout étendu
+                    // Vérifier que l'image est accessible (GET complet pour vraiment télécharger)
                     val request = Request.Builder()
                         .url(imageUrl)
-                        .head() // Juste vérifier, pas télécharger
+                        .get() // GET complet au lieu de HEAD
                         .build()
                     
                     client.newCall(request).execute().use { response ->
                         when (response.code) {
-                            200 -> return@withContext Result.success(imageUrl)
+                            200 -> {
+                                // Vérifier que le body n'est pas vide
+                                val contentLength = response.body?.contentLength() ?: 0
+                                if (contentLength > 1000) { // Au moins 1KB
+                                    return@withContext Result.success(imageUrl)
+                                } else {
+                                    throw IOException("Image trop petite ou invalide")
+                                }
+                            }
                             429 -> {
                                 // Rate limit - attendre TRÈS longtemps
                                 if (attempt < maxRetries) {

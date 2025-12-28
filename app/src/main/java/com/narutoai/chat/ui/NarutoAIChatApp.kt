@@ -44,11 +44,12 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
             characterForDetail?.let { character ->
                 CharacterProfileScreen(
                     character = character,
+                    hasSavedConversation = viewModel.hasSavedConversation(character.id),
                     onBackClick = {
                         currentScreen = Screen.CHARACTER_SELECTION
                     },
-                    onStartChat = {
-                        viewModel.selectCharacter(character)
+                    onStartChat = { loadSaved ->
+                        viewModel.selectCharacter(character, loadSaved)
                         currentScreen = Screen.CHAT
                     }
                 )

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
     
     private val sharedPreferences = application.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+    private val conversationManager = com.narutoai.chat.data.ConversationManager(application.applicationContext)
     
     private val _userProfile = mutableStateOf(loadUserProfile())
     val userProfile: State<UserProfile> = _userProfile
@@ -113,24 +114,59 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         return parts.joinToString(". ") + "."
     }
     
-    fun selectCharacter(character: Character) {
+    fun selectCharacter(character: Character, loadSaved: Boolean = true) {
         _selectedCharacter.value = character
-        _messages.value = emptyList()
-        _isNSFWMode.value = false
         _error.value = null
         
-        // Ajouter message d'accueil automatique si disponible
-        if (character.greetingMessage.isNotEmpty()) {
-            viewModelScope.launch {
-                // Petit délai pour effet naturel
-                kotlinx.coroutines.delay(500)
-                val greetingMsg = ChatMessage(
-                    content = character.greetingMessage,
-                    isUser = false
-                )
-                _messages.value = listOf(greetingMsg)
+        // Charger conversation sauvegardée si demandé
+        if (loadSaved && conversationManager.hasConversation(character.id)) {
+            val savedMessages = conversationManager.loadConversation(character.id)
+            val savedNSFW = conversationManager.getIsNSFW(character.id)
+            
+            _messages.value = savedMessages ?: emptyList()
+            _isNSFWMode.value = savedNSFW
+        } else {
+            // Nouvelle conversation
+            _messages.value = emptyList()
+            _isNSFWMode.value = false
+            
+            // Ajouter message d'accueil automatique si disponible
+            if (character.greetingMessage.isNotEmpty()) {
+                viewModelScope.launch {
+                    kotlinx.coroutines.delay(500)
+                    val greetingMsg = ChatMessage(
+                        content = character.greetingMessage,
+                        isUser = false
+                    )
+                    _messages.value = listOf(greetingMsg)
+                }
             }
         }
+    }
+    
+    fun hasSavedConversation(characterId: String): Boolean {
+        return conversationManager.hasConversation(characterId)
+    }
+    
+    fun startNewConversation() {
+        val character = _selectedCharacter.value ?: return
+        
+        // Supprimer l'ancienne conversation
+        conversationManager.deleteConversation(character.id)
+        
+        // Réinitialiser
+        selectCharacter(character, loadSaved = false)
+    }
+    
+    fun saveCurrentConversation() {
+        val character = _selectedCharacter.value ?: return
+        if (_messages.value.isEmpty()) return
+        
+        conversationManager.saveConversation(
+            characterId = character.id,
+            messages = _messages.value,
+            isNSFW = _isNSFWMode.value
+        )
     }
     
     fun toggleNSFWMode() {
@@ -192,6 +228,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         )
                         _messages.value = _messages.value + aiMessage
                         _isLoading.value = false
+                        
+                        // Sauvegarder automatiquement après chaque message
+                        saveCurrentConversation()
                     },
                     onFailure = { exception ->
                         _error.value = exception.message ?: "Unknown error"

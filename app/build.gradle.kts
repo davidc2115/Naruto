@@ -96,6 +96,9 @@ dependencies {
     // Coil pour images
     implementation("io.coil-kt:coil-compose:2.5.0")
     
+    // Gson pour sérialisation
+    implementation("com.google.code.gson:gson:2.10.1")
+    
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     

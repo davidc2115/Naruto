@@ -96,6 +96,13 @@ fun ChatScreen(
                     }
                 },
                 actions = {
+                    // Bouton nouvelle conversation
+                    IconButton(onClick = {
+                        viewModel.startNewConversation()
+                    }) {
+                        Icon(Icons.Default.Refresh, "Nouvelle conversation")
+                    }
+                    
                     // Bouton génération de média
                     IconButton(onClick = { showMediaMenu = !showMediaMenu }) {
                         Icon(Icons.Default.PhotoLibrary, "Générer image/vidéo")

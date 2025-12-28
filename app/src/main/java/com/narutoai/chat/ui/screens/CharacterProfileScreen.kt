@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material3.*
@@ -34,7 +35,8 @@ import com.narutoai.chat.models.Character
 fun CharacterProfileScreen(
     character: Character,
     onBackClick: () -> Unit,
-    onStartChat: () -> Unit
+    onStartChat: (loadSaved: Boolean) -> Unit,
+    hasSavedConversation: Boolean = false
 ) {
     var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
     var showNSFW by remember { mutableStateOf(false) }
@@ -212,6 +214,7 @@ fun CharacterProfileScreen(
                         val imageModel = if (imageUri.startsWith("drawable://")) {
                             val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
                             val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
+                            android.util.Log.d("CharacterProfile", "Loading NSFW: $fileName -> resId=$resId")
                             if (resId != 0) resId else imageUri
                         } else {
                             imageUri
@@ -230,21 +233,47 @@ fun CharacterProfileScreen(
                 }
             }
             
-            // Bouton commencer conversation
-            Button(
-                onClick = onStartChat,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Chat,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Commencer la conversation", style = MaterialTheme.typography.titleMedium)
+            // Boutons conversation
+            if (hasSavedConversation) {
+                // Si une conversation existe, proposer reprendre ou nouvelle
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { onStartChat(true) },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(Icons.Default.Chat, null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Reprendre", style = MaterialTheme.typography.titleSmall)
+                    }
+                    
+                    OutlinedButton(
+                        onClick = { onStartChat(false) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.Add, null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Nouveau", style = MaterialTheme.typography.titleSmall)
+                    }
+                }
+            } else {
+                // Pas de conversation sauvegardée, juste commencer
+                Button(
+                    onClick = { onStartChat(false) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(Icons.Default.Chat, null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Commencer la conversation", style = MaterialTheme.typography.titleMedium)
+                }
             }
         }
     }
