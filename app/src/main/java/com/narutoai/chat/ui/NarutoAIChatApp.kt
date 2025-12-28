@@ -2,7 +2,7 @@ package com.narutoai.chat.ui
 
 import androidx.compose.runtime.*
 import com.narutoai.chat.models.Character
-import com.narutoai.chat.ui.screens.CharacterDetailScreen
+import com.narutoai.chat.ui.screens.CharacterProfileScreen
 import com.narutoai.chat.ui.screens.CharacterSelectionScreen
 import com.narutoai.chat.ui.screens.ChatScreen
 import com.narutoai.chat.ui.screens.SettingsScreen
@@ -37,7 +37,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
         
         Screen.CHARACTER_DETAIL -> {
             characterForDetail?.let { character ->
-                CharacterDetailScreen(
+                CharacterProfileScreen(
                     character = character,
                     onBackClick = {
                         currentScreen = Screen.CHARACTER_SELECTION
@@ -45,14 +45,6 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     onStartChat = {
                         viewModel.selectCharacter(character)
                         currentScreen = Screen.CHAT
-                    },
-                    onGenerateGallery = {
-                        // Générer galerie avec Pollination AI - 10 images
-                        viewModel.generateCharacterGallery(character, count = 10) { images ->
-                            // Mettre à jour le personnage avec la galerie
-                            // Note: Dans une vraie app, il faudrait mettre à jour la base de données
-                            characterForDetail = character.copy(gallery = images)
-                        }
                     }
                 )
             }

@@ -47,7 +47,9 @@ data class ChatMessage(
     val id: String = java.util.UUID.randomUUID().toString(),
     val content: String,
     val isUser: Boolean,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val imageUrl: String? = null, // URL de l'image générée
+    val videoUrl: String? = null  // URL de la vidéo générée
 )
 
 data class ChatSession(

@@ -270,10 +270,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         _isGeneratingImage.value = false
                         
                         val source = if (usePollination) "Pollination AI" else "Freebox"
-                        // Remplacer le message de statut par l'image
+                        // Remplacer le message de statut par l'image AVEC URL
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
                             content = "✅ Image générée avec succès ($source)",
-                            isUser = false
+                            isUser = false,
+                            imageUrl = imageUrl // AJOUT: Inclure l'URL de l'image
                         )
                     },
                     onFailure = { exception ->
@@ -401,8 +402,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         
                         val source = if (usePollination) "Pollination AI" else "Freebox"
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ ${if (usePollination) "Image animée" else "Vidéo"} générée ($source):\n$videoUrl",
-                            isUser = false
+                            content = "✅ ${if (usePollination) "Image animée" else "Vidéo"} générée ($source)",
+                            isUser = false,
+                            videoUrl = videoUrl // AJOUT: Inclure l'URL de la vidéo
                         )
                     },
                     onFailure = { exception ->

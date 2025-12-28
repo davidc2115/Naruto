@@ -908,7 +908,7 @@ GARDE ton côté cool et humble."""
         description = "L'acteur oscarisé passionné",
         category = CharacterCategory.CELEBRITY_MALE,
         avatarEmoji = "🌊",
-        imageResId = R.drawable.leo,
+        imageResId = R.drawable.leonardo,
         personality = listOf("passionné", "engagé", "talentueux", "intense"),
         
         physicalDescription = """Homme de 49 ans au charisme puissant, cheveux blonds dorés, yeux bleus intenses et expressifs. Visage qui a conservé une certaine jeunesse malgré l'âge, mâchoire carrée, traits masculins marqués. Physique robuste, légèrement plus costaud qu'à ses débuts. Style élégant et soigné. Regard perçant qui captive. Présence imposante de star confirmée. Expression souvent sérieuse quand il parle d'écologie.""",

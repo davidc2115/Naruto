@@ -363,30 +363,80 @@ fun MessageBubble(message: ChatMessage, character: Character) {
             },
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            Row(
+            Column(
                 modifier = Modifier.padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (!message.isUser) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (!message.isUser) {
+                        Text(
+                            text = character.avatarEmoji,
+                            fontSize = 20.sp
+                        )
+                    }
+                    
                     Text(
-                        text = character.avatarEmoji,
-                        fontSize = 20.sp
+                        text = if (message.isUser) {
+                            AnnotatedString(message.content)
+                        } else {
+                            formatRoleplayText(message.content)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (message.isUser) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        }
                     )
                 }
                 
-                Text(
-                    text = if (message.isUser) {
-                        AnnotatedString(message.content)
-                    } else {
-                        formatRoleplayText(message.content)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (message.isUser) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSecondaryContainer
+                // Afficher l'image générée si présente
+                message.imageUrl?.let { imageUrl ->
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Image générée",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                
+                // Afficher la vidéo générée si présente
+                message.videoUrl?.let { videoUrl ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        // Afficher l'aperçu (image si c'est Pollination AI)
+                        AsyncImage(
+                            model = videoUrl,
+                            contentDescription = "Vidéo générée",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 200.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                        
+                        // Bouton pour ouvrir le lien
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        androidx.compose.material3.TextButton(
+                            onClick = {
+                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(videoUrl))
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Ouvrir dans le navigateur", style = MaterialTheme.typography.bodySmall)
+                        }
                     }
-                )
+                }
             }
         }
     }
