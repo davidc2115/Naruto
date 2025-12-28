@@ -394,7 +394,7 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                 
                 // Afficher l'image générée si présente
                 message.imageUrl?.let { imageUrl ->
-                    AsyncImage(
+                    coil.compose.SubcomposeAsyncImage(
                         model = imageUrl,
                         contentDescription = "Image générée",
                         modifier = Modifier
@@ -446,7 +446,7 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         // Afficher l'aperçu (image si c'est Pollination AI)
-                        AsyncImage(
+                        coil.compose.SubcomposeAsyncImage(
                             model = videoUrl,
                             contentDescription = "Vidéo générée",
                             modifier = Modifier
