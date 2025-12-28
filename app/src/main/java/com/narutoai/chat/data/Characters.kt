@@ -87,6 +87,23 @@ object Characters {
             "drawable://narutonsfw14.jpg",
             "drawable://narutonsfw15.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://narutonsfw1.jpg",
+            "drawable://narutonsfw2.jpg",
+            "drawable://narutonsfw3.jpg",
+            "drawable://narutonsfw4.jpg",
+            "drawable://narutonsfw5.jpg",
+            "drawable://narutonsfw6.jpg",
+            "drawable://narutonsfw7.jpg",
+            "drawable://narutonsfw8.jpg",
+            "drawable://narutonsfw9.jpg",
+            "drawable://narutonsfw10.jpg",
+            "drawable://narutonsfw11.jpg",
+            "drawable://narutonsfw12.jpg",
+            "drawable://narutonsfw13.jpg",
+            "drawable://narutonsfw14.jpg",
+            "drawable://narutonsfw15.jpg"
+        ),
         
         systemPromptSFW = """Tu es Naruto Uzumaki, ninja de 18-22 ans de Konoha.
 
@@ -216,6 +233,23 @@ RESTE énergique mais montre plus d'émotions et de vulnérabilité."""
             "drawable://sasukegallery8.jpg",
             "drawable://sasukegallery9.jpg",
             "drawable://sasukegallery10.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://sasukensfw1.jpg",
+            "drawable://sasukensfw2.jpg",
+            "drawable://sasukensfw3.jpg",
+            "drawable://sasukensfw4.jpg",
+            "drawable://sasukensfw5.jpg",
+            "drawable://sasukensfw6.jpg",
+            "drawable://sasukensfw7.jpg",
+            "drawable://sasukensfw8.jpg",
+            "drawable://sasukensfw9.jpg",
+            "drawable://sasukensfw10.jpg",
+            "drawable://sasukensfw11.jpg",
+            "drawable://sasukensfw12.jpg",
+            "drawable://sasukensfw13.jpg",
+            "drawable://sasukensfw14.jpg",
+            "drawable://sasukensfw15.jpg"
         ),
         galleryNSFW = listOf(
             "drawable://sasukensfw1.jpg",
@@ -355,6 +389,40 @@ RESTE distant mais montre des micro-fissures dans ton masque."""
             "drawable://sakuragallery9.jpg",
             "drawable://sakuragallery10.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://sakuransfw1.jpg",
+            "drawable://sakuransfw2.jpg",
+            "drawable://sakuransfw3.jpg",
+            "drawable://sakuransfw4.jpg",
+            "drawable://sakuransfw5.jpg",
+            "drawable://sakuransfw6.jpg",
+            "drawable://sakuransfw7.jpg",
+            "drawable://sakuransfw8.jpg",
+            "drawable://sakuransfw9.jpg",
+            "drawable://sakuransfw10.jpg",
+            "drawable://sakuransfw11.jpg",
+            "drawable://sakuransfw12.jpg",
+            "drawable://sakuransfw13.jpg",
+            "drawable://sakuransfw14.jpg",
+            "drawable://sakuransfw15.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://sakuransfw1.jpg",
+            "drawable://sakuransfw2.jpg",
+            "drawable://sakuransfw3.jpg",
+            "drawable://sakuransfw4.jpg",
+            "drawable://sakuransfw5.jpg",
+            "drawable://sakuransfw6.jpg",
+            "drawable://sakuransfw7.jpg",
+            "drawable://sakuransfw8.jpg",
+            "drawable://sakuransfw9.jpg",
+            "drawable://sakuransfw10.jpg",
+            "drawable://sakuransfw11.jpg",
+            "drawable://sakuransfw12.jpg",
+            "drawable://sakuransfw13.jpg",
+            "drawable://sakuransfw14.jpg",
+            "drawable://sakuransfw15.jpg"
+        ),
         systemPromptSFW = """Tu es Sakura Haruno, kunoichi de 18-22 ans de Konoha.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -482,6 +550,23 @@ GARDE ton caractère fort mais montre plus de vulnérabilité émotionnelle."""
             "drawable://kakashigallery8.jpg",
             "drawable://kakashigallery9.jpg",
             "drawable://kakashigallery10.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://kakashinsfw1.jpg",
+            "drawable://kakashinsfw2.jpg",
+            "drawable://kakashinsfw3.jpg",
+            "drawable://kakashinsfw4.jpg",
+            "drawable://kakashinsfw5.jpg",
+            "drawable://kakashinsfw6.jpg",
+            "drawable://kakashinsfw7.jpg",
+            "drawable://kakashinsfw8.jpg",
+            "drawable://kakashinsfw9.jpg",
+            "drawable://kakashinsfw10.jpg",
+            "drawable://kakashinsfw11.jpg",
+            "drawable://kakashinsfw12.jpg",
+            "drawable://kakashinsfw13.jpg",
+            "drawable://kakashinsfw14.jpg",
+            "drawable://kakashinsfw15.jpg"
         ),
         systemPromptSFW = """Tu es Kakashi Hatake, jonin de 26 ans de Konoha.
 
@@ -611,6 +696,23 @@ GARDE ton mystère mais sois plus engagé émotionnellement."""
             "drawable://hinatagallery8.jpg",
             "drawable://hinatagallery9.jpg",
             "drawable://hinatagallery10.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://hinatansfw1.jpg",
+            "drawable://hinatansfw2.jpg",
+            "drawable://hinatansfw3.jpg",
+            "drawable://hinatansfw4.jpg",
+            "drawable://hinatansfw5.jpg",
+            "drawable://hinatansfw6.jpg",
+            "drawable://hinatansfw7.jpg",
+            "drawable://hinatansfw8.jpg",
+            "drawable://hinatansfw9.jpg",
+            "drawable://hinatansfw10.jpg",
+            "drawable://hinatansfw11.jpg",
+            "drawable://hinatansfw12.jpg",
+            "drawable://hinatansfw13.jpg",
+            "drawable://hinatansfw14.jpg",
+            "drawable://hinatansfw15.jpg"
         ),
         systemPromptSFW = """Tu es Hinata Hyuga, kunoichi de 18-22 ans de Konoha.
 
@@ -746,6 +848,23 @@ RESTE TRÈS timide et douce, même plus qu'en SFW."""
             "drawable://itachigallery9.jpg",
             "drawable://itachigallery10.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://itachinsfw1.jpg",
+            "drawable://itachinsfw2.jpg",
+            "drawable://itachinsfw3.jpg",
+            "drawable://itachinsfw4.jpg",
+            "drawable://itachinsfw5.jpg",
+            "drawable://itachinsfw6.jpg",
+            "drawable://itachinsfw7.jpg",
+            "drawable://itachinsfw8.jpg",
+            "drawable://itachinsfw9.jpg",
+            "drawable://itachinsfw10.jpg",
+            "drawable://itachinsfw11.jpg",
+            "drawable://itachinsfw12.jpg",
+            "drawable://itachinsfw13.jpg",
+            "drawable://itachinsfw14.jpg",
+            "drawable://itachinsfw15.jpg"
+        ),
         systemPromptSFW = """Tu es Itachi Uchiha, 21 ans, membre de l'Akatsuki.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -875,6 +994,23 @@ RESTE calme mais montre ta douleur intérieure."""
             "drawable://bradgallery9.jpg",
             "drawable://bradgallery10.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://bradnsfw1.jpg",
+            "drawable://bradnsfw2.jpg",
+            "drawable://bradnsfw3.jpg",
+            "drawable://bradnsfw4.jpg",
+            "drawable://bradnsfw5.jpg",
+            "drawable://bradnsfw6.jpg",
+            "drawable://bradnsfw7.jpg",
+            "drawable://bradnsfw8.jpg",
+            "drawable://bradnsfw9.jpg",
+            "drawable://bradnsfw10.jpg",
+            "drawable://bradnsfw11.jpg",
+            "drawable://bradnsfw12.jpg",
+            "drawable://bradnsfw13.jpg",
+            "drawable://bradnsfw14.jpg",
+            "drawable://bradnsfw15.jpg"
+        ),
         systemPromptSFW = """Tu es Brad Pitt, acteur et producteur de 60 ans.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -1000,6 +1136,23 @@ GARDE ton côté cool et humble."""
             "drawable://leonardogallery8.jpg",
             "drawable://leonardogallery9.jpg",
             "drawable://leonardogallery10.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://leonardonsfw1.jpg",
+            "drawable://leonardonsfw2.jpg",
+            "drawable://leonardonsfw3.jpg",
+            "drawable://leonardonsfw4.jpg",
+            "drawable://leonardonsfw5.jpg",
+            "drawable://leonardonsfw6.jpg",
+            "drawable://leonardonsfw7.jpg",
+            "drawable://leonardonsfw8.jpg",
+            "drawable://leonardonsfw9.jpg",
+            "drawable://leonardonsfw10.jpg",
+            "drawable://leonardonsfw11.jpg",
+            "drawable://leonardonsfw12.jpg",
+            "drawable://leonardonsfw13.jpg",
+            "drawable://leonardonsfw14.jpg",
+            "drawable://leonardonsfw15.jpg"
         ),
         systemPromptSFW = """Tu es Leonardo DiCaprio, acteur et activiste de 49 ans.
 
@@ -1131,6 +1284,23 @@ GARDE ton intensité et ta passion."""
             "drawable://rockgallery9.jpg",
             "drawable://rockgallery10.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://rocknsfw1.jpg",
+            "drawable://rocknsfw2.jpg",
+            "drawable://rocknsfw3.jpg",
+            "drawable://rocknsfw4.jpg",
+            "drawable://rocknsfw5.jpg",
+            "drawable://rocknsfw6.jpg",
+            "drawable://rocknsfw7.jpg",
+            "drawable://rocknsfw8.jpg",
+            "drawable://rocknsfw9.jpg",
+            "drawable://rocknsfw10.jpg",
+            "drawable://rocknsfw11.jpg",
+            "drawable://rocknsfw12.jpg",
+            "drawable://rocknsfw13.jpg",
+            "drawable://rocknsfw14.jpg",
+            "drawable://rocknsfw15.jpg"
+        ),
         systemPromptSFW = """Tu es Dwayne 'The Rock' Johnson, 51 ans, acteur et ancien catcheur.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -1261,6 +1431,23 @@ GARDE ton énergie positive et motivante."""
             "drawable://scarlettgallery9.jpg",
             "drawable://scarlettgallery10.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://scarlettnsfw1.jpg",
+            "drawable://scarlettnsfw2.jpg",
+            "drawable://scarlettnsfw3.jpg",
+            "drawable://scarlettnsfw4.jpg",
+            "drawable://scarlettnsfw5.jpg",
+            "drawable://scarlettnsfw6.jpg",
+            "drawable://scarlettnsfw7.jpg",
+            "drawable://scarlettnsfw8.jpg",
+            "drawable://scarlettnsfw9.jpg",
+            "drawable://scarlettnsfw10.jpg",
+            "drawable://scarlettnsfw11.jpg",
+            "drawable://scarlettnsfw12.jpg",
+            "drawable://scarlettnsfw13.jpg",
+            "drawable://scarlettnsfw14.jpg",
+            "drawable://scarlettnsfw15.jpg"
+        ),
         systemPromptSFW = """Tu es Scarlett Johansson, actrice de 39 ans.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -1386,6 +1573,23 @@ GARDE ton intelligence et ta classe."""
             "drawable://margotgallery8.jpg",
             "drawable://margotgallery9.jpg",
             "drawable://margotgallery10.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://margotnsfw1.jpg",
+            "drawable://margotnsfw2.jpg",
+            "drawable://margotnsfw3.jpg",
+            "drawable://margotnsfw4.jpg",
+            "drawable://margotnsfw5.jpg",
+            "drawable://margotnsfw6.jpg",
+            "drawable://margotnsfw7.jpg",
+            "drawable://margotnsfw8.jpg",
+            "drawable://margotnsfw9.jpg",
+            "drawable://margotnsfw10.jpg",
+            "drawable://margotnsfw11.jpg",
+            "drawable://margotnsfw12.jpg",
+            "drawable://margotnsfw13.jpg",
+            "drawable://margotnsfw14.jpg",
+            "drawable://margotnsfw15.jpg"
         ),
         systemPromptSFW = """Tu es Margot Robbie, actrice et productrice de 34 ans.
 
@@ -1517,6 +1721,23 @@ GARDE ton côté fun et terre-à-terre."""
             "drawable://emmagallery9.jpg",
             "drawable://emmagallery10.jpg"
         ),
+        galleryNSFW = listOf(
+            "drawable://emmansfw1.jpg",
+            "drawable://emmansfw2.jpg",
+            "drawable://emmansfw3.jpg",
+            "drawable://emmansfw4.jpg",
+            "drawable://emmansfw5.jpg",
+            "drawable://emmansfw6.jpg",
+            "drawable://emmansfw7.jpg",
+            "drawable://emmansfw8.jpg",
+            "drawable://emmansfw9.jpg",
+            "drawable://emmansfw10.jpg",
+            "drawable://emmansfw11.jpg",
+            "drawable://emmansfw12.jpg",
+            "drawable://emmansfw13.jpg",
+            "drawable://emmansfw14.jpg",
+            "drawable://emmansfw15.jpg"
+        ),
         systemPromptSFW = """Tu es Emma Watson, actrice et activiste de 34 ans.
 
 IMPORTANT: RÉPONDS TOUJOURS EN FRANÇAIS, même si tu es un personnage anglophone.
@@ -1646,6 +1867,23 @@ GARDE ton élégance britannique et ton intelligence."""
             "drawable://zendayagallery8.jpg",
             "drawable://zendayagallery9.jpg",
             "drawable://zendayagallery10.jpg"
+        ),
+        galleryNSFW = listOf(
+            "drawable://zendayansfw1.jpg",
+            "drawable://zendayansfw2.jpg",
+            "drawable://zendayansfw3.jpg",
+            "drawable://zendayansfw4.jpg",
+            "drawable://zendayansfw5.jpg",
+            "drawable://zendayansfw6.jpg",
+            "drawable://zendayansfw7.jpg",
+            "drawable://zendayansfw8.jpg",
+            "drawable://zendayansfw9.jpg",
+            "drawable://zendayansfw10.jpg",
+            "drawable://zendayansfw11.jpg",
+            "drawable://zendayansfw12.jpg",
+            "drawable://zendayansfw13.jpg",
+            "drawable://zendayansfw14.jpg",
+            "drawable://zendayansfw15.jpg"
         ),
         systemPromptSFW = """Tu es Zendaya, actrice et icône de 28 ans.
 
