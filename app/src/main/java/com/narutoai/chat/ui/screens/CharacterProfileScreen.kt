@@ -37,6 +37,7 @@ fun CharacterProfileScreen(
     onStartChat: () -> Unit
 ) {
     var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
+    var showNSFW by remember { mutableStateOf(false) }
     val context = LocalContext.current
     
     Scaffold(
@@ -169,13 +170,35 @@ fun CharacterProfileScreen(
                 }
             }
             
-            // Galerie d'images
-            if (character.gallery.isNotEmpty()) {
-                Text(
-                    text = "📸 Galerie (${character.gallery.size} images)",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
+            // Galerie d'images avec toggle SFW/NSFW
+            val hasGallery = character.gallery.isNotEmpty()
+            val hasNSFWGallery = character.galleryNSFW.isNotEmpty()
+            
+            if (hasGallery || hasNSFWGallery) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val currentGallery = if (showNSFW && hasNSFWGallery) character.galleryNSFW else character.gallery
+                    val galleryLabel = if (showNSFW) "🔞 NSFW" else "📸 SFW"
+                    
+                    Text(
+                        text = "$galleryLabel Galerie (${currentGallery.size} images)",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    if (hasGallery && hasNSFWGallery) {
+                        TextButton(
+                            onClick = { showNSFW = !showNSFW }
+                        ) {
+                            Text(if (showNSFW) "Voir SFW" else "Voir NSFW 🔞")
+                        }
+                    }
+                }
+                
+                val currentGallery = if (showNSFW && hasNSFWGallery) character.galleryNSFW else character.gallery
                 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
@@ -184,8 +207,8 @@ fun CharacterProfileScreen(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(character.gallery.size) { index ->
-                        val imageUri = character.gallery[index]
+                    items(currentGallery.size) { index ->
+                        val imageUri = currentGallery[index]
                         val imageModel = if (imageUri.startsWith("drawable://")) {
                             val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
                             val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
@@ -228,6 +251,8 @@ fun CharacterProfileScreen(
     
     // Dialog plein écran pour image agrandie
     selectedImageIndex?.let { index ->
+        val currentGallery = if (showNSFW && character.galleryNSFW.isNotEmpty()) character.galleryNSFW else character.gallery
+        
         Dialog(
             onDismissRequest = { selectedImageIndex = null },
             properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -239,7 +264,7 @@ fun CharacterProfileScreen(
                     .clickable { selectedImageIndex = null },
                 contentAlignment = Alignment.Center
             ) {
-                val imageUri = character.gallery[index]
+                val imageUri = currentGallery[index]
                 val imageModel = if (imageUri.startsWith("drawable://")) {
                     val fileName = imageUri.removePrefix("drawable://").removeSuffix(".jpg")
                     val resId = context.resources.getIdentifier(fileName, "drawable", context.packageName)
@@ -272,7 +297,7 @@ fun CharacterProfileScreen(
                 
                 // Indicateur position
                 Text(
-                    text = "${index + 1} / ${character.gallery.size}",
+                    text = "${index + 1} / ${currentGallery.size}",
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)

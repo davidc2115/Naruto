@@ -30,7 +30,8 @@ data class Character(
     val dislikes: List<String> = emptyList(), // Ce qu'il/elle n'aime pas
     val skills: List<String> = emptyList(), // Compétences/capacités
     
-    val gallery: List<String> = emptyList(), // URLs des images de la galerie
+    val gallery: List<String> = emptyList(), // URLs des images de la galerie SFW
+    val galleryNSFW: List<String> = emptyList(), // URLs des images NSFW (sensuel/sexy/explicit)
     val thumbnailUrl: String = "", // URL de la vignette générée par Pollination
     
     // Message d'accueil au démarrage de la conversation
