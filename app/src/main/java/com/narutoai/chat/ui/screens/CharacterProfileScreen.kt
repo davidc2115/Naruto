@@ -127,16 +127,16 @@ fun CharacterProfileScreen(
                     )
                     
                     if (character.age.isNotEmpty()) {
-                        InfoRow(label = "Âge", value = character.age)
+                        CharacterInfoRow(label = "Âge", value = character.age)
                     }
                     if (character.height.isNotEmpty()) {
-                        InfoRow(label = "Taille", value = character.height)
+                        CharacterInfoRow(label = "Taille", value = character.height)
                     }
                     if (character.hairColor.isNotEmpty()) {
-                        InfoRow(label = "Cheveux", value = character.hairColor)
+                        CharacterInfoRow(label = "Cheveux", value = character.hairColor)
                     }
                     if (character.eyeColor.isNotEmpty()) {
-                        InfoRow(label = "Yeux", value = character.eyeColor)
+                        CharacterInfoRow(label = "Yeux", value = character.eyeColor)
                     }
                     
                     // Traits de personnalité
@@ -287,7 +287,7 @@ fun CharacterProfileScreen(
 }
 
 @Composable
-fun InfoRow(label: String, value: String) {
+fun CharacterInfoRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
