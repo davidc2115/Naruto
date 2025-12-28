@@ -104,15 +104,15 @@ class PollinationAIClient {
                                     )
                                 }
                             }
-                            502, 503, 504 -> {
-                                // Bad Gateway / Service Unavailable - retry
+                            500, 502, 503, 504 -> {
+                                // Internal Server Error / Bad Gateway / Service Unavailable - retry
                                 if (attempt < maxRetries) {
                                     delay(5000L * attempt) // 5s, 10s, 15s
                                     lastException = IOException("Erreur serveur ${response.code} (tentative $attempt/$maxRetries)")
                                     // Continue to next retry
                                 } else {
                                     return@withContext Result.failure(
-                                        IOException("❌ Erreur ${response.code} - Service Pollinations AI temporairement indisponible. Réessayez plus tard.")
+                                        IOException("❌ Erreur ${response.code} - Service Pollinations AI temporairement indisponible. Réessayez dans quelques minutes.")
                                     )
                                 }
                             }
