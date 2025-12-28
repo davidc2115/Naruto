@@ -218,7 +218,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     userMessage = text,
                     conversationHistory = history.dropLast(1), // Exclude the message we just added
                     temperature = if (_isNSFWMode.value) 0.9 else 0.8,
-                    maxTokens = 500
+                    maxTokens = 500,
+                    isNSFW = _isNSFWMode.value // IMPORTANT: Passer le flag NSFW
                 )
                 
                 result.fold(
@@ -325,7 +326,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 val promptResult = groqClient.chat(
                     systemPrompt = "You are an expert at creating detailed prompts for AI image generation. Focus on visual details, lighting, and atmosphere.",
                     userMessage = promptRequest,
-                    maxTokens = 150
+                    maxTokens = 150,
+                    isNSFW = _isNSFWMode.value // Permettre prompts NSFW
                 )
                 
                 val imagePrompt = promptResult.getOrNull()
@@ -439,7 +441,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 val promptResult = groqClient.chat(
                     systemPrompt = "You are an expert at creating cinematic video prompts with movement and action details.",
                     userMessage = promptRequest,
-                    maxTokens = 150
+                    maxTokens = 150,
+                    isNSFW = _isNSFWMode.value // Permettre prompts NSFW pour vidéos
                 )
                 
                 val videoPrompt = promptResult.getOrNull()
