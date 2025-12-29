@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.narutoai.chat.api.FreeboxMediaClient
+import com.narutoai.chat.api.ComfyUIClient
+import com.narutoai.chat.api.PollinationAIClient
+import com.narutoai.chat.api.StableHordeClient
 import com.narutoai.chat.utils.NotificationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -73,7 +75,7 @@ class ImageGenerationWorker(
             }
             
             result.fold(
-                onSuccess = { imageUrl ->
+                onSuccess = { imageUrl: String ->
                     // Notification de succès
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
@@ -85,7 +87,7 @@ class ImageGenerationWorker(
                     val outputData = workDataOf(KEY_RESULT_URL to imageUrl)
                     Result.success(outputData)
                 },
-                onFailure = { exception ->
+                onFailure = { exception: Throwable ->
                     // Notification d'erreur
                     NotificationHelper.showErrorNotification(
                         applicationContext,

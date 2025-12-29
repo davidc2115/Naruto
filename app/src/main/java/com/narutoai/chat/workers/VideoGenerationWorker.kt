@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.narutoai.chat.api.FreeboxMediaClient
+import com.narutoai.chat.api.PollinationAIClient
 import com.narutoai.chat.utils.NotificationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -64,7 +64,7 @@ class VideoGenerationWorker(
             )
             
             result.fold(
-                onSuccess = { videoUrl ->
+                onSuccess = { videoUrl: String ->
                     // Notification de succès
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
@@ -76,7 +76,7 @@ class VideoGenerationWorker(
                     val outputData = workDataOf(KEY_RESULT_URL to videoUrl)
                     Result.success(outputData)
                 },
-                onFailure = { exception ->
+                onFailure = { exception: Throwable ->
                     // Notification d'erreur
                     NotificationHelper.showErrorNotification(
                         applicationContext,
