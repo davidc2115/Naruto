@@ -3,6 +3,7 @@ package com.narutoai.chat.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,11 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.narutoai.chat.api.KeyStats
+import com.narutoai.chat.data.PreferencesManager
 import com.narutoai.chat.viewmodel.ChatViewModel
 import kotlinx.coroutines.launch
 
@@ -32,6 +35,11 @@ fun SettingsScreen(
     var keyStats by remember { mutableStateOf<List<KeyStats>>(emptyList()) }
     var testResult by remember { mutableStateOf<Pair<Boolean, String?>?>(null) }
     var showPassword by remember { mutableStateOf(false) }
+    
+    // Préférences pour API de génération
+    val context = LocalContext.current
+    val preferencesManager = remember { PreferencesManager(context) }
+    val selectedGenerationApi by preferencesManager.generationApi.collectAsState(initial = PreferencesManager.DEFAULT_API)
     
     val coroutineScope = rememberCoroutineScope()
     
@@ -157,6 +165,86 @@ fun SettingsScreen(
                             }
                         }
                     )
+                }
+            }
+            
+            // Section Génération d'images/vidéos
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Image, "API de génération")
+                            Text(
+                                text = "API de génération",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        Text(
+                            text = "Choisissez l'API pour générer images et vidéos. La génération se fera en arrière-plan avec notification.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
+                        )
+                        
+                        // Radio buttons pour choix d'API
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            ApiSelectionRow(
+                                title = "🏠 Freebox (local)",
+                                description = "Génération sur votre Freebox (plus lent mais privé)",
+                                selected = selectedGenerationApi == PreferencesManager.API_FREEBOX,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        preferencesManager.setGenerationApi(PreferencesManager.API_FREEBOX)
+                                    }
+                                }
+                            )
+                            
+                            ApiSelectionRow(
+                                title = "⚡ Stable Horde (recommandé)",
+                                description = "Gratuit, rapide, illimité, NSFW",
+                                selected = selectedGenerationApi == PreferencesManager.API_STABLE_HORDE,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        preferencesManager.setGenerationApi(PreferencesManager.API_STABLE_HORDE)
+                                    }
+                                }
+                            )
+                            
+                            ApiSelectionRow(
+                                title = "🌸 Pollination AI",
+                                description = "Rapide et simple, bonne qualité",
+                                selected = selectedGenerationApi == PreferencesManager.API_POLLINATION,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        preferencesManager.setGenerationApi(PreferencesManager.API_POLLINATION)
+                                    }
+                                }
+                            )
+                            
+                            ApiSelectionRow(
+                                title = "🔄 Auto (intelligent)",
+                                description = "Essaye Freebox → Stable Horde → Pollination",
+                                selected = selectedGenerationApi == PreferencesManager.API_AUTO,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        preferencesManager.setGenerationApi(PreferencesManager.API_AUTO)
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
             
@@ -376,5 +464,43 @@ fun InfoRow(label: String, value: String) {
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+@Composable
+fun ApiSelectionRow(
+    title: String,
+    description: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(
+                selected = selected,
+                onClick = onClick
+            )
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+        
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
     }
 }

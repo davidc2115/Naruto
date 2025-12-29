@@ -11,8 +11,8 @@ android {
         applicationId = "com.narutoai.chat"
         minSdk = 26
         targetSdk = 35
-        versionCode = 37
-        versionName = "2.25.0"
+        versionCode = 38
+        versionName = "2.26.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -85,6 +85,12 @@ dependencies {
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    
+    // WorkManager pour génération en arrière-plan
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    
+    // DataStore pour préférences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     
     // OkHttp pour API
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

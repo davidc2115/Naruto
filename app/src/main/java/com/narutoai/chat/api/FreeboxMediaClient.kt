@@ -39,7 +39,7 @@ class FreeboxMediaClient(
     
     /**
      * Génère une image selon l'API choisie par l'utilisateur
-     * v2.23.1: Désactive Freebox, utilise uniquement Stable Horde et Pollination (URLs)
+     * v2.26.0: Choix entre Freebox / Stable Horde / Pollination / Auto
      */
     suspend fun generateImage(
         prompt: String,
@@ -51,41 +51,78 @@ class FreeboxMediaClient(
         isNSFW: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            android.util.Log.d(TAG, "🎨 Génération image (Stable Horde → Pollination)")
+            android.util.Log.d(TAG, "🎨 Génération image (API: $preferredApi)")
             
-            // PRIORITÉ 1: Stable Horde (gratuit, illimité, URLs)
-            val stableHordeResult = stableHorde.generateImage(
-                prompt = prompt,
-                negativePrompt = negativePrompt,
-                width = width,
-                height = height,
-                steps = steps,
-                cfgScale = cfgScale,
-                nsfw = isNSFW
-            )
-            
-            if (stableHordeResult.isSuccess) {
-                android.util.Log.d(TAG, "✅ Image générée via Stable Horde")
-                return@withContext stableHordeResult
+            when (preferredApi) {
+                "freebox" -> {
+                    // FREEBOX uniquement
+                    android.util.Log.d(TAG, "🏠 Tentative Freebox")
+                    val result = comfyUIClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
+                    if (result.isSuccess) {
+                        android.util.Log.d(TAG, "✅ Image générée via Freebox")
+                    } else {
+                        android.util.Log.w(TAG, "⚠️ Freebox échoué: ${result.exceptionOrNull()?.message}")
+                    }
+                    result
+                }
+                
+                "stable_horde" -> {
+                    // STABLE HORDE uniquement
+                    android.util.Log.d(TAG, "⚡ Tentative Stable Horde")
+                    val result = stableHorde.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                    if (result.isSuccess) {
+                        android.util.Log.d(TAG, "✅ Image générée via Stable Horde")
+                    } else {
+                        android.util.Log.w(TAG, "⚠️ Stable Horde échoué: ${result.exceptionOrNull()?.message}")
+                    }
+                    result
+                }
+                
+                "pollination" -> {
+                    // POLLINATION uniquement
+                    android.util.Log.d(TAG, "🌸 Tentative Pollination AI")
+                    val result = pollinationClient.generateImage(prompt, width, height, enhance = true)
+                    if (result.isSuccess) {
+                        android.util.Log.d(TAG, "✅ Image générée via Pollination AI")
+                    } else {
+                        android.util.Log.w(TAG, "⚠️ Pollination échoué: ${result.exceptionOrNull()?.message}")
+                    }
+                    result
+                }
+                
+                else -> {
+                    // AUTO: Freebox → Stable Horde → Pollination
+                    android.util.Log.d(TAG, "🔄 Mode Auto (Freebox → Stable Horde → Pollination)")
+                    
+                    // Tentative 1: Freebox
+                    android.util.Log.d(TAG, "🏠 Tentative 1/3: Freebox")
+                    val freeboxResult = comfyUIClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
+                    if (freeboxResult.isSuccess) {
+                        android.util.Log.d(TAG, "✅ Image générée via Freebox")
+                        return@withContext freeboxResult
+                    }
+                    android.util.Log.w(TAG, "⚠️ Freebox échoué, essai Stable Horde...")
+                    
+                    // Tentative 2: Stable Horde
+                    android.util.Log.d(TAG, "⚡ Tentative 2/3: Stable Horde")
+                    val stableHordeResult = stableHorde.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                    if (stableHordeResult.isSuccess) {
+                        android.util.Log.d(TAG, "✅ Image générée via Stable Horde")
+                        return@withContext stableHordeResult
+                    }
+                    android.util.Log.w(TAG, "⚠️ Stable Horde échoué, essai Pollination...")
+                    
+                    // Tentative 3: Pollination AI
+                    android.util.Log.d(TAG, "🌸 Tentative 3/3: Pollination AI")
+                    val pollinationResult = pollinationClient.generateImage(prompt, width, height, enhance = true)
+                    if (pollinationResult.isSuccess) {
+                        android.util.Log.d(TAG, "✅ Image générée via Pollination AI")
+                    } else {
+                        android.util.Log.e(TAG, "❌ Toutes les APIs ont échoué")
+                    }
+                    pollinationResult
+                }
             }
-            
-            // FALLBACK: Pollination AI (URLs)
-            android.util.Log.w(TAG, "⚠️ Stable Horde échoué, fallback Pollination...")
-            val pollinationResult = pollinationClient.generateImage(
-                prompt = prompt,
-                width = width,
-                height = height,
-                enhance = true
-            )
-            
-            if (pollinationResult.isSuccess) {
-                android.util.Log.d(TAG, "✅ Image générée via Pollination AI")
-            } else {
-                android.util.Log.e(TAG, "❌ Toutes les APIs ont échoué")
-            }
-            
-            pollinationResult
-            
         } catch (e: Exception) {
             android.util.Log.e(TAG, "❌ Erreur génération: ${e.message}")
             Result.failure(e)

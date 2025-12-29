@@ -342,46 +342,58 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         return@launch
                     }
                 
-                // Utiliser Freebox (fallback automatique sur Pollination AI si inaccessible)
-                // Délai pour éviter rate limit après Groq
-                kotlinx.coroutines.delay(2000)
-                
-                val style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic"
-                
-                // Générer avec Freebox (fallback Pollination AI intégré)
-                // Paramètres optimisés pour vitesse sur ARM CPU
-                val result = freeboxMediaClient.generateImage(
-                    prompt = imagePrompt,
-                    width = 512, // Réduit pour vitesse
-                    height = 512, // Réduit pour vitesse
-                    steps = 12, // Réduit pour vitesse (12 au lieu de 25)
-                    cfgScale = 6.0, // Réduit pour vitesse
-                    isNSFW = _isNSFWMode.value
+                // Générer en arrière-plan avec notification
+                _messages.value = _messages.value.dropLast(1) + ChatMessage(
+                    content = "🔄 Génération en arrière-plan... Vous serez notifié quand c'est terminé.",
+                    isUser = false
                 )
+                _isGeneratingImage.value = false
                 
-                result.fold(
-                    onSuccess = { imageUrl ->
-                        _generatedImageUrl.value = imageUrl
-                        _isGeneratingImage.value = false
-                        
-                        // Remplacer le message de statut par l'image AVEC URL
-                        val source = if (imageUrl.startsWith("http")) "Cloud API" else "Local"
-                        _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ Image générée avec succès ($source)",
-                            isUser = false,
-                            imageUrl = imageUrl // AJOUT: Inclure l'URL de l'image
-                        )
-                    },
-                    onFailure = { exception ->
-                        val errorMsg = "❌ Erreur génération image: ${exception.message}\n\n💡 Conseil: Vérifiez votre connexion Internet."
-                        _error.value = errorMsg
-                        _isGeneratingImage.value = false
-                        _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = errorMsg,
-                            isUser = false
-                        )
+                // Récupérer l'API choisie
+                val selectedApi = preferencesManager.generationApi.first()
+                
+                // Créer Work Request pour génération en arrière-plan
+                val inputData = Data.Builder()
+                    .putString(ImageGenerationWorker.KEY_PROMPT, imagePrompt)
+                    .putString(ImageGenerationWorker.KEY_NEGATIVE_PROMPT, "low quality, blurry, distorted")
+                    .putInt(ImageGenerationWorker.KEY_WIDTH, 512)
+                    .putInt(ImageGenerationWorker.KEY_HEIGHT, 512)
+                    .putInt(ImageGenerationWorker.KEY_STEPS, 20)
+                    .putDouble(ImageGenerationWorker.KEY_CFG_SCALE, 7.0)
+                    .putBoolean(ImageGenerationWorker.KEY_IS_NSFW, _isNSFWMode.value)
+                    .putString(ImageGenerationWorker.KEY_PREFERRED_API, selectedApi)
+                    .build()
+                
+                val workRequest = OneTimeWorkRequestBuilder<ImageGenerationWorker>()
+                    .setInputData(inputData)
+                    .build()
+                
+                workManager.enqueue(workRequest)
+                
+                // Observer le résultat du Worker
+                workManager.getWorkInfoByIdLiveData(workRequest.id).observeForever { workInfo ->
+                    when (workInfo?.state) {
+                        WorkInfo.State.SUCCEEDED -> {
+                            val imageUrl = workInfo.outputData.getString(ImageGenerationWorker.KEY_RESULT_URL)
+                            if (imageUrl != null) {
+                                _generatedImageUrl.value = imageUrl
+                                _messages.value = _messages.value + ChatMessage(
+                                    content = "✅ Image générée avec succès !",
+                                    isUser = false,
+                                    imageUrl = imageUrl
+                                )
+                            }
+                        }
+                        WorkInfo.State.FAILED -> {
+                            val error = workInfo.outputData.getString(ImageGenerationWorker.KEY_ERROR)
+                            _messages.value = _messages.value + ChatMessage(
+                                content = "❌ Erreur génération: ${error ?: "Unknown error"}",
+                                isUser = false
+                            )
+                        }
+                        else -> { /* En cours */ }
                     }
-                )
+                }
             } catch (e: Exception) {
                 val errorMsg = "❌ Erreur: ${e.message}"
                 _error.value = errorMsg
