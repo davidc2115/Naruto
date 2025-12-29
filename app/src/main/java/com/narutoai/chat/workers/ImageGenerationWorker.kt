@@ -76,6 +76,8 @@ class ImageGenerationWorker(
             
             result.fold(
                 onSuccess = { imageUrl: String ->
+                    android.util.Log.d("ImageWorker", "✅ Image générée: ${imageUrl.take(100)}")
+                    
                     // Notification de succès
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
@@ -85,9 +87,12 @@ class ImageGenerationWorker(
                     )
                     
                     val outputData = workDataOf(KEY_RESULT_URL to imageUrl)
+                    android.util.Log.d("ImageWorker", "✅ Output data créé avec URL")
                     Result.success(outputData)
                 },
                 onFailure = { exception: Throwable ->
+                    android.util.Log.e("ImageWorker", "❌ Erreur: ${exception.message}", exception)
+                    
                     // Notification d'erreur
                     NotificationHelper.showErrorNotification(
                         applicationContext,

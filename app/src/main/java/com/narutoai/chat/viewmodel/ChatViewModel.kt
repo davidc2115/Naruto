@@ -380,28 +380,48 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 
                 workManager.enqueue(workRequest)
                 
-                // Observer le résultat du Worker
+                // Observer le résultat du Worker avec LiveData
                 workManager.getWorkInfoByIdLiveData(workRequest.id).observeForever { workInfo: WorkInfo? ->
+                    android.util.Log.d("ChatViewModel", "🔔 WorkInfo state: ${workInfo?.state}")
+                    
                     when (workInfo?.state) {
                         WorkInfo.State.SUCCEEDED -> {
                             val imageUrl = workInfo.outputData.getString(ImageGenerationWorker.KEY_RESULT_URL)
-                            if (imageUrl != null) {
+                            android.util.Log.d("ChatViewModel", "✅ Image URL reçue: ${imageUrl?.take(50)}")
+                            
+                            if (imageUrl != null && imageUrl.isNotEmpty()) {
                                 _generatedImageUrl.value = imageUrl
-                                _messages.value = _messages.value + ChatMessage(
+                                
+                                // Remplacer le message de statut par l'image
+                                _messages.value = _messages.value.dropLast(1) + ChatMessage(
                                     content = "✅ Image générée avec succès !",
                                     isUser = false,
                                     imageUrl = imageUrl
+                                )
+                                android.util.Log.d("ChatViewModel", "✅ Message avec image ajouté")
+                            } else {
+                                android.util.Log.e("ChatViewModel", "❌ URL image vide!")
+                                _messages.value = _messages.value + ChatMessage(
+                                    content = "❌ Erreur: URL image vide",
+                                    isUser = false
                                 )
                             }
                         }
                         WorkInfo.State.FAILED -> {
                             val error = workInfo.outputData.getString(ImageGenerationWorker.KEY_ERROR)
+                            android.util.Log.e("ChatViewModel", "❌ Worker failed: $error")
+                            
                             _messages.value = _messages.value + ChatMessage(
                                 content = "❌ Erreur génération: ${error ?: "Unknown error"}",
                                 isUser = false
                             )
                         }
-                        else -> { /* En cours */ }
+                        WorkInfo.State.RUNNING -> {
+                            android.util.Log.d("ChatViewModel", "⏳ Génération en cours...")
+                        }
+                        else -> {
+                            android.util.Log.d("ChatViewModel", "⏳ État: ${workInfo?.state}")
+                        }
                     }
                 }
             } catch (e: Exception) {
