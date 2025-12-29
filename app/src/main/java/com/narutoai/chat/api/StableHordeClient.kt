@@ -64,11 +64,11 @@ class StableHordeClient {
             val requestId = submitGenerationRequest(prompt, negativePrompt, width, height, steps, cfgScale, nsfw)
             android.util.Log.d("StableHorde", "✅ Requête soumise: $requestId")
             
-            // 2. Attendre et récupérer l'image
-            val imageBase64 = waitForGeneration(requestId)
+            // 2. Attendre et récupérer l'URL de l'image
+            val imageUrl = waitForGeneration(requestId)
             
-            android.util.Log.d("StableHorde", "✅ Image générée! (${imageBase64.length / 1024}KB)")
-            Result.success("data:image/png;base64,$imageBase64")
+            android.util.Log.d("StableHorde", "✅ Image générée! URL: ${imageUrl.take(100)}")
+            Result.success(imageUrl) // Retourner URL directe (pas data:image)
             
         } catch (e: Exception) {
             android.util.Log.e("StableHorde", "❌ Erreur: ${e.message}", e)
@@ -110,7 +110,7 @@ class StableHordeClient {
             put("models", JSONArray().apply {
                 put("stable_diffusion") // Modèle par défaut
             })
-            put("r2", true) // Retourner image en base64
+            put("r2", false) // IMPORTANT: Retourner URL (pas Base64) pour éviter Bundle overflow
         }
         
         val request = Request.Builder()
@@ -206,15 +206,20 @@ class StableHordeClient {
             
             val firstGen = generations.getJSONObject(0)
             
-            // Stable Horde retourne soit:
-            // - "img": base64 string (si r2=true)
-            // - "url": URL de l'image
-            if (firstGen.has("img")) {
-                firstGen.getString("img")
-            } else if (firstGen.has("url")) {
-                // Télécharger l'image depuis l'URL
-                val imageUrl = firstGen.getString("url")
-                downloadImageAsBase64(imageUrl)
+            // IMPORTANT: Stable Horde retourne soit:
+            // - "img": base64 string (si r2=true) → TROP GROS pour Bundle
+            // - "url": URL de l'image → PARFAIT
+            
+            // On préfère l'URL car Base64 dépasse souvent 500KB (limite Bundle)
+            if (firstGen.has("url")) {
+                val url = firstGen.getString("url")
+                android.util.Log.d("StableHorde", "✅ URL directe: $url")
+                return@withContext url // Retourner URL directe !
+            } else if (firstGen.has("img")) {
+                // Fallback Base64 (mais risque Bundle trop gros)
+                val base64 = firstGen.getString("img")
+                android.util.Log.w("StableHorde", "⚠️ Base64 reçu (${base64.length / 1024}KB) - risque Bundle overflow")
+                return@withContext "data:image/png;base64,$base64"
             } else {
                 throw IOException("Format de réponse inconnu")
             }
