@@ -412,9 +412,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         _isGeneratingVideo.value = true
         _error.value = null
         
-        // Ajouter message de statut
+                // Ajouter message de statut
         val statusMessage = ChatMessage(
-            content = "🎬 Génération de vidéo en cours... (cela peut prendre 1-2 minutes)",
+            content = "🎬 Génération de vidéo en cours... (5 secondes, cela peut prendre 1-2 minutes)",
             isUser = false
         )
         _messages.value = _messages.value + statusMessage
@@ -434,8 +434,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     
                     Physical description: ${character.physicalDescription}
                     
-                    Create a detailed video prompt in ENGLISH (max 75 words) for a 2-4 second animated scene.
-                    Include: character movement, camera angle, lighting, and atmosphere.
+                    Create a detailed video prompt in ENGLISH (max 75 words) for a 5 second animated scene.
+                    Include: character movement, action, camera angle, lighting, atmosphere, and transitions.
+                    Make it cinematic and dynamic with smooth motion.
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 
@@ -462,11 +463,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 // Délai pour éviter rate limit après Groq
                 kotlinx.coroutines.delay(2000)
                 
-                // Générer une vidéo/GIF animé avec Freebox (fallback Pollination AI intégré)
+                // Générer une vraie vidéo MP4 avec Pollination AI Video
                 val result = freeboxMediaClient.generateVideo(
-                    prompt = "$videoPrompt, animated, cinematic movement, dynamic scene",
+                    prompt = "$videoPrompt, smooth motion, cinematic, fluid animation, dynamic scene",
                     width = 512,
                     height = 512,
+                    duration = 5, // 5 secondes de vidéo
                     isNSFW = _isNSFWMode.value
                 )
                 
@@ -475,9 +477,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         _generatedVideoUrl.value = videoUrl
                         _isGeneratingVideo.value = false
                         
-                        val source = if (videoUrl.startsWith("data:image")) "Freebox" else "Pollination AI"
+                        val source = "Pollination AI Video"
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ Vidéo/animation générée ($source)",
+                            content = "✅ Vidéo générée (5s MP4, $source)",
                             isUser = false,
                             videoUrl = videoUrl // AJOUT: Inclure l'URL de la vidéo
                         )

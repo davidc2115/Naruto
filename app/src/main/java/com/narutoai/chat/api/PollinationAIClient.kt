@@ -29,11 +29,13 @@ class PollinationAIClient {
     companion object {
         // API Pollination - Gratuite et sans clé!
         private const val BASE_URL = "https://image.pollinations.ai/prompt"
+        private const val VIDEO_BASE_URL = "https://video.pollinations.ai/prompt"
         
         // Configuration par défaut
         private const val DEFAULT_WIDTH = 512
         private const val DEFAULT_HEIGHT = 768
         private const val DEFAULT_MODEL = "turbo" // Plus rapide
+        private const val DEFAULT_VIDEO_MODEL = "dreamshaper" // Modèle vidéo par défaut
     }
     
     /**
@@ -324,6 +326,135 @@ class PollinationAIClient {
                 append(", professional")
             }
             append(", masterpiece")
+        }.trim()
+    }
+    
+    /**
+     * Génère une vidéo avec Pollination AI
+     * @param prompt Description détaillée de la vidéo
+     * @param width Largeur de la vidéo
+     * @param height Hauteur de la vidéo
+     * @param duration Durée en secondes (3-10s)
+     * @param model Modèle à utiliser
+     * @return URL directe de la vidéo générée (MP4)
+     */
+    suspend fun generateVideo(
+        prompt: String,
+        width: Int = 512,
+        height: Int = 512,
+        duration: Int = 5, // 5 secondes par défaut
+        model: String = DEFAULT_VIDEO_MODEL,
+        enhance: Boolean = true,
+        isNSFW: Boolean = false
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            // Délai minimal pour éviter spam (génération vidéo = plus lourd)
+            delay(3000)
+            
+            // Retry avec backoff exponentiel
+            var lastException: Exception? = null
+            val maxRetries = 5
+            
+            for (attempt in 1..maxRetries) {
+                try {
+                    // Ajouter contexte NSFW si nécessaire
+                    val enhancedPrompt = if (isNSFW) {
+                        "adult content 18+, explicit, $prompt"
+                    } else {
+                        prompt
+                    }
+                    
+                    // Encoder le prompt pour URL
+                    val encodedPrompt = java.net.URLEncoder.encode(
+                        if (enhance) enhanceVideoPrompt(enhancedPrompt) else enhancedPrompt,
+                        "UTF-8"
+                    )
+                    
+                    val videoUrl = buildString {
+                        append(VIDEO_BASE_URL)
+                        append("/")
+                        append(encodedPrompt)
+                        append("?width=$width")
+                        append("&height=$height")
+                        append("&model=$model")
+                        append("&duration=$duration")
+                        append("&nologo=true")
+                        append("&enhance=true")
+                        // Seed unique
+                        append("&seed=${System.currentTimeMillis()}")
+                    }
+                    
+                    // Vérifier que la vidéo est accessible
+                    val request = Request.Builder()
+                        .url(videoUrl)
+                        .get()
+                        .build()
+                    
+                    client.newCall(request).execute().use { response ->
+                        when (response.code) {
+                            200 -> {
+                                val contentLength = response.body?.contentLength() ?: 0
+                                if (contentLength > 10000) { // Au moins 10KB pour une vidéo
+                                    return@withContext Result.success(videoUrl)
+                                } else {
+                                    throw IOException("Vidéo trop petite ou invalide")
+                                }
+                            }
+                            429 -> {
+                                if (attempt < maxRetries) {
+                                    delay(30000L * attempt) // 30s, 60s, 90s... pour vidéos
+                                    lastException = IOException("Rate limit 429 (tentative $attempt/$maxRetries)")
+                                } else {
+                                    return@withContext Result.failure(
+                                        IOException("❌ Rate limit - Trop de requêtes vidéo. Réessayez dans 5 minutes.")
+                                    )
+                                }
+                            }
+                            500, 502, 503, 504 -> {
+                                if (attempt < maxRetries) {
+                                    delay(20000L * attempt) // 20s, 40s, 60s...
+                                    lastException = IOException("Erreur serveur ${response.code} (tentative $attempt/$maxRetries)")
+                                } else {
+                                    return@withContext Result.failure(
+                                        IOException("❌ Erreur ${response.code} - Service Pollinations AI surchargé. Réessayez plus tard.")
+                                    )
+                                }
+                            }
+                            else -> {
+                                return@withContext Result.failure(
+                                    IOException("Erreur génération vidéo: HTTP ${response.code}")
+                                )
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    lastException = e
+                    if (attempt < maxRetries) {
+                        delay(5000L * attempt)
+                    }
+                }
+            }
+            
+            Result.failure(lastException ?: IOException("Échec génération vidéo après $maxRetries tentatives"))
+            
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Enrichit un prompt vidéo
+     */
+    private fun enhanceVideoPrompt(prompt: String): String {
+        return buildString {
+            append(prompt)
+            if (!prompt.contains("smooth")) {
+                append(", smooth motion, cinematic")
+            }
+            if (!prompt.contains("quality")) {
+                append(", high quality, detailed")
+            }
+            append(", professional video, masterpiece")
         }.trim()
     }
     

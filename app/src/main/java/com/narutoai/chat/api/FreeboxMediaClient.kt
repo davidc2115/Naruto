@@ -86,49 +86,66 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
     }
     
     /**
-     * Génère une "vidéo" (GIF animé) via img2img sur Freebox
-     * PRIORITÉ 1: Freebox SD WebUI (local, illimité, sans censure)
-     * PRIORITÉ 2 (Fallback): Pollination AI
+     * Génère une vidéo MP4 via Pollination AI
+     * NOTE: La Freebox n'a pas assez de ressources pour la génération vidéo
+     * On utilise directement Pollination AI Video (gratuit, sans limite)
      */
     suspend fun generateVideo(
         prompt: String,
-        negativePrompt: String = "low quality, blurry, distorted, ugly, deformed",
+        negativePrompt: String = "low quality, blurry, distorted, ugly, deformed, static",
         width: Int = 512,
         height: Int = 512,
+        duration: Int = 5, // 5 secondes
         isNSFW: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            // PRIORITÉ 1: Essayer Freebox en premier
-            android.util.Log.d("FreeboxMedia", "🎯 PRIORITÉ 1: Tentative génération vidéo via Freebox...")
+            android.util.Log.d("FreeboxMedia", "🎬 Génération vidéo via Pollination AI Video...")
             
-            // Vérifier disponibilité
-            if (!isAvailable()) {
-                android.util.Log.w("FreeboxMedia", "⚠️ Freebox non accessible")
-                android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI pour GIF")
-                // Pollination AI génère GIF via paramètre &nologo=true&motion=true
-                return@withContext pollinationFallback.generateImage(
-                    prompt = "$prompt, animated gif, motion blur, dynamic",
-                    width = width,
-                    height = height,
-                    enhance = true
-                )
+            // Enrichir le prompt avec le negative prompt et détails
+            val enhancedPrompt = buildString {
+                append(prompt)
+                append(", smooth motion, cinematic, fluid animation")
+                if (!prompt.contains("4k") && !prompt.contains("quality")) {
+                    append(", high quality, professional")
+                }
             }
             
-            android.util.Log.d("FreeboxMedia", "✅ Freebox accessible! Génération vidéo locale...")
-            
-            // Pour l'instant, générer une image simple
-            // TODO: Implémenter vraie génération vidéo/GIF avec AnimateDiff
-            generateImage(prompt, negativePrompt, width, height, isNSFW = isNSFW)
-            
-        } catch (e: Exception) {
-            android.util.Log.e("FreeboxMedia", "❌ Erreur vidéo Freebox: ${e.message}")
-            android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI")
-            pollinationFallback.generateImage(
-                prompt = "$prompt, animated style",
+            // Utiliser Pollination AI Video (supporte SFW et NSFW)
+            val result = pollinationFallback.generateVideo(
+                prompt = enhancedPrompt,
                 width = width,
                 height = height,
-                enhance = true
+                duration = duration,
+                enhance = true,
+                isNSFW = isNSFW
             )
+            
+            result.getOrElse { error ->
+                android.util.Log.e("FreeboxMedia", "❌ Erreur génération vidéo: ${error.message}")
+                return@withContext Result.failure(error)
+            }
+            
+            android.util.Log.d("FreeboxMedia", "✅ Vidéo générée via Pollination AI (${duration}s, ${width}x${height})")
+            result
+            
+        } catch (e: Exception) {
+            android.util.Log.e("FreeboxMedia", "❌ Erreur vidéo: ${e.message}")
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Retourne les modèles disponibles sur ComfyUI
+     */
+    suspend fun getAvailableModels(): List<String> = withContext(Dispatchers.IO) {
+        try {
+            if (isAvailable()) {
+                listOf("ComfyUI Default (sd_v15.safetensors)")
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }
