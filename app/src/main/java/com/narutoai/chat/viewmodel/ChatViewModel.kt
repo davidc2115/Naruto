@@ -486,11 +486,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 kotlinx.coroutines.delay(2000)
                 
                 // Générer une vraie vidéo MP4 avec Pollination AI Video
-                val result = freeboxMediaClient.generateVideo(
+                val result = pollinationAIClient.generateVideo(
                     prompt = "$videoPrompt, smooth motion, cinematic, fluid animation, dynamic scene",
                     width = 512,
                     height = 512,
                     duration = 5, // 5 secondes de vidéo
+                    enhance = true,
                     isNSFW = _isNSFWMode.value
                 )
                 
