@@ -365,7 +365,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         _isGeneratingImage.value = false
                         
                         // Remplacer le message de statut par l'image AVEC URL
-                        val source = if (imageUrl.startsWith("data:image")) "Freebox" else "Pollination AI"
+                        val source = if (imageUrl.startsWith("http")) "Cloud API" else "Local"
                         _messages.value = _messages.value.dropLast(1) + ChatMessage(
                             content = "✅ Image générée avec succès ($source)",
                             isUser = false,
