@@ -55,17 +55,22 @@ class ImageGenerationWorker(
                 "Création de votre image en cours..."
             )
             
-            // Générer l'image (FreeboxMediaClient gère le routing selon preferredApi)
-            val client = FreeboxMediaClient(preferredApi ?: "stable_horde")
-            val result = client.generateImage(
-                prompt = prompt,
-                negativePrompt = negativePrompt,
-                width = width,
-                height = height,
-                steps = steps,
-                cfgScale = cfgScale,
-                isNSFW = isNSFW
-            )
+            // Générer l'image avec l'API choisie
+            val result = when (preferredApi) {
+                "freebox" -> {
+                    val comfyClient = ComfyUIClient()
+                    comfyClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
+                }
+                "pollination" -> {
+                    val pollinationClient = PollinationAIClient()
+                    pollinationClient.generateImage(prompt, width, height, enhance = true)
+                }
+                else -> {
+                    // stable_horde ou auto
+                    val stableHordeClient = StableHordeClient()
+                    stableHordeClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                }
+            }
             
             result.fold(
                 onSuccess = { imageUrl ->

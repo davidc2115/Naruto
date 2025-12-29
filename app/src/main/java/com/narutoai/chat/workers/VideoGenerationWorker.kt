@@ -43,7 +43,6 @@ class VideoGenerationWorker(
             val height = inputData.getInt(KEY_HEIGHT, 512)
             val duration = inputData.getInt(KEY_DURATION, 5)
             val isNSFW = inputData.getBoolean(KEY_IS_NSFW, false)
-            val preferredApi = inputData.getString(KEY_PREFERRED_API) ?: "stable_horde"
             
             // Afficher notification de progression
             NotificationHelper.showProgressNotification(
@@ -53,14 +52,14 @@ class VideoGenerationWorker(
                 "Création de votre vidéo en cours (peut prendre 1-2 min)..."
             )
             
-            // Générer la vidéo
-            val client = FreeboxMediaClient(preferredApi ?: "stable_horde")
-            val result = client.generateVideo(
+            // Générer la vidéo avec Pollination AI
+            val pollinationClient = PollinationAIClient()
+            val result = pollinationClient.generateVideo(
                 prompt = prompt,
-                negativePrompt = negativePrompt,
                 width = width,
                 height = height,
                 duration = duration,
+                enhance = true,
                 isNSFW = isNSFW
             )
             
