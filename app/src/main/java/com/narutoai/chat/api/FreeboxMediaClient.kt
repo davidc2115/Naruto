@@ -33,7 +33,7 @@ class FreeboxMediaClient(
     /**
      * Vérifie si ComfyUI sur Freebox est accessible
      */
-    suspend fun isAvailable(): Boolean = comfyClient.isAvailable()
+    suspend fun isAvailable(): Boolean = comfyUIClient.isAvailable()
     
     /**
      * Génère une image selon l'API choisie par l'utilisateur
