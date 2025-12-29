@@ -386,8 +386,10 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     
                     when (workInfo?.state) {
                         WorkInfo.State.SUCCEEDED -> {
-                            val imageUrl = workInfo.outputData.getString(ImageGenerationWorker.KEY_RESULT_URL)
-                            android.util.Log.d("ChatViewModel", "✅ Image URL reçue: ${imageUrl?.take(50)}")
+                            // Lire l'URL depuis SharedPreferences (pas de limite de taille)
+                            val prefs = getApplication<Application>().getSharedPreferences("image_worker_results", android.content.Context.MODE_PRIVATE)
+                            val imageUrl = prefs.getString("latest_image_url", null)
+                            android.util.Log.d("ChatViewModel", "✅ Image URL lue depuis SharedPrefs: ${imageUrl?.take(50)}")
                             
                             if (imageUrl != null && imageUrl.isNotEmpty()) {
                                 _generatedImageUrl.value = imageUrl

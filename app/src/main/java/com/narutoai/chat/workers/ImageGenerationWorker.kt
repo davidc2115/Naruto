@@ -32,6 +32,9 @@ class ImageGenerationWorker(
         
         const val KEY_RESULT_URL = "result_url"
         const val KEY_ERROR = "error"
+        
+        private const val PREFS_NAME = "image_worker_results"
+        private const val KEY_LATEST_IMAGE_URL = "latest_image_url"
     }
     
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
@@ -60,8 +63,11 @@ class ImageGenerationWorker(
             // Générer l'image avec l'API choisie
             val result = when (preferredApi) {
                 "freebox" -> {
-                    val comfyClient = ComfyUIClient()
-                    comfyClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
+                    // Freebox temporairement désactivée (inaccessible depuis Internet)
+                    // Fallback vers Stable Horde
+                    android.util.Log.d("ImageWorker", "⚠️ Freebox désactivée, utilisation de Stable Horde")
+                    val stableHordeClient = StableHordeClient()
+                    stableHordeClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
                 }
                 "pollination" -> {
                     val pollinationClient = PollinationAIClient()
@@ -78,6 +84,11 @@ class ImageGenerationWorker(
                 onSuccess = { imageUrl: String ->
                     android.util.Log.d("ImageWorker", "✅ Image générée: ${imageUrl.take(100)}")
                     
+                    // Sauvegarder l'URL dans SharedPreferences (pas de limite)
+                    val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    prefs.edit().putString(KEY_LATEST_IMAGE_URL, imageUrl).apply()
+                    android.util.Log.d("ImageWorker", "✅ URL sauvegardée dans SharedPrefs (${imageUrl.length} chars)")
+                    
                     // Notification de succès
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
@@ -86,8 +97,8 @@ class ImageGenerationWorker(
                         "Votre image est prête ! Ouvrez l'app pour la voir."
                     )
                     
-                    val outputData = workDataOf(KEY_RESULT_URL to imageUrl)
-                    android.util.Log.d("ImageWorker", "✅ Output data créé avec URL")
+                    // Retourner uniquement un flag de succès (pas l'URL)
+                    val outputData = workDataOf(KEY_RESULT_URL to "success")
                     Result.success(outputData)
                 },
                 onFailure = { exception: Throwable ->
