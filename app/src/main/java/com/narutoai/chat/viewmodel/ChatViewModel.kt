@@ -349,12 +349,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 val style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic"
                 
                 // Générer avec Freebox (fallback Pollination AI intégré)
+                // Paramètres optimisés pour vitesse sur ARM CPU
                 val result = freeboxMediaClient.generateImage(
                     prompt = imagePrompt,
-                    width = 768,
-                    height = 768,
-                    steps = 25,
-                    cfgScale = 7.5,
+                    width = 512, // Réduit pour vitesse
+                    height = 512, // Réduit pour vitesse
+                    steps = 12, // Réduit pour vitesse (12 au lieu de 25)
+                    cfgScale = 6.0, // Réduit pour vitesse
                     isNSFW = _isNSFWMode.value
                 )
                 

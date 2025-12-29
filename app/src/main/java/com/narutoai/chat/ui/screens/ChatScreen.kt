@@ -66,6 +66,7 @@ fun ChatScreen(
     }
     
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0), // Gérer manuellement les insets
         topBar = {
             TopAppBar(
                 title = {
@@ -162,10 +163,14 @@ fun ChatScreen(
             )
         },
         bottomBar = {
-            // Input field
+            // Input field avec gestion du clavier et barre de navigation
             Surface(
                 shadowElevation = 8.dp,
-                tonalElevation = 4.dp
+                tonalElevation = 4.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding() // S'adapte au clavier
+                    .navigationBarsPadding() // S'adapte à la barre de navigation
             ) {
                 Row(
                     modifier = Modifier
@@ -230,11 +235,18 @@ fun ChatScreen(
                 )
             }
             
-            // Messages list
+            // Messages list avec gestion IME
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(), // Remonte avec le clavier
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 16.dp // Espace en bas pour voir le dernier message
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Welcome message

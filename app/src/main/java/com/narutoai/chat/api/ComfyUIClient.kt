@@ -32,7 +32,13 @@ class ComfyUIClient {
         private const val COMFY_WS_URL = "ws://88.174.155.230:33437/ws"
         
         private const val PING_TIMEOUT = 3000L
-        private const val GENERATION_TIMEOUT = 300000L // 5 min pour CPU
+        private const val GENERATION_TIMEOUT = 180000L // 3 min pour CPU (optimisé)
+        
+        // Paramètres optimisés pour ARM CPU
+        private const val FAST_STEPS = 12 // Au lieu de 20-30
+        private const val FAST_WIDTH = 512
+        private const val FAST_HEIGHT = 512
+        private const val FAST_CFG = 6.0 // Au lieu de 7-8
     }
     
     private val httpClient = OkHttpClient.Builder()
@@ -66,15 +72,15 @@ class ComfyUIClient {
     }
     
     /**
-     * Génère une image via ComfyUI
+     * Génère une image via ComfyUI (optimisé pour ARM CPU)
      */
     suspend fun generateImage(
         prompt: String,
         negativePrompt: String = "low quality, blurry, distorted",
-        width: Int = 512,
-        height: Int = 512,
-        steps: Int = 20,
-        cfgScale: Double = 7.0
+        width: Int = FAST_WIDTH,
+        height: Int = FAST_HEIGHT,
+        steps: Int = FAST_STEPS, // Réduit pour vitesse
+        cfgScale: Double = FAST_CFG // Réduit pour vitesse
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             if (!isAvailable()) {
@@ -300,7 +306,7 @@ class ComfyUIClient {
                 put("_meta", JSONObject().apply { put("title", "Load Checkpoint") })
             })
             
-            // EmptyLatentImage
+            // EmptyLatentImage - dimensions dynamiques
             put("5", JSONObject().apply {
                 put("inputs", JSONObject().apply {
                     put("width", width)
