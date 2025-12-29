@@ -67,7 +67,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val imageClient = ImageGenerationClient(application.applicationContext)
     private val videoClient = VideoGenerationClient(application.applicationContext)
     private val pollinationAIClient = PollinationAIClient()
-    private val freeboxMediaClient = com.narutoai.chat.api.FreeboxMediaClient(pollinationAIClient)
+    // freeboxMediaClient est maintenant créé dans les Workers avec l'API choisie
     
     init {
         viewModelScope.launch {
