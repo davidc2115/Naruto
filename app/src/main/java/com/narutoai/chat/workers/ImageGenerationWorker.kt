@@ -55,8 +55,8 @@ class ImageGenerationWorker(
                 "Création de votre image en cours..."
             )
             
-            // Générer l'image
-            val client = FreeboxMediaClient(preferredApi)
+            // Générer l'image (FreeboxMediaClient gère le routing selon preferredApi)
+            val client = FreeboxMediaClient(preferredApi ?: "stable_horde")
             val result = client.generateImage(
                 prompt = prompt,
                 negativePrompt = negativePrompt,

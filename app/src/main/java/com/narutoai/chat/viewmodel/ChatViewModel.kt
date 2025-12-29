@@ -5,20 +5,30 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.narutoai.chat.api.GroqClient
 import com.narutoai.chat.api.ImageGenerationClient
 import com.narutoai.chat.api.VideoGenerationClient
 import com.narutoai.chat.api.PollinationAIClient
+import com.narutoai.chat.data.PreferencesManager
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.ChatMessage
 import com.narutoai.chat.models.UserProfile
 import com.narutoai.chat.models.Gender
+import com.narutoai.chat.workers.ImageGenerationWorker
+import com.narutoai.chat.workers.VideoGenerationWorker
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
     
     private val sharedPreferences = application.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
     private val conversationManager = com.narutoai.chat.data.ConversationManager(application.applicationContext)
+    private val preferencesManager = PreferencesManager(application.applicationContext)
+    private val workManager = WorkManager.getInstance(application.applicationContext)
     
     private val _userProfile = mutableStateOf(loadUserProfile())
     val userProfile: State<UserProfile> = _userProfile

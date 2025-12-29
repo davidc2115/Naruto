@@ -54,7 +54,7 @@ class VideoGenerationWorker(
             )
             
             // Générer la vidéo
-            val client = FreeboxMediaClient(preferredApi)
+            val client = FreeboxMediaClient(preferredApi ?: "stable_horde")
             val result = client.generateVideo(
                 prompt = prompt,
                 negativePrompt = negativePrompt,

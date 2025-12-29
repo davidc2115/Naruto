@@ -11,22 +11,20 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
- * Client pour génération d'images via Stable Horde ou Pollination AI
- * v2.23.0: Support des 2 APIs avec choix utilisateur
+ * Client pour génération d'images via Freebox/Stable Horde/Pollination AI
+ * v2.26.0: Choix d'API + fallback automatique
  * 
  * APIs disponibles:
+ * - Freebox (ComfyUI): Local, privé, lent sur ARM CPU
  * - Stable Horde: Gratuit, illimité, NSFW, qualité SD 1.5/SDXL
  * - Pollination AI: Gratuit, rapide, NSFW, qualité variable
  */
 class FreeboxMediaClient(
-    private val pollinationClient: PollinationAIClient
+    private val preferredApi: String = "stable_horde"
 ) {
-    
+    private val pollinationClient = PollinationAIClient()
     private val stableHorde = StableHordeClient()
-    private val comfyClient = ComfyUIClient()
-    
-    // Choix utilisateur : "stable_horde" ou "pollination"
-    var preferredApi: String = "stable_horde" // Défaut: Stable Horde
+    private val comfyUIClient = ComfyUIClient()
     
     companion object {
         private const val TAG = "FreeboxMedia"
