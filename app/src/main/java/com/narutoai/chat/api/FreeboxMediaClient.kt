@@ -124,13 +124,13 @@ class FreeboxMediaClient(
                 isNSFW = isNSFW
             )
             
-            result.getOrElse { error ->
-                android.util.Log.e("FreeboxMedia", "❌ Erreur génération vidéo: ${error.message}")
-                return@withContext Result.failure(error)
+            if (result.isFailure) {
+                android.util.Log.e("FreeboxMedia", "❌ Erreur génération vidéo: ${result.exceptionOrNull()?.message}")
+                Result.failure(result.exceptionOrNull() ?: Exception("Video generation failed"))
+            } else {
+                android.util.Log.d("FreeboxMedia", "✅ Vidéo générée via Pollination AI (${duration}s, ${width}x${height})")
+                result
             }
-            
-            android.util.Log.d("FreeboxMedia", "✅ Vidéo générée via Pollination AI (${duration}s, ${width}x${height})")
-            result
             
         } catch (e: Exception) {
             android.util.Log.e("FreeboxMedia", "❌ Erreur vidéo: ${e.message}")

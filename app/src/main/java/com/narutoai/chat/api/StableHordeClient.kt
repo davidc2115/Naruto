@@ -108,7 +108,7 @@ class StableHordeClient {
             put("slow_workers", true) // Accepter workers lents (plus de disponibilité)
             put("censor_nsfw", false) // NE PAS censurer NSFW
             put("models", JSONArray().apply {
-                add("stable_diffusion") // Modèle par défaut
+                put("stable_diffusion") // Modèle par défaut
             })
             put("r2", true) // Retourner image en base64
         }
