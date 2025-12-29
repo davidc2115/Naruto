@@ -29,7 +29,8 @@ class PollinationAIClient {
     companion object {
         // API Pollination - Gratuite et sans clé!
         private const val BASE_URL = "https://image.pollinations.ai/prompt"
-        private const val VIDEO_BASE_URL = "https://video.pollinations.ai/prompt"
+        // TEMPORAIRE: Vidéo désactivée (problème DNS), fallback sur image
+        private const val VIDEO_BASE_URL = "https://image.pollinations.ai/prompt" // Fallback temporaire
         
         // Configuration par défaut
         private const val DEFAULT_WIDTH = 512

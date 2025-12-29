@@ -31,9 +31,8 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
     suspend fun isAvailable(): Boolean = comfyClient.isAvailable()
     
     /**
-     * Génère une image via Stable Diffusion WebUI sur Freebox
-     * PRIORITÉ 1: Freebox SD WebUI (local, illimité, sans censure)
-     * PRIORITÉ 2 (Fallback): Pollination AI (si Freebox inaccessible)
+     * Génère une image via Pollination AI directement
+     * CHANGEMENT v2.22.0: Pollination AI uniquement (Freebox trop lent/instable)
      */
     suspend fun generateImage(
         prompt: String,
@@ -45,43 +44,27 @@ class FreeboxMediaClient(private val pollinationFallback: PollinationAIClient) {
         isNSFW: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            // PRIORITÉ 1: Essayer Freebox en premier
-            android.util.Log.d("FreeboxMedia", "🎯 PRIORITÉ 1: Tentative génération via Freebox SD WebUI...")
+            android.util.Log.d("FreeboxMedia", "🎨 Génération d'image via Pollination AI...")
             
-            // Vérifier disponibilité Freebox
-            if (!isAvailable()) {
-                android.util.Log.w("FreeboxMedia", "⚠️ Freebox non accessible (timeout 3s)")
-                android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI")
-                return@withContext pollinationFallback.generateImage(prompt, width, height, enhance = true)
-            }
-            
-            android.util.Log.d(TAG, "✅ ComfyUI accessible! Génération locale...")
-            
-            // Utiliser le client ComfyUI avec WebSocket
-            val result = comfyClient.generateImage(
+            // Utiliser directement Pollination AI (plus rapide et fiable)
+            val result = pollinationFallback.generateImage(
                 prompt = prompt,
-                negativePrompt = negativePrompt,
                 width = width,
                 height = height,
-                steps = steps,
-                cfgScale = cfgScale
+                enhance = true
             )
             
-            result.getOrElse {
-                android.util.Log.w(TAG, "Erreur ComfyUI: ${it.message}")
-                android.util.Log.w(TAG, "🔄 FALLBACK: Utilisation Pollination AI")
-                return@withContext pollinationFallback.generateImage(prompt, width, height, enhance = true)
+            result.getOrElse { error ->
+                android.util.Log.e("FreeboxMedia", "❌ Erreur Pollination AI: ${error.message}")
+                return@withContext Result.failure(error)
             }
             
-            android.util.Log.d(TAG, "✅ Image générée via ComfyUI Freebox !")
-            android.util.Log.d(TAG, "📍 Source: ComfyUI (local, ARM CPU)")
+            android.util.Log.d("FreeboxMedia", "✅ Image générée via Pollination AI !")
             result
             
         } catch (e: Exception) {
-            android.util.Log.e("FreeboxMedia", "❌ Erreur Freebox: ${e.message}")
-            android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Utilisation Pollination AI")
-            // FALLBACK automatique sur Pollination AI
-            pollinationFallback.generateImage(prompt, width, height, enhance = true)
+            android.util.Log.e("FreeboxMedia", "❌ Erreur génération: ${e.message}")
+            Result.failure(e)
         }
     }
     
