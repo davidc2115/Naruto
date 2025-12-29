@@ -11,21 +11,22 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
- * Client pour génération d'images via Stable Horde (GRATUIT, ILLIMITÉ)
- * v2.23.0: Stable Horde remplace Pollination AI (plus stable, NSFW supporté)
+ * Client pour génération d'images via Stable Horde ou Pollination AI
+ * v2.23.0: Support des 2 APIs avec choix utilisateur
  * 
- * Stable Horde: Réseau décentralisé Stable Diffusion
- * - 100% gratuit
- * - Pas de clé API requise
- * - Support NSFW
- * - Pas de rate limit
+ * APIs disponibles:
+ * - Stable Horde: Gratuit, illimité, NSFW, qualité SD 1.5/SDXL
+ * - Pollination AI: Gratuit, rapide, NSFW, qualité variable
  */
 class FreeboxMediaClient(
-    private val pollinationFallback: PollinationAIClient
+    private val pollinationClient: PollinationAIClient
 ) {
     
-    private val stableHorde = StableHordeClient() // Nouvelle API principale
+    private val stableHorde = StableHordeClient()
     private val comfyClient = ComfyUIClient()
+    
+    // Choix utilisateur : "stable_horde" ou "pollination"
+    var preferredApi: String = "stable_horde" // Défaut: Stable Horde
     
     companion object {
         private const val TAG = "FreeboxMedia"
@@ -37,8 +38,8 @@ class FreeboxMediaClient(
     suspend fun isAvailable(): Boolean = comfyClient.isAvailable()
     
     /**
-     * Génère une image via Stable Horde (gratuit, illimité, NSFW supporté)
-     * v2.23.0: Stable Horde remplace Pollination AI
+     * Génère une image selon l'API choisie par l'utilisateur
+     * v2.23.0: Choix entre Stable Horde et Pollination AI
      */
     suspend fun generateImage(
         prompt: String,
@@ -50,40 +51,41 @@ class FreeboxMediaClient(
         isNSFW: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
-            android.util.Log.d("FreeboxMedia", "🎨 Génération via Stable Horde (gratuit, illimité)...")
-            
-            // PRIORITÉ 1: Stable Horde (gratuit, fiable, NSFW ok)
-            val result = stableHorde.generateImage(
-                prompt = prompt,
-                negativePrompt = negativePrompt,
-                width = width,
-                height = height,
-                steps = steps,
-                cfgScale = cfgScale,
-                nsfw = isNSFW
-            )
-            
-            result.getOrElse { error ->
-                android.util.Log.w("FreeboxMedia", "⚠️ Stable Horde échoué: ${error.message}")
-                android.util.Log.w("FreeboxMedia", "🔄 FALLBACK: Tentative Pollination AI...")
-                
-                // FALLBACK: Essayer Pollination AI
-                return@withContext pollinationFallback.generateImage(
-                    prompt = prompt,
-                    width = width,
-                    height = height,
-                    enhance = true
-                )
+            // Choisir l'API selon la préférence utilisateur
+            val primaryResult = when (preferredApi) {
+                "stable_horde" -> {
+                    android.util.Log.d(TAG, "🎨 API choisie: Stable Horde")
+                    stableHorde.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                }
+                "pollination" -> {
+                    android.util.Log.d(TAG, "🎨 API choisie: Pollination AI")
+                    pollinationClient.generateImage(prompt, width, height, enhance = true)
+                }
+                else -> {
+                    android.util.Log.d(TAG, "🎨 API par défaut: Stable Horde")
+                    stableHorde.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                }
             }
             
-            android.util.Log.d("FreeboxMedia", "✅ Image générée via Stable Horde !")
-            result
+            primaryResult.getOrElse { error ->
+                android.util.Log.w(TAG, "⚠️ API primaire échouée: ${error.message}")
+                android.util.Log.w(TAG, "🔄 FALLBACK: Tentative API alternative...")
+                
+                // FALLBACK: Essayer l'autre API
+                val fallbackResult = when (preferredApi) {
+                    "stable_horde" -> pollinationClient.generateImage(prompt, width, height, enhance = true)
+                    else -> stableHorde.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                }
+                
+                return@withContext fallbackResult
+            }
+            
+            android.util.Log.d(TAG, "✅ Image générée!")
+            primaryResult
             
         } catch (e: Exception) {
-            android.util.Log.e("FreeboxMedia", "❌ Erreur génération: ${e.message}")
-            
-            // Dernier fallback: Pollination AI
-            pollinationFallback.generateImage(prompt, width, height, enhance = true)
+            android.util.Log.e(TAG, "❌ Erreur génération: ${e.message}")
+            Result.failure(e)
         }
     }
     
