@@ -381,7 +381,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 workManager.enqueue(workRequest)
                 
                 // Observer le résultat du Worker
-                workManager.getWorkInfoByIdLiveData(workRequest.id).observeForever { workInfo ->
+                workManager.getWorkInfoByIdLiveData(workRequest.id).observeForever { workInfo: WorkInfo? ->
                     when (workInfo?.state) {
                         WorkInfo.State.SUCCEEDED -> {
                             val imageUrl = workInfo.outputData.getString(ImageGenerationWorker.KEY_RESULT_URL)
