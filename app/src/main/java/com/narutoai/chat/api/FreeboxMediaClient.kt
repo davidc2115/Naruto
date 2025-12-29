@@ -115,7 +115,7 @@ class FreeboxMediaClient(
             }
             
             // Utiliser Pollination AI Video (supporte SFW et NSFW)
-            val result = pollinationFallback.generateVideo(
+            val result = pollinationClient.generateVideo(
                 prompt = enhancedPrompt,
                 width = width,
                 height = height,
