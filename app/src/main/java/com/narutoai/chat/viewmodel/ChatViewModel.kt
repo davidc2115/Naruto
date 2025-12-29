@@ -495,7 +495,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 
                 result.fold(
-                    onSuccess = { videoUrl ->
+                    onSuccess = { videoUrl: String ->
                         _generatedVideoUrl.value = videoUrl
                         _isGeneratingVideo.value = false
                         
@@ -506,7 +506,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             videoUrl = videoUrl // AJOUT: Inclure l'URL de la vidéo
                         )
                     },
-                    onFailure = { exception ->
+                    onFailure = { exception: Throwable ->
                         val errorMsg = "❌ Erreur génération vidéo: ${exception.message}"
                         _error.value = errorMsg
                         _isGeneratingVideo.value = false
