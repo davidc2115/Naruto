@@ -381,21 +381,14 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://sakuragallery10.jpg"
         ),
         galleryNSFW = listOf(
-            "drawable://sakuransfw1.jpg",
-            "drawable://sakuransfw2.jpg",
-            "drawable://sakuransfw3.jpg",
-            "drawable://sakuransfw4.jpg",
-            "drawable://sakuransfw5.jpg",
-            "drawable://sakuransfw6.jpg",
-            "drawable://sakuransfw7.jpg",
-            "drawable://sakuransfw8.jpg",
-            "drawable://sakuransfw9.jpg",
-            "drawable://sakuransfw10.jpg",
-            "drawable://sakuransfw11.jpg",
-            "drawable://sakuransfw12.jpg",
-            "drawable://sakuransfw13.jpg",
-            "drawable://sakuransfw14.jpg",
-            "drawable://sakuransfw15.jpg"
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw1.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw2.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw3.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw4.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw5.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw6.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakura_1.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakura_2.png"
         ),
         systemPromptSFW = """Tu es Sakura Haruno, kunoichi de 18-22 ans de Konoha.
 
@@ -687,21 +680,10 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://hinatagallery10.jpg"
         ),
         galleryNSFW = listOf(
-            "drawable://hinatansfw1.jpg",
-            "drawable://hinatansfw2.jpg",
-            "drawable://hinatansfw3.jpg",
-            "drawable://hinatansfw4.jpg",
-            "drawable://hinatansfw5.jpg",
-            "drawable://hinatansfw6.jpg",
-            "drawable://hinatansfw7.jpg",
-            "drawable://hinatansfw8.jpg",
-            "drawable://hinatansfw9.jpg",
-            "drawable://hinatansfw10.jpg",
-            "drawable://hinatansfw11.jpg",
-            "drawable://hinatansfw12.jpg",
-            "drawable://hinatansfw13.jpg",
-            "drawable://hinatansfw14.jpg",
-            "drawable://hinatansfw15.jpg"
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinatansfw1.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinatansfw3.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinata_1.png",
+            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinata_2.png"
         ),
         systemPromptSFW = """Tu es Hinata Hyuga, kunoichi de 18-22 ans de Konoha.
 

@@ -325,11 +325,17 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     Based on this conversation with ${character.name}:
                     $context
                     
-                    Physical description of ${character.name}:
-                    ${character.physicalDescription}$nsfwContext
+                    CHARACTER PROFILE - ${character.name}:
+                    - Name: ${character.name}
+                    - Physical description: ${character.physicalDescription}
+                    - Age: ${character.age}
+                    - Hair: ${character.hairColor}
+                    - Eyes: ${character.eyeColor}
+                    - Body type: ${character.bodyType}$nsfwContext
                     
-                    Create a detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of this scene.
-                    Include: character's physical features, setting, mood, lighting, and action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
+                    Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
+                    IMPORTANT: Start with "${character.name}, " to ensure character identity.
+                    Include: ALL physical features listed above, setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 
