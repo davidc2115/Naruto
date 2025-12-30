@@ -368,7 +368,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     .putString(ImageGenerationWorker.KEY_NEGATIVE_PROMPT, "low quality, blurry, distorted")
                     .putInt(ImageGenerationWorker.KEY_WIDTH, 512)
                     .putInt(ImageGenerationWorker.KEY_HEIGHT, 512)
-                    .putInt(ImageGenerationWorker.KEY_STEPS, 20)
+                    .putInt(ImageGenerationWorker.KEY_STEPS, 15) // Réduit de 20 à 15 pour vitesse
                     .putDouble(ImageGenerationWorker.KEY_CFG_SCALE, 7.0)
                     .putBoolean(ImageGenerationWorker.KEY_IS_NSFW, _isNSFWMode.value)
                     .putString(ImageGenerationWorker.KEY_PREFERRED_API, selectedApi)
@@ -376,6 +376,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 
                 val workRequest = OneTimeWorkRequestBuilder<ImageGenerationWorker>()
                     .setInputData(inputData)
+                    .setExpedited(androidx.work.OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST) // Priorité haute
                     .build()
                 
                 workManager.enqueue(workRequest)

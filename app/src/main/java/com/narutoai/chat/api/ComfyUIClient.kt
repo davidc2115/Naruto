@@ -31,14 +31,14 @@ class ComfyUIClient {
         private const val COMFY_URL = "http://88.174.155.230:33437"
         private const val COMFY_WS_URL = "ws://88.174.155.230:33437/ws"
         
-        private const val PING_TIMEOUT = 3000L
-        private const val GENERATION_TIMEOUT = 180000L // 3 min pour CPU (optimisé)
+        private const val PING_TIMEOUT = 15000L // Augmenté de 3s à 15s
+        private const val GENERATION_TIMEOUT = 600000L // 10 min au lieu de 3 min
         
-        // Paramètres optimisés pour ARM CPU
-        private const val FAST_STEPS = 12 // Au lieu de 20-30
+        // Paramètres optimisés pour ARM CPU (ULTRA-RAPIDE)
+        private const val FAST_STEPS = 8 // Réduit de 12 à 8 pour vitesse
         private const val FAST_WIDTH = 512
         private const val FAST_HEIGHT = 512
-        private const val FAST_CFG = 6.0 // Au lieu de 7-8
+        private const val FAST_CFG = 5.0 // Réduit de 6.0 à 5.0 pour vitesse
     }
     
     private val httpClient = OkHttpClient.Builder()

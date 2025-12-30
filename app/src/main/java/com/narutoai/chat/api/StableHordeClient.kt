@@ -27,7 +27,7 @@ class StableHordeClient {
     
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(180, TimeUnit.SECONDS) // Temps d'attente generation
+        .readTimeout(600, TimeUnit.SECONDS) // 10 minutes pour génération lente
         .writeTimeout(30, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
         .build()
@@ -35,7 +35,7 @@ class StableHordeClient {
     companion object {
         private const val BASE_URL = "https://stablehorde.net/api/v2"
         private const val ANONYMOUS_KEY = "0000000000" // Clé anonyme gratuite
-        private const val MAX_WAIT_TIME = 180000L // 3 minutes max
+        private const val MAX_WAIT_TIME = 600000L // 10 minutes max (au lieu de 3)
         private const val POLL_INTERVAL = 5000L // Vérifier toutes les 5 secondes
     }
     
@@ -51,8 +51,8 @@ class StableHordeClient {
         prompt: String,
         negativePrompt: String = "low quality, blurry, distorted, ugly, deformed",
         width: Int = 512,
-        height: Int = 768,
-        steps: Int = 20,
+        height: Int = 512, // Réduit de 768 à 512 pour vitesse
+        steps: Int = 15, // Réduit de 20 à 15 pour vitesse
         cfgScale: Double = 7.0,
         nsfw: Boolean = false
     ): Result<String> = withContext(Dispatchers.IO) {
