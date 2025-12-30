@@ -87,25 +87,22 @@ class ImageGenerationWorker(
                 "freebox" -> {
                     // Freebox (ComfyUI local) - RÉACTIVÉ avec timeout augmenté
                     android.util.Log.d("ImageWorker", "🏠 Freebox/ComfyUI sélectionné")
+                    android.util.Log.d("ImageWorker", "🔍 Test d'accessibilité de ComfyUI...")
+                    
                     val comfyClient = ComfyUIClient()
                     
-                    // Essayer Freebox d'abord, fallback sur Pollination si échec
-                    val freeboxResult = comfyClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
-                    if (freeboxResult.isSuccess) {
-                        android.util.Log.d("ImageWorker", "✅ Freebox réussi (ComfyUI local)")
-                        
-                        // Afficher notification spécifique pour Freebox
-                        NotificationHelper.showProgressNotification(
-                            applicationContext,
-                            NotificationHelper.NOTIFICATION_ID_IMAGE,
-                            "Image générée ✅",
-                            "Source: Freebox (ComfyUI local)"
-                        )
-                        
-                        freeboxResult
-                    } else {
-                        val errorMsg = freeboxResult.exceptionOrNull()?.message ?: "Erreur inconnue"
-                        android.util.Log.w("ImageWorker", "⚠️ Freebox ÉCHEC: $errorMsg")
+                    // Tester d'abord l'accessibilité
+                    val isAvailable = try {
+                        kotlinx.coroutines.runBlocking {
+                            comfyClient.isAvailable()
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("ImageWorker", "❌ Erreur test ComfyUI: ${e.message}")
+                        false
+                    }
+                    
+                    if (!isAvailable) {
+                        android.util.Log.w("ImageWorker", "⚠️ ComfyUI NON ACCESSIBLE (http://88.174.155.230:33437)")
                         android.util.Log.w("ImageWorker", "🔄 Fallback automatique vers Pollination AI...")
                         
                         // Afficher notification de fallback
@@ -113,11 +110,44 @@ class ImageGenerationWorker(
                             applicationContext,
                             NotificationHelper.NOTIFICATION_ID_IMAGE,
                             "Freebox inaccessible",
-                            "Utilisation de Pollination AI (cloud)..."
+                            "ComfyUI non accessible. Utilisation de Pollination AI..."
                         )
                         
                         val pollinationClient = PollinationAIClient()
                         pollinationClient.generateImage(prompt, width, height, enhance = true)
+                    } else {
+                        android.util.Log.d("ImageWorker", "✅ ComfyUI accessible, génération...")
+                        
+                        // Essayer Freebox
+                        val freeboxResult = comfyClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
+                        if (freeboxResult.isSuccess) {
+                            android.util.Log.d("ImageWorker", "✅ Freebox réussi (ComfyUI local)")
+                            
+                            // Afficher notification spécifique pour Freebox
+                            NotificationHelper.showProgressNotification(
+                                applicationContext,
+                                NotificationHelper.NOTIFICATION_ID_IMAGE,
+                                "Image générée ✅",
+                                "Source: Freebox (ComfyUI local)"
+                            )
+                            
+                            freeboxResult
+                        } else {
+                            val errorMsg = freeboxResult.exceptionOrNull()?.message ?: "Erreur inconnue"
+                            android.util.Log.w("ImageWorker", "⚠️ Freebox ÉCHEC après test positif: $errorMsg")
+                            android.util.Log.w("ImageWorker", "🔄 Fallback vers Pollination AI...")
+                            
+                            // Afficher notification de fallback
+                            NotificationHelper.showProgressNotification(
+                                applicationContext,
+                                NotificationHelper.NOTIFICATION_ID_IMAGE,
+                                "Erreur génération Freebox",
+                                "Utilisation de Pollination AI..."
+                            )
+                            
+                            val pollinationClient = PollinationAIClient()
+                            pollinationClient.generateImage(prompt, width, height, enhance = true)
+                        }
                     }
                 }
                 "stable_horde" -> {
