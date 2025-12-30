@@ -5,7 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -15,6 +18,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
+
+// Extension pour DataStore (au niveau package)
+private val Context.dataStore by preferencesDataStore(name = "api_keys")
 
 /**
  * Client pour l'API Groq Vision (analyse d'images)
@@ -27,30 +33,32 @@ class GroqVisionClient(private val context: Context) {
         private const val MODEL = "llama-3.2-90b-vision-preview"
         private const val MAX_IMAGE_SIZE_KB = 500 // 500KB max pour Base64
         
-        // Clé API Groq - Utilise le GroqKeyManager pour rotation automatique
-        private fun getApiKey(context: Context): String {
-            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            
-            // Essayer de charger une clé depuis GroqKeyManager
-            val keysJson = prefs.getString("groq_api_keys", "[]") ?: "[]"
-            
+        // Clé API Groq - Utilise DataStore comme ApiKeyManager
+        private suspend fun getApiKey(context: Context): String {
             try {
-                val keysArray = org.json.JSONArray(keysJson)
-                if (keysArray.length() > 0) {
-                    // Utiliser la première clé disponible
-                    val firstKey = keysArray.getJSONObject(0)
-                    val apiKey = firstKey.optString("key", "")
-                    if (apiKey.isNotEmpty()) {
-                        android.util.Log.d("GroqVision", "✅ Clé API trouvée (${keysArray.length()} clés disponibles)")
-                        return apiKey
+                // Charger depuis DataStore (même système que ApiKeyManager)
+                val dataStore = context.dataStore
+                val apiKeysKey = androidx.datastore.preferences.core.stringPreferencesKey("api_keys")
+                
+                val keysString = dataStore.data
+                    .map { preferences -> preferences[apiKeysKey] ?: "" }
+                    .first()
+                
+                if (keysString.isNotEmpty()) {
+                    val keys = keysString.split("|||").filter { it.isNotBlank() }
+                    if (keys.isNotEmpty()) {
+                        android.util.Log.d("GroqVision", "✅ ${keys.size} clé(s) API trouvée(s)")
+                        return keys.first() // Utiliser première clé
                     }
                 }
+                
+                android.util.Log.w("GroqVision", "⚠️ Aucune clé API Groq dans DataStore")
+                return ""
+                
             } catch (e: Exception) {
                 android.util.Log.e("GroqVision", "Erreur chargement clés: ${e.message}")
+                return ""
             }
-            
-            android.util.Log.w("GroqVision", "⚠️ Aucune clé API Groq configurée")
-            return ""
         }
     }
     

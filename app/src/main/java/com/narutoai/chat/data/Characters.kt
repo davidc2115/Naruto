@@ -381,14 +381,14 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://sakuragallery10.jpg"
         ),
         galleryNSFW = listOf(
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw1.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw2.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw3.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw4.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw5.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakuransfw6.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakura_1.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/sakura_2.png"
+            "http://88.174.155.230:33500/images/sakuransfw1.png",
+            "http://88.174.155.230:33500/images/sakuransfw2.png",
+            "http://88.174.155.230:33500/images/sakuransfw3.png",
+            "http://88.174.155.230:33500/images/sakuransfw4.png",
+            "http://88.174.155.230:33500/images/sakuransfw5.png",
+            "http://88.174.155.230:33500/images/sakuransfw6.png",
+            "http://88.174.155.230:33500/images/sakura_1.png",
+            "http://88.174.155.230:33500/images/sakura_2.png"
         ),
         systemPromptSFW = """Tu es Sakura Haruno, kunoichi de 18-22 ans de Konoha.
 
@@ -680,10 +680,10 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://hinatagallery10.jpg"
         ),
         galleryNSFW = listOf(
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinatansfw1.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinatansfw3.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinata_1.png",
-            "https://raw.githubusercontent.com/mel805/naruto-ai-chat/main/character_images/hinata_2.png"
+            "http://88.174.155.230:33500/images/hinatansfw1.png",
+            "http://88.174.155.230:33500/images/hinatansfw3.png",
+            "http://88.174.155.230:33500/images/hinata_1.png",
+            "http://88.174.155.230:33500/images/hinata_2.png"
         ),
         systemPromptSFW = """Tu es Hinata Hyuga, kunoichi de 18-22 ans de Konoha.
 

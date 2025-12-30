@@ -31,16 +31,9 @@ fun SettingsScreen(
     onAdminTagsClick: (() -> Unit)? = null
 ) {
     var newGroqKey by remember { mutableStateOf("") }
-    var replicateKey by remember { mutableStateOf(viewModel.replicateApiKey.value ?: "") }
     var showAddKeyDialog by remember { mutableStateOf(false) }
     var keyStats by remember { mutableStateOf<List<KeyStats>>(emptyList()) }
     var testResult by remember { mutableStateOf<Pair<Boolean, String?>?>(null) }
-    var showPassword by remember { mutableStateOf(false) }
-    
-    // Préférences pour API de génération
-    val context = LocalContext.current
-    val preferencesManager = remember { PreferencesManager(context) }
-    val selectedGenerationApi by preferencesManager.generationApi.collectAsState(initial = PreferencesManager.DEFAULT_API)
     
     val coroutineScope = rememberCoroutineScope()
     
@@ -169,153 +162,6 @@ fun SettingsScreen(
                 }
             }
             
-            // Section Génération d'images/vidéos
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.Image, "API de génération")
-                            Text(
-                                text = "API de génération",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        
-                        Text(
-                            text = "Choisissez l'API pour générer images et vidéos. La génération se fera en arrière-plan avec notification.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
-                        )
-                        
-                        // Radio buttons pour choix d'API
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            ApiSelectionRow(
-                                title = "🏠 Freebox (local)",
-                                description = "Génération sur votre Freebox (plus lent mais privé)",
-                                selected = false, // PreferencesManager.API_FREEBOX removed
-                                onClick = {
-                                    coroutineScope.launch {
-                                        // API removed
-                                    }
-                                }
-                            )
-                            
-                            ApiSelectionRow(
-                                title = "⚡ Stable Horde (recommandé)",
-                                description = "Gratuit, rapide, illimité, NSFW",
-                                selected = false, // PreferencesManager.API_STABLE_HORDE removed
-                                onClick = {
-                                    coroutineScope.launch {
-                                        // API removed
-                                    }
-                                }
-                            )
-                            
-                            ApiSelectionRow(
-                                title = "🌸 Pollination AI",
-                                description = "Rapide et simple, bonne qualité",
-                                selected = true, // PreferencesManager.API_POLLINATION active
-                                onClick = {
-                                    coroutineScope.launch {
-                                        preferencesManager.setGenerationApi(PreferencesManager.API_POLLINATION)
-                                    }
-                                }
-                            )
-                            
-                            ApiSelectionRow(
-                                title = "🔄 Auto (intelligent)",
-                                description = "Essaye Freebox → Stable Horde → Pollination",
-                                selected = false, // PreferencesManager.API_AUTO removed
-                                onClick = {
-                                    coroutineScope.launch {
-                                        // API removed
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-            
-            // Section Replicate API
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.PhotoLibrary, "Images/Vidéos")
-                            Text(
-                                text = "Clé API Replicate",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        
-                        Text(
-                            text = "Pour générer des images et vidéos. Obtenez une clé gratuite sur replicate.com",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
-                        )
-                        
-                        OutlinedTextField(
-                            value = replicateKey,
-                            onValueChange = { replicateKey = it },
-                            label = { Text("Clé Replicate") },
-                            placeholder = { Text("r8_...") },
-                            modifier = Modifier.fillMaxWidth(),
-                            visualTransformation = if (showPassword) {
-                                VisualTransformation.None
-                            } else {
-                                PasswordVisualTransformation()
-                            },
-                            trailingIcon = {
-                                IconButton(onClick = { showPassword = !showPassword }) {
-                                    Icon(
-                                        if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                        "Toggle visibility"
-                                    )
-                                }
-                            },
-                            singleLine = true
-                        )
-                        
-                        Button(
-                            onClick = {
-                                viewModel.setReplicateApiKey(replicateKey)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = replicateKey.isNotBlank()
-                        ) {
-                            Icon(Icons.Default.Save, null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Sauvegarder")
-                        }
-                    }
-                }
-            }
-            
             // Informations
             item {
                 Card(
@@ -341,7 +187,7 @@ fun SettingsScreen(
                         }
                         
                         InfoRow("🚀 Groq API", "console.groq.com")
-                        InfoRow("🎨 Replicate API", "replicate.com")
+                        InfoRow("🎨 Pollination AI", "Génération gratuite illimitée")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
                         InfoRow("🔄 Rotation", "Automatique entre clés")
                     }
