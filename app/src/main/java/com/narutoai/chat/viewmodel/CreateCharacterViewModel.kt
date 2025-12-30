@@ -108,7 +108,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     
     /**
      * Analyse automatique de la photo pour générer le descriptif physique
-     * TODO: Intégrer avec API de vision (Groq Vision, GPT-4 Vision, etc.)
+     * Utilise Groq Vision API
      */
     fun analyzePhoto() {
         if (_avatarImageUri.value == null) {
@@ -118,33 +118,49 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
         
         viewModelScope.launch {
             _isAnalyzing.value = true
-            _analysisResult.value = "Analyse en cours..."
+            _analysisResult.value = "Analyse en cours avec Groq Vision..."
+            _errorMessage.value = null
             
             try {
-                // TODO: Appeler API de vision pour analyser la photo
-                // Pour l'instant, un placeholder
-                kotlinx.coroutines.delay(2000)
+                val context = getApplication<Application>()
+                val visionClient = com.narutoai.chat.api.GroqVisionClient(context)
                 
-                val mockAnalysis = """
-                    Jeune adulte, apparence entre 18-25 ans
-                    Cheveux [couleur détectée depuis photo]
-                    Yeux [couleur détectée]
-                    Morphologie [type de corps]
-                    Traits distinctifs : [éléments remarquables]
-                """.trimIndent()
+                val result = visionClient.analyzePhotoForCharacter(_avatarImageUri.value!!)
                 
-                _analysisResult.value = "Analyse terminée ✓"
-                _physicalDescription.value = mockAnalysis
-                
-                // Auto-remplir les champs détectés
-                _age.value = "18-25 ans"
-                _hairColor.value = "[détecté]"
-                _eyeColor.value = "[détecté]"
-                _bodyType.value = "[détecté]"
+                if (result.isSuccess) {
+                    val description = result.getOrNull()
+                    
+                    if (description != null) {
+                        // Remplir la description complète
+                        _physicalDescription.value = description.toFormattedDescription()
+                        
+                        // Auto-remplir les champs individuels
+                        _age.value = description.age
+                        _hairColor.value = description.hairColor
+                        _eyeColor.value = description.eyeColor
+                        _bodyType.value = description.bodyType
+                        _height.value = description.height
+                        
+                        _analysisResult.value = "✅ Analyse terminée avec succès !"
+                        
+                        android.util.Log.d("CreateCharacterVM", "Analyse réussie: $description")
+                    } else {
+                        _analysisResult.value = "⚠️ Analyse incomplète"
+                        _errorMessage.value = "L'analyse n'a pas pu extraire toutes les informations"
+                    }
+                } else {
+                    val error = result.exceptionOrNull()
+                    _analysisResult.value = "❌ Échec de l'analyse"
+                    _errorMessage.value = "Erreur: ${error?.message ?: "Inconnue"}"
+                    
+                    android.util.Log.e("CreateCharacterVM", "Erreur analyse: ${error?.message}", error)
+                }
                 
             } catch (e: Exception) {
                 _errorMessage.value = "Erreur d'analyse: ${e.message}"
-                _analysisResult.value = "Erreur d'analyse"
+                _analysisResult.value = "❌ Erreur d'analyse"
+                
+                android.util.Log.e("CreateCharacterVM", "Exception analyse: ${e.message}", e)
             } finally {
                 _isAnalyzing.value = false
             }

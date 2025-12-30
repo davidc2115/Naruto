@@ -6,6 +6,7 @@ import com.narutoai.chat.ui.screens.CharacterProfileScreen
 import com.narutoai.chat.ui.screens.CharacterSelectionScreen
 import com.narutoai.chat.ui.screens.ChatScreen
 import com.narutoai.chat.ui.screens.CreateCharacterScreen
+import com.narutoai.chat.ui.screens.CustomCharactersListScreen
 import com.narutoai.chat.ui.screens.SettingsScreen
 import com.narutoai.chat.ui.screens.UserProfileScreen
 import com.narutoai.chat.viewmodel.ChatViewModel
@@ -17,6 +18,7 @@ sealed class Screen {
     object SETTINGS : Screen()
     object USER_PROFILE : Screen()
     object CREATE_CHARACTER : Screen()
+    object CUSTOM_CHARACTERS_LIST : Screen()
 }
 
 @Composable
@@ -40,6 +42,9 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 },
                 onCreateCharacterClick = {
                     currentScreen = Screen.CREATE_CHARACTER
+                },
+                onCustomCharactersClick = {
+                    currentScreen = Screen.CUSTOM_CHARACTERS_LIST
                 },
                 viewModel = viewModel
             )
@@ -104,6 +109,27 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     currentScreen = Screen.CHARACTER_SELECTION
                 },
                 onCharacterCreated = {
+                    currentScreen = Screen.CHARACTER_SELECTION
+                }
+            )
+        }
+        
+        Screen.CUSTOM_CHARACTERS_LIST -> {
+            CustomCharactersListScreen(
+                onNavigateBack = {
+                    currentScreen = Screen.CHARACTER_SELECTION
+                },
+                onCreateNew = {
+                    currentScreen = Screen.CREATE_CHARACTER
+                },
+                onEditCharacter = { character ->
+                    // TODO: Implémenter édition
+                    // Pour l'instant, retour à la sélection
+                    currentScreen = Screen.CHARACTER_SELECTION
+                },
+                onSelectCharacter = { character ->
+                    // TODO: Convertir CustomCharacterEntity en Character et lancer chat
+                    // Pour l'instant, retour à la sélection
                     currentScreen = Screen.CHARACTER_SELECTION
                 }
             )

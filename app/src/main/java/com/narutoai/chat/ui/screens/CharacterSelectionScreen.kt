@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -32,6 +33,7 @@ fun CharacterSelectionScreen(
     onSettingsClick: () -> Unit = {},
     onUserProfileClick: () -> Unit = {},
     onCreateCharacterClick: () -> Unit = {},
+    onCustomCharactersClick: () -> Unit = {},
     viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var selectedCategory by remember { mutableStateOf<CharacterCategory?>(null) }
@@ -54,6 +56,9 @@ fun CharacterSelectionScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onCustomCharactersClick) {
+                        Icon(Icons.Default.People, "Mes personnages")
+                    }
                     IconButton(onClick = onUserProfileClick) {
                         Icon(Icons.Default.Person, "Mon Profil")
                     }
