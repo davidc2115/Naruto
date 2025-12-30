@@ -464,7 +464,15 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                         ) {
                             AsyncImage(
                                 model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
-                                    .data(videoUrl)
+                                    .data(
+                                        if (videoUrl.startsWith("/")) {
+                                            // Fichier local - Utiliser le chemin direct
+                                            java.io.File(videoUrl)
+                                        } else {
+                                            // URL
+                                            videoUrl
+                                        }
+                                    )
                                     .crossfade(true)
                                     .build(),
                                 contentDescription = "Vidéo générée",

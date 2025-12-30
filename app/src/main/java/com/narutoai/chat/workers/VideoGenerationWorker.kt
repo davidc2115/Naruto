@@ -29,10 +29,31 @@ class VideoGenerationWorker(
         
         const val KEY_RESULT_URL = "result_url"
         const val KEY_ERROR = "error"
+        
+        private const val PREFS_NAME = "video_worker_results"
+        private const val KEY_LATEST_VIDEO_URL = "latest_video_url"
     }
     
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
+            // Nettoyer les anciennes vidéos (garder seulement les 20 dernières)
+            try {
+                val videosDir = java.io.File(applicationContext.filesDir, "generated_videos")
+                if (videosDir.exists()) {
+                    val videoFiles = videosDir.listFiles { file -> 
+                        file.name.startsWith("video_") && (file.name.endsWith(".mp4") || file.name.endsWith(".gif"))
+                    }?.sortedByDescending { it.lastModified() } ?: emptyList()
+                    
+                    val toDelete = videoFiles.drop(20)
+                    toDelete.forEach { it.delete() }
+                    if (toDelete.isNotEmpty()) {
+                        android.util.Log.d("VideoWorker", "🗑️ ${toDelete.size} anciennes vidéos supprimées")
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.w("VideoWorker", "⚠️ Erreur nettoyage: ${e.message}")
+            }
+            
             // Créer canal de notification
             NotificationHelper.createNotificationChannel(applicationContext)
             
@@ -65,6 +86,56 @@ class VideoGenerationWorker(
             
             result.fold(
                 onSuccess = { videoUrl: String ->
+                    android.util.Log.d("VideoWorker", "✅ Vidéo générée: ${videoUrl.take(100)}")
+                    
+                    // Télécharger et sauvegarder en fichier permanent
+                    val finalVideoUrl = if (videoUrl.startsWith("http")) {
+                        try {
+                            android.util.Log.d("VideoWorker", "📥 Téléchargement vidéo...")
+                            val client = okhttp3.OkHttpClient.Builder()
+                                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                                .readTimeout(180, java.util.concurrent.TimeUnit.SECONDS)
+                                .build()
+                            
+                            val request = okhttp3.Request.Builder()
+                                .url(videoUrl)
+                                .get()
+                                .build()
+                            
+                            client.newCall(request).execute().use { response ->
+                                if (response.isSuccessful) {
+                                    val videoBytes = response.body?.bytes()
+                                    if (videoBytes != null && videoBytes.size > 10000) {
+                                        // Sauvegarder dans filesDir (PERMANENT)
+                                        val videosDir = java.io.File(applicationContext.filesDir, "generated_videos")
+                                        videosDir.mkdirs()
+                                        
+                                        val videoFile = java.io.File(videosDir, "video_${System.currentTimeMillis()}.mp4")
+                                        videoFile.writeBytes(videoBytes)
+                                        android.util.Log.d("VideoWorker", "✅ Vidéo sauvegardée PERMANENT: ${videoFile.absolutePath} (${videoBytes.size / 1024}KB)")
+                                        videoFile.absolutePath
+                                    } else {
+                                        android.util.Log.w("VideoWorker", "⚠️ Vidéo trop petite")
+                                        videoUrl
+                                    }
+                                } else {
+                                    android.util.Log.w("VideoWorker", "⚠️ Échec téléchargement")
+                                    videoUrl
+                                }
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("VideoWorker", "❌ Erreur téléchargement: ${e.message}")
+                            videoUrl
+                        }
+                    } else {
+                        videoUrl
+                    }
+                    
+                    // Sauvegarder dans SharedPreferences
+                    val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    prefs.edit().putString(KEY_LATEST_VIDEO_URL, finalVideoUrl).apply()
+                    android.util.Log.d("VideoWorker", "✅ Chemin vidéo sauvegardé: ${finalVideoUrl.take(100)}")
+                    
                     // Notification de succès
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
@@ -73,7 +144,7 @@ class VideoGenerationWorker(
                         "Votre vidéo est prête ! Ouvrez l'app pour la voir."
                     )
                     
-                    val outputData = workDataOf(KEY_RESULT_URL to videoUrl)
+                    val outputData = workDataOf(KEY_RESULT_URL to "success")
                     Result.success(outputData)
                 },
                 onFailure = { exception: Throwable ->

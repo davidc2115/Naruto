@@ -409,6 +409,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                                     imageUrl = imageUrl
                                 )
                                 android.util.Log.d("ChatViewModel", "✅ Message ajouté avec imageUrl: ${imageUrl.take(100)}")
+                                
+                                // Sauvegarder la conversation avec l'image
+                                saveCurrentConversation()
                             } else {
                                 android.util.Log.e("ChatViewModel", "❌ URL image vide ou null!")
                                 _messages.value = _messages.value + ChatMessage(
@@ -511,42 +514,78 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         return@launch
                     }
                 
-                // Utiliser Freebox (fallback automatique sur Pollination AI si inaccessible)
-                // Délai pour éviter rate limit après Groq
-                kotlinx.coroutines.delay(2000)
-                
-                // Générer une vraie vidéo MP4 avec Pollination AI Video
-                val result = pollinationAIClient.generateVideo(
-                    prompt = "$videoPrompt, smooth motion, cinematic, fluid animation, dynamic scene",
-                    width = 512,
-                    height = 512,
-                    duration = 5, // 5 secondes de vidéo
-                    enhance = true,
-                    isNSFW = _isNSFWMode.value
+                // Génération en arrière-plan avec WorkManager
+                _messages.value = _messages.value.dropLast(1) + ChatMessage(
+                    content = "🔄 Génération vidéo en arrière-plan... Vous serez notifié.",
+                    isUser = false
                 )
+                _isGeneratingVideo.value = false
                 
-                result.fold(
-                    onSuccess = { videoUrl: String ->
-                        _generatedVideoUrl.value = videoUrl
-                        _isGeneratingVideo.value = false
-                        
-                        val source = "Pollination AI Video"
-                        _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = "✅ Vidéo générée (5s MP4, $source)",
-                            isUser = false,
-                            videoUrl = videoUrl // AJOUT: Inclure l'URL de la vidéo
-                        )
-                    },
-                    onFailure = { exception: Throwable ->
-                        val errorMsg = "❌ Erreur génération vidéo: ${exception.message}"
-                        _error.value = errorMsg
-                        _isGeneratingVideo.value = false
-                        _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = errorMsg,
-                            isUser = false
-                        )
+                // Créer Work Request pour génération vidéo en arrière-plan
+                val inputData = Data.Builder()
+                    .putString(VideoGenerationWorker.KEY_PROMPT, "$videoPrompt, smooth motion, cinematic")
+                    .putString(VideoGenerationWorker.KEY_NEGATIVE_PROMPT, "low quality, blurry")
+                    .putInt(VideoGenerationWorker.KEY_WIDTH, 512)
+                    .putInt(VideoGenerationWorker.KEY_HEIGHT, 512)
+                    .putInt(VideoGenerationWorker.KEY_DURATION, 5)
+                    .putBoolean(VideoGenerationWorker.KEY_IS_NSFW, _isNSFWMode.value)
+                    .build()
+                
+                val workRequest = OneTimeWorkRequestBuilder<VideoGenerationWorker>()
+                    .setInputData(inputData)
+                    .setExpedited(androidx.work.OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    .build()
+                
+                workManager.enqueue(workRequest)
+                
+                // Observer le résultat du Worker
+                workManager.getWorkInfoByIdLiveData(workRequest.id).observeForever { workInfo: WorkInfo? ->
+                    android.util.Log.d("ChatViewModel", "🔔 WorkInfo vidéo state: ${workInfo?.state}")
+                    
+                    when (workInfo?.state) {
+                        WorkInfo.State.SUCCEEDED -> {
+                            // Lire l'URL depuis SharedPreferences
+                            val prefs = getApplication<Application>().getSharedPreferences("video_worker_results", android.content.Context.MODE_PRIVATE)
+                            val videoUrl = prefs.getString("latest_video_url", null)
+                            
+                            android.util.Log.d("ChatViewModel", "✅ Vidéo URL: ${videoUrl?.take(100)}")
+                            
+                            if (videoUrl != null && videoUrl.isNotEmpty()) {
+                                _generatedVideoUrl.value = videoUrl
+                                
+                                val source = "Pollination AI Video"
+                                _messages.value = _messages.value.dropLast(1) + ChatMessage(
+                                    content = "✅ Vidéo générée avec succès ! (Source: $source)",
+                                    isUser = false,
+                                    videoUrl = videoUrl
+                                )
+                                
+                                // Sauvegarder la conversation avec la vidéo
+                                saveCurrentConversation()
+                            } else {
+                                _messages.value = _messages.value + ChatMessage(
+                                    content = "❌ Erreur: URL vidéo vide",
+                                    isUser = false
+                                )
+                            }
+                        }
+                        WorkInfo.State.FAILED -> {
+                            val error = workInfo.outputData.getString(VideoGenerationWorker.KEY_ERROR)
+                            android.util.Log.e("ChatViewModel", "❌ Worker vidéo failed: $error")
+                            
+                            _messages.value = _messages.value + ChatMessage(
+                                content = "❌ Erreur génération vidéo: ${error ?: "Unknown error"}",
+                                isUser = false
+                            )
+                        }
+                        WorkInfo.State.RUNNING -> {
+                            android.util.Log.d("ChatViewModel", "⏳ Génération vidéo en cours...")
+                        }
+                        else -> {
+                            android.util.Log.d("ChatViewModel", "⏳ État vidéo: ${workInfo?.state}")
+                        }
                     }
-                )
+                }
             } catch (e: Exception) {
                 val errorMsg = "❌ Erreur: ${e.message}"
                 _error.value = errorMsg

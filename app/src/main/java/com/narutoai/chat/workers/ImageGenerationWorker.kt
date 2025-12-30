@@ -39,20 +39,26 @@ class ImageGenerationWorker(
     
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            // Nettoyer les anciennes images (garder seulement les 10 dernières)
+            // Nettoyer les anciennes images (garder seulement les 50 dernières pour économiser l'espace)
             try {
-                val cacheDir = applicationContext.cacheDir
-                val imageFiles = cacheDir.listFiles { file -> 
-                    file.name.startsWith("generated_image_") && file.name.endsWith(".png")
-                }?.sortedByDescending { it.lastModified() } ?: emptyList()
-                
-                // Supprimer toutes sauf les 10 plus récentes
-                imageFiles.drop(10).forEach { file ->
-                    file.delete()
-                    android.util.Log.d("ImageWorker", "🗑️ Ancienne image supprimée: ${file.name}")
+                val imagesDir = java.io.File(applicationContext.filesDir, "generated_images")
+                if (imagesDir.exists()) {
+                    val imageFiles = imagesDir.listFiles { file -> 
+                        file.name.startsWith("image_") && file.name.endsWith(".png")
+                    }?.sortedByDescending { it.lastModified() } ?: emptyList()
+                    
+                    // Supprimer toutes sauf les 50 plus récentes
+                    val toDelete = imageFiles.drop(50)
+                    toDelete.forEach { file ->
+                        file.delete()
+                        android.util.Log.d("ImageWorker", "🗑️ Ancienne image supprimée: ${file.name}")
+                    }
+                    if (toDelete.isNotEmpty()) {
+                        android.util.Log.d("ImageWorker", "🗑️ ${toDelete.size} anciennes images supprimées")
+                    }
                 }
             } catch (e: Exception) {
-                android.util.Log.w("ImageWorker", "⚠️ Erreur nettoyage cache: ${e.message}")
+                android.util.Log.w("ImageWorker", "⚠️ Erreur nettoyage: ${e.message}")
             }
             
             // Créer canal de notification
@@ -154,10 +160,10 @@ class ImageGenerationWorker(
                     
                     android.util.Log.d("ImageWorker", "🎨 Source: $source")
                     
-                    // Si c'est une URL Pollinations, la télécharger et sauvegarder en fichier local
-                    val finalImageUrl = if (imageUrl.contains("pollinations")) {
+                    // Si c'est une URL Pollinations, la télécharger et sauvegarder en fichier PERMANENT
+                    val finalImageUrl = if (imageUrl.contains("pollinations") || imageUrl.startsWith("http")) {
                         try {
-                            android.util.Log.d("ImageWorker", "📥 Téléchargement image Pollinations...")
+                            android.util.Log.d("ImageWorker", "📥 Téléchargement image...")
                             val client = okhttp3.OkHttpClient.Builder()
                                 .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
                                 .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
@@ -172,10 +178,13 @@ class ImageGenerationWorker(
                                 if (response.isSuccessful) {
                                     val imageBytes = response.body?.bytes()
                                     if (imageBytes != null && imageBytes.size > 1000) {
-                                        // Sauvegarder dans le cache de l'app
-                                        val imageFile = java.io.File(applicationContext.cacheDir, "generated_image_${System.currentTimeMillis()}.png")
+                                        // Sauvegarder dans filesDir (PERMANENT) au lieu de cacheDir (temporaire)
+                                        val imagesDir = java.io.File(applicationContext.filesDir, "generated_images")
+                                        imagesDir.mkdirs()
+                                        
+                                        val imageFile = java.io.File(imagesDir, "image_${System.currentTimeMillis()}.png")
                                         imageFile.writeBytes(imageBytes)
-                                        android.util.Log.d("ImageWorker", "✅ Image sauvegardée: ${imageFile.absolutePath} (${imageBytes.size / 1024}KB)")
+                                        android.util.Log.d("ImageWorker", "✅ Image sauvegardée PERMANENT: ${imageFile.absolutePath} (${imageBytes.size / 1024}KB)")
                                         imageFile.absolutePath
                                     } else {
                                         android.util.Log.w("ImageWorker", "⚠️ Image trop petite, utilisation URL")
