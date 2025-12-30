@@ -5,6 +5,7 @@ import com.narutoai.chat.models.Character
 import com.narutoai.chat.ui.screens.CharacterProfileScreen
 import com.narutoai.chat.ui.screens.CharacterSelectionScreen
 import com.narutoai.chat.ui.screens.ChatScreen
+import com.narutoai.chat.ui.screens.CreateCharacterScreen
 import com.narutoai.chat.ui.screens.SettingsScreen
 import com.narutoai.chat.ui.screens.UserProfileScreen
 import com.narutoai.chat.viewmodel.ChatViewModel
@@ -15,6 +16,7 @@ sealed class Screen {
     object CHAT : Screen()
     object SETTINGS : Screen()
     object USER_PROFILE : Screen()
+    object CREATE_CHARACTER : Screen()
 }
 
 @Composable
@@ -35,6 +37,9 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 },
                 onUserProfileClick = {
                     currentScreen = Screen.USER_PROFILE
+                },
+                onCreateCharacterClick = {
+                    currentScreen = Screen.CREATE_CHARACTER
                 },
                 viewModel = viewModel
             )
@@ -88,6 +93,17 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 },
                 onSaveProfile = { profile ->
                     viewModel.saveUserProfile(profile)
+                    currentScreen = Screen.CHARACTER_SELECTION
+                }
+            )
+        }
+        
+        Screen.CREATE_CHARACTER -> {
+            CreateCharacterScreen(
+                onNavigateBack = {
+                    currentScreen = Screen.CHARACTER_SELECTION
+                },
+                onCharacterCreated = {
                     currentScreen = Screen.CHARACTER_SELECTION
                 }
             )
