@@ -91,13 +91,11 @@ class ImageGenerationWorker(
                     
                     val comfyClient = ComfyUIClient()
                     
-                    // Tester d'abord l'accessibilité
+                    // Tester d'abord l'accessibilité (déjà dans Dispatchers.IO)
                     val isAvailable = try {
-                        kotlinx.coroutines.runBlocking {
-                            comfyClient.isAvailable()
-                        }
+                        comfyClient.isAvailable()
                     } catch (e: Exception) {
-                        android.util.Log.e("ImageWorker", "❌ Erreur test ComfyUI: ${e.message}")
+                        android.util.Log.e("ImageWorker", "❌ Exception test ComfyUI: ${e.javaClass.simpleName}: ${e.message}")
                         false
                     }
                     

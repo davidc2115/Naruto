@@ -31,7 +31,7 @@ class ComfyUIClient {
         private const val COMFY_URL = "http://88.174.155.230:33437"
         private const val COMFY_WS_URL = "ws://88.174.155.230:33437/ws"
         
-        private const val PING_TIMEOUT = 15000L // Augmenté de 3s à 15s
+        private const val PING_TIMEOUT = 30000L // 30 secondes pour test accessibilité
         private const val GENERATION_TIMEOUT = 600000L // 10 min au lieu de 3 min
         
         // Paramètres optimisés pour ARM CPU (ULTRA-RAPIDE)
@@ -57,16 +57,28 @@ class ComfyUIClient {
      */
     suspend fun isAvailable(): Boolean = withContext(Dispatchers.IO) {
         try {
+            Log.d(TAG, "🔍 Test accessibilité ComfyUI: $COMFY_URL")
+            
             val request = Request.Builder()
                 .url(COMFY_URL)
-                .head()
+                .get() // GET au lieu de HEAD (plus fiable)
                 .build()
             
+            val startTime = System.currentTimeMillis()
             pingClient.newCall(request).execute().use { response ->
-                response.isSuccessful
+                val duration = System.currentTimeMillis() - startTime
+                val isOk = response.isSuccessful
+                
+                if (isOk) {
+                    Log.d(TAG, "✅ ComfyUI accessible (${duration}ms, HTTP ${response.code})")
+                } else {
+                    Log.w(TAG, "⚠️ ComfyUI répond mais erreur HTTP ${response.code}")
+                }
+                
+                isOk
             }
         } catch (e: Exception) {
-            Log.w(TAG, "ComfyUI non accessible: ${e.message}")
+            Log.e(TAG, "❌ ComfyUI non accessible: ${e.javaClass.simpleName}: ${e.message}")
             false
         }
     }
