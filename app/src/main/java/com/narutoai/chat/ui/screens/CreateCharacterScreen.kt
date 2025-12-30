@@ -58,8 +58,10 @@ fun CreateCharacterScreen(
     // Gestion du succès
     LaunchedEffect(saveSuccess) {
         if (saveSuccess) {
-            onCharacterCreated()
+            // Attendre un peu pour que Room enregistre
+            kotlinx.coroutines.delay(500)
             viewModel.resetSaveSuccess()
+            onCharacterCreated()
         }
     }
     

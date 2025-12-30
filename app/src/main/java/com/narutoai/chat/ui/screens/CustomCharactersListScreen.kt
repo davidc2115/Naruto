@@ -41,13 +41,30 @@ fun CustomCharactersListScreen(
     var characterToDelete by remember { mutableStateOf<CustomCharacterEntity?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     
+    // Debug: log au chargement et changement
+    LaunchedEffect(Unit) {
+        android.util.Log.d("CustomCharactersList", "Screen mounted")
+    }
+    
+    LaunchedEffect(characters.size) {
+        android.util.Log.d("CustomCharactersList", "Characters: ${characters.size} items")
+    }
+    
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mes personnages") },
+                title = { Text("Mes personnages (${characters.size})") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, "Retour")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        // Force refresh en naviguant
+                        android.util.Log.d("CustomCharactersList", "Manual refresh requested")
+                    }) {
+                        Icon(Icons.Default.Refresh, "Actualiser")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -10,6 +10,7 @@ import com.narutoai.chat.ui.screens.CreateCharacterScreen
 import com.narutoai.chat.ui.screens.CustomCharactersListScreen
 import com.narutoai.chat.ui.screens.SettingsScreen
 import com.narutoai.chat.ui.screens.UserProfileScreen
+import com.narutoai.chat.utils.CharacterConverter
 import com.narutoai.chat.viewmodel.ChatViewModel
 
 sealed class Screen {
@@ -128,15 +129,20 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 onCreateNew = {
                     currentScreen = Screen.CREATE_CHARACTER
                 },
-                onEditCharacter = { character ->
-                    // TODO: Implémenter édition
-                    // Pour l'instant, retour à la sélection
-                    currentScreen = Screen.CHARACTER_SELECTION
+                onEditCharacter = { entity ->
+                    // TODO: Écran d'édition
+                    android.util.Log.d("NarutoApp", "Edit character: ${entity.name}")
+                    // Pour l'instant, afficher profil
+                    val character = CharacterConverter.toCharacter(entity)
+                    characterForDetail = character
+                    currentScreen = Screen.CHARACTER_DETAIL
                 },
-                onSelectCharacter = { character ->
-                    // TODO: Convertir CustomCharacterEntity en Character et lancer chat
-                    // Pour l'instant, retour à la sélection
-                    currentScreen = Screen.CHARACTER_SELECTION
+                onSelectCharacter = { entity ->
+                    // Convertir et lancer chat
+                    val character = CharacterConverter.toCharacter(entity)
+                    android.util.Log.d("NarutoApp", "Select custom character: ${character.name}")
+                    characterForDetail = character
+                    currentScreen = Screen.CHARACTER_DETAIL
                 }
             )
         }
