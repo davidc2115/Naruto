@@ -13,8 +13,8 @@ from urllib.parse import quote
 # Configuration
 POLLINATION_BASE_URL = "https://image.pollinations.ai/prompt"
 OUTPUT_DIR = "character_images"
-IMAGES_PER_CHARACTER = 6
-DELAY_BETWEEN_REQUESTS = 3  # secondes
+IMAGES_PER_CHARACTER = 3  # Réduit à 3 pour génération rapide
+DELAY_BETWEEN_REQUESTS = 2  # secondes
 
 # Définition des personnages avec leurs descriptions physiques
 CHARACTERS = {
@@ -183,7 +183,7 @@ def main():
     print(f"  - Dossier de sortie: {OUTPUT_DIR}")
     print(f"  - Délai entre requêtes: {DELAY_BETWEEN_REQUESTS}s")
     
-    input("\n⏸️  Appuyez sur ENTER pour commencer la génération...")
+    print("\n🚀 Démarrage de la génération...")
     
     total_success = 0
     start_time = time.time()
