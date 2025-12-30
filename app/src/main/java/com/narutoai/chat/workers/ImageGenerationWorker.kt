@@ -64,19 +64,28 @@ class ImageGenerationWorker(
             val result = when (preferredApi) {
                 "freebox" -> {
                     // Freebox temporairement désactivée (inaccessible depuis Internet)
-                    // Fallback vers Stable Horde
-                    android.util.Log.d("ImageWorker", "⚠️ Freebox désactivée, utilisation de Stable Horde")
+                    // Fallback vers Pollination AI (plus rapide que Stable Horde)
+                    android.util.Log.d("ImageWorker", "⚠️ Freebox désactivée, utilisation de Pollination AI")
+                    val pollinationClient = PollinationAIClient()
+                    pollinationClient.generateImage(prompt, width, height, enhance = true)
+                }
+                "stable_horde" -> {
+                    // Stable Horde (gratuit mais LENT - queue de plusieurs minutes)
+                    android.util.Log.d("ImageWorker", "⏳ Stable Horde sélectionné (peut être lent)")
                     val stableHordeClient = StableHordeClient()
                     stableHordeClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
                 }
                 "pollination" -> {
+                    // Pollination AI (rapide - 10-20 secondes)
+                    android.util.Log.d("ImageWorker", "⚡ Pollination AI sélectionné (rapide)")
                     val pollinationClient = PollinationAIClient()
                     pollinationClient.generateImage(prompt, width, height, enhance = true)
                 }
                 else -> {
-                    // stable_horde ou auto
-                    val stableHordeClient = StableHordeClient()
-                    stableHordeClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale, isNSFW)
+                    // Auto: Pollination AI par défaut (plus rapide)
+                    android.util.Log.d("ImageWorker", "⚡ Mode auto: utilisation de Pollination AI (rapide)")
+                    val pollinationClient = PollinationAIClient()
+                    pollinationClient.generateImage(prompt, width, height, enhance = true)
                 }
             }
             
