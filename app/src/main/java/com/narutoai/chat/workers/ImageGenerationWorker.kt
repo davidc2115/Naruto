@@ -50,7 +50,7 @@ class ImageGenerationWorker(
             val steps = inputData.getInt(KEY_STEPS, 15) // Réduit de 20 à 15 par défaut
             val cfgScale = inputData.getDouble(KEY_CFG_SCALE, 7.0)
             val isNSFW = inputData.getBoolean(KEY_IS_NSFW, false)
-            val preferredApi = inputData.getString(KEY_PREFERRED_API) ?: "stable_horde"
+            val preferredApi = inputData.getString(KEY_PREFERRED_API) ?: "pollination"
             
             // Afficher notification de progression
             NotificationHelper.showProgressNotification(

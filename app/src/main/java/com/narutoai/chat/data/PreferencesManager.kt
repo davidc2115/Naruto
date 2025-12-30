@@ -25,10 +25,10 @@ class PreferencesManager(private val context: Context) {
         const val API_FREEBOX = "freebox"
         const val API_POLLINATION = "pollination"
         const val API_STABLE_HORDE = "stable_horde"
-        const val API_AUTO = "auto" // Freebox → Stable Horde → Pollination
+        const val API_AUTO = "auto" // Pollination AI (rapide et fiable)
         
-        // Valeur par défaut
-        const val DEFAULT_API = API_STABLE_HORDE
+        // Valeur par défaut - POLLINATION AI (rapide 10-20s vs Stable Horde 2-10 min)
+        const val DEFAULT_API = API_POLLINATION
     }
     
     /**
