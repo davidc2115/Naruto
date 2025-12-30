@@ -95,10 +95,12 @@ class PollinationAIClient {
                     client.newCall(request).execute().use { response ->
                         when (response.code) {
                             200 -> {
-                                // Vérifier que le body n'est pas vide
-                                val contentLength = response.body?.contentLength() ?: 0
-                                if (contentLength > 1000) { // Au moins 1KB
-                                    return@withContext Result.success(imageUrl)
+                                // Télécharger l'image et la convertir en Base64 pour Coil
+                                val imageBytes = response.body?.bytes()
+                                if (imageBytes != null && imageBytes.size > 1000) { // Au moins 1KB
+                                    val base64 = android.util.Base64.encodeToString(imageBytes, android.util.Base64.NO_WRAP)
+                                    android.util.Log.d("PollinationAI", "✅ Image téléchargée: ${imageBytes.size / 1024}KB, Base64: ${base64.length} chars")
+                                    return@withContext Result.success("data:image/png;base64,$base64")
                                 } else {
                                     throw IOException("Image trop petite ou invalide")
                                 }

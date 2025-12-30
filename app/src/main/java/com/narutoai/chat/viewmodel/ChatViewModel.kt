@@ -390,10 +390,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             // Lire l'URL depuis SharedPreferences (pas de limite de taille)
                             val prefs = getApplication<Application>().getSharedPreferences("image_worker_results", android.content.Context.MODE_PRIVATE)
                             val imageUrl = prefs.getString("latest_image_url", null)
+                            val imageSource = prefs.getString("latest_image_source", "Cloud") ?: "Cloud"
                             
                             android.util.Log.d("ChatViewModel", "📖 Lecture URL depuis SharedPrefs")
                             android.util.Log.d("ChatViewModel", "✅ URL complète: $imageUrl")
                             android.util.Log.d("ChatViewModel", "📏 Longueur URL: ${imageUrl?.length ?: 0} caractères")
+                            android.util.Log.d("ChatViewModel", "🎨 Source: $imageSource")
                             
                             if (imageUrl != null && imageUrl.isNotEmpty()) {
                                 _generatedImageUrl.value = imageUrl
@@ -402,7 +404,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                                 
                                 // Remplacer le message de statut par l'image
                                 _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                                    content = "✅ Image générée avec succès !",
+                                    content = "✅ Image générée avec succès ! (Source: $imageSource)",
                                     isUser = false,
                                     imageUrl = imageUrl
                                 )

@@ -70,10 +70,30 @@ class ImageGenerationWorker(
                     // Essayer Freebox d'abord, fallback sur Pollination si échec
                     val freeboxResult = comfyClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
                     if (freeboxResult.isSuccess) {
-                        android.util.Log.d("ImageWorker", "✅ Freebox réussi")
+                        android.util.Log.d("ImageWorker", "✅ Freebox réussi (ComfyUI local)")
+                        
+                        // Afficher notification spécifique pour Freebox
+                        NotificationHelper.showProgressNotification(
+                            applicationContext,
+                            NotificationHelper.NOTIFICATION_ID_IMAGE,
+                            "Image générée ✅",
+                            "Source: Freebox (ComfyUI local)"
+                        )
+                        
                         freeboxResult
                     } else {
-                        android.util.Log.w("ImageWorker", "⚠️ Freebox échec, fallback Pollination: ${freeboxResult.exceptionOrNull()?.message}")
+                        val errorMsg = freeboxResult.exceptionOrNull()?.message ?: "Erreur inconnue"
+                        android.util.Log.w("ImageWorker", "⚠️ Freebox ÉCHEC: $errorMsg")
+                        android.util.Log.w("ImageWorker", "🔄 Fallback automatique vers Pollination AI...")
+                        
+                        // Afficher notification de fallback
+                        NotificationHelper.showProgressNotification(
+                            applicationContext,
+                            NotificationHelper.NOTIFICATION_ID_IMAGE,
+                            "Freebox inaccessible",
+                            "Utilisation de Pollination AI (cloud)..."
+                        )
+                        
                         val pollinationClient = PollinationAIClient()
                         pollinationClient.generateImage(prompt, width, height, enhance = true)
                     }
@@ -108,17 +128,28 @@ class ImageGenerationWorker(
                 onSuccess = { imageUrl: String ->
                     android.util.Log.d("ImageWorker", "✅ Image générée: ${imageUrl.take(100)}")
                     
+                    // Déterminer la source de l'image
+                    val source = when {
+                        preferredApi == "freebox" && !imageUrl.contains("pollinations") -> "Freebox (local)"
+                        preferredApi == "pollination" || imageUrl.contains("pollinations") -> "Pollination AI (cloud)"
+                        preferredApi == "stable_horde" -> "Stable Horde"
+                        else -> "Cloud"
+                    }
+                    
+                    android.util.Log.d("ImageWorker", "🎨 Source: $source")
+                    
                     // Sauvegarder l'URL dans SharedPreferences (pas de limite)
                     val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     prefs.edit().putString(KEY_LATEST_IMAGE_URL, imageUrl).apply()
+                    prefs.edit().putString("latest_image_source", source).apply()
                     android.util.Log.d("ImageWorker", "✅ URL sauvegardée dans SharedPrefs (${imageUrl.length} chars)")
                     
-                    // Notification de succès
+                    // Notification de succès avec source
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
                         NotificationHelper.NOTIFICATION_ID_IMAGE,
                         "Image générée ✅",
-                        "Votre image est prête ! Ouvrez l'app pour la voir."
+                        "Source: $source - Ouvrez l'app pour voir"
                     )
                     
                     // Retourner uniquement un flag de succès (pas l'URL)
