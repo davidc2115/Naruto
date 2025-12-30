@@ -27,12 +27,30 @@ class GroqVisionClient(private val context: Context) {
         private const val MODEL = "llama-3.2-90b-vision-preview"
         private const val MAX_IMAGE_SIZE_KB = 500 // 500KB max pour Base64
         
-        // Clé API Groq - À configurer dans les paramètres de l'app
-        // Pour tester, créez votre propre clé sur https://console.groq.com/keys
+        // Clé API Groq - Utilise le GroqKeyManager pour rotation automatique
         private fun getApiKey(context: Context): String {
-            val prefs = context.getSharedPreferences("naruto_ai_prefs", Context.MODE_PRIVATE)
-            return prefs.getString("groq_vision_api_key", "") 
-                ?: "YOUR_GROQ_API_KEY_HERE" // Placeholder
+            val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            
+            // Essayer de charger une clé depuis GroqKeyManager
+            val keysJson = prefs.getString("groq_api_keys", "[]") ?: "[]"
+            
+            try {
+                val keysArray = org.json.JSONArray(keysJson)
+                if (keysArray.length() > 0) {
+                    // Utiliser la première clé disponible
+                    val firstKey = keysArray.getJSONObject(0)
+                    val apiKey = firstKey.optString("key", "")
+                    if (apiKey.isNotEmpty()) {
+                        android.util.Log.d("GroqVision", "✅ Clé API trouvée (${keysArray.length()} clés disponibles)")
+                        return apiKey
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("GroqVision", "Erreur chargement clés: ${e.message}")
+            }
+            
+            android.util.Log.w("GroqVision", "⚠️ Aucune clé API Groq configurée")
+            return ""
         }
     }
     
@@ -104,11 +122,14 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                     .toRequestBody("application/json".toMediaType())
                 
                 val apiKey = getApiKey(context)
-                if (apiKey.isEmpty() || apiKey == "YOUR_GROQ_API_KEY_HERE") {
+                if (apiKey.isEmpty()) {
+                    android.util.Log.e("GroqVision", "❌ Aucune clé API Groq configurée")
                     return@withContext Result.failure(
-                        Exception("Clé API Groq non configurée. Ajoutez-la dans les paramètres.")
+                        Exception("Aucune clé API Groq configurée. Ajoutez-en une dans Paramètres > Gestion des clés Groq.")
                     )
                 }
+                
+                android.util.Log.d("GroqVision", "🔑 Utilisation clé API: ${apiKey.take(10)}...")
                 
                 val request = Request.Builder()
                     .url(GROQ_API_URL)
