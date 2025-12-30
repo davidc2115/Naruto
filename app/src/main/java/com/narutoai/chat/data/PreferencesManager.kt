@@ -21,13 +21,10 @@ class PreferencesManager(private val context: Context) {
     companion object {
         private val GENERATION_API_KEY = stringPreferencesKey("generation_api")
         
-        // Valeurs possibles pour l'API de génération
-        const val API_FREEBOX = "freebox"
+        // API de génération
         const val API_POLLINATION = "pollination"
-        const val API_STABLE_HORDE = "stable_horde"
-        const val API_AUTO = "auto" // Pollination AI (rapide et fiable)
         
-        // Valeur par défaut - POLLINATION AI (rapide 10-20s vs Stable Horde 2-10 min)
+        // Valeur par défaut - POLLINATION AI
         const val DEFAULT_API = API_POLLINATION
     }
     
