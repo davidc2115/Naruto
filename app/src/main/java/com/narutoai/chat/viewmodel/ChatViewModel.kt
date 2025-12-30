@@ -371,7 +371,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     .putInt(ImageGenerationWorker.KEY_STEPS, 15) // Réduit de 20 à 15 pour vitesse
                     .putDouble(ImageGenerationWorker.KEY_CFG_SCALE, 7.0)
                     .putBoolean(ImageGenerationWorker.KEY_IS_NSFW, _isNSFWMode.value)
-                    .putString(ImageGenerationWorker.KEY_PREFERRED_API, selectedApi)
+                    // .putString(ImageGenerationWorker.KEY_PREFERRED_API, selectedApi) - removed
                     .build()
                 
                 val workRequest = OneTimeWorkRequestBuilder<ImageGenerationWorker>()
@@ -421,7 +421,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
                         WorkInfo.State.FAILED -> {
-                            val error = workInfo.outputData.getString(ImageGenerationWorker.KEY_ERROR)
+                            val error = "Generation error"
                             android.util.Log.e("ChatViewModel", "❌ Worker failed: $error")
                             
                             _messages.value = _messages.value + ChatMessage(
@@ -570,7 +570,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
                         WorkInfo.State.FAILED -> {
-                            val error = workInfo.outputData.getString(VideoGenerationWorker.KEY_ERROR)
+                            val error = "Video generation error"
                             android.util.Log.e("ChatViewModel", "❌ Worker vidéo failed: $error")
                             
                             _messages.value = _messages.value + ChatMessage(

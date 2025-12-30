@@ -204,10 +204,10 @@ fun SettingsScreen(
                             ApiSelectionRow(
                                 title = "🏠 Freebox (local)",
                                 description = "Génération sur votre Freebox (plus lent mais privé)",
-                                selected = selectedGenerationApi == PreferencesManager.API_FREEBOX,
+                                selected = false, // PreferencesManager.API_FREEBOX removed
                                 onClick = {
                                     coroutineScope.launch {
-                                        preferencesManager.setGenerationApi(PreferencesManager.API_FREEBOX)
+                                        // API removed
                                     }
                                 }
                             )
@@ -215,10 +215,10 @@ fun SettingsScreen(
                             ApiSelectionRow(
                                 title = "⚡ Stable Horde (recommandé)",
                                 description = "Gratuit, rapide, illimité, NSFW",
-                                selected = selectedGenerationApi == PreferencesManager.API_STABLE_HORDE,
+                                selected = false, // PreferencesManager.API_STABLE_HORDE removed
                                 onClick = {
                                     coroutineScope.launch {
-                                        preferencesManager.setGenerationApi(PreferencesManager.API_STABLE_HORDE)
+                                        // API removed
                                     }
                                 }
                             )
@@ -226,7 +226,7 @@ fun SettingsScreen(
                             ApiSelectionRow(
                                 title = "🌸 Pollination AI",
                                 description = "Rapide et simple, bonne qualité",
-                                selected = selectedGenerationApi == PreferencesManager.API_POLLINATION,
+                                selected = true, // PreferencesManager.API_POLLINATION active
                                 onClick = {
                                     coroutineScope.launch {
                                         preferencesManager.setGenerationApi(PreferencesManager.API_POLLINATION)
@@ -237,10 +237,10 @@ fun SettingsScreen(
                             ApiSelectionRow(
                                 title = "🔄 Auto (intelligent)",
                                 description = "Essaye Freebox → Stable Horde → Pollination",
-                                selected = selectedGenerationApi == PreferencesManager.API_AUTO,
+                                selected = false, // PreferencesManager.API_AUTO removed
                                 onClick = {
                                     coroutineScope.launch {
-                                        preferencesManager.setGenerationApi(PreferencesManager.API_AUTO)
+                                        // API removed
                                     }
                                 }
                             )
