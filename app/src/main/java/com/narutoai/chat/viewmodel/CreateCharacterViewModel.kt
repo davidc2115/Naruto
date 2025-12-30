@@ -291,10 +291,13 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                 // Sauvegarder dans la DB
                 repository.insertCharacter(character)
                 
+                android.util.Log.d("CreateCharacterVM", "✅ Personnage sauvegardé: ${character.name} (ID: ${character.id})")
+                
                 _saveSuccess.value = true
                 
             } catch (e: Exception) {
                 e.printStackTrace()
+                android.util.Log.e("CreateCharacterVM", "❌ Erreur sauvegarde: ${e.message}", e)
                 _errorMessage.value = "Erreur de sauvegarde: ${e.message}"
             } finally {
                 _isSaving.value = false

@@ -19,10 +19,18 @@ class CustomCharactersViewModel(application: Application) : AndroidViewModel(app
     init {
         val dao = CustomCharacterDatabase.getDatabase(application).customCharacterDao()
         repository = CustomCharacterRepository(dao)
+        
+        android.util.Log.d("CustomCharactersVM", "ViewModel initialisé")
     }
     
     // Liste des personnages
     val characters: StateFlow<List<CustomCharacterEntity>> = repository.allCharacters
+        .onEach { list ->
+            android.util.Log.d("CustomCharactersVM", "📋 Personnages chargés: ${list.size}")
+            list.forEach { char ->
+                android.util.Log.d("CustomCharactersVM", "  - ${char.name} (${char.id})")
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

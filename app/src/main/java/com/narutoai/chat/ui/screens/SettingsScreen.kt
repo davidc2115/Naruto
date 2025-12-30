@@ -27,7 +27,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     viewModel: ChatViewModel,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onAdminTagsClick: (() -> Unit)? = null
 ) {
     var newGroqKey by remember { mutableStateOf("") }
     var replicateKey by remember { mutableStateOf(viewModel.replicateApiKey.value ?: "") }
@@ -343,6 +344,59 @@ fun SettingsScreen(
                         InfoRow("🎨 Replicate API", "replicate.com")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
                         InfoRow("🔄 Rotation", "Automatique entre clés")
+                    }
+                }
+            }
+            
+            // Administration (protégé par mot de passe)
+            if (onAdminTagsClick != null) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.Shield,
+                                    null,
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = "Administration",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                            
+                            Text(
+                                text = "Zone réservée à l'administrateur (protégée par mot de passe)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
+                            )
+                            
+                            Button(
+                                onClick = onAdminTagsClick,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                )
+                            ) {
+                                Icon(Icons.Default.AdminPanelSettings, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Gestion des tags")
+                            }
+                        }
                     }
                 }
             }

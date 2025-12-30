@@ -2,6 +2,7 @@ package com.narutoai.chat.ui
 
 import androidx.compose.runtime.*
 import com.narutoai.chat.models.Character
+import com.narutoai.chat.ui.screens.AdminTagsScreen
 import com.narutoai.chat.ui.screens.CharacterProfileScreen
 import com.narutoai.chat.ui.screens.CharacterSelectionScreen
 import com.narutoai.chat.ui.screens.ChatScreen
@@ -19,6 +20,7 @@ sealed class Screen {
     object USER_PROFILE : Screen()
     object CREATE_CHARACTER : Screen()
     object CUSTOM_CHARACTERS_LIST : Screen()
+    object ADMIN_TAGS : Screen()
 }
 
 @Composable
@@ -86,6 +88,9 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 viewModel = viewModel,
                 onBackClick = {
                     currentScreen = Screen.CHARACTER_SELECTION
+                },
+                onAdminTagsClick = {
+                    currentScreen = Screen.ADMIN_TAGS
                 }
             )
         }
@@ -106,10 +111,11 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
         Screen.CREATE_CHARACTER -> {
             CreateCharacterScreen(
                 onNavigateBack = {
-                    currentScreen = Screen.CHARACTER_SELECTION
+                    currentScreen = Screen.CUSTOM_CHARACTERS_LIST
                 },
                 onCharacterCreated = {
-                    currentScreen = Screen.CHARACTER_SELECTION
+                    // Rediriger vers la liste pour voir le personnage créé
+                    currentScreen = Screen.CUSTOM_CHARACTERS_LIST
                 }
             )
         }
@@ -131,6 +137,14 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     // TODO: Convertir CustomCharacterEntity en Character et lancer chat
                     // Pour l'instant, retour à la sélection
                     currentScreen = Screen.CHARACTER_SELECTION
+                }
+            )
+        }
+        
+        Screen.ADMIN_TAGS -> {
+            AdminTagsScreen(
+                onNavigateBack = {
+                    currentScreen = Screen.SETTINGS
                 }
             )
         }
