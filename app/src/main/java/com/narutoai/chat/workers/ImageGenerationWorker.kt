@@ -39,6 +39,22 @@ class ImageGenerationWorker(
     
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
+            // Nettoyer les anciennes images (garder seulement les 10 dernières)
+            try {
+                val cacheDir = applicationContext.cacheDir
+                val imageFiles = cacheDir.listFiles { file -> 
+                    file.name.startsWith("generated_image_") && file.name.endsWith(".png")
+                }?.sortedByDescending { it.lastModified() } ?: emptyList()
+                
+                // Supprimer toutes sauf les 10 plus récentes
+                imageFiles.drop(10).forEach { file ->
+                    file.delete()
+                    android.util.Log.d("ImageWorker", "🗑️ Ancienne image supprimée: ${file.name}")
+                }
+            } catch (e: Exception) {
+                android.util.Log.w("ImageWorker", "⚠️ Erreur nettoyage cache: ${e.message}")
+            }
+            
             // Créer canal de notification
             NotificationHelper.createNotificationChannel(applicationContext)
             
@@ -138,11 +154,51 @@ class ImageGenerationWorker(
                     
                     android.util.Log.d("ImageWorker", "🎨 Source: $source")
                     
-                    // Sauvegarder l'URL dans SharedPreferences (pas de limite)
+                    // Si c'est une URL Pollinations, la télécharger et sauvegarder en fichier local
+                    val finalImageUrl = if (imageUrl.contains("pollinations")) {
+                        try {
+                            android.util.Log.d("ImageWorker", "📥 Téléchargement image Pollinations...")
+                            val client = okhttp3.OkHttpClient.Builder()
+                                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                                .build()
+                            
+                            val request = okhttp3.Request.Builder()
+                                .url(imageUrl)
+                                .get()
+                                .build()
+                            
+                            client.newCall(request).execute().use { response ->
+                                if (response.isSuccessful) {
+                                    val imageBytes = response.body?.bytes()
+                                    if (imageBytes != null && imageBytes.size > 1000) {
+                                        // Sauvegarder dans le cache de l'app
+                                        val imageFile = java.io.File(applicationContext.cacheDir, "generated_image_${System.currentTimeMillis()}.png")
+                                        imageFile.writeBytes(imageBytes)
+                                        android.util.Log.d("ImageWorker", "✅ Image sauvegardée: ${imageFile.absolutePath} (${imageBytes.size / 1024}KB)")
+                                        imageFile.absolutePath
+                                    } else {
+                                        android.util.Log.w("ImageWorker", "⚠️ Image trop petite, utilisation URL")
+                                        imageUrl
+                                    }
+                                } else {
+                                    android.util.Log.w("ImageWorker", "⚠️ Échec téléchargement, utilisation URL")
+                                    imageUrl
+                                }
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("ImageWorker", "❌ Erreur téléchargement: ${e.message}")
+                            imageUrl
+                        }
+                    } else {
+                        imageUrl
+                    }
+                    
+                    // Sauvegarder le chemin dans SharedPreferences
                     val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                    prefs.edit().putString(KEY_LATEST_IMAGE_URL, imageUrl).apply()
+                    prefs.edit().putString(KEY_LATEST_IMAGE_URL, finalImageUrl).apply()
                     prefs.edit().putString("latest_image_source", source).apply()
-                    android.util.Log.d("ImageWorker", "✅ URL sauvegardée dans SharedPrefs (${imageUrl.length} chars)")
+                    android.util.Log.d("ImageWorker", "✅ Chemin sauvegardé dans SharedPrefs: ${finalImageUrl.take(100)}")
                     
                     // Notification de succès avec source
                     NotificationHelper.showSuccessNotification(

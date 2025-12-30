@@ -422,14 +422,28 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                     ) {
                         AsyncImage(
                             model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
-                                .data(imageUrl)
+                                .data(
+                                    if (imageUrl.startsWith("/")) {
+                                        // Fichier local
+                                        java.io.File(imageUrl)
+                                    } else {
+                                        // URL ou Base64
+                                        imageUrl
+                                    }
+                                )
                                 .crossfade(true)
+                                .memoryCacheKey(imageUrl)
+                                .diskCacheKey(imageUrl)
                                 .build(),
                             contentDescription = "Image générée",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                             placeholder = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.primaryContainer),
-                            error = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.errorContainer)
+                            error = androidx.compose.ui.graphics.painter.ColorPainter(MaterialTheme.colorScheme.errorContainer),
+                            onError = { error ->
+                                android.util.Log.e("ChatScreen", "❌ Erreur chargement image: ${error.result.throwable.message}")
+                                android.util.Log.e("ChatScreen", "URL: $imageUrl")
+                            }
                         )
                     }
                 }
