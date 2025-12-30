@@ -390,10 +390,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             // Lire l'URL depuis SharedPreferences (pas de limite de taille)
                             val prefs = getApplication<Application>().getSharedPreferences("image_worker_results", android.content.Context.MODE_PRIVATE)
                             val imageUrl = prefs.getString("latest_image_url", null)
-                            android.util.Log.d("ChatViewModel", "✅ Image URL lue depuis SharedPrefs: ${imageUrl?.take(50)}")
+                            
+                            android.util.Log.d("ChatViewModel", "📖 Lecture URL depuis SharedPrefs")
+                            android.util.Log.d("ChatViewModel", "✅ URL complète: $imageUrl")
+                            android.util.Log.d("ChatViewModel", "📏 Longueur URL: ${imageUrl?.length ?: 0} caractères")
                             
                             if (imageUrl != null && imageUrl.isNotEmpty()) {
                                 _generatedImageUrl.value = imageUrl
+                                
+                                android.util.Log.d("ChatViewModel", "🖼️ Création message avec imageUrl")
                                 
                                 // Remplacer le message de statut par l'image
                                 _messages.value = _messages.value.dropLast(1) + ChatMessage(
@@ -401,9 +406,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                                     isUser = false,
                                     imageUrl = imageUrl
                                 )
-                                android.util.Log.d("ChatViewModel", "✅ Message avec image ajouté")
+                                android.util.Log.d("ChatViewModel", "✅ Message ajouté avec imageUrl: ${imageUrl.take(100)}")
                             } else {
-                                android.util.Log.e("ChatViewModel", "❌ URL image vide!")
+                                android.util.Log.e("ChatViewModel", "❌ URL image vide ou null!")
                                 _messages.value = _messages.value + ChatMessage(
                                     content = "❌ Erreur: URL image vide",
                                     isUser = false

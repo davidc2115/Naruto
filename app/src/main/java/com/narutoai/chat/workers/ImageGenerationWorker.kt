@@ -63,11 +63,20 @@ class ImageGenerationWorker(
             // Générer l'image avec l'API choisie
             val result = when (preferredApi) {
                 "freebox" -> {
-                    // Freebox temporairement désactivée (inaccessible depuis Internet)
-                    // Fallback vers Pollination AI (plus rapide que Stable Horde)
-                    android.util.Log.d("ImageWorker", "⚠️ Freebox désactivée, utilisation de Pollination AI")
-                    val pollinationClient = PollinationAIClient()
-                    pollinationClient.generateImage(prompt, width, height, enhance = true)
+                    // Freebox (ComfyUI local) - RÉACTIVÉ avec timeout augmenté
+                    android.util.Log.d("ImageWorker", "🏠 Freebox/ComfyUI sélectionné")
+                    val comfyClient = ComfyUIClient()
+                    
+                    // Essayer Freebox d'abord, fallback sur Pollination si échec
+                    val freeboxResult = comfyClient.generateImage(prompt, negativePrompt, width, height, steps, cfgScale)
+                    if (freeboxResult.isSuccess) {
+                        android.util.Log.d("ImageWorker", "✅ Freebox réussi")
+                        freeboxResult
+                    } else {
+                        android.util.Log.w("ImageWorker", "⚠️ Freebox échec, fallback Pollination: ${freeboxResult.exceptionOrNull()?.message}")
+                        val pollinationClient = PollinationAIClient()
+                        pollinationClient.generateImage(prompt, width, height, enhance = true)
+                    }
                 }
                 "stable_horde" -> {
                     // Stable Horde (gratuit mais LENT - queue de plusieurs minutes)
@@ -87,6 +96,12 @@ class ImageGenerationWorker(
                     val pollinationClient = PollinationAIClient()
                     pollinationClient.generateImage(prompt, width, height, enhance = true)
                 }
+            }
+            
+            // DEBUG: Logger l'URL générée
+            result.onSuccess { url ->
+                android.util.Log.d("ImageWorker", "🎨 URL générée: $url")
+                android.util.Log.d("ImageWorker", "📏 Longueur URL: ${url.length} caractères")
             }
             
             result.fold(
