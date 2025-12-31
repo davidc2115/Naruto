@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import com.narutoai.chat.models.CharacterCategory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,16 +105,20 @@ fun CharacterSelectionScreen(
             .take(20)
     }
 
-    val filteredCharacters = remember(combinedCharacters, searchQuery, selectedTags) {
-        val q = searchQuery.trim().lowercase()
-        combinedCharacters.filter { c ->
-            val tags = CharacterTagUtils.uiTagsFor(c)
-            val matchesQuery = q.isEmpty() ||
-                c.name.lowercase().contains(q) ||
-                c.description.lowercase().contains(q) ||
-                tags.any { it.contains(q) }
-            val matchesTags = selectedTags.isEmpty() || selectedTags.all { it in tags }
-            matchesQuery && matchesTags
+    // IMPORTANT: utiliser derivedStateOf pour que le filtre réagisse aux changements de selectedTags
+    val filteredCharacters by remember(combinedCharacters, searchQuery) {
+        derivedStateOf {
+            val q = searchQuery.trim().lowercase()
+            val selected = selectedTags.toList()
+            combinedCharacters.filter { c ->
+                val tags = CharacterTagUtils.uiTagsFor(c)
+                val matchesQuery = q.isEmpty() ||
+                    c.name.lowercase().contains(q) ||
+                    c.description.lowercase().contains(q) ||
+                    tags.any { it.contains(q) }
+                val matchesTags = selected.isEmpty() || selected.all { it in tags }
+                matchesQuery && matchesTags
+            }
         }
     }
     
@@ -222,6 +228,45 @@ fun CharacterSelectionScreen(
                     }
                 }
             }
+
+            // Préchargement vignettes (optionnel) pour accélérer l'apparition des images réalistes
+            if (chatViewModel != null) {
+                val scope = rememberCoroutineScope()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                // Précharger une petite batch pour éviter rate-limit
+                                filteredCharacters
+                                    .asSequence()
+                                    .filter { it.imageResId == 0 && it.physicalDescription.isNotBlank() }
+                                    .take(12)
+                                    .forEach { c ->
+                                        chatViewModel.generateCharacterThumbnail(
+                                            character = c,
+                                            onComplete = { /* cache done */ },
+                                            onError = { /* ignore */ }
+                                        )
+                                    }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Précharger vignettes")
+                    }
+                    Text(
+                        text = "${filteredCharacters.size} résultat(s)",
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             
             // Character list
             LazyColumn(
@@ -275,14 +320,26 @@ fun CharacterCard(
     viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var thumbnailUrl by remember { mutableStateOf(character.thumbnailUrl) }
+    var isThumbLoading by remember { mutableStateOf(false) }
+    var thumbFailed by remember { mutableStateOf(false) }
     
     // Générer automatiquement une vignette (Pollination) si pas d'image locale.
     // Le ViewModel met en cache en SharedPreferences pour éviter de spammer l'API.
     LaunchedEffect(character.id) {
         if (thumbnailUrl.isEmpty() && character.imageResId == 0 && character.physicalDescription.isNotEmpty() && viewModel != null) {
-            viewModel.generateCharacterThumbnail(character) { url ->
-                thumbnailUrl = url
-            }
+            isThumbLoading = true
+            thumbFailed = false
+            viewModel.generateCharacterThumbnail(
+                character = character,
+                onComplete = { url ->
+                    thumbnailUrl = url
+                    isThumbLoading = false
+                },
+                onError = {
+                    isThumbLoading = false
+                    thumbFailed = true
+                }
+            )
         }
     }
     Card(
@@ -318,6 +375,28 @@ fun CharacterCard(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
+                } else if (isThumbLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                } else if (thumbFailed && viewModel != null && character.physicalDescription.isNotEmpty()) {
+                    IconButton(
+                        onClick = {
+                            isThumbLoading = true
+                            thumbFailed = false
+                            viewModel.generateCharacterThumbnail(
+                                character = character,
+                                onComplete = { url ->
+                                    thumbnailUrl = url
+                                    isThumbLoading = false
+                                },
+                                onError = {
+                                    isThumbLoading = false
+                                    thumbFailed = true
+                                }
+                            )
+                        }
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Réessayer", tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
                 } else {
                     Text(
                         text = character.avatarEmoji,
