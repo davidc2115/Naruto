@@ -76,16 +76,7 @@ object Characters {
             "drawable://narutonsfw3.jpg",
             "drawable://narutonsfw4.jpg",
             "drawable://narutonsfw5.jpg",
-            "drawable://narutonsfw6.jpg",
-            "drawable://narutonsfw7.jpg",
-            "drawable://narutonsfw8.jpg",
-            "drawable://narutonsfw9.jpg",
-            "drawable://narutonsfw10.jpg",
-            "drawable://narutonsfw11.jpg",
-            "drawable://narutonsfw12.jpg",
-            "drawable://narutonsfw13.jpg",
-            "drawable://narutonsfw14.jpg",
-            "drawable://narutonsfw15.jpg"
+            "drawable://narutonsfw6.jpg"
         ),
         
         systemPromptSFW = """Tu es Naruto Uzumaki, ninja de 18-22 ans de Konoha.
@@ -230,16 +221,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://sasukensfw3.jpg",
             "drawable://sasukensfw4.jpg",
             "drawable://sasukensfw5.jpg",
-            "drawable://sasukensfw6.jpg",
-            "drawable://sasukensfw7.jpg",
-            "drawable://sasukensfw8.jpg",
-            "drawable://sasukensfw9.jpg",
-            "drawable://sasukensfw10.jpg",
-            "drawable://sasukensfw11.jpg",
-            "drawable://sasukensfw12.jpg",
-            "drawable://sasukensfw13.jpg",
-            "drawable://sasukensfw14.jpg",
-            "drawable://sasukensfw15.jpg"
+            "drawable://sasukensfw6.jpg"
         ),
         systemPromptSFW = """Tu es Sasuke Uchiha, ninja de 18-22 ans de Konoha.
 
@@ -380,13 +362,14 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://sakuragallery9.jpg",
             "drawable://sakuragallery10.jpg"
         ),
+        // NSFW en local (offline): drawable-nodpi/sakuransfwX.(jpg/png)
         galleryNSFW = listOf(
-            "http://88.174.155.230:33500/images/sakuransfw1.png",
-            "http://88.174.155.230:33500/images/sakuransfw2.png",
-            "http://88.174.155.230:33500/images/sakuransfw3.png",
-            "http://88.174.155.230:33500/images/sakuransfw4.png",
-            "http://88.174.155.230:33500/images/sakuransfw5.png",
-            "http://88.174.155.230:33500/images/sakuransfw6.png"
+            "drawable://sakuransfw1.jpg",
+            "drawable://sakuransfw2.jpg",
+            "drawable://sakuransfw3.jpg",
+            "drawable://sakuransfw4.jpg",
+            "drawable://sakuransfw5.jpg",
+            "drawable://sakuransfw6.jpg"
         ),
         systemPromptSFW = """Tu es Sakura Haruno, kunoichi de 18-22 ans de Konoha.
 
@@ -677,11 +660,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
             "drawable://hinatagallery9.jpg",
             "drawable://hinatagallery10.jpg"
         ),
+        // NSFW en local (offline): drawable-nodpi/hinatansfwX.(jpg/png)
         galleryNSFW = listOf(
-            "http://88.174.155.230:33500/images/hinatansfw1.png",
-            "http://88.174.155.230:33500/images/hinatansfw3.png",
-            "http://88.174.155.230:33500/images/hinata_1.png",
-            "http://88.174.155.230:33500/images/hinata_2.png"
+            "drawable://hinatansfw1.jpg",
+            "drawable://hinatansfw3.jpg",
+            "drawable://hinata_1.jpg",
+            "drawable://hinata_2.jpg"
         ),
         systemPromptSFW = """Tu es Hinata Hyuga, kunoichi de 18-22 ans de Konoha.
 

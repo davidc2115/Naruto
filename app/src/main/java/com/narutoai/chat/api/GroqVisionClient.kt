@@ -28,8 +28,13 @@ class GroqVisionClient(private val context: Context) {
     
     companion object {
         private const val GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-        private const val MODEL = "llama-3.2-90b-vision-preview"
-        private const val MAX_IMAGE_SIZE_KB = 500 // 500KB max pour Base64
+        // Groq a parfois des changements de modèles vision; on garde une liste de fallback.
+        private val MODELS = listOf(
+            "llama-3.2-90b-vision-preview",
+            "llama-3.2-11b-vision-preview"
+        )
+        // Réduire un peu la taille pour éviter les erreurs 400 (payload trop gros).
+        private const val MAX_IMAGE_SIZE_KB = 350 // 350KB max (avant Base64)
     }
     
     /**
@@ -111,35 +116,34 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                 """.trimIndent()
                 
                 // Construire la requête JSON
-                val requestJson = JSONObject().apply {
-                    put("model", MODEL)
-                    put("messages", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("role", "user")
-                            put("content", JSONArray().apply {
-                                // Text prompt
-                                put(JSONObject().apply {
-                                    put("type", "text")
-                                    put("text", prompt)
-                                })
-                                // Image
-                                put(JSONObject().apply {
-                                    put("type", "image_url")
-                                    put("image_url", JSONObject().apply {
-                                        put("url", "data:image/jpeg;base64,$base64Image")
+                fun buildRequestJson(model: String): JSONObject {
+                    return JSONObject().apply {
+                        put("model", model)
+                        put("messages", JSONArray().apply {
+                            put(JSONObject().apply {
+                                put("role", "user")
+                                put("content", JSONArray().apply {
+                                    // Text prompt
+                                    put(JSONObject().apply {
+                                        put("type", "text")
+                                        put("text", prompt)
+                                    })
+                                    // Image
+                                    put(JSONObject().apply {
+                                        put("type", "image_url")
+                                        put("image_url", JSONObject().apply {
+                                            put("url", "data:image/jpeg;base64,$base64Image")
+                                        })
                                     })
                                 })
                             })
                         })
-                    })
-                    put("temperature", 0.3)
-                    put("max_tokens", 1000)
+                        put("temperature", 0.3)
+                        put("max_tokens", 1000)
+                    }
                 }
                 
                 // Créer la requête HTTP
-                val requestBody = requestJson.toString()
-                    .toRequestBody("application/json".toMediaType())
-                
                 val apiKey = getApiKey()
                 if (apiKey.isEmpty()) {
                     android.util.Log.e("GroqVision", "❌ ERREUR CRITIQUE: Aucune clé API Groq trouvée dans DataStore")
@@ -150,26 +154,49 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                     )
                 }
                 
-                val request = Request.Builder()
-                    .url(GROQ_API_URL)
-                    .header("Authorization", "Bearer $apiKey")
-                    .header("Content-Type", "application/json")
-                    .post(requestBody)
-                    .build()
-                
-                // Exécuter la requête
-                val response = client.newCall(request).execute()
-                val responseBody = response.body?.string()
-                
-                if (!response.isSuccessful) {
-                    android.util.Log.e("GroqVision", "HTTP ${response.code}: $responseBody")
-                    return@withContext Result.failure(
-                        Exception("Erreur API: HTTP ${response.code}")
-                    )
+                var lastHttpError: Pair<Int, String?>? = null
+                var responseBody: String? = null
+                var usedModel: String? = null
+
+                for (model in MODELS) {
+                    usedModel = model
+                    val requestBody = buildRequestJson(model).toString()
+                        .toRequestBody("application/json".toMediaType())
+
+                    val request = Request.Builder()
+                        .url(GROQ_API_URL)
+                        .header("Authorization", "Bearer $apiKey")
+                        .header("Content-Type", "application/json")
+                        .post(requestBody)
+                        .build()
+
+                    android.util.Log.d("GroqVision", "🧠 Vision model: $model, payload=${requestBody.contentLength()} bytes")
+
+                    val response = client.newCall(request).execute()
+                    responseBody = response.body?.string()
+
+                    if (response.isSuccessful) {
+                        break
+                    }
+
+                    lastHttpError = response.code to responseBody
+                    android.util.Log.e("GroqVision", "HTTP ${response.code} (model=$model): $responseBody")
+
+                    // Sur 400 on tente le fallback; sinon on arrête tout de suite.
+                    if (response.code != 400) {
+                        return@withContext Result.failure(
+                            Exception("Erreur API Groq Vision: HTTP ${response.code}\n${responseBody?.take(500) ?: ""}")
+                        )
+                    }
                 }
-                
+
                 if (responseBody == null) {
-                    return@withContext Result.failure(Exception("Réponse vide"))
+                    return@withContext Result.failure(Exception("Réponse vide (Groq Vision)"))
+                }
+                if (lastHttpError != null && lastHttpError.first == 400 && usedModel == MODELS.last()) {
+                    return@withContext Result.failure(
+                        Exception("Erreur API Groq Vision: HTTP 400\n${lastHttpError.second?.take(800) ?: ""}")
+                    )
                 }
                 
                 // Parser la réponse
