@@ -19,18 +19,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.narutoai.chat.data.Characters
+import com.narutoai.chat.data.CharacterPackLoader
 import com.narutoai.chat.utils.CharacterConverter
-import com.narutoai.chat.utils.AutoTagger
+import com.narutoai.chat.utils.CharacterTagUtils
 import com.narutoai.chat.viewmodel.CustomCharactersViewModel
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.CharacterCategory
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,52 +56,46 @@ fun CharacterSelectionScreen(
     val customCharacters = remember(customEntities) {
         customEntities.map { CharacterConverter.toCharacter(it) }
     }
-    
-    val characters = remember(selectedCategory) {
-        if (selectedCategory == null) {
-            Characters.allCharacters
-        } else {
-            Characters.getByCategory(selectedCategory!!)
+
+    // Charger le pack (assets)
+    val context = LocalContext.current
+    var packCharacters by remember { mutableStateOf<List<Character>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        packCharacters = withContext(Dispatchers.IO) {
+            CharacterPackLoader.load(context)
         }
     }
-    val combinedCharacters = remember(customCharacters, characters, selectedCategory) {
-        // On n'affiche les customs que dans "Tous" (sinon, on conserve le filtre existant)
-        if (selectedCategory == null) {
-            // Customs en haut, puis base list
-            val ids = HashSet<String>()
-            (customCharacters + characters).filter { ids.add(it.id) }
-        } else {
-            characters
+    
+    val baseCharacters = remember(packCharacters) {
+        // Persos intégrés + pack
+        Characters.allCharacters + packCharacters
+    }
+
+    val categoryFiltered = remember(baseCharacters, selectedCategory) {
+        when (selectedCategory) {
+            null -> baseCharacters
+            CharacterCategory.NARUTO -> baseCharacters.filter { it.category == CharacterCategory.NARUTO }
+            CharacterCategory.CELEBRITY_MALE, CharacterCategory.CELEBRITY_FEMALE ->
+                baseCharacters.filter { it.category == CharacterCategory.CELEBRITY_MALE || it.category == CharacterCategory.CELEBRITY_FEMALE }
+            else -> baseCharacters
         }
     }
 
-    // Tags "roleplay" calculés pour l'UI (personality + auto tags simples)
-    fun uiTagsFor(character: Character): List<String> {
-        val base = character.personality
-        val auto = AutoTagger.generateTags(
-            gender = when (character.category) {
-                CharacterCategory.CELEBRITY_FEMALE -> "femme"
-                CharacterCategory.CELEBRITY_MALE -> "homme"
-                else -> null
-            },
-            hairColor = character.hairColor,
-            eyeColor = character.eyeColor,
-            skinTone = null,
-            bodyType = character.bodyType,
-            age = character.age,
-            height = character.height
-        )
-        return (base + auto)
-            .map { it.lowercase().trim() }
-            .filter { it.isNotBlank() }
-            .distinct()
+    val combinedCharacters = remember(customCharacters, categoryFiltered, selectedCategory) {
+        // On n'affiche les customs que dans "Tous" (sinon, on conserve le filtre existant)
+        val ids = HashSet<String>()
+        if (selectedCategory == null) {
+            (customCharacters + categoryFiltered).filter { ids.add(it.id) }
+        } else {
+            categoryFiltered.filter { ids.add(it.id) }
+        }
     }
 
     val suggestedTags = remember(combinedCharacters) {
         // Top tags les plus fréquents
         val counts = mutableMapOf<String, Int>()
         combinedCharacters.forEach { c ->
-            uiTagsFor(c).forEach { t -> counts[t] = (counts[t] ?: 0) + 1 }
+            CharacterTagUtils.uiTagsFor(c).forEach { t -> counts[t] = (counts[t] ?: 0) + 1 }
         }
         counts.entries
             .sortedByDescending { it.value }
@@ -108,7 +106,7 @@ fun CharacterSelectionScreen(
     val filteredCharacters = remember(combinedCharacters, searchQuery, selectedTags) {
         val q = searchQuery.trim().lowercase()
         combinedCharacters.filter { c ->
-            val tags = uiTagsFor(c)
+            val tags = CharacterTagUtils.uiTagsFor(c)
             val matchesQuery = q.isEmpty() ||
                 c.name.lowercase().contains(q) ||
                 c.description.lowercase().contains(q) ||
@@ -348,7 +346,8 @@ fun CharacterCard(
                     modifier = Modifier.padding(top = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    character.personality.take(3).forEach { trait ->
+                    // Afficher des tags "recherche" (inclut genre/couleur cheveux/etc)
+                    CharacterTagUtils.uiTagsFor(character).take(3).forEach { trait ->
                         Surface(
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             shape = RoundedCornerShape(4.dp)
