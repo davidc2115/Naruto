@@ -3,16 +3,13 @@ package com.narutoai.chat.api
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import com.narutoai.chat.data.apiKeysDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-
-// Extension pour DataStore
-private val Context.dataStore by preferencesDataStore(name = "api_keys")
 
 /**
  * Gestionnaire de clés API avec rotation automatique
@@ -182,7 +179,7 @@ class ApiKeyManager(private val context: Context) {
      * Sauvegarde les clés dans le stockage persistant
      */
     private suspend fun saveKeysToStorage() {
-        context.dataStore.edit { preferences ->
+        context.apiKeysDataStore.edit { preferences ->
             preferences[API_KEYS_KEY] = apiKeys.joinToString(KEY_SEPARATOR)
         }
     }
@@ -191,7 +188,7 @@ class ApiKeyManager(private val context: Context) {
      * Charge les clés depuis le stockage persistant
      */
     private suspend fun loadKeysFromStorage(): List<String> {
-        return context.dataStore.data.map { preferences ->
+        return context.apiKeysDataStore.data.map { preferences ->
             preferences[API_KEYS_KEY]?.split(KEY_SEPARATOR)?.filter { it.isNotBlank() } ?: emptyList()
         }.first()
     }

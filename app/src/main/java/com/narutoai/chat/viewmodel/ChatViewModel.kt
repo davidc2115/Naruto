@@ -14,6 +14,8 @@ import com.narutoai.chat.api.ImageGenerationClient
 import com.narutoai.chat.api.VideoGenerationClient
 import com.narutoai.chat.api.PollinationAIClient
 import com.narutoai.chat.data.PreferencesManager
+import com.narutoai.chat.data.CustomCharacterDatabase
+import com.narutoai.chat.data.CustomGalleryRepository
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.ChatMessage
 import com.narutoai.chat.models.UserProfile
@@ -68,6 +70,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val videoClient = VideoGenerationClient(application.applicationContext)
     private val pollinationAIClient = PollinationAIClient()
     // freeboxMediaClient est maintenant créé dans les Workers avec l'API choisie
+    
+    // Repository pour galerie personnalisée
+    private val galleryRepository: CustomGalleryRepository by lazy {
+        val dao = CustomCharacterDatabase.getDatabase(application).customGalleryImageDao()
+        CustomGalleryRepository(dao)
+    }
     
     init {
         viewModelScope.launch {
@@ -415,6 +423,22 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                                     imageUrl = imageUrl
                                 )
                                 android.util.Log.d("ChatViewModel", "✅ Message ajouté avec imageUrl: ${imageUrl.take(100)}")
+                                
+                                // Ajouter l'image à la galerie locale du personnage
+                                _selectedCharacter.value?.let { character ->
+                                    viewModelScope.launch {
+                                        try {
+                                            val imageId = galleryRepository.addImageToGallery(
+                                                characterId = character.id,
+                                                imagePath = imageUrl,
+                                                isNSFW = _isNSFWMode.value
+                                            )
+                                            android.util.Log.d("ChatViewModel", "📸 Image ajoutée à la galerie (ID: $imageId, NSFW: ${_isNSFWMode.value})")
+                                        } catch (e: Exception) {
+                                            android.util.Log.e("ChatViewModel", "❌ Erreur ajout galerie: ${e.message}", e)
+                                        }
+                                    }
+                                }
                                 
                                 // Sauvegarder la conversation avec l'image
                                 saveCurrentConversation()

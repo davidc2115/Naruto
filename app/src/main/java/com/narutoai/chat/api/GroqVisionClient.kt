@@ -5,7 +5,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.narutoai.chat.data.apiKeysDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -18,9 +19,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
-
-// Extension pour DataStore (au niveau package)
-private val Context.dataStore by preferencesDataStore(name = "api_keys")
 
 /**
  * Client pour l'API Groq Vision (analyse d'images)
@@ -36,34 +34,41 @@ class GroqVisionClient(private val context: Context) {
     
     /**
      * Charge une clé API depuis DataStore (même système que ApiKeyManager)
+     * Séparateur de clés: "|||"
      */
     private suspend fun getApiKey(): String {
         return try {
             android.util.Log.d("GroqVision", "🔍 Chargement clés API depuis DataStore...")
             
-            val apiKeysKey = androidx.datastore.preferences.core.stringPreferencesKey("api_keys")
+            val apiKeysKey = stringPreferencesKey("api_keys")
             
-            val keysString = context.dataStore.data
+            val keysString = context.apiKeysDataStore.data
                 .map { preferences -> preferences[apiKeysKey] ?: "" }
                 .first()
             
-            android.util.Log.d("GroqVision", "📦 Données DataStore: '$keysString'")
+            android.util.Log.d("GroqVision", "📦 Données DataStore brutes: '${keysString.take(50)}${if (keysString.length > 50) "..." else ""}'")
             
             if (keysString.isNotEmpty()) {
+                // Séparer les clés avec "|||" (même séparateur que ApiKeyManager)
                 val keys = keysString.split("|||").filter { it.isNotBlank() }
-                android.util.Log.d("GroqVision", "✅ ${keys.size} clé(s) API trouvée(s)")
+                android.util.Log.d("GroqVision", "✅ ${keys.size} clé(s) API trouvée(s) après parsing")
                 
                 if (keys.isNotEmpty()) {
                     val firstKey = keys.first()
-                    android.util.Log.d("GroqVision", "🔑 Utilisation clé: ${firstKey.take(10)}...")
+                    android.util.Log.d("GroqVision", "🔑 Utilisation clé: ${firstKey.take(12)}...${firstKey.takeLast(4)}")
                     return firstKey
+                } else {
+                    android.util.Log.w("GroqVision", "⚠️ Parsing a donné 0 clés (données vides après split)")
                 }
+            } else {
+                android.util.Log.w("GroqVision", "⚠️ DataStore vide (keysString.isEmpty())")
             }
             
-            android.util.Log.w("GroqVision", "⚠️ Aucune clé API Groq dans DataStore")
+            android.util.Log.e("GroqVision", "❌ Aucune clé API Groq trouvée dans DataStore")
             ""
         } catch (e: Exception) {
-            android.util.Log.e("GroqVision", "❌ Erreur chargement clés: ${e.message}", e)
+            android.util.Log.e("GroqVision", "❌ EXCEPTION chargement clés: ${e.javaClass.simpleName}: ${e.message}", e)
+            e.printStackTrace()
             ""
         }
     }
@@ -137,9 +142,11 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                 
                 val apiKey = getApiKey()
                 if (apiKey.isEmpty()) {
-                    android.util.Log.e("GroqVision", "❌ Aucune clé API Groq configurée")
+                    android.util.Log.e("GroqVision", "❌ ERREUR CRITIQUE: Aucune clé API Groq trouvée dans DataStore")
+                    android.util.Log.e("GroqVision", "   Allez dans Paramètres > Section 'Clés API Groq' > Bouton 'Ajouter une clé Groq'")
+                    android.util.Log.e("GroqVision", "   Les clés doivent commencer par 'gsk_'")
                     return@withContext Result.failure(
-                        Exception("Aucune clé API Groq configurée. Ajoutez-en une dans Paramètres > Gestion des clés Groq.")
+                        Exception("❌ Clé API Groq non trouvée\n\nVérifiez que vous avez bien ajouté au moins une clé dans :\nParamètres > Clés API Groq > Ajouter\n\nLes clés doivent commencer par 'gsk_'")
                     )
                 }
                 
