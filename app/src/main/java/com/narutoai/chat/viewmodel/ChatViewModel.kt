@@ -664,7 +664,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Génère une vignette pour un personnage avec Pollination AI
      */
-    fun generateCharacterThumbnail(character: Character, onComplete: (String) -> Unit) {
+    fun generateCharacterThumbnail(
+        character: Character,
+        onComplete: (String) -> Unit,
+        onError: (Throwable) -> Unit = {}
+    ) {
         viewModelScope.launch {
             try {
                 // Cache local pour éviter de regénérer à chaque affichage
@@ -688,10 +692,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     },
                     onFailure = { exception ->
                         _error.value = "Erreur génération vignette: ${exception.message}"
+                        onError(exception)
                     }
                 )
             } catch (e: Exception) {
                 _error.value = "Erreur: ${e.message}"
+                onError(e)
             }
         }
     }
