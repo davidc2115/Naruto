@@ -47,6 +47,7 @@ fun CreateCharacterScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val saveSuccess by viewModel.saveSuccess.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    var lastAutoAnalyzedUri by remember { mutableStateOf<Uri?>(null) }
     
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -62,6 +63,15 @@ fun CreateCharacterScreen(
             kotlinx.coroutines.delay(500)
             viewModel.resetSaveSuccess()
             onCharacterCreated()
+        }
+    }
+
+    // Analyse automatique au changement de photo (1 fois par URI)
+    LaunchedEffect(avatarImageUri) {
+        val uri = avatarImageUri
+        if (uri != null && uri != lastAutoAnalyzedUri) {
+            lastAutoAnalyzedUri = uri
+            viewModel.analyzePhoto()
         }
     }
     

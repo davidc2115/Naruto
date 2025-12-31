@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.narutoai.chat.data.CustomCharacterDatabase
 import com.narutoai.chat.data.CustomCharacterEntity
 import com.narutoai.chat.data.CustomCharacterRepository
+import com.narutoai.chat.utils.AutoTagger
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
@@ -48,6 +49,12 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     private val _eyeColor = MutableStateFlow("")
     val eyeColor: StateFlow<String> = _eyeColor.asStateFlow()
     
+    private val _gender = MutableStateFlow("")
+    val gender: StateFlow<String> = _gender.asStateFlow()
+
+    private val _skinTone = MutableStateFlow("")
+    val skinTone: StateFlow<String> = _skinTone.asStateFlow()
+
     private val _bodyType = MutableStateFlow("")
     val bodyType: StateFlow<String> = _bodyType.asStateFlow()
     
@@ -90,6 +97,8 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     fun updateHeight(value: String) { _height.value = value }
     fun updateHairColor(value: String) { _hairColor.value = value }
     fun updateEyeColor(value: String) { _eyeColor.value = value }
+    fun updateGender(value: String) { _gender.value = value }
+    fun updateSkinTone(value: String) { _skinTone.value = value }
     fun updateBodyType(value: String) { _bodyType.value = value }
     fun updateTemperament(value: String) { _temperament.value = value }
     fun updateScenario(value: String) { _scenario.value = value }
@@ -136,8 +145,10 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         
                         // Auto-remplir les champs individuels
                         _age.value = description.age
+                        _gender.value = description.gender
                         _hairColor.value = description.hairColor
                         _eyeColor.value = description.eyeColor
+                        _skinTone.value = description.skinTone
                         _bodyType.value = description.bodyType
                         _height.value = description.height
                         
@@ -260,6 +271,18 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                 
                 // Générer les prompts
                 val (sfwPrompt, nsfwPrompt) = generateSystemPrompts()
+
+                // Tags auto (roleplay): homme/femme, brune/blond, etc.
+                val autoTags = AutoTagger.generateTags(
+                    gender = _gender.value,
+                    hairColor = _hairColor.value,
+                    eyeColor = _eyeColor.value,
+                    skinTone = _skinTone.value,
+                    bodyType = _bodyType.value,
+                    age = _age.value,
+                    height = _height.value
+                )
+                val tagsJson = org.json.JSONArray(autoTags).toString()
                 
                 // Créer l'entité
                 val character = CustomCharacterEntity(
@@ -272,11 +295,14 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                     personality = "[]", // TODO: gérer la liste
                     physicalDescription = _physicalDescription.value,
                     age = _age.value,
+                    gender = _gender.value,
                     height = _height.value,
                     hairColor = _hairColor.value,
                     eyeColor = _eyeColor.value,
+                    skinTone = _skinTone.value,
                     bodyType = _bodyType.value,
                     distinctiveFeatures = "[]",
+                    tags = tagsJson,
                     scenario = _scenario.value,
                     backgroundStory = "",
                     temperament = _temperament.value,
@@ -323,6 +349,8 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
         _height.value = ""
         _hairColor.value = ""
         _eyeColor.value = ""
+        _gender.value = ""
+        _skinTone.value = ""
         _bodyType.value = ""
         _temperament.value = ""
         _scenario.value = ""

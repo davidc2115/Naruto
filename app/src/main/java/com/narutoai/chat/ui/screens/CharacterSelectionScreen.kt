@@ -23,8 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.narutoai.chat.data.Characters
+import com.narutoai.chat.utils.CharacterConverter
+import com.narutoai.chat.viewmodel.CustomCharactersViewModel
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.CharacterCategory
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,15 +37,32 @@ fun CharacterSelectionScreen(
     onUserProfileClick: () -> Unit = {},
     onCreateCharacterClick: () -> Unit = {},
     onCustomCharactersClick: () -> Unit = {},
-    viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
+    chatViewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var selectedCategory by remember { mutableStateOf<CharacterCategory?>(null) }
+
+    // Charger les personnages custom depuis Room pour les afficher aussi ici
+    val customVm: CustomCharactersViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val customEntities by customVm.characters.collectAsState()
+    val customCharacters = remember(customEntities) {
+        customEntities.map { CharacterConverter.toCharacter(it) }
+    }
     
     val characters = remember(selectedCategory) {
         if (selectedCategory == null) {
             Characters.allCharacters
         } else {
             Characters.getByCategory(selectedCategory!!)
+        }
+    }
+    val combinedCharacters = remember(customCharacters, characters, selectedCategory) {
+        // On n'affiche les customs que dans "Tous" (sinon, on conserve le filtre existant)
+        if (selectedCategory == null) {
+            // Customs en haut, puis base list
+            val ids = HashSet<String>()
+            (customCharacters + characters).filter { ids.add(it.id) }
+        } else {
+            characters
         }
     }
     
@@ -128,11 +148,11 @@ fun CharacterSelectionScreen(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(characters) { character ->
+                items(combinedCharacters) { character ->
                     CharacterCard(
                         character = character,
                         onClick = { onCharacterSelected(character) },
-                        viewModel = viewModel
+                        viewModel = chatViewModel
                     )
                 }
             }

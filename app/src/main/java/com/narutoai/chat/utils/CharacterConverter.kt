@@ -11,6 +11,9 @@ import org.json.JSONArray
 object CharacterConverter {
     
     fun toCharacter(entity: CustomCharacterEntity): Character {
+        val personality = parseJsonArray(entity.personality)
+        val tags = parseJsonArray(entity.tags)
+
         return Character(
             id = entity.id,
             name = entity.name,
@@ -19,7 +22,8 @@ object CharacterConverter {
             systemPromptSFW = entity.systemPromptSFW,
             systemPromptNSFW = entity.systemPromptNSFW,
             avatarEmoji = "👤", // Emoji par défaut
-            personality = parseJsonArray(entity.personality),
+            // Pour les personnages custom, on affiche les tags auto s'il n'y a pas de "personality" définie.
+            personality = if (personality.isNotEmpty()) personality else tags,
             imageUrl = "",
             imageResId = 0,
             
@@ -88,11 +92,14 @@ object CharacterConverter {
             personality = toJsonArray(character.personality),
             physicalDescription = character.physicalDescription,
             age = character.age,
+            gender = "",
             height = character.height,
             hairColor = character.hairColor,
             eyeColor = character.eyeColor,
+            skinTone = "",
             bodyType = character.bodyType,
             distinctiveFeatures = toJsonArray(character.distinctiveFeatures),
+            tags = "[]",
             scenario = character.scenario,
             backgroundStory = character.backgroundStory,
             temperament = character.temperament,

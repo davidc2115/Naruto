@@ -300,8 +300,25 @@ fun CustomCharacterCard(
                     if (character.age.isNotEmpty()) {
                         Chip(text = "⌛ ${character.age}")
                     }
+                    if (character.gender.isNotEmpty()) {
+                        Chip(text = "⚧ ${character.gender}")
+                    }
                     if (character.hairColor.isNotEmpty()) {
                         Chip(text = "👱 ${character.hairColor}")
+                    }
+                    // Tags auto (JSON)
+                    val autoTags = remember(character.tags) {
+                        try {
+                            val json = org.json.JSONArray(character.tags)
+                            buildList {
+                                for (i in 0 until json.length()) add(json.optString(i))
+                            }
+                        } catch (_: Exception) {
+                            emptyList()
+                        }
+                    }
+                    autoTags.take(2).forEach { tag ->
+                        if (tag.isNotBlank()) Chip(text = "#$tag")
                     }
                 }
             }
