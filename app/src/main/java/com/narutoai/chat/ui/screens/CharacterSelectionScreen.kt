@@ -276,15 +276,15 @@ fun CharacterCard(
 ) {
     var thumbnailUrl by remember { mutableStateOf(character.thumbnailUrl) }
     
-    // DÉSACTIVÉ: Les vignettes sont maintenant des images locales (R.drawable.xxx)
-    // Plus besoin de générer dynamiquement
-    // LaunchedEffect(character.id) {
-    //     if (thumbnailUrl.isEmpty() && character.physicalDescription.isNotEmpty() && viewModel != null) {
-    //         viewModel.generateCharacterThumbnail(character) { url ->
-    //             thumbnailUrl = url
-    //         }
-    //     }
-    // }
+    // Générer automatiquement une vignette (Pollination) si pas d'image locale.
+    // Le ViewModel met en cache en SharedPreferences pour éviter de spammer l'API.
+    LaunchedEffect(character.id) {
+        if (thumbnailUrl.isEmpty() && character.imageResId == 0 && character.physicalDescription.isNotEmpty() && viewModel != null) {
+            viewModel.generateCharacterThumbnail(character) { url ->
+                thumbnailUrl = url
+            }
+        }
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()

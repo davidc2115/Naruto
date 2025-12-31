@@ -667,6 +667,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun generateCharacterThumbnail(character: Character, onComplete: (String) -> Unit) {
         viewModelScope.launch {
             try {
+                // Cache local pour éviter de regénérer à chaque affichage
+                getCachedThumbnailUrl(character.id)?.let { cached ->
+                    if (cached.isNotBlank()) {
+                        onComplete(cached)
+                        return@launch
+                    }
+                }
+
                 val result = pollinationAIClient.generateCharacterThumbnail(
                     characterName = character.name,
                     physicalDescription = character.physicalDescription,
@@ -675,6 +683,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 
                 result.fold(
                     onSuccess = { thumbnailUrl ->
+                        cacheThumbnailUrl(character.id, thumbnailUrl)
                         onComplete(thumbnailUrl)
                     },
                     onFailure = { exception ->
@@ -685,6 +694,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 _error.value = "Erreur: ${e.message}"
             }
         }
+    }
+
+    private fun getCachedThumbnailUrl(characterId: String): String? {
+        return sharedPreferences.getString("thumb_$characterId", null)
+    }
+
+    private fun cacheThumbnailUrl(characterId: String, url: String) {
+        if (url.isBlank()) return
+        sharedPreferences.edit().putString("thumb_$characterId", url).apply()
     }
     
     /**
