@@ -32,33 +32,39 @@ class GroqVisionClient(private val context: Context) {
         private const val GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
         private const val MODEL = "llama-3.2-90b-vision-preview"
         private const val MAX_IMAGE_SIZE_KB = 500 // 500KB max pour Base64
-        
-        // Clé API Groq - Utilise DataStore comme ApiKeyManager
-        private suspend fun getApiKey(context: Context): String {
-            try {
-                // Charger depuis DataStore (même système que ApiKeyManager)
-                val dataStore = context.dataStore
-                val apiKeysKey = androidx.datastore.preferences.core.stringPreferencesKey("api_keys")
+    }
+    
+    /**
+     * Charge une clé API depuis DataStore (même système que ApiKeyManager)
+     */
+    private suspend fun getApiKey(): String {
+        return try {
+            android.util.Log.d("GroqVision", "🔍 Chargement clés API depuis DataStore...")
+            
+            val apiKeysKey = androidx.datastore.preferences.core.stringPreferencesKey("api_keys")
+            
+            val keysString = context.dataStore.data
+                .map { preferences -> preferences[apiKeysKey] ?: "" }
+                .first()
+            
+            android.util.Log.d("GroqVision", "📦 Données DataStore: '$keysString'")
+            
+            if (keysString.isNotEmpty()) {
+                val keys = keysString.split("|||").filter { it.isNotBlank() }
+                android.util.Log.d("GroqVision", "✅ ${keys.size} clé(s) API trouvée(s)")
                 
-                val keysString = dataStore.data
-                    .map { preferences -> preferences[apiKeysKey] ?: "" }
-                    .first()
-                
-                if (keysString.isNotEmpty()) {
-                    val keys = keysString.split("|||").filter { it.isNotBlank() }
-                    if (keys.isNotEmpty()) {
-                        android.util.Log.d("GroqVision", "✅ ${keys.size} clé(s) API trouvée(s)")
-                        return keys.first() // Utiliser première clé
-                    }
+                if (keys.isNotEmpty()) {
+                    val firstKey = keys.first()
+                    android.util.Log.d("GroqVision", "🔑 Utilisation clé: ${firstKey.take(10)}...")
+                    return firstKey
                 }
-                
-                android.util.Log.w("GroqVision", "⚠️ Aucune clé API Groq dans DataStore")
-                return ""
-                
-            } catch (e: Exception) {
-                android.util.Log.e("GroqVision", "Erreur chargement clés: ${e.message}")
-                return ""
             }
+            
+            android.util.Log.w("GroqVision", "⚠️ Aucune clé API Groq dans DataStore")
+            ""
+        } catch (e: Exception) {
+            android.util.Log.e("GroqVision", "❌ Erreur chargement clés: ${e.message}", e)
+            ""
         }
     }
     
@@ -129,15 +135,13 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                 val requestBody = requestJson.toString()
                     .toRequestBody("application/json".toMediaType())
                 
-                val apiKey = getApiKey(context)
+                val apiKey = getApiKey()
                 if (apiKey.isEmpty()) {
                     android.util.Log.e("GroqVision", "❌ Aucune clé API Groq configurée")
                     return@withContext Result.failure(
                         Exception("Aucune clé API Groq configurée. Ajoutez-en une dans Paramètres > Gestion des clés Groq.")
                     )
                 }
-                
-                android.util.Log.d("GroqVision", "🔑 Utilisation clé API: ${apiKey.take(10)}...")
                 
                 val request = Request.Builder()
                     .url(GROQ_API_URL)

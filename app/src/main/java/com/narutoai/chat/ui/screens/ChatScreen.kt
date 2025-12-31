@@ -1,6 +1,7 @@
 package com.narutoai.chat.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,6 +53,7 @@ fun ChatScreen(
     
     var inputText by remember { mutableStateOf("") }
     var showMediaMenu by remember { mutableStateOf(false) }
+    var fullscreenImageUrl by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -257,7 +259,11 @@ fun ChatScreen(
                 }
                 
                 items(messages) { message ->
-                    MessageBubble(message, character)
+                    MessageBubble(
+                        message = message,
+                        character = character,
+                        onImageClick = { imageUrl -> fullscreenImageUrl = imageUrl }
+                    )
                 }
                 
                 // Loading indicator
@@ -305,6 +311,54 @@ fun ChatScreen(
                 ) {
                     Text(text = error ?: "Erreur inconnue")
                 }
+            }
+        }
+    }
+    
+    // Dialog fullscreen pour afficher l'image en grand
+    if (fullscreenImageUrl != null) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { fullscreenImageUrl = null }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.95f))
+                    .clickable { fullscreenImageUrl = null },
+                contentAlignment = Alignment.Center
+            ) {
+                // Bouton fermer
+                IconButton(
+                    onClick = { fullscreenImageUrl = null },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Fermer",
+                        tint = Color.White
+                    )
+                }
+                
+                // Image en grand
+                AsyncImage(
+                    model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                        .data(
+                            if (fullscreenImageUrl!!.startsWith("/")) {
+                                java.io.File(fullscreenImageUrl!!)
+                            } else {
+                                fullscreenImageUrl
+                            }
+                        )
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Image en grand",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(32.dp),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
     }
@@ -363,7 +417,11 @@ fun WelcomeCard(character: Character, isNSFWMode: Boolean) {
 }
 
 @Composable
-fun MessageBubble(message: ChatMessage, character: Character) {
+fun MessageBubble(
+    message: ChatMessage,
+    character: Character,
+    onImageClick: (String) -> Unit = {}
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start
@@ -419,6 +477,7 @@ fun MessageBubble(message: ChatMessage, character: Character) {
                             .heightIn(min = 200.dp, max = 300.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .clickable { onImageClick(imageUrl) }
                     ) {
                         AsyncImage(
                             model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)

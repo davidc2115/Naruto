@@ -78,12 +78,13 @@ interface CustomCharacterDao {
  * Base de données Room
  */
 @Database(
-    entities = [CustomCharacterEntity::class],
-    version = 1,
+    entities = [CustomCharacterEntity::class, CustomGalleryImage::class],
+    version = 2,
     exportSchema = false
 )
 abstract class CustomCharacterDatabase : RoomDatabase() {
     abstract fun customCharacterDao(): CustomCharacterDao
+    abstract fun customGalleryImageDao(): CustomGalleryImageDao
     
     companion object {
         @Volatile
