@@ -224,8 +224,11 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                 var lastHttpError: Pair<Int, String?>? = null
                 var responseBody: String? = null
                 var usedModel: String? = null
+                var success = false
 
-                val modelCandidates = getVisionModelCandidates(apiKey).ifEmpty { FALLBACK_VISION_MODELS }
+                val modelCandidates = getVisionModelCandidates(apiKey)
+                    .filterNot { it.contains("llama-3.2-11b-vision-preview", ignoreCase = true) } // modèle décommissionné connu
+                    .ifEmpty { FALLBACK_VISION_MODELS }
 
                 for (model in modelCandidates) {
                     usedModel = model
@@ -245,6 +248,8 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                     responseBody = response.body?.string()
 
                     if (response.isSuccessful) {
+                        success = true
+                        lastHttpError = null
                         break
                     }
 
@@ -267,9 +272,14 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                 if (responseBody == null) {
                     return@withContext Result.failure(Exception("Réponse vide (Groq Vision)"))
                 }
-                if (lastHttpError != null && lastHttpError.first == 400) {
+                if (!success && lastHttpError != null && lastHttpError.first == 400) {
                     return@withContext Result.failure(
                         Exception("Erreur API Groq Vision: HTTP 400\n${lastHttpError.second?.take(800) ?: ""}")
+                    )
+                }
+                if (!success) {
+                    return@withContext Result.failure(
+                        Exception("Erreur API Groq Vision: HTTP ${lastHttpError?.first ?: "?"}\n${lastHttpError?.second?.take(800) ?: ""}")
                     )
                 }
                 
