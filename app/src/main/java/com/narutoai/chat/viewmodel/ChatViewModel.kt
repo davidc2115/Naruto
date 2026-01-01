@@ -401,12 +401,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     
                     when (workInfo?.state) {
                         WorkInfo.State.SUCCEEDED -> {
-                            // Lire l'URL depuis SharedPreferences (pas de limite de taille)
-                            val prefs = getApplication<Application>().getSharedPreferences("image_worker_results", android.content.Context.MODE_PRIVATE)
-                            val imageUrl = prefs.getString("latest_image_url", null)
-                            val imageSource = prefs.getString("latest_image_source", "Cloud") ?: "Cloud"
+                            // Lire l'URL depuis l'outputData du Worker (plus fiable que SharedPrefs)
+                            val imageUrl = workInfo.outputData.getString(ImageGenerationWorker.KEY_IMAGE_PATH)
+                            val imageSource = "Pollination AI"
                             
-                            android.util.Log.d("ChatViewModel", "📖 Lecture URL depuis SharedPrefs")
+                            android.util.Log.d("ChatViewModel", "📖 Lecture URL depuis outputData")
                             android.util.Log.d("ChatViewModel", "✅ URL complète: $imageUrl")
                             android.util.Log.d("ChatViewModel", "📏 Longueur URL: ${imageUrl?.length ?: 0} caractères")
                             android.util.Log.d("ChatViewModel", "🎨 Source: $imageSource")

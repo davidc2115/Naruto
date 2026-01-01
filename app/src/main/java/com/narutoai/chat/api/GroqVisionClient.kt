@@ -33,7 +33,13 @@ class GroqVisionClient(private val context: Context) {
         // Fallback si l'endpoint models est indisponible.
         // IMPORTANT: ne pas inclure de modèles décommissionnés.
         private val FALLBACK_VISION_MODELS = listOf(
-            "llama-3.2-90b-vision-preview"
+            // Liste la plus compatible possible (Groq peut changer)
+            "llama-3.3-70b-vision-preview",
+            "llama-3.3-70b-vision",
+            "llama-3.2-90b-vision-preview",
+            "llama-3.2-90b-vision",
+            "llama-3.2-11b-vision",
+            "llama-3.2-11b-vision-preview"
         )
         // Réduire un peu la taille pour éviter les erreurs 400 (payload trop gros).
         private const val MAX_IMAGE_SIZE_KB = 350 // 350KB max (avant Base64)
@@ -97,6 +103,17 @@ class GroqVisionClient(private val context: Context) {
             err.optString("code", "").contains("model_decommissioned", ignoreCase = true)
         } catch (_: Exception) {
             false
+        }
+    }
+
+    private fun getGroqErrorCode(httpBody: String?): String? {
+        return try {
+            if (httpBody.isNullOrBlank()) return null
+            val obj = JSONObject(httpBody)
+            val err = obj.optJSONObject("error") ?: return null
+            err.optString("code", null)
+        } catch (_: Exception) {
+            null
         }
     }
 
@@ -256,7 +273,15 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                     lastHttpError = response.code to responseBody
                     android.util.Log.e("GroqVision", "HTTP ${response.code} (model=$model): $responseBody")
 
-                    // Sur 400 on tente le fallback; sinon on arrête tout de suite.
+                    val errorCode = getGroqErrorCode(responseBody)
+
+                    // Si le modèle est décommissionné / introuvable, on tente le fallback (même si le status != 400)
+                    if (errorCode != null && (errorCode.contains("model_decommissioned", true) || errorCode.contains("model_not_found", true))) {
+                        cachedVisionModels = null
+                        continue
+                    }
+
+                    // Sur 400 on tente le fallback; sinon on arrête.
                     if (response.code != 400) {
                         return@withContext Result.failure(
                             Exception("Erreur API Groq Vision: HTTP ${response.code}\n${responseBody?.take(500) ?: ""}")
