@@ -38,6 +38,29 @@ class PollinationAIClient {
         private const val DEFAULT_MODEL = "turbo" // Plus rapide
         private const val DEFAULT_VIDEO_MODEL = "dreamshaper" // Modèle vidéo par défaut
     }
+
+    private fun extractAgeNumber(age: String?): Int? {
+        val raw = age.orEmpty().trim()
+        if (raw.isBlank()) return null
+        // Cherche d'abord un âge explicite (ex: "24", "24 ans", "18-25")
+        Regex("(\\d{2})").find(raw)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }
+        return null
+    }
+
+    private fun safeAdultAge(age: String?): Int {
+        val n = extractAgeNumber(age)
+        return when {
+            n == null -> 21
+            n < 18 -> 21
+            else -> n
+        }
+    }
+
+    private fun adultSafetySuffix(age: String?): String {
+        val a = safeAdultAge(age)
+        // Ajout dans le prompt (Pollinations ne gère pas de negative_prompt natif ici)
+        return "adult, $a years old, mature adult appearance, no child, no teen, no underage, no loli, not young-looking"
+    }
     
     /**
      * Génère une image hyper-réaliste avec Pollination AI
@@ -159,13 +182,15 @@ class PollinationAIClient {
         characterName: String,
         physicalDescription: String,
         style: String = "realistic",
-        gender: String = "female"
+        gender: String = "female",
+        age: String = ""
     ): Result<String> = withContext(Dispatchers.IO) {
         val detailedPrompt = buildCharacterPrompt(
             characterName,
             physicalDescription,
             style,
-            gender
+            gender,
+            age = age
         )
         
         generateImage(
@@ -185,7 +210,8 @@ class PollinationAIClient {
         characterName: String,
         physicalDescription: String,
         style: String = "realistic",
-        count: Int = 6
+        count: Int = 6,
+        age: String = ""
     ): Result<List<String>> = withContext(Dispatchers.IO) {
         try {
             val images = mutableListOf<String>()
@@ -205,7 +231,8 @@ class PollinationAIClient {
                     characterName,
                     physicalDescription,
                     style,
-                    additionalDetails = variation
+                    additionalDetails = variation,
+                    age = age
                 )
                 
                 val result = generateImage(
@@ -237,9 +264,10 @@ class PollinationAIClient {
     suspend fun generateCharacterThumbnail(
         characterName: String,
         physicalDescription: String,
-        style: String = "realistic"
+        style: String = "realistic",
+        age: String = ""
     ): Result<String> = withContext(Dispatchers.IO) {
-        val thumbnailPrompt = buildThumbnailPrompt(characterName, physicalDescription, style)
+        val thumbnailPrompt = buildThumbnailPrompt(characterName, physicalDescription, style, age)
         
         generateImage(
             prompt = thumbnailPrompt,
@@ -258,7 +286,8 @@ class PollinationAIClient {
         physicalDescription: String,
         style: String,
         gender: String = "female",
-        additionalDetails: String = ""
+        additionalDetails: String = "",
+        age: String = ""
     ): String {
         val styleModifier = when (style.lowercase()) {
             "realistic" -> "photorealistic, ultra detailed, professional photography, natural lighting, 8k uhd"
@@ -279,6 +308,8 @@ class PollinationAIClient {
             append("$physicalDescription, ")
             if (genderDetails.isNotEmpty()) append("$genderDetails, ")
             if (additionalDetails.isNotEmpty()) append("$additionalDetails, ")
+            append(adultSafetySuffix(age))
+            append(", ")
             append("$styleModifier, ")
             append("sharp focus, detailed face, expressive eyes, ")
             append("professional quality, masterpiece")
@@ -291,7 +322,8 @@ class PollinationAIClient {
     private fun buildThumbnailPrompt(
         name: String,
         physicalDescription: String,
-        style: String
+        style: String,
+        age: String = ""
     ): String {
         val stylePrefix = when (style.lowercase()) {
             "realistic" -> "photorealistic portrait"
@@ -303,6 +335,8 @@ class PollinationAIClient {
             append("$stylePrefix, ")
             append("$name, ")
             append("$physicalDescription, ")
+            append(adultSafetySuffix(age))
+            append(", ")
             append("headshot, centered, ")
             append("professional lighting, ")
             append("clean background, ")

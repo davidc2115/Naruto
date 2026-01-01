@@ -344,6 +344,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
                     IMPORTANT: Start with "${character.name}, " to ensure character identity.
                     Include: ALL physical features listed above, setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
+                    CRITICAL SAFETY: The character MUST be an ADULT (18+). Use the provided age; if unclear, choose 21+.
+                    Do NOT depict child/teen/underage or a young-looking appearance. Avoid terms like: child, teen, schoolgirl, loli.
+                    The prompt MUST explicitly include: "adult, XX years old" (XX>=18).
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 
@@ -365,6 +368,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         )
                         return@launch
                     }
+
+                val finalPrompt = enforceAdultAndProfileInPrompt(character, imagePrompt)
                 
                 // Générer en arrière-plan avec notification
                 _messages.value = _messages.value.dropLast(1) + ChatMessage(
@@ -378,7 +383,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 
                 // Créer Work Request pour génération en arrière-plan
                 val inputData = Data.Builder()
-                    .putString(ImageGenerationWorker.KEY_PROMPT, imagePrompt)
+                    .putString(ImageGenerationWorker.KEY_PROMPT, finalPrompt)
                     .putString(ImageGenerationWorker.KEY_NEGATIVE_PROMPT, "low quality, blurry, distorted")
                     .putInt(ImageGenerationWorker.KEY_WIDTH, 512)
                     .putInt(ImageGenerationWorker.KEY_HEIGHT, 512)
@@ -681,7 +686,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 val result = pollinationAIClient.generateCharacterThumbnail(
                     characterName = character.name,
                     physicalDescription = character.physicalDescription,
-                    style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic"
+                    style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic",
+                    age = character.age
                 )
                 
                 result.fold(
@@ -708,6 +714,43 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private fun cacheThumbnailUrl(characterId: String, url: String) {
         if (url.isBlank()) return
         sharedPreferences.edit().putString("thumb_$characterId", url).apply()
+    }
+
+    private fun extractAgeNumber(age: String): Int? {
+        return Regex("(\\d{2})").find(age)?.groupValues?.getOrNull(1)?.toIntOrNull()
+    }
+
+    private fun safeAdultAgeFromCharacter(character: Character): Int {
+        val n = extractAgeNumber(character.age)
+        return when {
+            n == null -> 21
+            n < 18 -> 21
+            else -> n
+        }
+    }
+
+    private fun enforceAdultAndProfileInPrompt(character: Character, prompt: String): String {
+        val age = safeAdultAgeFromCharacter(character)
+        val adultSafety = "adult, $age years old, mature adult appearance, no child, no teen, no underage, no loli, not young-looking"
+
+        // Ré-ancrer la description physique si Groq l'a trop “créativisée”
+        val anchors = buildList {
+            if (character.physicalDescription.isNotBlank()) add(character.physicalDescription.trim())
+            if (character.hairColor.isNotBlank()) add("hair: ${character.hairColor.trim()}")
+            if (character.eyeColor.isNotBlank()) add("eyes: ${character.eyeColor.trim()}")
+            if (character.bodyType.isNotBlank()) add("body type: ${character.bodyType.trim()}")
+        }.joinToString(", ")
+
+        val base = prompt.trim().trimEnd('.')
+        return buildString {
+            append(base)
+            append(", ")
+            append(adultSafety)
+            if (anchors.isNotBlank()) {
+                append(", ")
+                append(anchors)
+            }
+        }
     }
     
     /**

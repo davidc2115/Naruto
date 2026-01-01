@@ -140,11 +140,23 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                     val description = result.getOrNull()
                     
                     if (description != null) {
+                        fun normalizeAdultAge(raw: String): String {
+                            val n = Regex("(\\d{2})").find(raw)?.groupValues?.getOrNull(1)?.toIntOrNull()
+                            return when {
+                                raw.isBlank() -> "21 ans"
+                                n == null -> raw
+                                n < 18 -> "21 ans"
+                                else -> raw
+                            }
+                        }
+
+                        val safeAge = normalizeAdultAge(description.age)
+
                         // Remplir la description complète
-                        _physicalDescription.value = description.toFormattedDescription()
+                        _physicalDescription.value = description.copy(age = safeAge).toFormattedDescription()
                         
                         // Auto-remplir les champs individuels
-                        _age.value = description.age
+                        _age.value = safeAge
                         _gender.value = description.gender
                         _hairColor.value = description.hairColor
                         _eyeColor.value = description.eyeColor

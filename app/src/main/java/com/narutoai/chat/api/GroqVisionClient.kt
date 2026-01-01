@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Client pour l'API Groq Vision (analyse d'images)
- * Utilise le modèle llama-3.2-90b-vision-preview
+ * Sélectionne dynamiquement un modèle Vision disponible (préférence non-Llama).
  */
 class GroqVisionClient(private val context: Context) {
     
@@ -32,14 +32,23 @@ class GroqVisionClient(private val context: Context) {
 
         // Fallback si l'endpoint models est indisponible.
         // IMPORTANT: ne pas inclure de modèles décommissionnés.
+        // Modèles vision "préférés" (on les tente en premier si disponibles).
+        // NB: Groq peut changer les IDs -> on tolère model_not_found et on fallback.
+        private val PREFERRED_VISION_MODELS = listOf(
+            "qwen-2.5-vl-72b-instruct",
+            "qwen2.5-vl-72b-instruct",
+            "pixtral-12b-2409",
+            "pixtral-12b",
+            "llava-1.6-34b"
+        )
+
         private val FALLBACK_VISION_MODELS = listOf(
             // Liste la plus compatible possible (Groq peut changer)
-            "llama-3.3-70b-vision-preview",
             "llama-3.3-70b-vision",
-            "llama-3.2-90b-vision-preview",
+            "llama-3.3-70b-vision-preview",
             "llama-3.2-90b-vision",
-            "llama-3.2-11b-vision",
-            "llama-3.2-11b-vision-preview"
+            "llama-3.2-90b-vision-preview",
+            "llama-3.2-11b-vision"
         )
         // Réduire un peu la taille pour éviter les erreurs 400 (payload trop gros).
         private const val MAX_IMAGE_SIZE_KB = 350 // 350KB max (avant Base64)
@@ -95,6 +104,8 @@ class GroqVisionClient(private val context: Context) {
     @Volatile
     private var cachedVisionModels: List<String>? = null
 
+    private val badVisionModels = java.util.Collections.synchronizedSet(mutableSetOf<String>())
+
     private fun isModelDecommissionedError(httpBody: String?): Boolean {
         return try {
             if (httpBody.isNullOrBlank()) return false
@@ -141,14 +152,15 @@ class GroqVisionClient(private val context: Context) {
                     }
                 }
 
-                // Garder uniquement les modèles vision
+                // Garder uniquement les modèles vision (vision/vl)
                 val vision = ids
-                    .filter { it.contains("vision", ignoreCase = true) }
+                    .filter { it.contains("vision", ignoreCase = true) || it.contains("-vl", ignoreCase = true) }
                     .distinct()
 
-                // Trier: préférer 90b, puis preview, puis le reste
+                // Trier: préférer non-llama, puis plus gros, puis preview
                 val sorted = vision.sortedWith(
-                    compareByDescending<String> { it.contains("90b", ignoreCase = true) }
+                    compareByDescending<String> { !it.contains("llama", ignoreCase = true) }
+                        .thenByDescending { it.contains("90b", ignoreCase = true) || it.contains("72b", ignoreCase = true) || it.contains("70b", ignoreCase = true) }
                         .thenByDescending { it.contains("preview", ignoreCase = true) }
                         .thenBy { it }
                 )
@@ -163,7 +175,9 @@ class GroqVisionClient(private val context: Context) {
     private suspend fun getVisionModelCandidates(apiKey: String): List<String> {
         cachedVisionModels?.let { if (it.isNotEmpty()) return it }
         val fetched = fetchVisionModels(apiKey)
-        val models = (fetched + FALLBACK_VISION_MODELS).distinct()
+        val models = (PREFERRED_VISION_MODELS + fetched + FALLBACK_VISION_MODELS)
+            .distinct()
+            .filterNot { badVisionModels.contains(it) }
         cachedVisionModels = models
         return models
     }
@@ -196,7 +210,9 @@ FORMAT REQUIS (réponds UNIQUEMENT avec ce JSON, rien d'autre):
   "detailedDescription": "description physique complète en 2-3 phrases"
 }
 
-IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
+IMPORTANT:
+- Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
+- Le personnage doit être ADULTE (18+). Si l'âge est incertain, renvoie 21+.
                 """.trimIndent()
                 
                 // Construire la requête JSON
@@ -277,6 +293,7 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
 
                     // Si le modèle est décommissionné / introuvable, on tente le fallback (même si le status != 400)
                     if (errorCode != null && (errorCode.contains("model_decommissioned", true) || errorCode.contains("model_not_found", true))) {
+                        badVisionModels.add(model)
                         cachedVisionModels = null
                         continue
                     }
