@@ -85,12 +85,23 @@ object AutoTagger {
             bodyNorm.contains("muscl") -> tags.add("musclé")
             bodyNorm.contains("pulpeus") || bodyNorm.contains("curvy") -> tags.add("pulpeuse")
         }
+        if (bodyNorm.contains("curvy")) tags.add("curvy")
+        if (bodyNorm.contains("bbw")) tags.add("bbw")
+        if (bodyNorm.contains("chubby")) tags.add("chubby")
 
         val ageNorm = age.orEmpty().lowercase()
         when {
             ageNorm.contains("ado") -> tags.add("adolescent(e)")
             ageNorm.contains("jeune") -> tags.add("jeune adulte")
             ageNorm.contains("mature") -> tags.add("mature")
+        }
+
+        // Tags "mature" plus spécifiques (si âge détectable)
+        val numericAge = Regex("(\\d{2})").find(ageNorm)?.groupValues?.getOrNull(1)?.toIntOrNull()
+        if (numericAge != null) {
+            if (numericAge >= 40) tags.add("mature")
+            if (numericAge >= 35 && tags.contains("femme")) tags.add("milf")
+            if (numericAge >= 35 && tags.contains("homme")) tags.add("dilf")
         }
 
         val heightNorm = height.orEmpty().lowercase()

@@ -28,10 +28,12 @@ class GroqVisionClient(private val context: Context) {
     
     companion object {
         private const val GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-        // Groq a parfois des changements de modèles vision; on garde une liste de fallback.
-        private val MODELS = listOf(
-            "llama-3.2-90b-vision-preview",
-            "llama-3.2-11b-vision-preview"
+        private const val GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
+
+        // Fallback si l'endpoint models est indisponible.
+        // IMPORTANT: ne pas inclure de modèles décommissionnés.
+        private val FALLBACK_VISION_MODELS = listOf(
+            "llama-3.2-90b-vision-preview"
         )
         // Réduire un peu la taille pour éviter les erreurs 400 (payload trop gros).
         private const val MAX_IMAGE_SIZE_KB = 350 // 350KB max (avant Base64)
@@ -83,6 +85,71 @@ class GroqVisionClient(private val context: Context) {
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
+
+    @Volatile
+    private var cachedVisionModels: List<String>? = null
+
+    private fun isModelDecommissionedError(httpBody: String?): Boolean {
+        return try {
+            if (httpBody.isNullOrBlank()) return false
+            val obj = JSONObject(httpBody)
+            val err = obj.optJSONObject("error") ?: return false
+            err.optString("code", "").contains("model_decommissioned", ignoreCase = true)
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private suspend fun fetchVisionModels(apiKey: String): List<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = Request.Builder()
+                    .url(GROQ_MODELS_URL)
+                    .header("Authorization", "Bearer $apiKey")
+                    .get()
+                    .build()
+
+                val response = client.newCall(request).execute()
+                val body = response.body?.string()
+                if (!response.isSuccessful || body.isNullOrBlank()) {
+                    return@withContext emptyList()
+                }
+
+                val json = JSONObject(body)
+                val data = json.optJSONArray("data") ?: return@withContext emptyList()
+                val ids = buildList {
+                    for (i in 0 until data.length()) {
+                        val id = data.optJSONObject(i)?.optString("id").orEmpty()
+                        if (id.isNotBlank()) add(id)
+                    }
+                }
+
+                // Garder uniquement les modèles vision
+                val vision = ids
+                    .filter { it.contains("vision", ignoreCase = true) }
+                    .distinct()
+
+                // Trier: préférer 90b, puis preview, puis le reste
+                val sorted = vision.sortedWith(
+                    compareByDescending<String> { it.contains("90b", ignoreCase = true) }
+                        .thenByDescending { it.contains("preview", ignoreCase = true) }
+                        .thenBy { it }
+                )
+
+                sorted
+            } catch (_: Exception) {
+                emptyList()
+            }
+        }
+    }
+
+    private suspend fun getVisionModelCandidates(apiKey: String): List<String> {
+        cachedVisionModels?.let { if (it.isNotEmpty()) return it }
+        val fetched = fetchVisionModels(apiKey)
+        val models = (fetched + FALLBACK_VISION_MODELS).distinct()
+        cachedVisionModels = models
+        return models
+    }
     
     /**
      * Analyse une image et génère un descriptif physique détaillé
@@ -158,7 +225,9 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                 var responseBody: String? = null
                 var usedModel: String? = null
 
-                for (model in MODELS) {
+                val modelCandidates = getVisionModelCandidates(apiKey).ifEmpty { FALLBACK_VISION_MODELS }
+
+                for (model in modelCandidates) {
                     usedModel = model
                     val requestBody = buildRequestJson(model).toString()
                         .toRequestBody("application/json".toMediaType())
@@ -188,12 +257,17 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                             Exception("Erreur API Groq Vision: HTTP ${response.code}\n${responseBody?.take(500) ?: ""}")
                         )
                     }
+
+                    // Si le modèle est décommissionné, invalider le cache (on relira /models au prochain run)
+                    if (isModelDecommissionedError(responseBody)) {
+                        cachedVisionModels = null
+                    }
                 }
 
                 if (responseBody == null) {
                     return@withContext Result.failure(Exception("Réponse vide (Groq Vision)"))
                 }
-                if (lastHttpError != null && lastHttpError.first == 400 && usedModel == MODELS.last()) {
+                if (lastHttpError != null && lastHttpError.first == 400) {
                     return@withContext Result.failure(
                         Exception("Erreur API Groq Vision: HTTP 400\n${lastHttpError.second?.take(800) ?: ""}")
                     )
