@@ -344,6 +344,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
                     IMPORTANT: Start with "${character.name}, " to ensure character identity.
                     Include: ALL physical features listed above, setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
+                    CRITICAL SAFETY: The character MUST be an ADULT (18+). Use the provided age; if unclear, choose 21+.
+                    Do NOT depict child/teen/underage or a young-looking appearance. Avoid terms like: child, teen, schoolgirl, loli.
+                    The prompt MUST explicitly include: "adult, XX years old" (XX>=18).
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 
@@ -365,6 +368,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         )
                         return@launch
                     }
+
+                val finalPrompt = enforceAdultAndProfileInPrompt(character, imagePrompt)
                 
                 // Générer en arrière-plan avec notification
                 _messages.value = _messages.value.dropLast(1) + ChatMessage(
@@ -378,7 +383,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 
                 // Créer Work Request pour génération en arrière-plan
                 val inputData = Data.Builder()
-                    .putString(ImageGenerationWorker.KEY_PROMPT, imagePrompt)
+                    .putString(ImageGenerationWorker.KEY_PROMPT, finalPrompt)
                     .putString(ImageGenerationWorker.KEY_NEGATIVE_PROMPT, "low quality, blurry, distorted")
                     .putInt(ImageGenerationWorker.KEY_WIDTH, 512)
                     .putInt(ImageGenerationWorker.KEY_HEIGHT, 512)
@@ -401,12 +406,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     
                     when (workInfo?.state) {
                         WorkInfo.State.SUCCEEDED -> {
-                            // Lire l'URL depuis SharedPreferences (pas de limite de taille)
-                            val prefs = getApplication<Application>().getSharedPreferences("image_worker_results", android.content.Context.MODE_PRIVATE)
-                            val imageUrl = prefs.getString("latest_image_url", null)
-                            val imageSource = prefs.getString("latest_image_source", "Cloud") ?: "Cloud"
+                            // Lire l'URL depuis l'outputData du Worker (plus fiable que SharedPrefs)
+                            val imageUrl = workInfo.outputData.getString(ImageGenerationWorker.KEY_IMAGE_PATH)
+                            val imageSource = "Pollination AI"
                             
-                            android.util.Log.d("ChatViewModel", "📖 Lecture URL depuis SharedPrefs")
+                            android.util.Log.d("ChatViewModel", "📖 Lecture URL depuis outputData")
                             android.util.Log.d("ChatViewModel", "✅ URL complète: $imageUrl")
                             android.util.Log.d("ChatViewModel", "📏 Longueur URL: ${imageUrl?.length ?: 0} caractères")
                             android.util.Log.d("ChatViewModel", "🎨 Source: $imageSource")
@@ -664,25 +668,87 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Génère une vignette pour un personnage avec Pollination AI
      */
-    fun generateCharacterThumbnail(character: Character, onComplete: (String) -> Unit) {
+    fun generateCharacterThumbnail(
+        character: Character,
+        onComplete: (String) -> Unit,
+        onError: (Throwable) -> Unit = {}
+    ) {
         viewModelScope.launch {
             try {
+                // Cache local pour éviter de regénérer à chaque affichage
+                getCachedThumbnailUrl(character.id)?.let { cached ->
+                    if (cached.isNotBlank()) {
+                        onComplete(cached)
+                        return@launch
+                    }
+                }
+
                 val result = pollinationAIClient.generateCharacterThumbnail(
                     characterName = character.name,
                     physicalDescription = character.physicalDescription,
-                    style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic"
+                    style = if (character.category == com.narutoai.chat.models.CharacterCategory.NARUTO) "anime" else "realistic",
+                    age = character.age
                 )
                 
                 result.fold(
                     onSuccess = { thumbnailUrl ->
+                        cacheThumbnailUrl(character.id, thumbnailUrl)
                         onComplete(thumbnailUrl)
                     },
                     onFailure = { exception ->
                         _error.value = "Erreur génération vignette: ${exception.message}"
+                        onError(exception)
                     }
                 )
             } catch (e: Exception) {
                 _error.value = "Erreur: ${e.message}"
+                onError(e)
+            }
+        }
+    }
+
+    private fun getCachedThumbnailUrl(characterId: String): String? {
+        return sharedPreferences.getString("thumb_$characterId", null)
+    }
+
+    private fun cacheThumbnailUrl(characterId: String, url: String) {
+        if (url.isBlank()) return
+        sharedPreferences.edit().putString("thumb_$characterId", url).apply()
+    }
+
+    private fun extractAgeNumber(age: String): Int? {
+        return Regex("(\\d{2})").find(age)?.groupValues?.getOrNull(1)?.toIntOrNull()
+    }
+
+    private fun safeAdultAgeFromCharacter(character: Character): Int {
+        val n = extractAgeNumber(character.age)
+        return when {
+            n == null -> 21
+            n < 18 -> 21
+            else -> n
+        }
+    }
+
+    private fun enforceAdultAndProfileInPrompt(character: Character, prompt: String): String {
+        val age = safeAdultAgeFromCharacter(character)
+        val adultSafety = "adult, $age years old, mature adult appearance, no child, no teen, no underage, no loli, not young-looking"
+
+        // Ré-ancrer la description physique si Groq l'a trop “créativisée”
+        val anchors = buildList {
+            if (character.physicalDescription.isNotBlank()) add(character.physicalDescription.trim())
+            if (character.hairColor.isNotBlank()) add("hair: ${character.hairColor.trim()}")
+            if (character.eyeColor.isNotBlank()) add("eyes: ${character.eyeColor.trim()}")
+            if (character.bodyType.isNotBlank()) add("body type: ${character.bodyType.trim()}")
+        }.joinToString(", ")
+
+        val base = prompt.trim().trimEnd('.')
+        return buildString {
+            append(base)
+            append(", ")
+            append(adultSafety)
+            if (anchors.isNotBlank()) {
+                append(", ")
+                append(anchors)
             }
         }
     }

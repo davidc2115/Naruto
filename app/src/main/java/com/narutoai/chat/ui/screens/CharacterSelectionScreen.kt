@@ -5,26 +5,38 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.narutoai.chat.data.Characters
+import com.narutoai.chat.data.CharacterPackLoader
+import com.narutoai.chat.utils.CharacterConverter
+import com.narutoai.chat.utils.CharacterTagUtils
+import com.narutoai.chat.viewmodel.CustomCharactersViewModel
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.CharacterCategory
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,15 +46,79 @@ fun CharacterSelectionScreen(
     onUserProfileClick: () -> Unit = {},
     onCreateCharacterClick: () -> Unit = {},
     onCustomCharactersClick: () -> Unit = {},
-    viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
+    chatViewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var selectedCategory by remember { mutableStateOf<CharacterCategory?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    val selectedTags = remember { mutableStateListOf<String>() }
+
+    // Charger les personnages custom depuis Room pour les afficher aussi ici
+    val customVm: CustomCharactersViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val customEntities by customVm.characters.collectAsState()
+    val customCharacters = remember(customEntities) {
+        customEntities.map { CharacterConverter.toCharacter(it) }
+    }
+
+    // Charger le pack (assets)
+    val context = LocalContext.current
+    var packCharacters by remember { mutableStateOf<List<Character>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        packCharacters = withContext(Dispatchers.IO) {
+            CharacterPackLoader.load(context)
+        }
+    }
     
-    val characters = remember(selectedCategory) {
+    val baseCharacters = remember(packCharacters) {
+        // Persos intégrés + pack
+        Characters.allCharacters + packCharacters
+    }
+
+    val categoryFiltered = remember(baseCharacters, selectedCategory) {
+        when (selectedCategory) {
+            null -> baseCharacters
+            CharacterCategory.NARUTO -> baseCharacters.filter { it.category == CharacterCategory.NARUTO }
+            CharacterCategory.CELEBRITY_MALE, CharacterCategory.CELEBRITY_FEMALE ->
+                baseCharacters.filter { it.category == CharacterCategory.CELEBRITY_MALE || it.category == CharacterCategory.CELEBRITY_FEMALE }
+            else -> baseCharacters
+        }
+    }
+
+    val combinedCharacters = remember(customCharacters, categoryFiltered, selectedCategory) {
+        // On n'affiche les customs que dans "Tous" (sinon, on conserve le filtre existant)
+        val ids = HashSet<String>()
         if (selectedCategory == null) {
-            Characters.allCharacters
+            (customCharacters + categoryFiltered).filter { ids.add(it.id) }
         } else {
-            Characters.getByCategory(selectedCategory!!)
+            categoryFiltered.filter { ids.add(it.id) }
+        }
+    }
+
+    val suggestedTags = remember(combinedCharacters) {
+        // Top tags les plus fréquents
+        val counts = mutableMapOf<String, Int>()
+        combinedCharacters.forEach { c ->
+            CharacterTagUtils.uiTagsFor(c).forEach { t -> counts[t] = (counts[t] ?: 0) + 1 }
+        }
+        counts.entries
+            .sortedByDescending { it.value }
+            .map { it.key }
+            .take(20)
+    }
+
+    // IMPORTANT: utiliser derivedStateOf pour que le filtre réagisse aux changements de selectedTags
+    val filteredCharacters by remember(combinedCharacters, searchQuery) {
+        derivedStateOf {
+            val q = searchQuery.trim().lowercase()
+            val selected = selectedTags.toList()
+            combinedCharacters.filter { c ->
+                val tags = CharacterTagUtils.uiTagsFor(c)
+                val matchesQuery = q.isEmpty() ||
+                    c.name.lowercase().contains(q) ||
+                    c.description.lowercase().contains(q) ||
+                    tags.any { it.contains(q) }
+                val matchesTags = selected.isEmpty() || selected.all { it in tags }
+                matchesQuery && matchesTags
+            }
         }
     }
     
@@ -123,16 +199,84 @@ fun CharacterSelectionScreen(
             }
             
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Recherche + tags
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher") },
+                label = { Text("Rechercher par nom / description / tag") },
+                placeholder = { Text("Ex: brune, romantique, ninja…") }
+            )
+
+            if (suggestedTags.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(suggestedTags) { tag ->
+                        FilterChip(
+                            selected = selectedTags.contains(tag),
+                            onClick = {
+                                if (selectedTags.contains(tag)) selectedTags.remove(tag) else selectedTags.add(tag)
+                            },
+                            label = { Text("#$tag") }
+                        )
+                    }
+                }
+            }
+
+            // Préchargement vignettes (optionnel) pour accélérer l'apparition des images réalistes
+            if (chatViewModel != null) {
+                val scope = rememberCoroutineScope()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                // Précharger une petite batch pour éviter rate-limit
+                                filteredCharacters
+                                    .asSequence()
+                                    .filter { it.imageResId == 0 && it.physicalDescription.isNotBlank() }
+                                    .take(12)
+                                    .forEach { c ->
+                                        chatViewModel.generateCharacterThumbnail(
+                                            character = c,
+                                            onComplete = { /* cache done */ },
+                                            onError = { /* ignore */ }
+                                        )
+                                    }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Précharger vignettes")
+                    }
+                    Text(
+                        text = "${filteredCharacters.size} résultat(s)",
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             
             // Character list
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(characters) { character ->
+                items(filteredCharacters) { character ->
                     CharacterCard(
                         character = character,
                         onClick = { onCharacterSelected(character) },
-                        viewModel = viewModel
+                        viewModel = chatViewModel
                     )
                 }
             }
@@ -176,16 +320,28 @@ fun CharacterCard(
     viewModel: com.narutoai.chat.viewmodel.ChatViewModel? = null
 ) {
     var thumbnailUrl by remember { mutableStateOf(character.thumbnailUrl) }
+    var isThumbLoading by remember { mutableStateOf(false) }
+    var thumbFailed by remember { mutableStateOf(false) }
     
-    // DÉSACTIVÉ: Les vignettes sont maintenant des images locales (R.drawable.xxx)
-    // Plus besoin de générer dynamiquement
-    // LaunchedEffect(character.id) {
-    //     if (thumbnailUrl.isEmpty() && character.physicalDescription.isNotEmpty() && viewModel != null) {
-    //         viewModel.generateCharacterThumbnail(character) { url ->
-    //             thumbnailUrl = url
-    //         }
-    //     }
-    // }
+    // Générer automatiquement une vignette (Pollination) si pas d'image locale.
+    // Le ViewModel met en cache en SharedPreferences pour éviter de spammer l'API.
+    LaunchedEffect(character.id) {
+        if (thumbnailUrl.isEmpty() && character.imageResId == 0 && character.physicalDescription.isNotEmpty() && viewModel != null) {
+            isThumbLoading = true
+            thumbFailed = false
+            viewModel.generateCharacterThumbnail(
+                character = character,
+                onComplete = { url ->
+                    thumbnailUrl = url
+                    isThumbLoading = false
+                },
+                onError = {
+                    isThumbLoading = false
+                    thumbFailed = true
+                }
+            )
+        }
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -199,20 +355,55 @@ fun CharacterCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar avec vignette Pollination AI ou image locale
-            AsyncImage(
-                model = when {
-                    thumbnailUrl.isNotEmpty() -> thumbnailUrl
-                    character.imageResId != 0 -> character.imageResId
-                    else -> character.avatarEmoji
-                },
-                contentDescription = character.name,
+            // Avatar (image si dispo, sinon emoji)
+            val imageModel = when {
+                thumbnailUrl.isNotEmpty() -> thumbnailUrl
+                character.imageResId != 0 -> character.imageResId
+                else -> null
+            }
+            Box(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer),
-                contentScale = ContentScale.Crop
-            )
+                contentAlignment = Alignment.Center
+            ) {
+                if (imageModel != null) {
+                    AsyncImage(
+                        model = imageModel,
+                        contentDescription = character.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else if (isThumbLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                } else if (thumbFailed && viewModel != null && character.physicalDescription.isNotEmpty()) {
+                    IconButton(
+                        onClick = {
+                            isThumbLoading = true
+                            thumbFailed = false
+                            viewModel.generateCharacterThumbnail(
+                                character = character,
+                                onComplete = { url ->
+                                    thumbnailUrl = url
+                                    isThumbLoading = false
+                                },
+                                onError = {
+                                    isThumbLoading = false
+                                    thumbFailed = true
+                                }
+                            )
+                        }
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Réessayer", tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                } else {
+                    Text(
+                        text = character.avatarEmoji,
+                        fontSize = 32.sp
+                    )
+                }
+            }
             
             // Character info
             Column(
@@ -229,12 +420,13 @@ fun CharacterCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
-                // Personality tags
+                // Tags (personality)
                 Row(
                     modifier = Modifier.padding(top = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    character.personality.take(3).forEach { trait ->
+                    // Afficher des tags "recherche" (inclut genre/couleur cheveux/etc)
+                    CharacterTagUtils.uiTagsFor(character).take(3).forEach { trait ->
                         Surface(
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             shape = RoundedCornerShape(4.dp)

@@ -22,14 +22,35 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Client pour l'API Groq Vision (analyse d'images)
- * Utilise le modèle llama-3.2-90b-vision-preview
+ * Sélectionne dynamiquement un modèle Vision disponible (préférence non-Llama).
  */
 class GroqVisionClient(private val context: Context) {
     
     companion object {
         private const val GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-        private const val MODEL = "llama-3.2-90b-vision-preview"
-        private const val MAX_IMAGE_SIZE_KB = 500 // 500KB max pour Base64
+        private const val GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models"
+
+        // Fallback si l'endpoint models est indisponible.
+        // IMPORTANT: ne pas inclure de modèles décommissionnés.
+        // Modèles vision "préférés" (on les tente en premier si disponibles).
+        // NB: Groq peut changer les IDs -> on tolère model_not_found et on fallback.
+        private val PREFERRED_VISION_MODELS = listOf(
+            "qwen-2.5-vl-72b-instruct",
+            "qwen2.5-vl-72b-instruct",
+            "pixtral-12b-2409",
+            "pixtral-12b",
+            "llava-1.6-34b"
+        )
+
+        private val FALLBACK_VISION_MODELS = listOf(
+            // Liste la plus compatible possible (Groq peut changer)
+            "llama-3.3-70b-vision",
+            "llama-3.3-70b-vision-preview",
+            "llama-3.2-90b-vision",
+            "llama-3.2-90b-vision-preview"
+        )
+        // Réduire un peu la taille pour éviter les erreurs 400 (payload trop gros).
+        private const val MAX_IMAGE_SIZE_KB = 350 // 350KB max (avant Base64)
     }
     
     /**
@@ -78,6 +99,108 @@ class GroqVisionClient(private val context: Context) {
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
+
+    @Volatile
+    private var cachedVisionModels: List<String>? = null
+
+    private val badVisionModels = java.util.Collections.synchronizedSet(mutableSetOf<String>())
+
+    private fun isBannedModel(modelId: String): Boolean {
+        // 11b vision a été régulièrement décommissionné côté Groq (et provoque des 400/404).
+        return modelId.contains("llama-3.2-11b-vision", ignoreCase = true)
+    }
+
+    private fun isModelDecommissionedError(httpBody: String?): Boolean {
+        return try {
+            if (httpBody.isNullOrBlank()) return false
+            val obj = JSONObject(httpBody)
+            val err = obj.optJSONObject("error") ?: return false
+            val code = err.optString("code", "")
+            val message = err.optString("message", "")
+            code.contains("model_decommissioned", ignoreCase = true) ||
+                message.contains("decommissioned", ignoreCase = true)
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun getGroqErrorCode(httpBody: String?): String? {
+        return try {
+            if (httpBody.isNullOrBlank()) return null
+            val obj = JSONObject(httpBody)
+            val err = obj.optJSONObject("error") ?: return null
+            err.optString("code", null)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun getGroqErrorMessage(httpBody: String?): String? {
+        return try {
+            if (httpBody.isNullOrBlank()) return null
+            val obj = JSONObject(httpBody)
+            val err = obj.optJSONObject("error") ?: return null
+            err.optString("message", null)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private suspend fun fetchVisionModels(apiKey: String): List<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = Request.Builder()
+                    .url(GROQ_MODELS_URL)
+                    .header("Authorization", "Bearer $apiKey")
+                    .get()
+                    .build()
+
+                val response = client.newCall(request).execute()
+                val body = response.body?.string()
+                if (!response.isSuccessful || body.isNullOrBlank()) {
+                    return@withContext emptyList()
+                }
+
+                val json = JSONObject(body)
+                val data = json.optJSONArray("data") ?: return@withContext emptyList()
+                val ids = buildList {
+                    for (i in 0 until data.length()) {
+                        val id = data.optJSONObject(i)?.optString("id").orEmpty()
+                        if (id.isNotBlank()) add(id)
+                    }
+                }
+
+                // Garder uniquement les modèles vision (vision/vl)
+                val vision = ids
+                    .filter { it.contains("vision", ignoreCase = true) || it.contains("-vl", ignoreCase = true) }
+                    .filterNot { isBannedModel(it) }
+                    .distinct()
+
+                // Trier: préférer non-llama, puis plus gros, puis preview
+                val sorted = vision.sortedWith(
+                    compareByDescending<String> { !it.contains("llama", ignoreCase = true) }
+                        .thenByDescending { it.contains("90b", ignoreCase = true) || it.contains("72b", ignoreCase = true) || it.contains("70b", ignoreCase = true) }
+                        .thenByDescending { it.contains("preview", ignoreCase = true) }
+                        .thenBy { it }
+                )
+
+                sorted
+            } catch (_: Exception) {
+                emptyList()
+            }
+        }
+    }
+
+    private suspend fun getVisionModelCandidates(apiKey: String): List<String> {
+        cachedVisionModels?.let { if (it.isNotEmpty()) return it }
+        val fetched = fetchVisionModels(apiKey)
+        val models = (PREFERRED_VISION_MODELS + fetched + FALLBACK_VISION_MODELS)
+            .distinct()
+            .filterNot { isBannedModel(it) }
+            .filterNot { badVisionModels.contains(it) }
+        cachedVisionModels = models
+        return models
+    }
     
     /**
      * Analyse une image et génère un descriptif physique détaillé
@@ -107,39 +230,40 @@ FORMAT REQUIS (réponds UNIQUEMENT avec ce JSON, rien d'autre):
   "detailedDescription": "description physique complète en 2-3 phrases"
 }
 
-IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
+IMPORTANT:
+- Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
+- Le personnage doit être ADULTE (18+). Si l'âge est incertain, renvoie 21+.
                 """.trimIndent()
                 
                 // Construire la requête JSON
-                val requestJson = JSONObject().apply {
-                    put("model", MODEL)
-                    put("messages", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("role", "user")
-                            put("content", JSONArray().apply {
-                                // Text prompt
-                                put(JSONObject().apply {
-                                    put("type", "text")
-                                    put("text", prompt)
-                                })
-                                // Image
-                                put(JSONObject().apply {
-                                    put("type", "image_url")
-                                    put("image_url", JSONObject().apply {
-                                        put("url", "data:image/jpeg;base64,$base64Image")
+                fun buildRequestJson(model: String): JSONObject {
+                    return JSONObject().apply {
+                        put("model", model)
+                        put("messages", JSONArray().apply {
+                            put(JSONObject().apply {
+                                put("role", "user")
+                                put("content", JSONArray().apply {
+                                    // Text prompt
+                                    put(JSONObject().apply {
+                                        put("type", "text")
+                                        put("text", prompt)
+                                    })
+                                    // Image
+                                    put(JSONObject().apply {
+                                        put("type", "image_url")
+                                        put("image_url", JSONObject().apply {
+                                            put("url", "data:image/jpeg;base64,$base64Image")
+                                        })
                                     })
                                 })
                             })
                         })
-                    })
-                    put("temperature", 0.3)
-                    put("max_tokens", 1000)
+                        put("temperature", 0.3)
+                        put("max_tokens", 1000)
+                    }
                 }
                 
                 // Créer la requête HTTP
-                val requestBody = requestJson.toString()
-                    .toRequestBody("application/json".toMediaType())
-                
                 val apiKey = getApiKey()
                 if (apiKey.isEmpty()) {
                     android.util.Log.e("GroqVision", "❌ ERREUR CRITIQUE: Aucune clé API Groq trouvée dans DataStore")
@@ -150,26 +274,103 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.
                     )
                 }
                 
-                val request = Request.Builder()
-                    .url(GROQ_API_URL)
-                    .header("Authorization", "Bearer $apiKey")
-                    .header("Content-Type", "application/json")
-                    .post(requestBody)
-                    .build()
-                
-                // Exécuter la requête
-                val response = client.newCall(request).execute()
-                val responseBody = response.body?.string()
-                
-                if (!response.isSuccessful) {
-                    android.util.Log.e("GroqVision", "HTTP ${response.code}: $responseBody")
+                var lastHttpError: Pair<Int, String?>? = null
+                var responseBody: String? = null
+                var usedModel: String? = null
+                var success = false
+
+                val modelCandidates = getVisionModelCandidates(apiKey)
+                    .filterNot { isBannedModel(it) }
+                    .ifEmpty { FALLBACK_VISION_MODELS.filterNot { m -> isBannedModel(m) } }
+
+                android.util.Log.d(
+                    "GroqVision",
+                    "🧠 Vision candidates=${modelCandidates.size} first=${modelCandidates.take(5)}"
+                )
+
+                for (model in modelCandidates) {
+                    usedModel = model
+                    val requestBody = buildRequestJson(model).toString()
+                        .toRequestBody("application/json".toMediaType())
+
+                    val request = Request.Builder()
+                        .url(GROQ_API_URL)
+                        .header("Authorization", "Bearer $apiKey")
+                        .header("Content-Type", "application/json")
+                        .post(requestBody)
+                        .build()
+
+                    android.util.Log.d("GroqVision", "🧠 Vision model: $model, payload=${requestBody.contentLength()} bytes")
+
+                    val response = client.newCall(request).execute()
+                    responseBody = response.body?.string()
+
+                    if (response.isSuccessful) {
+                        success = true
+                        lastHttpError = null
+                        break
+                    }
+
+                    lastHttpError = response.code to responseBody
+                    android.util.Log.e("GroqVision", "HTTP ${response.code} (model=$model): $responseBody")
+
+                    val errorCode = getGroqErrorCode(responseBody)
+                    val errorMessage = getGroqErrorMessage(responseBody).orEmpty()
+
+                    // Si le modèle est décommissionné / introuvable, on tente le fallback (même si le status != 400)
+                    val isModelGone =
+                        (errorCode != null && (errorCode.contains("model_decommissioned", true) || errorCode.contains("model_not_found", true))) ||
+                            errorMessage.contains("decommissioned", ignoreCase = true) ||
+                            errorMessage.contains("model", ignoreCase = true) && errorMessage.contains("not found", ignoreCase = true) ||
+                            errorMessage.contains("does not exist", ignoreCase = true)
+
+                    if (isModelGone) {
+                        badVisionModels.add(model)
+                        cachedVisionModels = null
+                        continue
+                    }
+
+                    // Sur 400 on tente le fallback; sinon on arrête.
+                    if (response.code != 400) {
+                        return@withContext Result.failure(
+                            Exception("Erreur API Groq Vision: HTTP ${response.code}\n${responseBody?.take(500) ?: ""}")
+                        )
+                    }
+
+                    // Si le modèle est décommissionné, invalider le cache (on relira /models au prochain run)
+                    if (isModelDecommissionedError(responseBody)) {
+                        cachedVisionModels = null
+                    }
+                }
+
+                if (responseBody == null) {
+                    return@withContext Result.failure(Exception("Réponse vide (Groq Vision)"))
+                }
+                if (!success && lastHttpError != null && lastHttpError.first == 400) {
                     return@withContext Result.failure(
-                        Exception("Erreur API: HTTP ${response.code}")
+                        Exception(
+                            buildString {
+                                append("Erreur API Groq Vision: HTTP 400")
+                                if (!usedModel.isNullOrBlank()) append("\nModèle tenté: $usedModel")
+                                append("\nCandidats (top5): ${modelCandidates.take(5)}")
+                                append("\n")
+                                append(lastHttpError.second?.take(800) ?: "")
+                            }
+                        )
                     )
                 }
-                
-                if (responseBody == null) {
-                    return@withContext Result.failure(Exception("Réponse vide"))
+                if (!success) {
+                    return@withContext Result.failure(
+                        Exception(
+                            buildString {
+                                append("Erreur API Groq Vision: HTTP ${lastHttpError?.first ?: "?"}")
+                                if (!usedModel.isNullOrBlank()) append("\nModèle tenté: $usedModel")
+                                append("\nCandidats (top5): ${modelCandidates.take(5)}")
+                                append("\n")
+                                append(lastHttpError?.second?.take(800) ?: "")
+                            }
+                        )
+                    )
                 }
                 
                 // Parser la réponse

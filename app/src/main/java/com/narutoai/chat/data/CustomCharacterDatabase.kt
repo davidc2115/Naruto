@@ -21,11 +21,14 @@ data class CustomCharacterEntity(
     // Détails physiques
     val physicalDescription: String = "",
     val age: String = "",
+    val gender: String = "", // homme / femme / autre
     val height: String = "",
     val hairColor: String = "",
     val eyeColor: String = "",
+    val skinTone: String = "",
     val bodyType: String = "",
     val distinctiveFeatures: String = "", // JSON array
+    val tags: String = "[]", // JSON array: tags auto (homme, brune, etc.)
     
     // Background
     val scenario: String = "",
@@ -79,7 +82,7 @@ interface CustomCharacterDao {
  */
 @Database(
     entities = [CustomCharacterEntity::class, CustomGalleryImage::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class CustomCharacterDatabase : RoomDatabase() {
@@ -89,6 +92,15 @@ abstract class CustomCharacterDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: CustomCharacterDatabase? = null
+
+        private val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                // Ajouter les nouveaux champs avec valeurs par défaut pour préserver les données existantes
+                db.execSQL("ALTER TABLE custom_characters ADD COLUMN gender TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE custom_characters ADD COLUMN skinTone TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE custom_characters ADD COLUMN tags TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
         
         fun getDatabase(context: Context): CustomCharacterDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -97,6 +109,7 @@ abstract class CustomCharacterDatabase : RoomDatabase() {
                     CustomCharacterDatabase::class.java,
                     "custom_characters_database"
                 )
+                    .addMigrations(MIGRATION_2_3)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.narutoai.chat.data.CustomCharacterEntity
+import com.narutoai.chat.utils.AutoTagger
 import com.narutoai.chat.viewmodel.CustomCharactersViewModel
 import java.io.File
 
@@ -300,8 +301,40 @@ fun CustomCharacterCard(
                     if (character.age.isNotEmpty()) {
                         Chip(text = "⌛ ${character.age}")
                     }
+                    if (character.gender.isNotEmpty()) {
+                        Chip(text = "⚧ ${character.gender}")
+                    }
                     if (character.hairColor.isNotEmpty()) {
                         Chip(text = "👱 ${character.hairColor}")
+                    }
+                    // Tags auto (JSON) + fallback si ancien personnage (tags vides)
+                    val autoTags = remember(character.tags, character.gender, character.hairColor, character.eyeColor, character.skinTone, character.bodyType, character.age, character.height) {
+                        val fromDb = try {
+                            val json = org.json.JSONArray(character.tags)
+                            buildList {
+                                for (i in 0 until json.length()) add(json.optString(i))
+                            }.filter { it.isNotBlank() }
+                        } catch (_: Exception) {
+                            emptyList()
+                        }
+
+                        if (fromDb.isNotEmpty()) {
+                            fromDb
+                        } else {
+                            AutoTagger.generateTags(
+                                gender = character.gender,
+                                hairColor = character.hairColor,
+                                eyeColor = character.eyeColor,
+                                skinTone = character.skinTone,
+                                bodyType = character.bodyType,
+                                age = character.age,
+                                height = character.height
+                            )
+                        }
+                    }
+
+                    autoTags.take(3).forEach { tag ->
+                        if (tag.isNotBlank()) Chip(text = "#$tag")
                     }
                 }
             }

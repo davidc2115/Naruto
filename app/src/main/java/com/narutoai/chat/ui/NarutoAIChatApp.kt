@@ -49,7 +49,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 onCustomCharactersClick = {
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
                 },
-                viewModel = viewModel
+                chatViewModel = viewModel
             )
         }
         
