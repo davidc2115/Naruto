@@ -66,8 +66,9 @@ fun SettingsScreen(
         ) {
             // Section Google Gemini Vision (NOUVEAU - pour analyse d'images)
             item {
+                val context = LocalContext.current
+                
                 var geminiKey by remember { 
-                    val context = LocalContext.current
                     val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
                     mutableStateOf(prefs.getString("gemini_api_key", "") ?: "")
                 }
@@ -127,7 +128,6 @@ fun SettingsScreen(
                             ) {
                                 Button(
                                     onClick = {
-                                        val context = LocalContext.current
                                         val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
                                         prefs.edit().putString("gemini_api_key", geminiKey).apply()
                                         showGeminiKeyInput = false
@@ -168,7 +168,6 @@ fun SettingsScreen(
                         
                         OutlinedButton(
                             onClick = { 
-                                val context = LocalContext.current
                                 val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
                                     data = android.net.Uri.parse("https://makersuite.google.com/app/apikey")
                                 }
