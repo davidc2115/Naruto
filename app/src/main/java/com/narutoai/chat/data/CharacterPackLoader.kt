@@ -184,36 +184,77 @@ STYLE:
         personality: List<String>
     ): String {
         val baseClean = base.trim()
-        // Déjà long -> ne pas surcharger
-        if (baseClean.length >= 220) return baseClean
+        // Si déjà très long, on conserve (évite doublons excessifs)
+        if (baseClean.length >= 520) return baseClean
+
+        fun extractAgeNumber(raw: String): Int? =
+            Regex("(\\d{2})").find(raw)?.groupValues?.getOrNull(1)?.toIntOrNull()
+
+        val safeAdultAge = extractAgeNumber(age)?.let { if (it < 18) 21 else it } ?: 21
+        val adultAnchor = "Adulte (${safeAdultAge} ans)"
 
         val vibe = when {
             personality.any { it.contains("goth", ignoreCase = true) } -> "une aura sombre et magnétique"
+            personality.any { it.contains("vampire", ignoreCase = true) } -> "une élégance nocturne, presque prédatrice"
             personality.any { it.contains("romantique", ignoreCase = true) } -> "une présence douce et attirante"
-            personality.any { it.contains("dominant", ignoreCase = true) || it.contains("dominante", ignoreCase = true) } -> "une présence contrôlée et sûre d’elle"
-            personality.any { it.contains("fantasy", ignoreCase = true) } -> "une aura presque irréelle"
+            personality.any { it.contains("dominant", ignoreCase = true) || it.contains("dominante", ignoreCase = true) } -> "une assurance calme et autoritaire"
+            personality.any { it.contains("sport", ignoreCase = true) || it.contains("workout", ignoreCase = true) } -> "une énergie athlétique et sûre d’elle"
+            personality.any { it.contains("fantasy", ignoreCase = true) } -> "une aura légèrement irréelle"
             else -> "une présence marquante"
         }
 
-        val parts = mutableListOf<String>()
-        if (baseClean.isNotEmpty()) parts.add(baseClean.trimEnd('.', ' '))
+        val hair = hairColor.takeIf { it.isNotBlank() } ?: "cheveux soignés"
+        val eyes = eyeColor.takeIf { it.isNotBlank() } ?: "regard expressif"
+        val morpho = bodyType.takeIf { it.isNotBlank() } ?: "silhouette harmonieuse"
+        val taille = height.takeIf { it.isNotBlank() } ?: ""
 
-        val details = buildList {
-            if (age.isNotBlank()) add("Âge: $age")
-            if (height.isNotBlank()) add("Taille: $height")
-            if (hairColor.isNotBlank()) add("Cheveux: $hairColor")
-            if (eyeColor.isNotBlank()) add("Yeux: $eyeColor")
-            if (bodyType.isNotBlank()) add("Silhouette: $bodyType")
+        val sentences = mutableListOf<String>()
+
+        // 1) Base (si fourni) + rappel adulte
+        if (baseClean.isNotBlank()) {
+            sentences.add("${baseClean.trimEnd('.', ' ')} (${adultAnchor}).")
+        } else {
+            sentences.add("${adultAnchor}.")
         }
 
-        if (details.isNotEmpty()) {
-            parts.add(details.joinToString(". ") + ".")
+        // 2) Description structurée (plus “visuelle” que des champs bruts)
+        sentences.add(
+            buildString {
+                append("On la reconnaît à ses ")
+                append(hair.lowercase())
+                append(", à ses yeux ")
+                append(eyes.lowercase())
+                append(" et à une ")
+                append(morpho.lowercase())
+                if (taille.isNotBlank()) {
+                    append("; elle mesure environ ")
+                    append(taille)
+                }
+                append(".")
+            }
+        )
+
+        // 3) Visage / peau / détails (génériques mais utiles pour la génération)
+        sentences.add("Son visage est bien dessiné, avec une expression vivante, une peau naturelle et un regard qui capte facilement l’attention.")
+
+        // 4) Posture / gestuelle
+        sentences.add("Sa posture est assurée; ses gestes sont précis et expressifs, ce qui renforce immédiatement ${vibe}.")
+
+        // 5) Style vestimentaire “safe” (évite infantilisation, reste adulte)
+        val style = when {
+            personality.any { it.contains("work", true) || it.contains("boss", true) } -> "tenue élégante et professionnelle, lignes nettes, accessoires discrets"
+            personality.any { it.contains("club", true) || it.contains("nightlife", true) || it.contains("dj", true) } -> "street‑glam adulte: matières brillantes, contraste, détails soignés"
+            personality.any { it.contains("books", true) || it.contains("bibli", true) } -> "style sobre et chic: couleurs douces, coupe classique, allure intellectuelle"
+            personality.any { it.contains("sport", true) || it.contains("workout", true) } -> "look sportif adulte: tenue d’entraînement ajustée, pratique et propre"
+            personality.any { it.contains("fantasy", true) || it.contains("vampire", true) } -> "tenue habillée et dramatique: tissus nobles, ambiance nocturne, sophistication"
+            else -> "casual chic adulte: simple, flatteur, bien entretenu"
         }
+        sentences.add("Elle porte généralement une $style.")
 
-        parts.add("Détails: peau naturelle, expression vivante, regard expressif; $vibe.")
-        parts.add("Style: portrait hyper-réaliste, lumière studio, arrière-plan neutre, tenue habillée.")
+        // 6) Consignes photo (cadrage / lumière) pour aider Pollinations
+        sentences.add("Rendu souhaité: portrait hyper‑réaliste, traits réalistes, lumière studio douce, fond neutre, textures fidèles (cheveux/peau/yeux).")
 
-        return parts.joinToString(" ").replace("\\s+".toRegex(), " ").trim()
+        return sentences.joinToString(" ").replace("\\s+".toRegex(), " ").trim()
     }
 }
 

@@ -47,8 +47,7 @@ class GroqVisionClient(private val context: Context) {
             "llama-3.3-70b-vision",
             "llama-3.3-70b-vision-preview",
             "llama-3.2-90b-vision",
-            "llama-3.2-90b-vision-preview",
-            "llama-3.2-11b-vision"
+            "llama-3.2-90b-vision-preview"
         )
         // Réduire un peu la taille pour éviter les erreurs 400 (payload trop gros).
         private const val MAX_IMAGE_SIZE_KB = 350 // 350KB max (avant Base64)
@@ -106,12 +105,20 @@ class GroqVisionClient(private val context: Context) {
 
     private val badVisionModels = java.util.Collections.synchronizedSet(mutableSetOf<String>())
 
+    private fun isBannedModel(modelId: String): Boolean {
+        // 11b vision a été régulièrement décommissionné côté Groq (et provoque des 400/404).
+        return modelId.contains("llama-3.2-11b-vision", ignoreCase = true)
+    }
+
     private fun isModelDecommissionedError(httpBody: String?): Boolean {
         return try {
             if (httpBody.isNullOrBlank()) return false
             val obj = JSONObject(httpBody)
             val err = obj.optJSONObject("error") ?: return false
-            err.optString("code", "").contains("model_decommissioned", ignoreCase = true)
+            val code = err.optString("code", "")
+            val message = err.optString("message", "")
+            code.contains("model_decommissioned", ignoreCase = true) ||
+                message.contains("decommissioned", ignoreCase = true)
         } catch (_: Exception) {
             false
         }
@@ -123,6 +130,17 @@ class GroqVisionClient(private val context: Context) {
             val obj = JSONObject(httpBody)
             val err = obj.optJSONObject("error") ?: return null
             err.optString("code", null)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun getGroqErrorMessage(httpBody: String?): String? {
+        return try {
+            if (httpBody.isNullOrBlank()) return null
+            val obj = JSONObject(httpBody)
+            val err = obj.optJSONObject("error") ?: return null
+            err.optString("message", null)
         } catch (_: Exception) {
             null
         }
@@ -155,6 +173,7 @@ class GroqVisionClient(private val context: Context) {
                 // Garder uniquement les modèles vision (vision/vl)
                 val vision = ids
                     .filter { it.contains("vision", ignoreCase = true) || it.contains("-vl", ignoreCase = true) }
+                    .filterNot { isBannedModel(it) }
                     .distinct()
 
                 // Trier: préférer non-llama, puis plus gros, puis preview
@@ -177,6 +196,7 @@ class GroqVisionClient(private val context: Context) {
         val fetched = fetchVisionModels(apiKey)
         val models = (PREFERRED_VISION_MODELS + fetched + FALLBACK_VISION_MODELS)
             .distinct()
+            .filterNot { isBannedModel(it) }
             .filterNot { badVisionModels.contains(it) }
         cachedVisionModels = models
         return models
@@ -260,8 +280,8 @@ IMPORTANT:
                 var success = false
 
                 val modelCandidates = getVisionModelCandidates(apiKey)
-                    .filterNot { it.contains("llama-3.2-11b-vision-preview", ignoreCase = true) } // modèle décommissionné connu
-                    .ifEmpty { FALLBACK_VISION_MODELS }
+                    .filterNot { isBannedModel(it) }
+                    .ifEmpty { FALLBACK_VISION_MODELS.filterNot { m -> isBannedModel(m) } }
 
                 for (model in modelCandidates) {
                     usedModel = model
@@ -290,9 +310,16 @@ IMPORTANT:
                     android.util.Log.e("GroqVision", "HTTP ${response.code} (model=$model): $responseBody")
 
                     val errorCode = getGroqErrorCode(responseBody)
+                    val errorMessage = getGroqErrorMessage(responseBody).orEmpty()
 
                     // Si le modèle est décommissionné / introuvable, on tente le fallback (même si le status != 400)
-                    if (errorCode != null && (errorCode.contains("model_decommissioned", true) || errorCode.contains("model_not_found", true))) {
+                    val isModelGone =
+                        (errorCode != null && (errorCode.contains("model_decommissioned", true) || errorCode.contains("model_not_found", true))) ||
+                            errorMessage.contains("decommissioned", ignoreCase = true) ||
+                            errorMessage.contains("model", ignoreCase = true) && errorMessage.contains("not found", ignoreCase = true) ||
+                            errorMessage.contains("does not exist", ignoreCase = true)
+
+                    if (isModelGone) {
                         badVisionModels.add(model)
                         cachedVisionModels = null
                         continue
