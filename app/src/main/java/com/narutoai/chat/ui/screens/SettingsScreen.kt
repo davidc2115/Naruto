@@ -52,14 +52,12 @@ fun SettingsScreen(
                         fontWeight = FontWeight.Bold
                     ) 
                 },
-                navigationIcon = if (onBackClick != null) {
+                navigationIcon = onBackClick?.let { callback ->
                     {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = callback) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
                         }
                     }
-                } else {
-                    null
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
