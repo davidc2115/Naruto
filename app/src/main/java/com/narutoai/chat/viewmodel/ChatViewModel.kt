@@ -329,6 +329,21 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     ""
                 }
                 
+                // Construire description anatomique détaillée
+                val anatomyDetails = buildString {
+                    if (character.gender.isNotEmpty()) {
+                        append("\n- Gender: ${character.gender}")
+                    }
+                    if (character.breastSize.isNotEmpty() && 
+                        (character.gender.lowercase().contains("femme") || character.gender.lowercase() == "f")) {
+                        append("\n- Breast size: ${character.breastSize}")
+                    }
+                    if (character.penisSize.isNotEmpty() && 
+                        (character.gender.lowercase().contains("homme") || character.gender.lowercase() == "m")) {
+                        append("\n- Penis size: ${character.penisSize}")
+                    }
+                }
+                
                 val promptRequest = """
                     Based on this conversation with ${character.name}:
                     $context
@@ -339,11 +354,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     - Age: ${character.age}
                     - Hair: ${character.hairColor}
                     - Eyes: ${character.eyeColor}
-                    - Body type: ${character.bodyType}$nsfwContext
+                    - Body type: ${character.bodyType}$anatomyDetails$nsfwContext
                     
                     Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
                     IMPORTANT: Start with "${character.name}, " to ensure character identity.
-                    Include: ALL physical features listed above, setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
+                    Include: ALL physical features listed above (including anatomical details), setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 

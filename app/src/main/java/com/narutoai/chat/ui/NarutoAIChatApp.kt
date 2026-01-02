@@ -19,7 +19,7 @@ sealed class Screen {
     object CHAT : Screen()
     object SETTINGS : Screen()
     object USER_PROFILE : Screen()
-    object CREATE_CHARACTER : Screen()
+    data class CREATE_CHARACTER(val editCharacterId: String? = null) : Screen()
     object CUSTOM_CHARACTERS_LIST : Screen()
     object ADMIN_TAGS : Screen()
 }
@@ -30,7 +30,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
     var characterForDetail by remember { mutableStateOf<Character?>(null) }
     val selectedCharacter = viewModel.selectedCharacter.value
     
-    when (currentScreen) {
+    when (val screen = currentScreen) {
         Screen.CHARACTER_SELECTION -> {
             CharacterSelectionScreen(
                 onCharacterSelected = { character ->
@@ -44,7 +44,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     currentScreen = Screen.USER_PROFILE
                 },
                 onCreateCharacterClick = {
-                    currentScreen = Screen.CREATE_CHARACTER
+                    currentScreen = Screen.CREATE_CHARACTER()
                 },
                 onCustomCharactersClick = {
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
@@ -109,7 +109,8 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
             )
         }
         
-        Screen.CREATE_CHARACTER -> {
+        Screen.CREATE_CHARACTER::class -> {
+            val editId = (screen as? Screen.CREATE_CHARACTER)?.editCharacterId
             CreateCharacterScreen(
                 onNavigateBack = {
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
@@ -117,7 +118,8 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                 onCharacterCreated = {
                     // Rediriger vers la liste pour voir le personnage créé
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
-                }
+                },
+                editCharacterId = editId
             )
         }
         
@@ -127,15 +129,12 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     currentScreen = Screen.CHARACTER_SELECTION
                 },
                 onCreateNew = {
-                    currentScreen = Screen.CREATE_CHARACTER
+                    currentScreen = Screen.CREATE_CHARACTER()
                 },
                 onEditCharacter = { entity ->
-                    // TODO: Écran d'édition
-                    android.util.Log.d("NarutoApp", "Edit character: ${entity.name}")
-                    // Pour l'instant, afficher profil
-                    val character = CharacterConverter.toCharacter(entity)
-                    characterForDetail = character
-                    currentScreen = Screen.CHARACTER_DETAIL
+                    // Ouvrir l'écran d'édition avec l'ID du personnage
+                    currentScreen = Screen.CREATE_CHARACTER(editCharacterId = entity.id)
+                    android.util.Log.d("NarutoApp", "Edit character: ${entity.name} (ID: ${entity.id})")
                 },
                 onSelectCharacter = { entity ->
                     // Convertir et lancer chat

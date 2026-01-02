@@ -51,6 +51,15 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     private val _bodyType = MutableStateFlow("")
     val bodyType: StateFlow<String> = _bodyType.asStateFlow()
     
+    private val _gender = MutableStateFlow("")
+    val gender: StateFlow<String> = _gender.asStateFlow()
+    
+    private val _breastSize = MutableStateFlow("")
+    val breastSize: StateFlow<String> = _breastSize.asStateFlow()
+    
+    private val _penisSize = MutableStateFlow("")
+    val penisSize: StateFlow<String> = _penisSize.asStateFlow()
+    
     private val _temperament = MutableStateFlow("")
     val temperament: StateFlow<String> = _temperament.asStateFlow()
     
@@ -82,6 +91,10 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
     
+    // ID du personnage en cours d'édition (null = création)
+    private val _editingCharacterId = MutableStateFlow<String?>(null)
+    val editingCharacterId: StateFlow<String?> = _editingCharacterId.asStateFlow()
+    
     // Méthodes de mise à jour
     fun updateName(value: String) { _name.value = value }
     fun updateDescription(value: String) { _description.value = value }
@@ -91,6 +104,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     fun updateHairColor(value: String) { _hairColor.value = value }
     fun updateEyeColor(value: String) { _eyeColor.value = value }
     fun updateBodyType(value: String) { _bodyType.value = value }
+    fun updateGender(value: String) { _gender.value = value }
+    fun updateBreastSize(value: String) { _breastSize.value = value }
+    fun updatePenisSize(value: String) { _penisSize.value = value }
     fun updateTemperament(value: String) { _temperament.value = value }
     fun updateScenario(value: String) { _scenario.value = value }
     fun updateGreetingMessage(value: String) { _greetingMessage.value = value }
@@ -103,6 +119,50 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
             _analysisResult.value = "Photo sélectionnée. Appuyez sur 'Analyser' pour générer le descriptif automatique."
         } else {
             _analysisResult.value = null
+        }
+    }
+    
+    /**
+     * Charge un personnage existant pour édition
+     */
+    fun loadCharacterForEdit(characterId: String) {
+        viewModelScope.launch {
+            try {
+                val character = repository.getCharacterById(characterId)
+                if (character != null) {
+                    _editingCharacterId.value = characterId
+                    _name.value = character.name
+                    _description.value = character.description
+                    _physicalDescription.value = character.physicalDescription
+                    _age.value = character.age
+                    _height.value = character.height
+                    _hairColor.value = character.hairColor
+                    _eyeColor.value = character.eyeColor
+                    _bodyType.value = character.bodyType
+                    _gender.value = character.gender
+                    _breastSize.value = character.breastSize
+                    _penisSize.value = character.penisSize
+                    _temperament.value = character.temperament
+                    _scenario.value = character.scenario
+                    _greetingMessage.value = character.greetingMessage
+                    
+                    // Charger l'image si elle existe
+                    if (character.avatarImagePath.isNotEmpty()) {
+                        val file = File(character.avatarImagePath)
+                        if (file.exists()) {
+                            _avatarImageUri.value = Uri.fromFile(file)
+                            _savedImagePath.value = character.avatarImagePath
+                        }
+                    }
+                    
+                    android.util.Log.d("CreateCharacterVM", "✅ Personnage chargé pour édition: ${character.name}")
+                } else {
+                    _errorMessage.value = "Personnage introuvable"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur de chargement: ${e.message}"
+                android.util.Log.e("CreateCharacterVM", "Erreur chargement: ${e.message}", e)
+            }
         }
     }
     
@@ -136,9 +196,12 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         
                         // Auto-remplir les champs individuels
                         _age.value = description.age
+                        _gender.value = description.gender
                         _hairColor.value = description.hairColor
                         _eyeColor.value = description.eyeColor
                         _bodyType.value = description.bodyType
+                        _breastSize.value = description.breastSize
+                        _penisSize.value = description.penisSize
                         _height.value = description.height
                         
                         _analysisResult.value = "✅ Analyse terminée avec succès !"
@@ -253,17 +316,23 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
             try {
                 // Sauvegarder l'image si présente
                 val imagePath = _avatarImageUri.value?.let { uri ->
-                    saveImageToInternalStorage(uri)
-                } ?: ""
+                    // Si on édite et qu'on garde la même image
+                    if (_savedImagePath.value != null && uri.toString().contains(_savedImagePath.value!!)) {
+                        _savedImagePath.value
+                    } else {
+                        saveImageToInternalStorage(uri)
+                    }
+                } ?: _savedImagePath.value ?: ""
                 
                 _savedImagePath.value = imagePath
                 
                 // Générer les prompts
                 val (sfwPrompt, nsfwPrompt) = generateSystemPrompts()
                 
-                // Créer l'entité
+                // Créer ou mettre à jour l'entité
+                val characterId = _editingCharacterId.value ?: "custom_${UUID.randomUUID()}"
                 val character = CustomCharacterEntity(
-                    id = "custom_${UUID.randomUUID()}",
+                    id = characterId,
                     name = _name.value,
                     description = _description.value,
                     systemPromptSFW = sfwPrompt,
@@ -276,6 +345,9 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                     hairColor = _hairColor.value,
                     eyeColor = _eyeColor.value,
                     bodyType = _bodyType.value,
+                    gender = _gender.value,
+                    breastSize = _breastSize.value,
+                    penisSize = _penisSize.value,
                     distinctiveFeatures = "[]",
                     scenario = _scenario.value,
                     backgroundStory = "",
@@ -291,7 +363,8 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                 // Sauvegarder dans la DB
                 repository.insertCharacter(character)
                 
-                android.util.Log.d("CreateCharacterVM", "✅ Personnage sauvegardé: ${character.name} (ID: ${character.id})")
+                val action = if (_editingCharacterId.value != null) "modifié" else "sauvegardé"
+                android.util.Log.d("CreateCharacterVM", "✅ Personnage $action: ${character.name} (ID: ${character.id})")
                 
                 _saveSuccess.value = true
                 
@@ -313,9 +386,84 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
     }
     
     /**
+     * Crée un personnage complet automatiquement depuis une photo
+     * Utilise Groq Vision pour générer TOUT le profil
+     */
+    fun createCharacterFromPhoto(imageUri: Uri) {
+        viewModelScope.launch {
+            _isAnalyzing.value = true
+            _analysisResult.value = "Analyse complète en cours..."
+            _errorMessage.value = null
+            
+            try {
+                val context = getApplication<Application>()
+                val visionClient = com.narutoai.chat.api.GroqVisionClient(context)
+                
+                // Première analyse : description physique
+                val physicalResult = visionClient.analyzePhotoForCharacter(imageUri)
+                
+                if (physicalResult.isSuccess) {
+                    val description = physicalResult.getOrNull()
+                    
+                    if (description != null) {
+                        // Remplir automatiquement tous les champs
+                        _avatarImageUri.value = imageUri
+                        _physicalDescription.value = description.toFormattedDescription()
+                        _age.value = description.age
+                        _gender.value = description.gender
+                        _hairColor.value = description.hairColor
+                        _eyeColor.value = description.eyeColor
+                        _bodyType.value = description.bodyType
+                        _breastSize.value = description.breastSize
+                        _penisSize.value = description.penisSize
+                        _height.value = description.height
+                        
+                        // Générer un nom basique
+                        val defaultName = when {
+                            description.gender.lowercase().contains("femme") -> "Personnage Féminin"
+                            description.gender.lowercase().contains("homme") -> "Personnage Masculin"
+                            else -> "Personnage"
+                        }
+                        _name.value = defaultName
+                        
+                        // Générer description courte
+                        _description.value = "Un personnage ${description.gender.lowercase()} avec ${description.hairColor} et ${description.eyeColor}"
+                        
+                        // Générer tempérament par défaut
+                        _temperament.value = "Sympathique, ouvert, intéressant"
+                        
+                        // Message d'accueil générique
+                        _greetingMessage.value = "Salut ! Je suis ravi(e) de faire ta connaissance !"
+                        
+                        _analysisResult.value = "✅ Personnage créé depuis la photo ! Vous pouvez modifier les détails avant de sauvegarder."
+                        
+                        android.util.Log.d("CreateCharacterVM", "✅ Personnage auto-généré depuis photo")
+                    } else {
+                        _analysisResult.value = "⚠️ Analyse incomplète"
+                        _errorMessage.value = "Impossible d'extraire les informations de la photo"
+                    }
+                } else {
+                    val error = physicalResult.exceptionOrNull()
+                    _analysisResult.value = "❌ Échec de l'analyse"
+                    _errorMessage.value = "Erreur: ${error?.message ?: "Inconnue"}"
+                    android.util.Log.e("CreateCharacterVM", "Erreur création depuis photo: ${error?.message}", error)
+                }
+                
+            } catch (e: Exception) {
+                _errorMessage.value = "Erreur de création: ${e.message}"
+                _analysisResult.value = "❌ Erreur"
+                android.util.Log.e("CreateCharacterVM", "Exception création depuis photo: ${e.message}", e)
+            } finally {
+                _isAnalyzing.value = false
+            }
+        }
+    }
+    
+    /**
      * Réinitialise le formulaire
      */
     fun resetForm() {
+        _editingCharacterId.value = null
         _name.value = ""
         _description.value = ""
         _physicalDescription.value = ""
@@ -324,6 +472,9 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
         _hairColor.value = ""
         _eyeColor.value = ""
         _bodyType.value = ""
+        _gender.value = ""
+        _breastSize.value = ""
+        _penisSize.value = ""
         _temperament.value = ""
         _scenario.value = ""
         _greetingMessage.value = ""

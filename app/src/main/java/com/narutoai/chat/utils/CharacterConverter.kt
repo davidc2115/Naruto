@@ -30,6 +30,9 @@ object CharacterConverter {
             hairColor = entity.hairColor,
             eyeColor = entity.eyeColor,
             bodyType = entity.bodyType,
+            breastSize = entity.breastSize,
+            penisSize = entity.penisSize,
+            gender = entity.gender,
             distinctiveFeatures = parseJsonArray(entity.distinctiveFeatures),
             
             // Background
@@ -92,6 +95,9 @@ object CharacterConverter {
             hairColor = character.hairColor,
             eyeColor = character.eyeColor,
             bodyType = character.bodyType,
+            breastSize = character.breastSize,
+            penisSize = character.penisSize,
+            gender = character.gender,
             distinctiveFeatures = toJsonArray(character.distinctiveFeatures),
             scenario = character.scenario,
             backgroundStory = character.backgroundStory,

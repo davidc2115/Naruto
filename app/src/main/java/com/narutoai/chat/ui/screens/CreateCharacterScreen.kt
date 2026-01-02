@@ -28,7 +28,8 @@ import com.narutoai.chat.viewmodel.CreateCharacterViewModel
 fun CreateCharacterScreen(
     onNavigateBack: () -> Unit,
     onCharacterCreated: () -> Unit,
-    viewModel: CreateCharacterViewModel = viewModel()
+    viewModel: CreateCharacterViewModel = viewModel(),
+    editCharacterId: String? = null // Nouveau paramètre pour l'édition
 ) {
     val name by viewModel.name.collectAsState()
     val description by viewModel.description.collectAsState()
@@ -38,6 +39,9 @@ fun CreateCharacterScreen(
     val hairColor by viewModel.hairColor.collectAsState()
     val eyeColor by viewModel.eyeColor.collectAsState()
     val bodyType by viewModel.bodyType.collectAsState()
+    val gender by viewModel.gender.collectAsState()
+    val breastSize by viewModel.breastSize.collectAsState()
+    val penisSize by viewModel.penisSize.collectAsState()
     val temperament by viewModel.temperament.collectAsState()
     val scenario by viewModel.scenario.collectAsState()
     val greetingMessage by viewModel.greetingMessage.collectAsState()
@@ -47,6 +51,14 @@ fun CreateCharacterScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val saveSuccess by viewModel.saveSuccess.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val editingCharacterId by viewModel.editingCharacterId.collectAsState()
+    
+    // Charger le personnage pour édition si un ID est fourni
+    LaunchedEffect(editCharacterId) {
+        if (editCharacterId != null) {
+            viewModel.loadCharacterForEdit(editCharacterId)
+        }
+    }
     
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -68,7 +80,9 @@ fun CreateCharacterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("✨ Créer un personnage") },
+                title = { 
+                    Text(if (editingCharacterId != null) "✏️ Modifier un personnage" else "✨ Créer un personnage") 
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, "Retour")
@@ -142,6 +156,32 @@ fun CreateCharacterScreen(
                         Icon(Icons.Default.PhotoLibrary, "Galerie", modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
                         Text("Choisir une photo")
+                    }
+                    
+                    // Import rapide depuis photo
+                    if (avatarImageUri != null && editingCharacterId == null) {
+                        Button(
+                            onClick = { viewModel.createCharacterFromPhoto(avatarImageUri!!) },
+                            enabled = !isAnalyzing,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary
+                            )
+                        ) {
+                            if (isAnalyzing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text("Création automatique...")
+                            } else {
+                                Icon(Icons.Default.AutoAwesome, "Import", modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Import rapide depuis photo")
+                            }
+                        }
                     }
                     
                     // Analyse automatique
@@ -289,6 +329,39 @@ fun CreateCharacterScreen(
                         singleLine = true,
                         placeholder = { Text("Ex: Athlétique, musclé") }
                     )
+                    
+                    // Sélecteur de genre
+                    OutlinedTextField(
+                        value = gender,
+                        onValueChange = { viewModel.updateGender(it) },
+                        label = { Text("Genre") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text("Ex: Homme, Femme, Autre") }
+                    )
+                    
+                    // Champs conditionnels selon le genre
+                    if (gender.lowercase().contains("femme") || gender.lowercase() == "f") {
+                        OutlinedTextField(
+                            value = breastSize,
+                            onValueChange = { viewModel.updateBreastSize(it) },
+                            label = { Text("Taille de poitrine") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            placeholder = { Text("Ex: Petite, Moyenne, Généreuse") }
+                        )
+                    }
+                    
+                    if (gender.lowercase().contains("homme") || gender.lowercase() == "h" || gender.lowercase() == "m") {
+                        OutlinedTextField(
+                            value = penisSize,
+                            onValueChange = { viewModel.updatePenisSize(it) },
+                            label = { Text("Taille du pénis") },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            placeholder = { Text("Ex: Moyenne, Au-dessus moyenne, Grande") }
+                        )
+                    }
                 }
             }
             
@@ -382,7 +455,10 @@ fun CreateCharacterScreen(
                 } else {
                     Icon(Icons.Default.Save, "Sauvegarder", modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(12.dp))
-                    Text("Créer le personnage", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        if (editingCharacterId != null) "Enregistrer les modifications" else "Créer le personnage",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
             
