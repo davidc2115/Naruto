@@ -69,79 +69,63 @@ class VideoGenerationWorker(
             NotificationHelper.showProgressNotification(
                 applicationContext,
                 NotificationHelper.NOTIFICATION_ID_VIDEO,
-                "Génération de vidéo",
-                "Création de votre vidéo en cours (peut prendre 1-2 min)..."
+                "Génération de GIF animé",
+                "Création de votre animation (30 secondes environ)..."
             )
             
-            // Générer la vidéo avec Pollination AI
+            // 🆕 NOUVELLE SOLUTION: Générer image puis animer en GIF
+            // 1. Générer une image avec Pollination AI
             val pollinationClient = PollinationAIClient()
-            val result = pollinationClient.generateVideo(
+            val imageResult = pollinationClient.generateImage(
                 prompt = prompt,
                 width = width,
                 height = height,
-                duration = duration,
-                enhance = true,
-                isNSFW = isNSFW
+                model = "flux", // Meilleure qualité pour animation
+                enhance = true
+            )
+            
+            if (imageResult.isFailure) {
+                return@withContext Result.failure(
+                    imageResult.exceptionOrNull() ?: Exception("Échec génération image")
+                )
+            }
+            
+            val imageUrl = imageResult.getOrNull() 
+                ?: return@withContext Result.failure(Exception("URL image vide"))
+            
+            android.util.Log.d("VideoWorker", "✅ Image générée: $imageUrl")
+            
+            // 2. Créer un GIF animé à partir de l'image
+            val gifClient = com.narutoai.chat.api.GifAnimationClient()
+            val videosDir = java.io.File(applicationContext.filesDir, "generated_videos")
+            videosDir.mkdirs()
+            val gifFile = java.io.File(videosDir, "video_${System.currentTimeMillis()}.gif")
+            
+            val result = gifClient.createAnimatedGif(
+                imageUrl = imageUrl,
+                outputFile = gifFile,
+                animationType = "ken_burns", // Effet cinématique (zoom + pan)
+                durationMs = duration * 1000 // Convertir secondes en ms
             )
             
             result.fold(
-                onSuccess = { videoUrl: String ->
-                    android.util.Log.d("VideoWorker", "✅ Vidéo générée: ${videoUrl.take(100)}")
+                onSuccess = { gifPath: String ->
+                    android.util.Log.d("VideoWorker", "✅ GIF animé créé: ${gifPath.take(100)}")
                     
-                    // Télécharger et sauvegarder en fichier permanent
-                    val finalVideoUrl = if (videoUrl.startsWith("http")) {
-                        try {
-                            android.util.Log.d("VideoWorker", "📥 Téléchargement vidéo...")
-                            val client = okhttp3.OkHttpClient.Builder()
-                                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                                .readTimeout(180, java.util.concurrent.TimeUnit.SECONDS)
-                                .build()
-                            
-                            val request = okhttp3.Request.Builder()
-                                .url(videoUrl)
-                                .get()
-                                .build()
-                            
-                            client.newCall(request).execute().use { response ->
-                                if (response.isSuccessful) {
-                                    val videoBytes = response.body?.bytes()
-                                    if (videoBytes != null && videoBytes.size > 10000) {
-                                        // Sauvegarder dans filesDir (PERMANENT)
-                                        val videosDir = java.io.File(applicationContext.filesDir, "generated_videos")
-                                        videosDir.mkdirs()
-                                        
-                                        val videoFile = java.io.File(videosDir, "video_${System.currentTimeMillis()}.mp4")
-                                        videoFile.writeBytes(videoBytes)
-                                        android.util.Log.d("VideoWorker", "✅ Vidéo sauvegardée PERMANENT: ${videoFile.absolutePath} (${videoBytes.size / 1024}KB)")
-                                        videoFile.absolutePath
-                                    } else {
-                                        android.util.Log.w("VideoWorker", "⚠️ Vidéo trop petite")
-                                        videoUrl
-                                    }
-                                } else {
-                                    android.util.Log.w("VideoWorker", "⚠️ Échec téléchargement")
-                                    videoUrl
-                                }
-                            }
-                        } catch (e: Exception) {
-                            android.util.Log.e("VideoWorker", "❌ Erreur téléchargement: ${e.message}")
-                            videoUrl
-                        }
-                    } else {
-                        videoUrl
-                    }
+                    // Le fichier GIF est déjà sauvegardé localement
+                    val finalVideoUrl = gifPath
                     
                     // Sauvegarder dans SharedPreferences
                     val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     prefs.edit().putString(KEY_LATEST_VIDEO_URL, finalVideoUrl).apply()
-                    android.util.Log.d("VideoWorker", "✅ Chemin vidéo sauvegardé: ${finalVideoUrl.take(100)}")
+                    android.util.Log.d("VideoWorker", "✅ Chemin GIF sauvegardé: ${finalVideoUrl.take(100)}")
                     
                     // Notification de succès
                     NotificationHelper.showSuccessNotification(
                         applicationContext,
                         NotificationHelper.NOTIFICATION_ID_VIDEO,
-                        "Vidéo générée ✅",
-                        "Votre vidéo est prête ! Ouvrez l'app pour la voir."
+                        "Vidéo animée générée ✅",
+                        "Votre GIF animé est prêt ! Ouvrez l'app pour le voir."
                     )
                     
                     val outputData = workDataOf(KEY_RESULT_URL to "success")
