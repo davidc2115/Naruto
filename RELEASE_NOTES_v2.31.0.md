@@ -1,5 +1,7 @@
 # 🎉 Naruto AI Chat - Version 2.31.0
 
+> ⚠️ **MISE À JOUR IMPORTANTE** : Le modèle `llama-3.2-90b-vision-preview` mentionné dans ces notes a été décommissionné en décembre 2024. Veuillez utiliser la **version 2.39.4+** qui intègre un système de fallback automatique avec les nouveaux modèles recommandés. Voir [release_notes_v2.39.4.md](./release_notes_v2.39.4.md) pour plus de détails.
+
 ## ✨ Nouveautés majeures
 
 ### 📋 **Liste des personnages personnalisés**
@@ -39,7 +41,7 @@ L'analyse automatique de photo est maintenant **fonctionnelle** avec une vraie I
 1. Créez un personnage
 2. Ajoutez une photo
 3. Cliquez sur **"Analyser la photo"**
-4. L'IA Groq Vision (modèle `llama-3.2-90b-vision-preview`) analyse l'image
+4. L'IA Groq Vision ~~(modèle `llama-3.2-90b-vision-preview`)~~ **(⚠️ OBSOLÈTE - voir v2.39.4+)** analyse l'image
 5. **Génération automatique** :
    - ✅ Âge estimé
    - ✅ Genre (homme/femme)
@@ -55,7 +57,7 @@ L'analyse automatique de photo est maintenant **fonctionnelle** avec une vraie I
 #### Technique
 
 - **API**: Groq Vision API
-- **Modèle**: llama-3.2-90b-vision-preview
+- **Modèle**: ~~llama-3.2-90b-vision-preview~~ **(⚠️ DÉCOMMISSIONNÉ - voir v2.39.4+ pour les nouveaux modèles)**
 - **Format**: JSON structuré
 - **Compression**: Images redimensionnées à 1024px max, JPEG 85%
 - **Taille max**: 500KB en Base64

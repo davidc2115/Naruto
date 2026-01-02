@@ -2,6 +2,16 @@
 
 Pour utiliser l'analyse automatique de photos avec l'IA, vous devez configurer votre clé API Groq.
 
+## ⚠️ Mise à jour importante (v2.39.4+)
+
+Le modèle `llama-3.2-90b-vision-preview` a été décommissionné par Groq. L'application utilise désormais un système de **fallback automatique** entre plusieurs modèles vision :
+
+1. **llama-3.2-90b-vision-instruct** (modèle principal recommandé)
+2. **llama-3.2-11b-vision-preview** (alternative plus légère)
+3. **llava-v1.5-7b-4096-preview** (fallback stable)
+
+Si un modèle échoue, l'application essaie automatiquement le suivant. Aucune action n'est requise de votre part ! 🎉
+
 ## 📋 Étapes
 
 ### 1️⃣ Obtenir une clé API Groq
@@ -75,6 +85,9 @@ Voir : https://console.groq.com/settings/limits
 ### "Timeout"
 ➡️ Connexion Internet lente, réessayez
 
+### "Model decommissioned" ou "Modèle décommissionné"
+➡️ Mettez à jour l'application vers la version 2.39.4+ qui intègre le système de fallback automatique
+
 ---
 
 ## 🛠️ Pour les développeurs
@@ -84,10 +97,16 @@ Voir : https://console.groq.com/settings/limits
 ```kotlin
 class GroqVisionClient(context: Context) {
     companion object {
-        private fun getApiKey(context: Context): String {
-            // Lit depuis SharedPreferences
-            val prefs = context.getSharedPreferences("naruto_ai_prefs", MODE_PRIVATE)
-            return prefs.getString("groq_vision_api_key", "") ?: ""
+        // Modèles vision avec fallback automatique
+        private val VISION_MODELS = listOf(
+            "llama-3.2-90b-vision-instruct",
+            "llama-3.2-11b-vision-preview",
+            "llava-v1.5-7b-4096-preview"
+        )
+        
+        private suspend fun getApiKey(): String {
+            // Lit depuis DataStore (même système que ApiKeyManager)
+            // ...
         }
     }
     
