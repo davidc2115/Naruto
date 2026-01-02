@@ -64,6 +64,126 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Section Google Gemini Vision (NOUVEAU - pour analyse d'images)
+            item {
+                var geminiKey by remember { 
+                    val context = LocalContext.current
+                    val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+                    mutableStateOf(prefs.getString("gemini_api_key", "") ?: "")
+                }
+                var showGeminiKeyInput by remember { mutableStateOf(false) }
+                var showGeminiPassword by remember { mutableStateOf(false) }
+                
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.PhotoCamera, "Vision API")
+                            Text(
+                                text = "🆕 Google Gemini Vision",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        Text(
+                            text = "Clé API GRATUITE pour analyser les photos lors de la création de personnages. 60 requêtes/min, 1500/jour.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                        )
+                        
+                        if (geminiKey.isEmpty() || showGeminiKeyInput) {
+                            OutlinedTextField(
+                                value = geminiKey,
+                                onValueChange = { geminiKey = it },
+                                label = { Text("Clé API Google Gemini") },
+                                placeholder = { Text("AIzaSy...") },
+                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = if (showGeminiPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                                trailingIcon = {
+                                    IconButton(onClick = { showGeminiPassword = !showGeminiPassword }) {
+                                        Icon(
+                                            if (showGeminiPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                            null
+                                        )
+                                    }
+                                },
+                                singleLine = true
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val context = LocalContext.current
+                                        val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+                                        prefs.edit().putString("gemini_api_key", geminiKey).apply()
+                                        showGeminiKeyInput = false
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = geminiKey.startsWith("AIza")
+                                ) {
+                                    Icon(Icons.Default.Save, null)
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Enregistrer")
+                                }
+                                
+                                if (geminiKey.isNotEmpty()) {
+                                    OutlinedButton(
+                                        onClick = { showGeminiKeyInput = false },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text("Annuler")
+                                    }
+                                }
+                            }
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "✅ Clé configurée: ${geminiKey.take(10)}...${geminiKey.takeLast(4)}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                IconButton(onClick = { showGeminiKeyInput = true }) {
+                                    Icon(Icons.Default.Edit, "Modifier")
+                                }
+                            }
+                        }
+                        
+                        OutlinedButton(
+                            onClick = { 
+                                val context = LocalContext.current
+                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                                    data = android.net.Uri.parse("https://makersuite.google.com/app/apikey")
+                                }
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.OpenInNew, null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Obtenir une clé gratuite")
+                        }
+                    }
+                }
+            }
+            
             // Section Groq API
             item {
                 Card(
@@ -82,14 +202,14 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Key, "Clés API")
                             Text(
-                                text = "Clés API Groq",
+                                text = "Clés API Groq (Chat)",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Gérez vos clés API Groq pour le chat. Plusieurs clés tournent automatiquement.",
+                            text = "Gérez vos clés API Groq pour le chat uniquement. Plusieurs clés tournent automatiquement.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -186,9 +306,11 @@ fun SettingsScreen(
                             )
                         }
                         
-                        InfoRow("🚀 Groq API", "console.groq.com")
-                        InfoRow("🎨 Pollination AI", "Génération gratuite illimitée")
+                        InfoRow("🚀 Groq API", "Chat uniquement (console.groq.com)")
+                        InfoRow("🎨 Google Gemini", "Analyse photos GRATUITE")
+                        InfoRow("🖼️ Pollination AI", "Génération images/vidéos gratuite")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
+                        InfoRow("📊 Limite Gemini", "60 req/min, 1500/jour gratuit")
                         InfoRow("🔄 Rotation", "Automatique entre clés")
                     }
                 }

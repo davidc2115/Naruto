@@ -118,12 +118,13 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
         
         viewModelScope.launch {
             _isAnalyzing.value = true
-            _analysisResult.value = "Analyse en cours avec Groq Vision..."
+            _analysisResult.value = "🔍 Analyse en cours avec Google Gemini Vision (GRATUIT)..."
             _errorMessage.value = null
             
             try {
                 val context = getApplication<Application>()
-                val visionClient = com.narutoai.chat.api.GroqVisionClient(context)
+                // 🆕 Utilisation de Gemini Vision au lieu de Groq (tous les modèles Groq Vision sont décommissionnés)
+                val visionClient = com.narutoai.chat.api.GeminiVisionClient(context)
                 
                 val result = visionClient.analyzePhotoForCharacter(_avatarImageUri.value!!)
                 
@@ -141,9 +142,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         _bodyType.value = description.bodyType
                         _height.value = description.height
                         
-                        _analysisResult.value = "✅ Analyse terminée avec succès !"
+                        _analysisResult.value = "✅ Analyse terminée avec succès par Google Gemini !"
                         
-                        android.util.Log.d("CreateCharacterVM", "Analyse réussie: $description")
+                        android.util.Log.d("CreateCharacterVM", "✨ Analyse Gemini réussie: $description")
                     } else {
                         _analysisResult.value = "⚠️ Analyse incomplète"
                         _errorMessage.value = "L'analyse n'a pas pu extraire toutes les informations"
@@ -153,14 +154,14 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                     _analysisResult.value = "❌ Échec de l'analyse"
                     _errorMessage.value = "Erreur: ${error?.message ?: "Inconnue"}"
                     
-                    android.util.Log.e("CreateCharacterVM", "Erreur analyse: ${error?.message}", error)
+                    android.util.Log.e("CreateCharacterVM", "❌ Erreur analyse Gemini: ${error?.message}", error)
                 }
                 
             } catch (e: Exception) {
                 _errorMessage.value = "Erreur d'analyse: ${e.message}"
                 _analysisResult.value = "❌ Erreur d'analyse"
                 
-                android.util.Log.e("CreateCharacterVM", "Exception analyse: ${e.message}", e)
+                android.util.Log.e("CreateCharacterVM", "💥 Exception analyse Gemini: ${e.message}", e)
             } finally {
                 _isAnalyzing.value = false
             }
