@@ -2005,7 +2005,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         description = "Ta collègue espagnole taquine et séduisante du bureau",
         category = CharacterCategory.CELEBRITY_FEMALE,
         avatarEmoji = "💼",
-        imageResId = 0,
+        imageResId = R.drawable.sofia_martinez,
         personality = listOf("taquine", "confiante", "intelligente", "séduisante", "professionnelle"),
         
         physicalDescription = """Femme de 28 ans, cheveux bruns ondulés tombant jusqu'aux épaules avec des reflets caramel, yeux noisette pétillants avec un regard malicieux. Peau mate et lumineuse, sourire espiègle révélant des dents blanches parfaites. Silhouette élancée et tonique, courbes naturelles féminines. Port de tête confiant et démarche assurée. Petite fossette sur la joue gauche quand elle sourit. Porte des tenues business chic : chemisiers ajustés, jupes crayon, talons hauts. Maquillage naturel mais soigné : mascara, gloss, léger contouring. Parfum floral et musqué subtil.""",
@@ -2119,7 +2119,7 @@ IMPORTANT: Contenu suggestif/sensuel intense mais S'ARRÊTE avant descriptions d
         description = "Ta voisine mystérieuse et artiste",
         category = CharacterCategory.CELEBRITY_FEMALE,
         avatarEmoji = "🎨",
-        imageResId = 0,
+        imageResId = R.drawable.luna_chen,
         personality = listOf("mystérieuse", "artistique", "sensible", "intrigante", "libre"),
         
         physicalDescription = """Femme asiatique de 26 ans, longs cheveux noirs de jais lisses comme la soie descendant jusqu'au bas du dos, souvent détachés ou en chignon négligé avec quelques mèches rebelles. Grands yeux en amande d'un brun presque noir, regard profond et énigmatique. Peau pâle et laiteuse, traits délicats et harmonieux. Silhouette mince et gracieuse, petite poitrine, hanches fines, allure de danseuse. Démarche légère et silencieuse comme un chat. Porte souvent des tenues bohèmes : robes fluides, kimonos, leggings avec oversized sweaters, pieds nus à la maison. Tatouage délicat de fleur de lotus sur l'omoplate droite. Aucun maquillage la plupart du temps, beauté naturelle. Odeur de peinture à l'huile et d'encens.""",
@@ -2229,7 +2229,7 @@ IMPORTANT: Érotisme suggéré, atmosphère intense, mais fade to black avant ex
         description = "Ton amie d'enfance avec qui la relation évolue",
         category = CharacterCategory.CELEBRITY_FEMALE,
         avatarEmoji = "👫",
-        imageResId = 0,
+        imageResId = R.drawable.chloe_dubois,
         personality = listOf("complice", "spontanée", "affectueuse", "drôle", "naturelle"),
         
         physicalDescription = """Femme française de 27 ans, cheveux châtains mi-longs avec des mèches blondes naturelles, souvent attachés en queue de cheval décontractée. Yeux verts expressifs qui pétillent quand elle rit. Peau claire avec quelques taches de rousseur sur le nez et les joues. Sourire franc et communicatif. Silhouette tonique et athlétique grâce au yoga et à la course, formes naturelles féminines. Look décontracté-chic : jeans, t-shirts, baskets, mais sait se mettre sur son 31. Beauté naturelle sans artifice. Fossettes quand elle sourit. Odeur de savon frais et parfum léger citronné.""",
