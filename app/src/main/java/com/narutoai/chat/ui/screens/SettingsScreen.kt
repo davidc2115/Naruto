@@ -138,8 +138,9 @@ fun SettingsScreen(
                             ) {
                                 Button(
                                     onClick = {
-                                        val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+                                        val prefs = context.applicationContext.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
                                         prefs.edit().putString("replicate_api_key", replicateKey).apply()
+                                        android.util.Log.d("SettingsScreen", "✅ Clé Replicate sauvegardée: ${replicateKey.take(10)}...${replicateKey.takeLast(4)}")
                                         showReplicateKeyInput = false
                                     },
                                     modifier = Modifier.weight(1f),

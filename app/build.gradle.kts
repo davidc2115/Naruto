@@ -12,8 +12,8 @@ android {
         applicationId = "com.narutoai.chat"
         minSdk = 26
         targetSdk = 35
-        versionCode = 75
-        versionName = "2.45.0"
+        versionCode = 76
+        versionName = "2.45.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

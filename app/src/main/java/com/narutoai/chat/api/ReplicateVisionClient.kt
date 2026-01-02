@@ -310,19 +310,33 @@ IMPORTANT: Respond ONLY with the JSON, nothing else.
      */
     private fun getApiKey(): String {
         try {
-            val prefs = context.getSharedPreferences("naruto_ai_prefs", Context.MODE_PRIVATE)
+            android.util.Log.d("ReplicateVision", "🔍 Début récupération clé API Replicate...")
+            
+            // IMPORTANT: Utiliser applicationContext pour être sûr d'avoir le bon contexte
+            val appContext = context.applicationContext
+            val prefs = appContext.getSharedPreferences("naruto_ai_prefs", Context.MODE_PRIVATE)
+            
+            // Lister toutes les clés pour debug
+            val allEntries = prefs.all
+            android.util.Log.d("ReplicateVision", "📋 Toutes les clés dans naruto_ai_prefs: ${allEntries.keys}")
+            
+            // Récupérer la clé
             val savedKey = prefs.getString("replicate_api_key", "") ?: ""
             
             if (savedKey.isNotEmpty()) {
-                android.util.Log.d("ReplicateVision", "🔑 Clé Replicate trouvée")
+                android.util.Log.d("ReplicateVision", "✅ Clé trouvée: ${savedKey.take(10)}...${savedKey.takeLast(4)} (longueur: ${savedKey.length})")
                 return savedKey
             }
             
-            android.util.Log.e("ReplicateVision", "❌ Aucune clé API trouvée")
+            // Si vide, afficher message détaillé
+            android.util.Log.e("ReplicateVision", "❌ Clé Replicate vide ou absente")
+            android.util.Log.e("ReplicateVision", "💡 Allez dans Paramètres > Replicate Vision pour configurer")
+            
             return ""
             
         } catch (e: Exception) {
-            android.util.Log.e("ReplicateVision", "❌ Erreur chargement clé: ${e.message}")
+            android.util.Log.e("ReplicateVision", "❌ ERREUR chargement clé: ${e.javaClass.simpleName}: ${e.message}", e)
+            e.printStackTrace()
             return ""
         }
     }
