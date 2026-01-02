@@ -64,7 +64,7 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section Hugging Face Vision (NOUVEAU - GRATUIT et SANS CLÉ!)
+            // Section Analyse locale (NOUVEAU - 100% local et hors ligne!)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -80,16 +80,16 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.PhotoCamera, "Vision API")
+                            Icon(Icons.Default.PhotoCamera, "Analyse locale")
                             Text(
-                                text = "🎉 Hugging Face Vision",
+                                text = "🔍 Analyse d'Images Locale",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Analyse d'images 100% GRATUITE et SANS CLÉ API lors de la création de personnages. Utilise des modèles open-source (BLIP, ViT-GPT2) hébergés par Hugging Face.",
+                            text = "Analyse BASIQUE et INSTANTANÉE de vos photos, 100% en local sur votre appareil. Aucune connexion internet requise !",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                         )
@@ -98,11 +98,19 @@ fun SettingsScreen(
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            InfoChip("✅ Aucune clé API requise")
-                            InfoChip("✅ 100% gratuit et illimité")
-                            InfoChip("✅ Modèles open-source de qualité")
-                            InfoChip("✅ Aucune configuration nécessaire")
+                            InfoChip("✅ Aucune API externe")
+                            InfoChip("✅ 100% hors ligne")
+                            InfoChip("✅ Instantané (< 1 seconde)")
+                            InfoChip("✅ Privacy totale (rien n'est envoyé)")
+                            InfoChip("✅ Toujours fonctionnel")
                         }
+                        
+                        Text(
+                            text = "Note: L'analyse est basique (teint, couleurs dominantes). Complétez manuellement pour plus de précision.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f),
+                            fontWeight = FontWeight.Light
+                        )
                     }
                 }
             }
@@ -230,10 +238,10 @@ fun SettingsScreen(
                         }
                         
                         InfoRow("🚀 Groq API", "Chat uniquement (console.groq.com)")
-                        InfoRow("🎨 Hugging Face", "Analyse photos GRATUITE et SANS CLÉ")
+                        InfoRow("🔍 Analyse locale", "Basique, instantanée, hors ligne")
                         InfoRow("🖼️ Pollination AI", "Génération images/vidéos gratuite")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
-                        InfoRow("📊 Limite HuggingFace", "Illimité (rate limit raisonnable)")
+                        InfoRow("📊 Analyse locale", "Illimitée (100% local)")
                         InfoRow("🔄 Rotation", "Automatique entre clés Groq")
                     }
                 }
