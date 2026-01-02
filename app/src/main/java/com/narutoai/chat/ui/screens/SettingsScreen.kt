@@ -64,17 +64,8 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section Google Gemini Vision (NOUVEAU - pour analyse d'images)
+            // Section Hugging Face Vision (NOUVEAU - GRATUIT et SANS CLÉ!)
             item {
-                val context = LocalContext.current
-                
-                var geminiKey by remember { 
-                    val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
-                    mutableStateOf(prefs.getString("gemini_api_key", "") ?: "")
-                }
-                var showGeminiKeyInput by remember { mutableStateOf(false) }
-                var showGeminiPassword by remember { mutableStateOf(false) }
-                
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -91,99 +82,32 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.PhotoCamera, "Vision API")
                             Text(
-                                text = "🆕 Google Gemini Vision",
+                                text = "🎉 Hugging Face Vision",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Clé API GRATUITE pour analyser les photos lors de la création de personnages. 60 requêtes/min, 1500/jour.",
+                            text = "Analyse d'images 100% GRATUITE et SANS CLÉ API lors de la création de personnages. Utilise des modèles open-source (BLIP, ViT-GPT2) hébergés par Hugging Face.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                         )
                         
-                        if (geminiKey.isEmpty() || showGeminiKeyInput) {
-                            OutlinedTextField(
-                                value = geminiKey,
-                                onValueChange = { geminiKey = it },
-                                label = { Text("Clé API Google Gemini") },
-                                placeholder = { Text("AIzaSy...") },
-                                modifier = Modifier.fillMaxWidth(),
-                                visualTransformation = if (showGeminiPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                                trailingIcon = {
-                                    IconButton(onClick = { showGeminiPassword = !showGeminiPassword }) {
-                                        Icon(
-                                            if (showGeminiPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                            null
-                                        )
-                                    }
-                                },
-                                singleLine = true
-                            )
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Button(
-                                    onClick = {
-                                        val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
-                                        prefs.edit().putString("gemini_api_key", geminiKey).apply()
-                                        showGeminiKeyInput = false
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = geminiKey.startsWith("AIza")
-                                ) {
-                                    Icon(Icons.Default.Save, null)
-                                    Spacer(Modifier.width(4.dp))
-                                    Text("Enregistrer")
-                                }
-                                
-                                if (geminiKey.isNotEmpty()) {
-                                    OutlinedButton(
-                                        onClick = { showGeminiKeyInput = false },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("Annuler")
-                                    }
-                                }
-                            }
-                        } else {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "✅ Clé configurée: ${geminiKey.take(10)}...${geminiKey.takeLast(4)}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                IconButton(onClick = { showGeminiKeyInput = true }) {
-                                    Icon(Icons.Default.Edit, "Modifier")
-                                }
-                            }
-                        }
-                        
-                        OutlinedButton(
-                            onClick = { 
-                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-                                    data = android.net.Uri.parse("https://makersuite.google.com/app/apikey")
-                                }
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.fillMaxWidth()
+                        // Avantages
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Icon(Icons.Default.OpenInNew, null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Obtenir une clé gratuite")
+                            InfoChip("✅ Aucune clé API requise")
+                            InfoChip("✅ 100% gratuit et illimité")
+                            InfoChip("✅ Modèles open-source de qualité")
+                            InfoChip("✅ Aucune configuration nécessaire")
                         }
                     }
                 }
             }
             
-            // Section Groq API
+            // Section Groq API (Chat uniquement)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -201,14 +125,14 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Key, "Clés API")
                             Text(
-                                text = "Clés API Groq (Chat)",
+                                text = "Clés API Groq (Chat uniquement)",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Gérez vos clés API Groq pour le chat uniquement. Plusieurs clés tournent automatiquement.",
+                            text = "Gérez vos clés API Groq pour les conversations uniquement. Plusieurs clés tournent automatiquement.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -306,11 +230,11 @@ fun SettingsScreen(
                         }
                         
                         InfoRow("🚀 Groq API", "Chat uniquement (console.groq.com)")
-                        InfoRow("🎨 Google Gemini", "Analyse photos GRATUITE")
+                        InfoRow("🎨 Hugging Face", "Analyse photos GRATUITE et SANS CLÉ")
                         InfoRow("🖼️ Pollination AI", "Génération images/vidéos gratuite")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
-                        InfoRow("📊 Limite Gemini", "60 req/min, 1500/jour gratuit")
-                        InfoRow("🔄 Rotation", "Automatique entre clés")
+                        InfoRow("📊 Limite HuggingFace", "Illimité (rate limit raisonnable)")
+                        InfoRow("🔄 Rotation", "Automatique entre clés Groq")
                     }
                 }
             }
@@ -523,5 +447,20 @@ fun ApiSelectionRow(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
+    }
+}
+
+@Composable
+fun InfoChip(text: String) {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
