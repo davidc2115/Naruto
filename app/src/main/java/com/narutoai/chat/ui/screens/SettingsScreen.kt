@@ -45,24 +45,36 @@ fun SettingsScreen(
     
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Configuration",
-                        fontWeight = FontWeight.Bold
-                    ) 
-                },
-                navigationIcon = onBackClick?.let { callback ->
-                    {
-                        IconButton(onClick = callback) {
+            if (onBackClick != null) {
+                TopAppBar(
+                    title = { 
+                        Text(
+                            "Configuration",
+                            fontWeight = FontWeight.Bold
+                        ) 
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
                         }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
                 )
-            )
+            } else {
+                TopAppBar(
+                    title = { 
+                        Text(
+                            "Configuration",
+                            fontWeight = FontWeight.Bold
+                        ) 
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                )
+            }
         }
     ) { padding ->
         LazyColumn(
