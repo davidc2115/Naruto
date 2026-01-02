@@ -1,6 +1,7 @@
 package com.narutoai.chat.ui
 
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.ui.screens.AdminTagsScreen
 import com.narutoai.chat.ui.screens.CharacterProfileScreen
@@ -12,6 +13,7 @@ import com.narutoai.chat.ui.screens.SettingsScreen
 import com.narutoai.chat.ui.screens.UserProfileScreen
 import com.narutoai.chat.utils.CharacterConverter
 import com.narutoai.chat.viewmodel.ChatViewModel
+import com.narutoai.chat.viewmodel.CreateCharacterViewModel
 
 sealed class Screen {
     object CHARACTER_SELECTION : Screen()
@@ -118,7 +120,11 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     // Rediriger vers la liste pour voir le personnage créé
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
                 },
-                editCharacterId = screen.editCharacterId
+                editCharacterId = screen.editCharacterId,
+                // Utiliser une clé basée sur l'ID pour éviter la réutilisation du ViewModel
+                viewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                    key = screen.editCharacterId ?: "new_character"
+                )
             )
         }
         
