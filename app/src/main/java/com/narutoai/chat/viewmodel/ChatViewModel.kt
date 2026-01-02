@@ -289,12 +289,41 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     character.systemPromptSFW
                 }
                 
+                // ✅ INCLURE LE SCÉNARIO ET BACKGROUND STORY
+                val enrichedSystemPrompt = buildString {
+                    append(baseSystemPrompt)
+                    
+                    // Ajouter scénario si présent
+                    if (character.scenario.isNotBlank()) {
+                        append("\n\n[SCÉNARIO/CONTEXTE]\n")
+                        append(character.scenario)
+                        append("\nTu dois ABSOLUMENT respecter ce scénario dans tes réponses et interactions.")
+                    }
+                    
+                    // Ajouter background story si présent
+                    if (character.backgroundStory.isNotBlank()) {
+                        append("\n\n[TON HISTOIRE/BACKGROUND]\n")
+                        append(character.backgroundStory)
+                    }
+                    
+                    // Ajouter traits de personnalité détaillés
+                    if (character.temperament.isNotBlank()) {
+                        append("\n\n[TEMPÉRAMENT]\n")
+                        append(character.temperament)
+                    }
+                    
+                    if (character.characterTraits.isNotEmpty()) {
+                        append("\n\n[TRAITS DE CARACTÈRE]\n")
+                        append(character.characterTraits.joinToString("\n- ", prefix = "- "))
+                    }
+                }
+                
                 // Ajouter contexte utilisateur au prompt
                 val userContext = getUserContext()
                 val systemPrompt = if (userContext.isNotEmpty()) {
-                    "$baseSystemPrompt\n\n[CONTEXTE UTILISATEUR]\n$userContext\nUtilise ces informations pour personnaliser tes réponses."
+                    "$enrichedSystemPrompt\n\n[CONTEXTE UTILISATEUR]\n$userContext\nUtilise ces informations pour personnaliser tes réponses."
                 } else {
-                    baseSystemPrompt
+                    enrichedSystemPrompt
                 }
                 
                 // Build conversation history
