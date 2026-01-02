@@ -34,7 +34,7 @@ data class ConversationHistory(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatHistoryScreen(
-    onConversationClick: (characterId: String, isNSFW: Boolean) -> Unit
+    onConversationClick: (characterId: String) -> Unit
 ) {
     val context = LocalContext.current
     val conversationManager = remember { ConversationManager(context) }
@@ -51,34 +51,19 @@ fun ChatHistoryScreen(
             val allConversations = mutableListOf<ConversationHistory>()
             
             Characters.allCharacters.forEach { character ->
-                // SFW
-                val sfwMessages = conversationManager.loadConversation(character.id, false)
-                if (sfwMessages.isNotEmpty()) {
+                // Charger la conversation (une seule par personnage)
+                val messages = conversationManager.loadConversation(character.id)
+                if (messages != null && messages.isNotEmpty()) {
+                    val isNSFW = conversationManager.getIsNSFW(character.id)
                     allConversations.add(
                         ConversationHistory(
                             characterId = character.id,
                             characterName = character.name,
                             characterEmoji = character.avatarEmoji,
-                            lastMessage = sfwMessages.lastOrNull()?.content ?: "",
-                            messageCount = sfwMessages.size,
-                            lastMessageTime = sfwMessages.lastOrNull()?.timestamp ?: 0L,
-                            isNSFW = false
-                        )
-                    )
-                }
-                
-                // NSFW
-                val nsfwMessages = conversationManager.loadConversation(character.id, true)
-                if (nsfwMessages.isNotEmpty()) {
-                    allConversations.add(
-                        ConversationHistory(
-                            characterId = character.id,
-                            characterName = character.name,
-                            characterEmoji = character.avatarEmoji,
-                            lastMessage = nsfwMessages.lastOrNull()?.content ?: "",
-                            messageCount = nsfwMessages.size,
-                            lastMessageTime = nsfwMessages.lastOrNull()?.timestamp ?: 0L,
-                            isNSFW = true
+                            lastMessage = messages.lastOrNull()?.content ?: "",
+                            messageCount = messages.size,
+                            lastMessageTime = messages.lastOrNull()?.timestamp ?: 0L,
+                            isNSFW = isNSFW
                         )
                     )
                 }
@@ -152,13 +137,13 @@ fun ChatHistoryScreen(
                     items(conversations) { conv ->
                         ConversationCard(
                             conversation = conv,
-                            onClick = { onConversationClick(conv.characterId, conv.isNSFW) },
+                            onClick = { onConversationClick(conv.characterId) },
                             onDelete = {
                                 // Supprimer la conversation
-                                conversationManager.saveConversation(conv.characterId, emptyList(), conv.isNSFW)
+                                conversationManager.deleteConversation(conv.characterId)
                                 // Recharger
                                 conversations = conversations.filter { 
-                                    it.characterId != conv.characterId || it.isNSFW != conv.isNSFW 
+                                    it.characterId != conv.characterId
                                 }
                             }
                         )

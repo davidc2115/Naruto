@@ -17,7 +17,7 @@ import com.narutoai.chat.navigation.BottomNavItem
 @Composable
 fun MainScreen(
     onCharacterClick: (Character) -> Unit,
-    onStartChat: (characterId: String, isNSFW: Boolean) -> Unit,
+    onStartChat: (characterId: String) -> Unit,
     onCreateCharacter: () -> Unit,
     onEditCharacter: (String?) -> Unit
 ) {
