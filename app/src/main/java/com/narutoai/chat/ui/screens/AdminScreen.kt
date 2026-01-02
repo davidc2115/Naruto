@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -251,6 +252,70 @@ fun AdminScreen() {
             
             Spacer(modifier = Modifier.height(16.dp))
             
+            // Nouvelles fonctionnalités
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "✨ Nouvelles fonctionnalités",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    // Thème
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🎨 Thème")
+                        Text("Système", style = MaterialTheme.typography.bodySmall)
+                    }
+                    
+                    Divider()
+                    
+                    // Export/Import
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("📦 Export/Import")
+                        Text("Disponible", style = MaterialTheme.typography.bodySmall)
+                    }
+                    
+                    Divider()
+                    
+                    // Mode vocal
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🔊 Mode vocal (TTS)")
+                        Text("Activé", style = MaterialTheme.typography.bodySmall)
+                    }
+                    
+                    Divider()
+                    
+                    // Galeries
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🖼️ Galeries personnalisées")
+                        Text("Disponible", style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
             // Statistiques
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -268,7 +333,7 @@ fun AdminScreen() {
                     StatItem("Personnages prédéfinis", "13")
                     StatItem("Personnages custom", "0") // TODO: Compter
                     StatItem("Conversations totales", "0") // TODO: Compter
-                    StatItem("Version de l'app", "2.49.0")
+                    StatItem("Version de l'app", "2.50.0")
                 }
             }
             
