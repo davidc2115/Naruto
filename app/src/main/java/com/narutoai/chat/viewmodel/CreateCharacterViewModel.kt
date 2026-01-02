@@ -194,14 +194,14 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         // Remplir la description complète
                         _physicalDescription.value = description.toFormattedDescription()
                         
-                        // Auto-remplir les champs individuels
+                        // Auto-remplir les champs individuels avec normalisation
                         _age.value = description.age
-                        _gender.value = description.gender
+                        _gender.value = normalizeGender(description.gender)
                         _hairColor.value = description.hairColor
                         _eyeColor.value = description.eyeColor
                         _bodyType.value = description.bodyType
-                        _breastSize.value = description.breastSize
-                        _penisSize.value = description.penisSize
+                        _breastSize.value = normalizeBreastSize(description.breastSize)
+                        _penisSize.value = normalizePenisSize(description.penisSize)
                         _height.value = description.height
                         
                         _analysisResult.value = "✅ Analyse terminée avec succès !"
@@ -386,6 +386,44 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
     }
     
     /**
+     * Normalise le genre de l'API vers le format du dropdown
+     */
+    private fun normalizeGender(gender: String): String {
+        return when (gender.lowercase().trim()) {
+            "homme", "male", "man", "m", "h" -> "Homme"
+            "femme", "female", "woman", "f" -> "Femme"
+            "autre", "other", "non-binary", "non binaire" -> "Autre"
+            else -> gender.replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    /**
+     * Normalise la taille de poitrine de l'API vers le format du dropdown
+     */
+    private fun normalizeBreastSize(size: String): String {
+        return when (size.lowercase().trim()) {
+            "petite", "small", "petit" -> "Petite"
+            "moyenne", "medium", "average", "moyen" -> "Moyenne"
+            "généreuse", "generous", "large" -> "Généreuse"
+            "très généreuse", "very generous", "très large", "extra large", "xl" -> "Très généreuse"
+            else -> if (size.isNotEmpty()) size.replaceFirstChar { it.uppercase() } else ""
+        }
+    }
+    
+    /**
+     * Normalise la taille du pénis de l'API vers le format du dropdown
+     */
+    private fun normalizePenisSize(size: String): String {
+        return when (size.lowercase().trim()) {
+            "moyenne", "medium", "average", "moyen" -> "Moyenne"
+            "au-dessus de la moyenne", "above average", "au dessus", "large" -> "Au-dessus de la moyenne"
+            "grande", "big", "grand" -> "Grande"
+            "très grande", "very large", "extra large", "xl" -> "Très grande"
+            else -> if (size.isNotEmpty()) size.replaceFirstChar { it.uppercase() } else ""
+        }
+    }
+    
+    /**
      * Crée un personnage complet automatiquement depuis une photo
      * Utilise Groq Vision pour générer TOUT le profil
      */
@@ -406,22 +444,23 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                     val description = physicalResult.getOrNull()
                     
                     if (description != null) {
-                        // Remplir automatiquement tous les champs
+                        // Remplir automatiquement tous les champs avec normalisation
                         _avatarImageUri.value = imageUri
                         _physicalDescription.value = description.toFormattedDescription()
                         _age.value = description.age
-                        _gender.value = description.gender
+                        _gender.value = normalizeGender(description.gender)
                         _hairColor.value = description.hairColor
                         _eyeColor.value = description.eyeColor
                         _bodyType.value = description.bodyType
-                        _breastSize.value = description.breastSize
-                        _penisSize.value = description.penisSize
+                        _breastSize.value = normalizeBreastSize(description.breastSize)
+                        _penisSize.value = normalizePenisSize(description.penisSize)
                         _height.value = description.height
                         
                         // Générer un nom basique
-                        val defaultName = when {
-                            description.gender.lowercase().contains("femme") -> "Personnage Féminin"
-                            description.gender.lowercase().contains("homme") -> "Personnage Masculin"
+                        val normalizedGender = normalizeGender(description.gender)
+                        val defaultName = when (normalizedGender) {
+                            "Femme" -> "Personnage Féminin"
+                            "Homme" -> "Personnage Masculin"
                             else -> "Personnage"
                         }
                         _name.value = defaultName

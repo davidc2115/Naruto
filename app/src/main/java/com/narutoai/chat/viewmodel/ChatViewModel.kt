@@ -344,6 +344,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
                 
+                android.util.Log.d("ChatViewModel", "🎨 Anatomie pour génération: Genre='${character.gender}', Poitrine='${character.breastSize}', Pénis='${character.penisSize}'")
+                android.util.Log.d("ChatViewModel", "📝 Détails anatomiques ajoutés au prompt: $anatomyDetails")
+                
                 val promptRequest = """
                     Based on this conversation with ${character.name}:
                     $context

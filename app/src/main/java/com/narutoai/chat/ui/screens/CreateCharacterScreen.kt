@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +58,9 @@ fun CreateCharacterScreen(
     LaunchedEffect(editCharacterId) {
         if (editCharacterId != null) {
             viewModel.loadCharacterForEdit(editCharacterId)
+        } else {
+            // Réinitialiser le formulaire si on crée un nouveau personnage
+            viewModel.resetForm()
         }
     }
     
@@ -330,37 +334,114 @@ fun CreateCharacterScreen(
                         placeholder = { Text("Ex: Athlétique, musclé") }
                     )
                     
-                    // Sélecteur de genre
-                    OutlinedTextField(
-                        value = gender,
-                        onValueChange = { viewModel.updateGender(it) },
-                        label = { Text("Genre") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        placeholder = { Text("Ex: Homme, Femme, Autre") }
-                    )
+                    // Sélecteur de genre (Dropdown)
+                    var genderExpanded by rememberSaveable { mutableStateOf(false) }
+                    val genderOptions = listOf("Homme", "Femme", "Autre")
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = genderExpanded,
+                        onExpandedChange = { genderExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = gender,
+                            onValueChange = { },
+                            readOnly = true,
+                            label = { Text("Genre *") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = genderExpanded,
+                            onDismissRequest = { genderExpanded = false }
+                        ) {
+                            genderOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        viewModel.updateGender(option)
+                                        genderExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                     
                     // Champs conditionnels selon le genre
                     if (gender.lowercase().contains("femme") || gender.lowercase() == "f") {
-                        OutlinedTextField(
-                            value = breastSize,
-                            onValueChange = { viewModel.updateBreastSize(it) },
-                            label = { Text("Taille de poitrine") },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            placeholder = { Text("Ex: Petite, Moyenne, Généreuse") }
-                        )
+                        // Dropdown pour taille de poitrine
+                        var breastExpanded by rememberSaveable { mutableStateOf(false) }
+                        val breastSizeOptions = listOf("Petite", "Moyenne", "Généreuse", "Très généreuse")
+                        
+                        ExposedDropdownMenuBox(
+                            expanded = breastExpanded,
+                            onExpandedChange = { breastExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = breastSize,
+                                onValueChange = { },
+                                readOnly = true,
+                                label = { Text("Taille de poitrine") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = breastExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = breastExpanded,
+                                onDismissRequest = { breastExpanded = false }
+                            ) {
+                                breastSizeOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            viewModel.updateBreastSize(option)
+                                            breastExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                     
                     if (gender.lowercase().contains("homme") || gender.lowercase() == "h" || gender.lowercase() == "m") {
-                        OutlinedTextField(
-                            value = penisSize,
-                            onValueChange = { viewModel.updatePenisSize(it) },
-                            label = { Text("Taille du pénis") },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            placeholder = { Text("Ex: Moyenne, Au-dessus moyenne, Grande") }
-                        )
+                        // Dropdown pour taille du pénis
+                        var penisExpanded by rememberSaveable { mutableStateOf(false) }
+                        val penisSizeOptions = listOf("Moyenne", "Au-dessus de la moyenne", "Grande", "Très grande")
+                        
+                        ExposedDropdownMenuBox(
+                            expanded = penisExpanded,
+                            onExpandedChange = { penisExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = penisSize,
+                                onValueChange = { },
+                                readOnly = true,
+                                label = { Text("Taille du pénis") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = penisExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = penisExpanded,
+                                onDismissRequest = { penisExpanded = false }
+                            ) {
+                                penisSizeOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            viewModel.updatePenisSize(option)
+                                            penisExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
