@@ -118,12 +118,12 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
         
         viewModelScope.launch {
             _isAnalyzing.value = true
-            _analysisResult.value = "🔍 Analyse avec Groq Vision (modèles actifs)..."
+            _analysisResult.value = "🔍 Analyse avec Groq Vision AI..."
             _errorMessage.value = null
             
             try {
                 val context = getApplication<Application>()
-                // ✅ Retour à Groq Vision avec modèles vérifiés NON décommissionnés
+                // ✅ Groq Vision avec modèles corrigés (janvier 2025)
                 val visionClient = com.narutoai.chat.api.GroqVisionClient(context)
                 
                 val result = visionClient.analyzePhotoForCharacter(_avatarImageUri.value!!)
@@ -142,7 +142,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         _bodyType.value = description.bodyType
                         _height.value = description.height
                         
-                        _analysisResult.value = "✅ Analyse terminée avec Groq Vision !"
+                        _analysisResult.value = "✅ Analyse terminée avec succès !"
                         
                         android.util.Log.d("CreateCharacterVM", "✨ Analyse Groq réussie: $description")
                     } else {

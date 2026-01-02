@@ -144,7 +144,7 @@ fun CreateCharacterScreen(
                         Text("Choisir une photo")
                     }
                     
-                    // Analyse automatique
+                    // Analyse IA automatique
                     if (avatarImageUri != null) {
                         Button(
                             onClick = { viewModel.analyzePhoto() },
@@ -161,20 +161,31 @@ fun CreateCharacterScreen(
                                     color = Color.White
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                Text("Analyse...")
+                                Text("Analyse en cours...")
                             } else {
-                                Icon(Icons.Default.AutoAwesome, "Analyse", modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.AutoAwesome, "Analyse IA", modifier = Modifier.size(20.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text("Analyser la photo (auto)")
+                                Text("🤖 Analyser avec IA (Groq)")
                             }
                         }
                         
                         analysisResult?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (it.contains("✓")) Color.Green else MaterialTheme.colorScheme.onSurface
-                            )
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = when {
+                                        it.contains("✅") -> MaterialTheme.colorScheme.primaryContainer
+                                        it.contains("❌") -> MaterialTheme.colorScheme.errorContainer
+                                        else -> MaterialTheme.colorScheme.secondaryContainer
+                                    }
+                                )
+                            ) {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier.padding(12.dp),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
@@ -244,23 +255,23 @@ fun CreateCharacterScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        OutlinedTextField(
-                            value = age,
-                            onValueChange = { viewModel.updateAge(it) },
-                            label = { Text("Âge") },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            placeholder = { Text("Ex: 18-25") }
-                        )
-                        
-                        OutlinedTextField(
-                            value = height,
-                            onValueChange = { viewModel.updateHeight(it) },
-                            label = { Text("Taille") },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            placeholder = { Text("Ex: 165cm") }
-                        )
+                    OutlinedTextField(
+                        value = age,
+                        onValueChange = { viewModel.updateAge(it) },
+                        label = { Text("Âge") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        placeholder = { Text("20-35, ado, mature...") }
+                    )
+                    
+                    OutlinedTextField(
+                        value = height,
+                        onValueChange = { viewModel.updateHeight(it) },
+                        label = { Text("Taille") },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        placeholder = { Text("165cm, grande...") }
+                    )
                     }
                     
                     OutlinedTextField(
@@ -269,7 +280,7 @@ fun CreateCharacterScreen(
                         label = { Text("Couleur cheveux") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: Blond doré, longs") }
+                        placeholder = { Text("Châtain court, blond long, brun bouclé...") }
                     )
                     
                     OutlinedTextField(
@@ -278,7 +289,7 @@ fun CreateCharacterScreen(
                         label = { Text("Couleur yeux") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: Bleu océan") }
+                        placeholder = { Text("Marron, bleu, vert, noisette...") }
                     )
                     
                     OutlinedTextField(
@@ -287,7 +298,7 @@ fun CreateCharacterScreen(
                         label = { Text("Type de corps") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: Athlétique, musclé") }
+                        placeholder = { Text("Mince, athlétique, musclé, normal...") }
                     )
                 }
             }
