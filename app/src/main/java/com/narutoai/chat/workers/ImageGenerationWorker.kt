@@ -52,8 +52,22 @@ class ImageGenerationWorker(
             val result = pollinationClient.generateImage(prompt, width, height, enhance = true)
             
             if (result.isSuccess) {
-                val imagePath = result.getOrNull()
-                android.util.Log.d("ImageWorker", "✅ Image générée: $imagePath")
+                val imageUrl = result.getOrNull()
+                android.util.Log.d("ImageWorker", "✅ Image générée: $imageUrl")
+                android.util.Log.d("ImageWorker", "📏 Longueur URL: ${imageUrl?.length ?: 0}")
+                
+                // IMPORTANT: Sauvegarder dans SharedPreferences pour ChatViewModel
+                if (imageUrl != null && imageUrl.isNotEmpty()) {
+                    val prefs = applicationContext.getSharedPreferences("image_worker_results", Context.MODE_PRIVATE)
+                    prefs.edit().apply {
+                        putString("latest_image_url", imageUrl)
+                        putString("latest_image_source", "Pollination AI")
+                        apply()
+                    }
+                    android.util.Log.d("ImageWorker", "💾 URL sauvegardée dans SharedPrefs")
+                } else {
+                    android.util.Log.e("ImageWorker", "❌ URL vide ou null!")
+                }
                 
                 // Notification de succès
                 NotificationHelper.showProgressNotification(
@@ -63,8 +77,8 @@ class ImageGenerationWorker(
                     "Pollination AI"
                 )
                 
-                // Retourner résultat
-                val outputData = workDataOf(KEY_IMAGE_PATH to imagePath)
+                // Retourner résultat avec l'URL (pour compatibilité)
+                val outputData = workDataOf(KEY_IMAGE_PATH to imageUrl)
                 Result.success(outputData)
             } else {
                 android.util.Log.e("ImageWorker", "❌ Échec: ${result.exceptionOrNull()?.message}")

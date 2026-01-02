@@ -163,6 +163,78 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
+    /**
+     * Génère une vignette hyper-réaliste pour un personnage
+     * Utilise Pollination AI avec description physique détaillée
+     */
+    fun generateCharacterThumbnail(character: Character) {
+        viewModelScope.launch {
+            try {
+                android.util.Log.d("ChatViewModel", "🎨 Génération vignette pour ${character.name}")
+                
+                val result = pollinationAIClient.generateCharacterThumbnail(
+                    characterName = character.name,
+                    physicalDescription = character.physicalDescription,
+                    style = "realistic"
+                )
+                
+                result.fold(
+                    onSuccess = { thumbnailUrl ->
+                        android.util.Log.d("ChatViewModel", "✅ Vignette générée: $thumbnailUrl")
+                        // On pourrait sauvegarder l'URL dans la DB ici
+                    },
+                    onFailure = { error ->
+                        android.util.Log.e("ChatViewModel", "❌ Erreur vignette: ${error.message}")
+                    }
+                )
+            } catch (e: Exception) {
+                android.util.Log.e("ChatViewModel", "❌ Exception vignette: ${e.message}", e)
+            }
+        }
+    }
+    
+    /**
+     * Génère une galerie d'images pour un personnage
+     * Crée plusieurs variations (SFW ou NSFW)
+     */
+    fun generateCharacterGallery(character: Character, count: Int = 6, isNSFW: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                android.util.Log.d("ChatViewModel", "🖼️ Génération galerie (${if (isNSFW) "NSFW" else "SFW"}) pour ${character.name}")
+                
+                val style = if (isNSFW) "artistic" else "realistic"
+                
+                val result = pollinationAIClient.generateCharacterGallery(
+                    characterName = character.name,
+                    physicalDescription = character.physicalDescription,
+                    style = style,
+                    count = count
+                )
+                
+                result.fold(
+                    onSuccess = { imageUrls ->
+                        android.util.Log.d("ChatViewModel", "✅ ${imageUrls.size} images générées pour galerie")
+                        
+                        // Ajouter les images à la galerie personnalisée
+                        imageUrls.forEach { url ->
+                            galleryRepository.addImageToGallery(
+                                characterId = character.id,
+                                imagePath = url,
+                                isNSFW = isNSFW
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        android.util.Log.e("ChatViewModel", "❌ Erreur galerie: ${error.message}")
+                    }
+                )
+            } catch (e: Exception) {
+                android.util.Log.e("ChatViewModel", "❌ Exception galerie: ${e.message}", e)
+            }
+        }
+    }
+
+    
     fun hasSavedConversation(characterId: String): Boolean {
         return conversationManager.hasConversation(characterId)
     }
@@ -217,12 +289,41 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     character.systemPromptSFW
                 }
                 
+                // ✅ INCLURE LE SCÉNARIO ET BACKGROUND STORY
+                val enrichedSystemPrompt = buildString {
+                    append(baseSystemPrompt)
+                    
+                    // Ajouter scénario si présent
+                    if (character.scenario.isNotBlank()) {
+                        append("\n\n[SCÉNARIO/CONTEXTE]\n")
+                        append(character.scenario)
+                        append("\nTu dois ABSOLUMENT respecter ce scénario dans tes réponses et interactions.")
+                    }
+                    
+                    // Ajouter background story si présent
+                    if (character.backgroundStory.isNotBlank()) {
+                        append("\n\n[TON HISTOIRE/BACKGROUND]\n")
+                        append(character.backgroundStory)
+                    }
+                    
+                    // Ajouter traits de personnalité détaillés
+                    if (character.temperament.isNotBlank()) {
+                        append("\n\n[TEMPÉRAMENT]\n")
+                        append(character.temperament)
+                    }
+                    
+                    if (character.characterTraits.isNotEmpty()) {
+                        append("\n\n[TRAITS DE CARACTÈRE]\n")
+                        append(character.characterTraits.joinToString("\n- ", prefix = "- "))
+                    }
+                }
+                
                 // Ajouter contexte utilisateur au prompt
                 val userContext = getUserContext()
                 val systemPrompt = if (userContext.isNotEmpty()) {
-                    "$baseSystemPrompt\n\n[CONTEXTE UTILISATEUR]\n$userContext\nUtilise ces informations pour personnaliser tes réponses."
+                    "$enrichedSystemPrompt\n\n[CONTEXTE UTILISATEUR]\n$userContext\nUtilise ces informations pour personnaliser tes réponses."
                 } else {
-                    baseSystemPrompt
+                    enrichedSystemPrompt
                 }
                 
                 // Build conversation history
@@ -322,36 +423,101 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         "$role: ${msg.content}"
                     }
                 
-                // Créer un prompt d'image avec Groq
+                // Créer un prompt d'image AMÉLIORÉ avec Groq
+                // Prendre en compte: description physique + contexte conversation + tenue + pose + événement
                 val nsfwContext = if (_isNSFWMode.value) {
-                    "\n\nIMPORTANT: Generate an EXPLICIT NSFW/adult/erotic scene. Include nudity, sensual poses, intimate details, sexual content if contextually appropriate."
+                    "\n\nIMPORTANT: Generate a SUGGESTIVE/SENSUAL/EROTIC scene. Include: revealing outfit, sensual pose, intimate atmosphere, seductive expression, suggestive body language. Focus on artistic sensuality, not explicit pornography."
                 } else {
                     ""
                 }
                 
+                // Construire un profil physique ULTRA détaillé
+                val physicalProfile = buildString {
+                    append("CHARACTER PROFILE - ${character.name}:\n")
+                    append("- Name: ${character.name}\n")
+                    append("- Age: ${character.age}\n")
+                    
+                    // Genre
+                    if (character.gender.isNotBlank()) {
+                        append("- Gender: ${character.gender}\n")
+                    }
+                    
+                    append("- Hair: ${character.hairColor}\n")
+                    append("- Eyes: ${character.eyeColor}\n")
+                    append("- Body: ${character.bodyType}\n")
+                    
+                    // Anatomie spécifique au genre
+                    if (character.bustSize.isNotBlank() && character.gender.lowercase() in listOf("femme", "female", "woman")) {
+                        append("- Bust size: ${character.bustSize}\n")
+                    }
+                    if (character.penisSize.isNotBlank() && character.gender.lowercase() in listOf("homme", "male", "man")) {
+                        append("- Build: ${character.penisSize}\n")
+                    }
+                    
+                    // Description physique complète
+                    if (character.physicalDescription.isNotEmpty()) {
+                        append("- Detailed appearance: ${character.physicalDescription}\n")
+                    }
+                    
+                    // Traits distinctifs
+                    if (character.distinctiveFeatures.isNotEmpty()) {
+                        append("- Distinctive features: ${character.distinctiveFeatures.joinToString(", ")}\n")
+                    }
+                    
+                    // Tempérament pour l'expression
+                    if (character.temperament.isNotEmpty()) {
+                        append("- Temperament/Expression: ${character.temperament}\n")
+                    }
+                }
+                
                 val promptRequest = """
-                    Based on this conversation with ${character.name}:
+                    Based on this RECENT conversation with ${character.name}:
                     $context
                     
-                    CHARACTER PROFILE - ${character.name}:
-                    - Name: ${character.name}
-                    - Physical description: ${character.physicalDescription}
-                    - Age: ${character.age}
-                    - Hair: ${character.hairColor}
-                    - Eyes: ${character.eyeColor}
-                    - Body type: ${character.bodyType}$nsfwContext
+                    $physicalProfile$nsfwContext
                     
-                    Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
-                    IMPORTANT: Start with "${character.name}, " to ensure character identity.
-                    Include: ALL physical features listed above, setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
-                    Respond ONLY with the English prompt, no explanation.
+                    TASK: Create a HYPER-DETAILED image prompt in ENGLISH (max 100 words) for generating ${if (_isNSFWMode.value) "a SENSUAL/SUGGESTIVE" else "a photorealistic"} image of ${character.name}.
+                    
+                    REQUIREMENTS:
+                    1. START with: "${character.name}, "
+                    2. Include ALL physical features from the profile above (hair, eyes, body, age, etc.)
+                    3. Deduce the CHARACTER'S OUTFIT from conversation context (casual, formal, lingerie, etc.)${if (_isNSFWMode.value) " - REVEALING/SEXY outfit if sensual context" else ""}
+                    4. Deduce the POSE/ACTION from conversation (sitting, standing, lying, dancing, etc.)${if (_isNSFWMode.value) " - SENSUAL/SEDUCTIVE pose" else ""}
+                    5. Deduce the SETTING/LOCATION from conversation (bedroom, office, beach, etc.)
+                    6. Add MOOD and LIGHTING appropriate to the scene
+                    7. Include CHARACTER'S EXPRESSION matching the conversation tone${if (_isNSFWMode.value) " - seductive, playful, intimate" else ""}
+                    ${if (_isNSFWMode.value) "8. ARTISTIC SENSUALITY: Focus on beauty, desire, intimacy - NOT explicit pornography" else ""}
+                    
+                    Respond with ONLY the English prompt, no explanation or commentary.
                 """.trimIndent()
                 
                 val promptResult = groqClient.chat(
-                    systemPrompt = "You are an expert at creating detailed prompts for AI image generation. Focus on visual details, lighting, and atmosphere.",
+                    systemPrompt = """You are an EXPERT at creating hyper-detailed prompts for AI image generation (Stable Diffusion, FLUX, etc.).
+                    
+YOUR EXPERTISE:
+- Master at describing physical features with precision
+- Excellent at deducing clothing/outfit from context
+- Skilled at translating conversation mood into visual scene
+- Expert at lighting, composition, and artistic direction
+
+YOUR TASK:
+- Analyze the conversation to understand the CURRENT SCENE
+- Extract outfit/clothing clues from dialogue
+- Determine pose/action from context
+- Create a prompt that will generate a CONSISTENT character matching ALL physical details provided
+
+${if (_isNSFWMode.value) """
+NSFW MODE - SENSUAL/ARTISTIC APPROACH:
+- Focus on BEAUTY and DESIRE, not crude pornography
+- Use terms like: "sensual pose", "intimate atmosphere", "revealing outfit", "seductive expression", "artistic nudity"
+- Emphasize aesthetics: "soft lighting", "elegant", "alluring", "romantic mood"
+- Describe body language: "arched back", "sultry gaze", "lips parted", "intimate proximity"
+""" else ""}
+
+CRITICAL: Be SPECIFIC about physical features to ensure character consistency.""",
                     userMessage = promptRequest,
-                    maxTokens = 150,
-                    isNSFW = _isNSFWMode.value // Permettre prompts NSFW
+                    maxTokens = 200,
+                    isNSFW = _isNSFWMode.value
                 )
                 
                 val imagePrompt = promptResult.getOrNull()

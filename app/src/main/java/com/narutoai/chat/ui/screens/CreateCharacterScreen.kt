@@ -34,10 +34,13 @@ fun CreateCharacterScreen(
     val description by viewModel.description.collectAsState()
     val physicalDescription by viewModel.physicalDescription.collectAsState()
     val age by viewModel.age.collectAsState()
+    val gender by viewModel.gender.collectAsState()
     val height by viewModel.height.collectAsState()
     val hairColor by viewModel.hairColor.collectAsState()
     val eyeColor by viewModel.eyeColor.collectAsState()
     val bodyType by viewModel.bodyType.collectAsState()
+    val bustSize by viewModel.bustSize.collectAsState()
+    val penisSize by viewModel.penisSize.collectAsState()
     val temperament by viewModel.temperament.collectAsState()
     val scenario by viewModel.scenario.collectAsState()
     val greetingMessage by viewModel.greetingMessage.collectAsState()
@@ -144,7 +147,7 @@ fun CreateCharacterScreen(
                         Text("Choisir une photo")
                     }
                     
-                    // Analyse automatique
+                    // Analyse IA automatique
                     if (avatarImageUri != null) {
                         Button(
                             onClick = { viewModel.analyzePhoto() },
@@ -161,20 +164,31 @@ fun CreateCharacterScreen(
                                     color = Color.White
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                Text("Analyse...")
+                                Text("Analyse en cours...")
                             } else {
-                                Icon(Icons.Default.AutoAwesome, "Analyse", modifier = Modifier.size(20.dp))
+                                Icon(Icons.Default.AutoAwesome, "Analyse IA", modifier = Modifier.size(20.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text("Analyser la photo (auto)")
+                                Text("🤖 Analyser avec IA (Groq)")
                             }
                         }
                         
                         analysisResult?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (it.contains("✓")) Color.Green else MaterialTheme.colorScheme.onSurface
-                            )
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = when {
+                                        it.contains("✅") -> MaterialTheme.colorScheme.primaryContainer
+                                        it.contains("❌") -> MaterialTheme.colorScheme.errorContainer
+                                        else -> MaterialTheme.colorScheme.secondaryContainer
+                                    }
+                                )
+                            ) {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier.padding(12.dp),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
                 }
@@ -240,6 +254,41 @@ fun CreateCharacterScreen(
                         placeholder = { Text("Description complète de l'apparence...") }
                     )
                     
+                    // Genre (Dropdown)
+                    var genderExpanded by remember { mutableStateOf(false) }
+                    val genderOptions = listOf("Homme", "Femme", "Non-binaire", "Autre")
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = genderExpanded,
+                        onExpandedChange = { genderExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = gender,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Genre") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = genderExpanded,
+                            onDismissRequest = { genderExpanded = false }
+                        ) {
+                            genderOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        viewModel.updateGender(option)
+                                        genderExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -250,7 +299,7 @@ fun CreateCharacterScreen(
                             label = { Text("Âge") },
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            placeholder = { Text("Ex: 18-25") }
+                            placeholder = { Text("20-35, ado, mature...") }
                         )
                         
                         OutlinedTextField(
@@ -259,7 +308,7 @@ fun CreateCharacterScreen(
                             label = { Text("Taille") },
                             modifier = Modifier.weight(1f),
                             singleLine = true,
-                            placeholder = { Text("Ex: 165cm") }
+                            placeholder = { Text("165cm, grande...") }
                         )
                     }
                     
@@ -269,7 +318,7 @@ fun CreateCharacterScreen(
                         label = { Text("Couleur cheveux") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: Blond doré, longs") }
+                        placeholder = { Text("Châtain court, blond long, brun bouclé...") }
                     )
                     
                     OutlinedTextField(
@@ -278,7 +327,7 @@ fun CreateCharacterScreen(
                         label = { Text("Couleur yeux") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: Bleu océan") }
+                        placeholder = { Text("Marron, bleu, vert, noisette...") }
                     )
                     
                     OutlinedTextField(
@@ -287,8 +336,94 @@ fun CreateCharacterScreen(
                         label = { Text("Type de corps") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: Athlétique, musclé") }
+                        placeholder = { Text("Mince, athlétique, musclé, normal...") }
                     )
+                    
+                    // Taille de poitrine (si féminin) - Dropdown
+                    var bustExpanded by remember { mutableStateOf(false) }
+                    val bustOptions = listOf(
+                        "Petite poitrine (Bonnet A)",
+                        "Poitrine modeste (Bonnet B)",
+                        "Poitrine moyenne (Bonnet C)",
+                        "Poitrine généreuse (Bonnet D)",
+                        "Poitrine volumineuse (Bonnet E/DD)",
+                        "Très grosse poitrine (Bonnet F+)"
+                    )
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = bustExpanded,
+                        onExpandedChange = { bustExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = bustSize,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Taille de poitrine (si féminin)") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = bustExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            placeholder = { Text("Sélectionner...") }
+                        )
+                        ExposedDropdownMenu(
+                            expanded = bustExpanded,
+                            onDismissRequest = { bustExpanded = false }
+                        ) {
+                            bustOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        viewModel.updateBustSize(option)
+                                        bustExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Taille du sexe (si masculin) - Dropdown
+                    var penisExpanded by remember { mutableStateOf(false) }
+                    val penisOptions = listOf(
+                        "Taille modeste (14-15cm)",
+                        "Taille moyenne (16-17cm)",
+                        "Bonne taille (18-19cm)",
+                        "Grande taille (20-21cm)",
+                        "Très grande taille (22-23cm)",
+                        "Taille exceptionnelle (24cm+)"
+                    )
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = penisExpanded,
+                        onExpandedChange = { penisExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = penisSize,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Taille du sexe (si masculin)") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = penisExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            placeholder = { Text("Sélectionner...") }
+                        )
+                        ExposedDropdownMenu(
+                            expanded = penisExpanded,
+                            onDismissRequest = { penisExpanded = false }
+                        ) {
+                            penisOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        viewModel.updatePenisSize(option)
+                                        penisExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             }
             

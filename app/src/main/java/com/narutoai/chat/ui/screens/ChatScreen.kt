@@ -226,9 +226,15 @@ fun ChatScreen(
                 .padding(padding)
         ) {
             // Image de fond du personnage (semi-transparente)
-            if (character.imageResId != 0) {
+            val backgroundImage = when {
+                character.thumbnailUrl.isNotEmpty() -> character.thumbnailUrl
+                character.imageResId != 0 -> character.imageResId
+                else -> null
+            }
+            
+            if (backgroundImage != null) {
                 AsyncImage(
-                    model = character.imageResId,
+                    model = backgroundImage,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()

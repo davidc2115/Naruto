@@ -1,156 +1,213 @@
 package com.narutoai.chat.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.narutoai.chat.data.Characters
 import com.narutoai.chat.models.Character
-import com.narutoai.chat.ui.screens.AdminTagsScreen
-import com.narutoai.chat.ui.screens.CharacterProfileScreen
-import com.narutoai.chat.ui.screens.CharacterSelectionScreen
-import com.narutoai.chat.ui.screens.ChatScreen
-import com.narutoai.chat.ui.screens.CreateCharacterScreen
-import com.narutoai.chat.ui.screens.CustomCharactersListScreen
-import com.narutoai.chat.ui.screens.SettingsScreen
-import com.narutoai.chat.ui.screens.UserProfileScreen
+import com.narutoai.chat.ui.screens.*
 import com.narutoai.chat.utils.CharacterConverter
 import com.narutoai.chat.viewmodel.ChatViewModel
-
-sealed class Screen {
-    object CHARACTER_SELECTION : Screen()
-    object CHARACTER_DETAIL : Screen()
-    object CHAT : Screen()
-    object SETTINGS : Screen()
-    object USER_PROFILE : Screen()
-    object CREATE_CHARACTER : Screen()
-    object CUSTOM_CHARACTERS_LIST : Screen()
-    object ADMIN_TAGS : Screen()
-}
+import com.narutoai.chat.viewmodel.CustomCharactersViewModel
 
 @Composable
 fun NarutoAIChatApp(viewModel: ChatViewModel) {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.CHARACTER_SELECTION) }
-    var characterForDetail by remember { mutableStateOf<Character?>(null) }
-    val selectedCharacter = viewModel.selectedCharacter.value
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
     
-    when (currentScreen) {
-        Screen.CHARACTER_SELECTION -> {
-            CharacterSelectionScreen(
-                onCharacterSelected = { character ->
-                    characterForDetail = character
-                    currentScreen = Screen.CHARACTER_DETAIL
+    // Charger les personnages custom
+    val customViewModel: CustomCharactersViewModel = viewModel()
+    val customCharacters by customViewModel.characters.collectAsState(initial = emptyList())
+    
+    // Convertir les custom characters en Character
+    val customCharacterModels = remember(customCharacters) {
+        customCharacters.map { entity ->
+            CharacterConverter.toCharacter(entity)
+        }
+    }
+    
+    // Combiner prédéfinis + custom
+    val allCharacters = remember(customCharacterModels) {
+        Characters.allCharacters + customCharacterModels
+    }
+    
+    // Fonction helper pour trouver un personnage par ID
+    fun findCharacterById(id: String): Character? {
+        return allCharacters.find { it.id == id }
+    }
+    
+    // Gérer le bouton back système
+    BackHandler(enabled = currentRoute != "main") {
+        if (navController.previousBackStackEntry != null) {
+            navController.popBackStack()
+        }
+    }
+    
+    NavHost(
+        navController = navController,
+        startDestination = "main"
+    ) {
+        // Écran principal avec Bottom Nav Bar
+        composable("main") {
+            MainScreen(
+                onCharacterClick = { character ->
+                    navController.navigate("character_profile/${character.id}")
                 },
-                onSettingsClick = {
-                    currentScreen = Screen.SETTINGS
+                onStartChat = { characterId ->
+                    navController.navigate("chat/$characterId")
                 },
-                onUserProfileClick = {
-                    currentScreen = Screen.USER_PROFILE
+                onCreateCharacter = {
+                    navController.navigate("create_character")
                 },
-                onCreateCharacterClick = {
-                    currentScreen = Screen.CREATE_CHARACTER
-                },
-                onCustomCharactersClick = {
-                    currentScreen = Screen.CUSTOM_CHARACTERS_LIST
-                },
-                viewModel = viewModel
+                onEditCharacter = { characterId ->
+                    navController.navigate("edit_character?id=$characterId")
+                }
             )
         }
         
-        Screen.CHARACTER_DETAIL -> {
-            characterForDetail?.let { character ->
+        // Profil de personnage
+        composable(
+            route = "character_profile/{characterId}",
+            arguments = listOf(navArgument("characterId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val characterId = backStackEntry.arguments?.getString("characterId")
+            val character = characterId?.let { findCharacterById(it) }
+            
+            if (character != null) {
                 CharacterProfileScreen(
                     character = character,
                     hasSavedConversation = viewModel.hasSavedConversation(character.id),
                     onBackClick = {
-                        currentScreen = Screen.CHARACTER_SELECTION
+                        navController.popBackStack()
                     },
                     onStartChat = { loadSaved ->
                         viewModel.selectCharacter(character, loadSaved)
-                        currentScreen = Screen.CHAT
+                        navController.navigate("chat/${character.id}")
+                    },
+                    onEditClick = {
+                        navController.navigate("edit_character?id=${character.id}")
                     }
                 )
+            } else {
+                // Personnage non trouvé, retour à l'écran principal
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
             }
         }
         
-        Screen.CHAT -> {
-            if (selectedCharacter != null) {
+        // Chat
+        composable(
+            route = "chat/{characterId}",
+            arguments = listOf(navArgument("characterId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val characterId = backStackEntry.arguments?.getString("characterId")
+            val selectedCharacter = viewModel.selectedCharacter.value
+            
+            if (selectedCharacter != null && selectedCharacter.id == characterId) {
                 ChatScreen(
                     viewModel = viewModel,
                     character = selectedCharacter,
                     onBackClick = {
-                        currentScreen = Screen.CHARACTER_DETAIL
-                        characterForDetail = selectedCharacter
+                        navController.popBackStack()
                     }
                 )
             } else {
-                currentScreen = Screen.CHARACTER_SELECTION
+                // Recharger le personnage si nécessaire (prédéfini OU custom)
+                val character = characterId?.let { findCharacterById(it) }
+                if (character != null) {
+                    LaunchedEffect(Unit) {
+                        viewModel.selectCharacter(character, true)
+                    }
+                    ChatScreen(
+                        viewModel = viewModel,
+                        character = character,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                } else {
+                    // Personnage non trouvé
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
+                }
             }
         }
         
-        Screen.SETTINGS -> {
+        // Création de personnage
+        composable("create_character") {
+            CreateCharacterScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onCharacterCreated = {
+                    // Retour à l'écran principal (onglet Explorer)
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        // Édition de personnage
+        composable(
+            route = "edit_character?id={characterId}",
+            arguments = listOf(navArgument("characterId") { 
+                type = NavType.StringType
+                nullable = true
+            })
+        ) { backStackEntry ->
+            val characterId = backStackEntry.arguments?.getString("characterId")
+            
+            EditCharacterScreen(
+                characterId = characterId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onCharacterSaved = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        // Settings (ancien écran conservé pour compatibilité)
+        composable("settings") {
             SettingsScreen(
                 viewModel = viewModel,
                 onBackClick = {
-                    currentScreen = Screen.CHARACTER_SELECTION
+                    navController.popBackStack()
                 },
                 onAdminTagsClick = {
-                    currentScreen = Screen.ADMIN_TAGS
+                    navController.navigate("admin_tags")
                 }
             )
         }
         
-        Screen.USER_PROFILE -> {
+        // User Profile (ancien écran conservé)
+        composable("user_profile") {
             UserProfileScreen(
                 currentProfile = viewModel.userProfile.value,
                 onBackClick = {
-                    currentScreen = Screen.CHARACTER_SELECTION
+                    navController.popBackStack()
                 },
                 onSaveProfile = { profile ->
                     viewModel.saveUserProfile(profile)
-                    currentScreen = Screen.CHARACTER_SELECTION
+                    navController.popBackStack()
                 }
             )
         }
         
-        Screen.CREATE_CHARACTER -> {
-            CreateCharacterScreen(
-                onNavigateBack = {
-                    currentScreen = Screen.CUSTOM_CHARACTERS_LIST
-                },
-                onCharacterCreated = {
-                    // Rediriger vers la liste pour voir le personnage créé
-                    currentScreen = Screen.CUSTOM_CHARACTERS_LIST
-                }
-            )
-        }
-        
-        Screen.CUSTOM_CHARACTERS_LIST -> {
-            CustomCharactersListScreen(
-                onNavigateBack = {
-                    currentScreen = Screen.CHARACTER_SELECTION
-                },
-                onCreateNew = {
-                    currentScreen = Screen.CREATE_CHARACTER
-                },
-                onEditCharacter = { entity ->
-                    // TODO: Écran d'édition
-                    android.util.Log.d("NarutoApp", "Edit character: ${entity.name}")
-                    // Pour l'instant, afficher profil
-                    val character = CharacterConverter.toCharacter(entity)
-                    characterForDetail = character
-                    currentScreen = Screen.CHARACTER_DETAIL
-                },
-                onSelectCharacter = { entity ->
-                    // Convertir et lancer chat
-                    val character = CharacterConverter.toCharacter(entity)
-                    android.util.Log.d("NarutoApp", "Select custom character: ${character.name}")
-                    characterForDetail = character
-                    currentScreen = Screen.CHARACTER_DETAIL
-                }
-            )
-        }
-        
-        Screen.ADMIN_TAGS -> {
+        // Admin Tags (ancien écran)
+        composable("admin_tags") {
             AdminTagsScreen(
                 onNavigateBack = {
-                    currentScreen = Screen.SETTINGS
+                    navController.popBackStack()
                 }
             )
         }

@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ fun CharacterProfileScreen(
     character: Character,
     onBackClick: () -> Unit,
     onStartChat: (loadSaved: Boolean) -> Unit,
+    onEditClick: (() -> Unit)? = null,
     hasSavedConversation: Boolean = false
 ) {
     var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
@@ -65,6 +67,18 @@ fun CharacterProfileScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
                     }
                 },
+                actions = {
+                    // Bouton modifier (visible seulement si onEditClick est fourni)
+                    onEditClick?.let {
+                        IconButton(onClick = it) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "Modifier",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -84,21 +98,26 @@ fun CharacterProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                val mainImageResId = if (character.imageResId != 0) {
-                    character.imageResId
-                } else {
-                    // Fallback: première image de la galerie
-                    if (character.gallery.isNotEmpty()) {
+                // Ordre de priorité : thumbnailUrl (custom) > imageResId (prédéfini) > galerie
+                val mainImageModel = when {
+                    // 1. Si thumbnailUrl existe (personnages custom)
+                    character.thumbnailUrl.isNotEmpty() -> character.thumbnailUrl
+                    // 2. Si imageResId existe (personnages prédéfinis)
+                    character.imageResId != 0 -> character.imageResId
+                    // 3. Fallback: première image de la galerie
+                    character.gallery.isNotEmpty() -> {
                         val firstImage = character.gallery[0]
                         if (firstImage.startsWith("drawable://")) {
                             val fileName = firstImage.removePrefix("drawable://").removeSuffix(".jpg")
                             context.resources.getIdentifier(fileName, "drawable", context.packageName)
-                        } else 0
-                    } else 0
+                        } else firstImage // Retourner l'URI directement si pas drawable
+                    }
+                    // 4. Rien trouvé
+                    else -> null
                 }
                 
                 AsyncImage(
-                    model = mainImageResId,
+                    model = mainImageModel,
                     contentDescription = character.name,
                     modifier = Modifier
                         .fillMaxWidth()

@@ -64,7 +64,50 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section Groq API
+            // Section Groq Vision (utilise les clés Groq configurées)
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.PhotoCamera, "Groq Vision")
+                            Text(
+                                text = "👁️ Groq Vision",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        Text(
+                            text = "Analyse d'images avec Groq Vision. Utilise automatiquement vos clés API Groq configurées ci-dessous. Modèles actifs: llama-3.2-90b-vision-instruct, llama-3.2-11b-vision-preview, llava-v1.5-7b-4096-preview.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                        )
+                        
+                        // Avantages
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            InfoChip("✅ Utilise vos clés Groq existantes")
+                            InfoChip("✅ Fallback automatique entre modèles")
+                            InfoChip("✅ Analyse complète physique")
+                            InfoChip("✅ Modèles vérifiés actifs")
+                        }
+                    }
+                }
+            }
+            
+            // Section Groq API (Chat uniquement)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -82,14 +125,14 @@ fun SettingsScreen(
                         ) {
                             Icon(Icons.Default.Key, "Clés API")
                             Text(
-                                text = "Clés API Groq",
+                                text = "Clés API Groq (Chat uniquement)",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Gérez vos clés API Groq pour le chat. Plusieurs clés tournent automatiquement.",
+                            text = "Gérez vos clés API Groq pour les conversations uniquement. Plusieurs clés tournent automatiquement.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -186,10 +229,11 @@ fun SettingsScreen(
                             )
                         }
                         
-                        InfoRow("🚀 Groq API", "console.groq.com")
-                        InfoRow("🎨 Pollination AI", "Génération gratuite illimitée")
+                        InfoRow("🚀 Groq API", "Chat + Vision (console.groq.com)")
+                        InfoRow("👁️ Groq Vision", "Analyse photos (mêmes clés)")
+                        InfoRow("🖼️ Pollination AI", "Génération images/vidéos gratuite")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
-                        InfoRow("🔄 Rotation", "Automatique entre clés")
+                        InfoRow("🔄 Rotation", "Automatique entre clés Groq")
                     }
                 }
             }
@@ -402,5 +446,20 @@ fun ApiSelectionRow(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
+    }
+}
+
+@Composable
+fun InfoChip(text: String) {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
