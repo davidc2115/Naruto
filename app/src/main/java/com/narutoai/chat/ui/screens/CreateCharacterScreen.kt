@@ -34,10 +34,13 @@ fun CreateCharacterScreen(
     val description by viewModel.description.collectAsState()
     val physicalDescription by viewModel.physicalDescription.collectAsState()
     val age by viewModel.age.collectAsState()
+    val gender by viewModel.gender.collectAsState()
     val height by viewModel.height.collectAsState()
     val hairColor by viewModel.hairColor.collectAsState()
     val eyeColor by viewModel.eyeColor.collectAsState()
     val bodyType by viewModel.bodyType.collectAsState()
+    val bustSize by viewModel.bustSize.collectAsState()
+    val penisSize by viewModel.penisSize.collectAsState()
     val temperament by viewModel.temperament.collectAsState()
     val scenario by viewModel.scenario.collectAsState()
     val greetingMessage by viewModel.greetingMessage.collectAsState()
@@ -251,27 +254,37 @@ fun CreateCharacterScreen(
                         placeholder = { Text("Description complète de l'apparence...") }
                     )
                     
+                    // Genre
+                    OutlinedTextField(
+                        value = gender,
+                        onValueChange = { viewModel.updateGender(it) },
+                        label = { Text("Genre") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text("Homme, Femme, Non-binaire...") }
+                    )
+                    
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                    OutlinedTextField(
-                        value = age,
-                        onValueChange = { viewModel.updateAge(it) },
-                        label = { Text("Âge") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        placeholder = { Text("20-35, ado, mature...") }
-                    )
-                    
-                    OutlinedTextField(
-                        value = height,
-                        onValueChange = { viewModel.updateHeight(it) },
-                        label = { Text("Taille") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        placeholder = { Text("165cm, grande...") }
-                    )
+                        OutlinedTextField(
+                            value = age,
+                            onValueChange = { viewModel.updateAge(it) },
+                            label = { Text("Âge") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            placeholder = { Text("20-35, ado, mature...") }
+                        )
+                        
+                        OutlinedTextField(
+                            value = height,
+                            onValueChange = { viewModel.updateHeight(it) },
+                            label = { Text("Taille") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            placeholder = { Text("165cm, grande...") }
+                        )
                     }
                     
                     OutlinedTextField(
@@ -299,6 +312,26 @@ fun CreateCharacterScreen(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         placeholder = { Text("Mince, athlétique, musclé, normal...") }
+                    )
+                    
+                    // Taille de poitrine (si féminin)
+                    OutlinedTextField(
+                        value = bustSize,
+                        onValueChange = { viewModel.updateBustSize(it) },
+                        label = { Text("Taille de poitrine (si féminin)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text("Bonnet A, B, C, D, E...") }
+                    )
+                    
+                    // Taille du sexe (si masculin)
+                    OutlinedTextField(
+                        value = penisSize,
+                        onValueChange = { viewModel.updatePenisSize(it) },
+                        label = { Text("Taille du sexe (si masculin)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        placeholder = { Text("16cm, 18cm, 20cm...") }
                     )
                 }
             }
