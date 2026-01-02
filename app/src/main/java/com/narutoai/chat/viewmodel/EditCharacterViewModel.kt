@@ -130,10 +130,13 @@ class EditCharacterViewModel(application: Application) : AndroidViewModel(applic
         _description.value = character.description
         _physicalDescription.value = character.physicalDescription
         _age.value = character.age
+        _gender.value = character.gender
         _height.value = character.height
         _hairColor.value = character.hairColor
         _eyeColor.value = character.eyeColor
         _bodyType.value = character.bodyType
+        _bustSize.value = character.bustSize
+        _penisSize.value = character.penisSize
         _temperament.value = character.temperament
         _scenario.value = character.scenario
         _greetingMessage.value = character.greetingMessage

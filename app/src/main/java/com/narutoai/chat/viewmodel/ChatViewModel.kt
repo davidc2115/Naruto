@@ -436,9 +436,23 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     append("CHARACTER PROFILE - ${character.name}:\n")
                     append("- Name: ${character.name}\n")
                     append("- Age: ${character.age}\n")
+                    
+                    // Genre
+                    if (character.gender.isNotBlank()) {
+                        append("- Gender: ${character.gender}\n")
+                    }
+                    
                     append("- Hair: ${character.hairColor}\n")
                     append("- Eyes: ${character.eyeColor}\n")
                     append("- Body: ${character.bodyType}\n")
+                    
+                    // Anatomie spécifique au genre
+                    if (character.bustSize.isNotBlank() && character.gender.lowercase() in listOf("femme", "female", "woman")) {
+                        append("- Bust size: ${character.bustSize}\n")
+                    }
+                    if (character.penisSize.isNotBlank() && character.gender.lowercase() in listOf("homme", "male", "man")) {
+                        append("- Build: ${character.penisSize}\n")
+                    }
                     
                     // Description physique complète
                     if (character.physicalDescription.isNotEmpty()) {

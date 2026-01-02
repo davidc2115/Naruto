@@ -159,13 +159,18 @@ class PollinationAIClient {
         characterName: String,
         physicalDescription: String,
         style: String = "realistic",
-        gender: String = "female"
+        gender: String = "female",
+        bustSize: String = "",
+        penisSize: String = ""
     ): Result<String> = withContext(Dispatchers.IO) {
         val detailedPrompt = buildCharacterPrompt(
             characterName,
             physicalDescription,
             style,
-            gender
+            gender,
+            additionalDetails = "",
+            bustSize = bustSize,
+            penisSize = penisSize
         )
         
         generateImage(
@@ -258,7 +263,9 @@ class PollinationAIClient {
         physicalDescription: String,
         style: String,
         gender: String = "female",
-        additionalDetails: String = ""
+        additionalDetails: String = "",
+        bustSize: String = "",
+        penisSize: String = ""
     ): String {
         val styleModifier = when (style.lowercase()) {
             "realistic" -> "photorealistic, ultra detailed, professional photography, natural lighting, 8k uhd"
@@ -269,15 +276,45 @@ class PollinationAIClient {
         }
         
         val genderDetails = when (gender.lowercase()) {
-            "male" -> "handsome male, masculine features"
-            "female" -> "beautiful woman, feminine features"
+            "male", "homme" -> "handsome male, masculine features"
+            "female", "femme" -> "beautiful woman, feminine features"
             else -> ""
+        }
+        
+        // Ajouter détails anatomiques si fournis
+        val anatomyDetails = buildString {
+            if (bustSize.isNotBlank() && gender.lowercase() in listOf("female", "femme")) {
+                // Convertir taille de bonnet en description
+                val bustDesc = when {
+                    bustSize.contains("A", ignoreCase = true) -> "small chest, petite bust"
+                    bustSize.contains("B", ignoreCase = true) -> "modest chest, natural bust"
+                    bustSize.contains("C", ignoreCase = true) -> "medium chest, proportionate bust"
+                    bustSize.contains("D", ignoreCase = true) -> "full chest, voluptuous bust"
+                    bustSize.contains("E", ignoreCase = true) || bustSize.contains("DD", ignoreCase = true) -> "large chest, generous bust"
+                    bustSize.contains("F", ignoreCase = true) || bustSize.contains("G", ignoreCase = true) -> "very large chest, ample bust"
+                    else -> bustSize
+                }
+                append("$bustDesc, ")
+            }
+            
+            if (penisSize.isNotBlank() && gender.lowercase() in listOf("male", "homme")) {
+                // Convertir taille en description (discrète pour le prompt)
+                val penisDesc = when {
+                    penisSize.contains("14") || penisSize.contains("15") || penisSize.contains("petit", ignoreCase = true) -> "average build"
+                    penisSize.contains("16") || penisSize.contains("17") || penisSize.contains("moyen", ignoreCase = true) -> "well-proportioned build"
+                    penisSize.contains("18") || penisSize.contains("19") || penisSize.contains("20") -> "athletic build, well-endowed"
+                    penisSize.contains("21") || penisSize.contains("22") || penisSize.contains("23") || penisSize.contains("grand", ignoreCase = true) -> "muscular build, generously proportioned"
+                    else -> "athletic build"
+                }
+                append("$penisDesc, ")
+            }
         }
         
         return buildString {
             append("portrait of $name, ")
             append("$physicalDescription, ")
             if (genderDetails.isNotEmpty()) append("$genderDetails, ")
+            if (anatomyDetails.isNotEmpty()) append(anatomyDetails)
             if (additionalDetails.isNotEmpty()) append("$additionalDetails, ")
             append("$styleModifier, ")
             append("sharp focus, detailed face, expressive eyes, ")
