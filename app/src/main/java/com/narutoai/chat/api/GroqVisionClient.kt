@@ -283,6 +283,11 @@ IMPORTANT:
                     .filterNot { isBannedModel(it) }
                     .ifEmpty { FALLBACK_VISION_MODELS.filterNot { m -> isBannedModel(m) } }
 
+                android.util.Log.d(
+                    "GroqVision",
+                    "🧠 Vision candidates=${modelCandidates.size} first=${modelCandidates.take(5)}"
+                )
+
                 for (model in modelCandidates) {
                     usedModel = model
                     val requestBody = buildRequestJson(model).toString()
@@ -343,12 +348,28 @@ IMPORTANT:
                 }
                 if (!success && lastHttpError != null && lastHttpError.first == 400) {
                     return@withContext Result.failure(
-                        Exception("Erreur API Groq Vision: HTTP 400\n${lastHttpError.second?.take(800) ?: ""}")
+                        Exception(
+                            buildString {
+                                append("Erreur API Groq Vision: HTTP 400")
+                                if (!usedModel.isNullOrBlank()) append("\nModèle tenté: $usedModel")
+                                append("\nCandidats (top5): ${modelCandidates.take(5)}")
+                                append("\n")
+                                append(lastHttpError.second?.take(800) ?: "")
+                            }
+                        )
                     )
                 }
                 if (!success) {
                     return@withContext Result.failure(
-                        Exception("Erreur API Groq Vision: HTTP ${lastHttpError?.first ?: "?"}\n${lastHttpError?.second?.take(800) ?: ""}")
+                        Exception(
+                            buildString {
+                                append("Erreur API Groq Vision: HTTP ${lastHttpError?.first ?: "?"}")
+                                if (!usedModel.isNullOrBlank()) append("\nModèle tenté: $usedModel")
+                                append("\nCandidats (top5): ${modelCandidates.take(5)}")
+                                append("\n")
+                                append(lastHttpError?.second?.take(800) ?: "")
+                            }
+                        )
                     )
                 }
                 
