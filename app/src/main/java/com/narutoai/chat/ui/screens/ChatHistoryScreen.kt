@@ -39,33 +39,55 @@ fun ChatHistoryScreen(
     val context = LocalContext.current
     val conversationManager = remember { ConversationManager(context) }
     
+    // Charger les personnages custom
+    val customViewModel: com.narutoai.chat.viewmodel.CustomCharactersViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val customCharacters by customViewModel.characters.collectAsState(initial = emptyList())
+    
+    // Convertir les custom characters en Character
+    val customCharacterModels = remember(customCharacters) {
+        customCharacters.map { entity ->
+            com.narutoai.chat.utils.CharacterConverter.toCharacter(entity)
+        }
+    }
+    
+    // Combiner prédéfinis + custom
+    val allCharacters = remember(customCharacterModels) {
+        Characters.allCharacters + customCharacterModels
+    }
+    
     // État local pour les conversations
     var conversations by remember { mutableStateOf<List<ConversationHistory>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     
     // Charger les conversations au démarrage
-    LaunchedEffect(Unit) {
+    LaunchedEffect(allCharacters) {
         isLoading = true
         try {
-            // Récupérer tous les personnages qui ont des conversations sauvegardées
+            // Récupérer TOUS les IDs de conversations sauvegardées
+            val conversationIds = conversationManager.getAllConversationIds()
             val allConversations = mutableListOf<ConversationHistory>()
             
-            Characters.allCharacters.forEach { character ->
-                // Charger la conversation (une seule par personnage)
-                val messages = conversationManager.loadConversation(character.id)
+            conversationIds.forEach { characterId ->
+                // Charger la conversation
+                val messages = conversationManager.loadConversation(characterId)
                 if (messages != null && messages.isNotEmpty()) {
-                    val isNSFW = conversationManager.getIsNSFW(character.id)
-                    allConversations.add(
-                        ConversationHistory(
-                            characterId = character.id,
-                            characterName = character.name,
-                            characterEmoji = character.avatarEmoji,
-                            lastMessage = messages.lastOrNull()?.content ?: "",
-                            messageCount = messages.size,
-                            lastMessageTime = messages.lastOrNull()?.timestamp ?: 0L,
-                            isNSFW = isNSFW
+                    // Trouver le personnage (prédéfini OU custom)
+                    val character = allCharacters.find { it.id == characterId }
+                    
+                    if (character != null) {
+                        val isNSFW = conversationManager.getIsNSFW(characterId)
+                        allConversations.add(
+                            ConversationHistory(
+                                characterId = character.id,
+                                characterName = character.name,
+                                characterEmoji = character.avatarEmoji,
+                                lastMessage = messages.lastOrNull()?.content ?: "",
+                                messageCount = messages.size,
+                                lastMessageTime = messages.lastOrNull()?.timestamp ?: 0L,
+                                isNSFW = isNSFW
+                            )
                         )
-                    )
+                    }
                 }
             }
             

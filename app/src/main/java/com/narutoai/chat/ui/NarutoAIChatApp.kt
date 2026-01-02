@@ -2,6 +2,7 @@ package com.narutoai.chat.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,12 +14,34 @@ import com.narutoai.chat.models.Character
 import com.narutoai.chat.ui.screens.*
 import com.narutoai.chat.utils.CharacterConverter
 import com.narutoai.chat.viewmodel.ChatViewModel
+import com.narutoai.chat.viewmodel.CustomCharactersViewModel
 
 @Composable
 fun NarutoAIChatApp(viewModel: ChatViewModel) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    
+    // Charger les personnages custom
+    val customViewModel: CustomCharactersViewModel = viewModel()
+    val customCharacters by customViewModel.characters.collectAsState(initial = emptyList())
+    
+    // Convertir les custom characters en Character
+    val customCharacterModels = remember(customCharacters) {
+        customCharacters.map { entity ->
+            CharacterConverter.toCharacter(entity)
+        }
+    }
+    
+    // Combiner prédéfinis + custom
+    val allCharacters = remember(customCharacterModels) {
+        Characters.allCharacters + customCharacterModels
+    }
+    
+    // Fonction helper pour trouver un personnage par ID
+    fun findCharacterById(id: String): Character? {
+        return allCharacters.find { it.id == id }
+    }
     
     // Gérer le bouton back système
     BackHandler(enabled = currentRoute != "main") {
@@ -55,7 +78,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
             arguments = listOf(navArgument("characterId") { type = NavType.StringType })
         ) { backStackEntry ->
             val characterId = backStackEntry.arguments?.getString("characterId")
-            val character = Characters.allCharacters.find { it.id == characterId }
+            val character = characterId?.let { findCharacterById(it) }
             
             if (character != null) {
                 CharacterProfileScreen(
@@ -72,6 +95,11 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                         navController.navigate("edit_character?id=${character.id}")
                     }
                 )
+            } else {
+                // Personnage non trouvé, retour à l'écran principal
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
             }
         }
         
@@ -92,10 +120,12 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     }
                 )
             } else {
-                // Recharger le personnage si nécessaire
-                val character = Characters.allCharacters.find { it.id == characterId }
+                // Recharger le personnage si nécessaire (prédéfini OU custom)
+                val character = characterId?.let { findCharacterById(it) }
                 if (character != null) {
-                    viewModel.selectCharacter(character, true)
+                    LaunchedEffect(Unit) {
+                        viewModel.selectCharacter(character, true)
+                    }
                     ChatScreen(
                         viewModel = viewModel,
                         character = character,
@@ -104,7 +134,10 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                         }
                     )
                 } else {
-                    navController.popBackStack()
+                    // Personnage non trouvé
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
                 }
             }
         }
