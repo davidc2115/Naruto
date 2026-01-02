@@ -27,8 +27,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     viewModel: ChatViewModel,
-    onBackClick: () -> Unit,
-    onAdminTagsClick: (() -> Unit)? = null
+    onBackClick: (() -> Unit)? = null, // Nullable pour bottom nav
+    onAdminTagsClick: (() -> Unit)? = null,
+    onUserProfileClick: (() -> Unit)? = null
 ) {
     var newGroqKey by remember { mutableStateOf("") }
     var showAddKeyDialog by remember { mutableStateOf(false) }
@@ -45,12 +46,19 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Paramètres") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
-                    }
+                title = { 
+                    Text(
+                        "Configuration",
+                        fontWeight = FontWeight.Bold
+                    ) 
                 },
+                navigationIcon = if (onBackClick != null) {
+                    {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
+                        }
+                    }
+                } else null,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -190,6 +198,44 @@ fun SettingsScreen(
                         InfoRow("🎨 Pollination AI", "Génération gratuite illimitée")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
                         InfoRow("🔄 Rotation", "Automatique entre clés")
+                    }
+                }
+            }
+            
+            // Profil utilisateur
+            if (onUserProfileClick != null) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Person, "Profil utilisateur")
+                                Text(
+                                    text = "Profil utilisateur",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            
+                            Button(
+                                onClick = onUserProfileClick,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.Edit, null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Modifier mon profil")
+                            }
+                        }
                     }
                 }
             }
