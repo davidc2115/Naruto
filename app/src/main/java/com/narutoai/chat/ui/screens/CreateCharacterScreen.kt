@@ -55,11 +55,15 @@ fun CreateCharacterScreen(
     val editingCharacterId by viewModel.editingCharacterId.collectAsState()
     
     // Charger le personnage pour édition si un ID est fourni
+    // Ne pas réinitialiser si on édite
     LaunchedEffect(editCharacterId) {
-        if (editCharacterId != null) {
+        android.util.Log.d("CreateCharacterScreen", "LaunchedEffect triggered with editCharacterId=$editCharacterId")
+        if (editCharacterId != null && editCharacterId.isNotEmpty()) {
+            android.util.Log.d("CreateCharacterScreen", "Loading character for edit: $editCharacterId")
             viewModel.loadCharacterForEdit(editCharacterId)
-        } else {
-            // Réinitialiser le formulaire si on crée un nouveau personnage
+        } else if (editingCharacterId == null) {
+            // Réinitialiser le formulaire SEULEMENT si on n'est pas déjà en train d'éditer
+            android.util.Log.d("CreateCharacterScreen", "Resetting form for new character")
             viewModel.resetForm()
         }
     }
