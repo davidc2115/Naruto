@@ -46,7 +46,7 @@ object CharacterConverter {
             // Galeries (vides pour custom pour l'instant)
             gallery = emptyList(),
             galleryNSFW = emptyList(),
-            thumbnailUrl = "",
+            thumbnailUrl = entity.avatarImagePath, // ✅ Photo du personnage custom
             
             // Message d'accueil
             greetingMessage = entity.greetingMessage
