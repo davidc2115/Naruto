@@ -22,6 +22,7 @@ object Characters {
         eyeColor = "Bleu océan",
         bodyType = "Athlétique, musclé mais élancé",
         bustSize = "",
+        penisSize = "Taille moyenne (16cm)",
         distinctiveFeatures = listOf(
             "Six marques de moustaches (3 par joue)",
             "Bandeau frontal de Konoha",
@@ -179,6 +180,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Noir profond (rouge Sharingan)",
         bodyType = "Athlétique, muscles secs, gracieux",
         bustSize = "",
+        penisSize = "Taille généreuse (18cm)",
         distinctiveFeatures = listOf(
             "Sharingan (yeux rouges avec tomoe)",
             "Marque maudite sur le cou",
@@ -338,6 +340,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Vert émeraude",
         bodyType = "Athlétique et féminin, musclée",
         bustSize = "Poitrine moyenne ferme (Bonnet C)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Cheveux roses uniques",
             "Front large (complexe d'enfance)",
@@ -483,6 +486,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Noir (droite), rouge Sharingan (gauche caché)",
         bodyType = "Athlétique, élancé, agile",
         bustSize = "",
+        penisSize = "Taille moyenne (17cm)",
         distinctiveFeatures = listOf(
             "Masque couvrant toujours le visage",
             "Sharingan dans l'œil gauche",
@@ -638,6 +642,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Blanc perle (Byakugan), lavande au repos",
         bodyType = "Féminin, gracieux, courbes douces",
         bustSize = "Poitrine généreuse (Bonnet D)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Yeux Byakugan blanc perle uniques",
             "Rougit TRÈS facilement",
@@ -787,6 +792,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Noir (Mangekyō Sharingan rouge-noir)",
         bodyType = "Élancé, gracieux, musclé finement",
         bustSize = "",
+        penisSize = "Taille moyenne (16cm)",
         distinctiveFeatures = listOf(
             "Mangekyō Sharingan (motif unique)",
             "Lignes de stress sous les yeux",
@@ -947,6 +953,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Bleu perçant",
         bodyType = "Athlétique, musclé, entretenu",
         bustSize = "",
+        penisSize = "Bien membré (19cm)",
         distinctiveFeatures = listOf(
             "Mâchoire carrée légendaire",
             "Sourire ravageur emblématique",
@@ -1100,6 +1107,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Bleu intense",
         bodyType = "Robuste, athlétique, imposant",
         bustSize = "",
+        penisSize = "Très bien membré (20cm)",
         distinctiveFeatures = listOf(
             "Regard bleu perçant et intense",
             "Sourire charmeur emblématique",
@@ -1253,6 +1261,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Marron",
         bodyType = "Musculature massive de catcheur",
         bustSize = "",
+        penisSize = "Énorme et impressionnant (23cm)",
         distinctiveFeatures = listOf(
             "Physique massif et impressionnant",
             "Sourcil levé emblématique (The People's Eyebrow)",
@@ -1415,6 +1424,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Vert magnétique",
         bodyType = "Athlétique, courbes, féminin",
         bustSize = "Poitrine généreuse et sexy (Bonnet D)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Voix rauque et sensuelle iconique",
             "Lèvres pulpeuses emblématiques",
@@ -1568,6 +1578,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Bleu pétillant",
         bodyType = "Athlétique, tonifié, féminin",
         bustSize = "Poitrine moyenne naturelle (Bonnet C)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Sourire éclatant contagieux",
             "Accent australien charmant",
@@ -1724,6 +1735,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Marron expressif",
         bodyType = "Mince, gracieux, élégant",
         bustSize = "Poitrine petite et délicate (Bonnet A-B)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Regard intelligent et pénétrant",
             "Accent britannique raffiné",
@@ -1881,6 +1893,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Noisette expressif",
         bodyType = "Élancée, mannequin, gracieuse",
         bustSize = "Poitrine petite de mannequin (Bonnet A)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Grande taille élégante (178cm)",
             "Style mode avant-gardiste iconique",
@@ -2042,6 +2055,7 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         eyeColor = "Noisette pétillant",
         bodyType = "Élancé, tonique, courbes naturelles",
         bustSize = "Poitrine moyenne sexy (Bonnet C)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Fossette sur joue gauche",
             "Regard malicieux et taquin",
@@ -2158,6 +2172,7 @@ IMPORTANT: Contenu suggestif/sensuel intense mais S'ARRÊTE avant descriptions d
         eyeColor = "Brun foncé, presque noir",
         bodyType = "Mince, gracieuse, allure de danseuse",
         bustSize = "Petite poitrine délicate (Bonnet A)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Regard profond et mystérieux",
             "Tatouage fleur de lotus sur omoplate",
@@ -2270,6 +2285,7 @@ IMPORTANT: Érotisme suggéré, atmosphère intense, mais fade to black avant ex
         eyeColor = "Vert expressif",
         bodyType = "Tonique, athlétique, formes naturelles",
         bustSize = "Poitrine moyenne naturelle (Bonnet B-C)",
+        penisSize = "",
         distinctiveFeatures = listOf(
             "Fossettes adorables",
             "Taches de rousseur sur le nez",

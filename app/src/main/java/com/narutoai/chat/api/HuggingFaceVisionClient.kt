@@ -206,6 +206,17 @@ class HuggingFaceVisionClient(private val context: Context) {
             ""
         }
         
+        // Détecter taille du sexe (si masculin)
+        val penisSize = if (gender == "Homme") {
+            when {
+                lowerDesc.contains("well-endowed") || lowerDesc.contains("muscular") -> "Bien membré (20cm)"
+                lowerDesc.contains("athletic") || lowerDesc.contains("fit") -> "Taille généreuse (18cm)"
+                else -> "Taille moyenne (16cm)"
+            }
+        } else {
+            ""
+        }
+        
         // Construire description détaillée
         val detailedDescription = buildString {
             append("$gender de $age, ")
@@ -222,6 +233,7 @@ class HuggingFaceVisionClient(private val context: Context) {
             skinTone = "Peau naturelle",
             bodyType = bodyType,
             bustSize = bustSize,
+            penisSize = penisSize,
             height = "Taille moyenne",
             facialFeatures = "Traits harmonieux",
             distinctiveFeatures = "Voir description détaillée",

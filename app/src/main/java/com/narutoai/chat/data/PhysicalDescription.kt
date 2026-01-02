@@ -12,6 +12,7 @@ data class PhysicalDescription(
     val skinTone: String = "",
     val bodyType: String = "",
     val bustSize: String = "", // Taille de poitrine (si féminin)
+    val penisSize: String = "", // Taille du sexe (si masculin)
     val height: String = "",
     val facialFeatures: String = "",
     val distinctiveFeatures: String = "",
@@ -35,6 +36,7 @@ data class PhysicalDescription(
         if (skinTone.isNotBlank()) details.add("Teint: $skinTone")
         if (bodyType.isNotBlank()) details.add("Morphologie: $bodyType")
         if (bustSize.isNotBlank()) details.add("Poitrine: $bustSize")
+        if (penisSize.isNotBlank()) details.add("Sexe: $penisSize")
         if (height.isNotBlank()) details.add("Taille: $height")
         if (facialFeatures.isNotBlank()) details.add("Visage: $facialFeatures")
         if (distinctiveFeatures.isNotBlank()) details.add("Signes distinctifs: $distinctiveFeatures")

@@ -37,6 +37,9 @@ class EditCharacterViewModel(application: Application) : AndroidViewModel(applic
     private val _age = MutableStateFlow("")
     val age: StateFlow<String> = _age
     
+    private val _gender = MutableStateFlow("")
+    val gender: StateFlow<String> = _gender
+    
     private val _height = MutableStateFlow("")
     val height: StateFlow<String> = _height
     
@@ -48,6 +51,12 @@ class EditCharacterViewModel(application: Application) : AndroidViewModel(applic
     
     private val _bodyType = MutableStateFlow("")
     val bodyType: StateFlow<String> = _bodyType
+    
+    private val _bustSize = MutableStateFlow("")
+    val bustSize: StateFlow<String> = _bustSize
+    
+    private val _penisSize = MutableStateFlow("")
+    val penisSize: StateFlow<String> = _penisSize
     
     private val _temperament = MutableStateFlow("")
     val temperament: StateFlow<String> = _temperament
@@ -89,10 +98,13 @@ class EditCharacterViewModel(application: Application) : AndroidViewModel(applic
                     _description.value = entity.description
                     _physicalDescription.value = entity.physicalDescription
                     _age.value = entity.age
+                    _gender.value = entity.gender
                     _height.value = entity.height
                     _hairColor.value = entity.hairColor
                     _eyeColor.value = entity.eyeColor
                     _bodyType.value = entity.bodyType
+                    _bustSize.value = entity.bustSize
+                    _penisSize.value = entity.penisSize
                     _temperament.value = entity.temperament
                     _scenario.value = entity.scenario
                     _greetingMessage.value = entity.greetingMessage
@@ -131,10 +143,13 @@ class EditCharacterViewModel(application: Application) : AndroidViewModel(applic
     fun updateDescription(value: String) { _description.value = value }
     fun updatePhysicalDescription(value: String) { _physicalDescription.value = value }
     fun updateAge(value: String) { _age.value = value }
+    fun updateGender(value: String) { _gender.value = value }
     fun updateHeight(value: String) { _height.value = value }
     fun updateHairColor(value: String) { _hairColor.value = value }
     fun updateEyeColor(value: String) { _eyeColor.value = value }
     fun updateBodyType(value: String) { _bodyType.value = value }
+    fun updateBustSize(value: String) { _bustSize.value = value }
+    fun updatePenisSize(value: String) { _penisSize.value = value }
     fun updateTemperament(value: String) { _temperament.value = value }
     fun updateScenario(value: String) { _scenario.value = value }
     fun updateGreetingMessage(value: String) { _greetingMessage.value = value }
@@ -227,10 +242,13 @@ class EditCharacterViewModel(application: Application) : AndroidViewModel(applic
                     personality = JSONArray(listOf(_temperament.value)).toString(),
                     physicalDescription = _physicalDescription.value,
                     age = _age.value,
+                    gender = _gender.value,
                     height = _height.value,
                     hairColor = _hairColor.value,
                     eyeColor = _eyeColor.value,
                     bodyType = _bodyType.value,
+                    bustSize = _bustSize.value,
+                    penisSize = _penisSize.value,
                     scenario = _scenario.value,
                     temperament = _temperament.value,
                     greetingMessage = _greetingMessage.value

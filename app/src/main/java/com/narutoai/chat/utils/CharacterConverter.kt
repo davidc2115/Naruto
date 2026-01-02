@@ -26,10 +26,13 @@ object CharacterConverter {
             // Détails physiques
             physicalDescription = entity.physicalDescription,
             age = entity.age,
+            gender = entity.gender,
             height = entity.height,
             hairColor = entity.hairColor,
             eyeColor = entity.eyeColor,
             bodyType = entity.bodyType,
+            bustSize = entity.bustSize,
+            penisSize = entity.penisSize,
             distinctiveFeatures = parseJsonArray(entity.distinctiveFeatures),
             
             // Background
@@ -88,10 +91,13 @@ object CharacterConverter {
             personality = toJsonArray(character.personality),
             physicalDescription = character.physicalDescription,
             age = character.age,
+            gender = character.gender,
             height = character.height,
             hairColor = character.hairColor,
             eyeColor = character.eyeColor,
             bodyType = character.bodyType,
+            bustSize = character.bustSize,
+            penisSize = character.penisSize,
             distinctiveFeatures = toJsonArray(character.distinctiveFeatures),
             scenario = character.scenario,
             backgroundStory = character.backgroundStory,

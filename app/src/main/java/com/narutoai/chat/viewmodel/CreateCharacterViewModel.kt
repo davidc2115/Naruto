@@ -57,6 +57,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     private val _bustSize = MutableStateFlow("")
     val bustSize: StateFlow<String> = _bustSize.asStateFlow()
     
+    private val _penisSize = MutableStateFlow("")
+    val penisSize: StateFlow<String> = _penisSize.asStateFlow()
+    
     private val _temperament = MutableStateFlow("")
     val temperament: StateFlow<String> = _temperament.asStateFlow()
     
@@ -99,6 +102,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     fun updateEyeColor(value: String) { _eyeColor.value = value }
     fun updateBodyType(value: String) { _bodyType.value = value }
     fun updateBustSize(value: String) { _bustSize.value = value }
+    fun updatePenisSize(value: String) { _penisSize.value = value }
     fun updateTemperament(value: String) { _temperament.value = value }
     fun updateScenario(value: String) { _scenario.value = value }
     fun updateGreetingMessage(value: String) { _greetingMessage.value = value }
@@ -150,6 +154,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         _eyeColor.value = description.eyeColor
                         _bodyType.value = description.bodyType
                         _bustSize.value = description.bustSize
+                        _penisSize.value = description.penisSize
                         _height.value = description.height
                         
                         _analysisResult.value = "✅ Analyse terminée avec succès ! (Hugging Face)"
@@ -289,6 +294,7 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                     eyeColor = _eyeColor.value,
                     bodyType = _bodyType.value,
                     bustSize = _bustSize.value,
+                    penisSize = _penisSize.value,
                     distinctiveFeatures = "[]",
                     scenario = _scenario.value,
                     backgroundStory = "",
