@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.narutoai.chat.data.predefinedCharacters
+import com.narutoai.chat.data.Characters
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.CharacterCategory
 import com.narutoai.chat.viewmodel.CustomCharactersViewModel
@@ -65,7 +65,7 @@ fun ExplorerScreen(
     }
     
     // Combiner personnages prédéfinis + custom
-    val allCharacters = predefinedCharacters + customCharacterModels
+    val allCharacters = Characters.allCharacters + customCharacterModels
     
     // Tags disponibles
     val availableTags = remember(allCharacters) {

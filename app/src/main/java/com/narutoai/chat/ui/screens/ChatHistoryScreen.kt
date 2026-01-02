@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.narutoai.chat.data.ConversationManager
-import com.narutoai.chat.data.predefinedCharacters
+import com.narutoai.chat.data.Characters
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,7 +50,7 @@ fun ChatHistoryScreen(
             // Récupérer tous les personnages qui ont des conversations sauvegardées
             val allConversations = mutableListOf<ConversationHistory>()
             
-            predefinedCharacters.forEach { character ->
+            Characters.allCharacters.forEach { character ->
                 // SFW
                 val sfwMessages = conversationManager.loadConversation(character.id, false)
                 if (sfwMessages.isNotEmpty()) {
@@ -155,7 +155,7 @@ fun ChatHistoryScreen(
                             onClick = { onConversationClick(conv.characterId, conv.isNSFW) },
                             onDelete = {
                                 // Supprimer la conversation
-                                conversationManager.clearConversation(conv.characterId, conv.isNSFW)
+                                conversationManager.saveConversation(conv.characterId, emptyList(), conv.isNSFW)
                                 // Recharger
                                 conversations = conversations.filter { 
                                     it.characterId != conv.characterId || it.isNSFW != conv.isNSFW 

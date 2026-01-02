@@ -71,7 +71,7 @@ fun CharacterProfileScreen(
                     onEditClick?.let {
                         IconButton(onClick = it) {
                             Icon(
-                                imageVector = Icons.Default.Edit,
+                                imageVector = Icons.Filled.Edit,
                                 contentDescription = "Modifier",
                                 tint = MaterialTheme.colorScheme.primary
                             )
