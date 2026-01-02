@@ -39,6 +39,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     private val _age = MutableStateFlow("")
     val age: StateFlow<String> = _age.asStateFlow()
     
+    private val _gender = MutableStateFlow("")
+    val gender: StateFlow<String> = _gender.asStateFlow()
+    
     private val _height = MutableStateFlow("")
     val height: StateFlow<String> = _height.asStateFlow()
     
@@ -50,6 +53,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     
     private val _bodyType = MutableStateFlow("")
     val bodyType: StateFlow<String> = _bodyType.asStateFlow()
+    
+    private val _bustSize = MutableStateFlow("")
+    val bustSize: StateFlow<String> = _bustSize.asStateFlow()
     
     private val _temperament = MutableStateFlow("")
     val temperament: StateFlow<String> = _temperament.asStateFlow()
@@ -87,10 +93,12 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     fun updateDescription(value: String) { _description.value = value }
     fun updatePhysicalDescription(value: String) { _physicalDescription.value = value }
     fun updateAge(value: String) { _age.value = value }
+    fun updateGender(value: String) { _gender.value = value }
     fun updateHeight(value: String) { _height.value = value }
     fun updateHairColor(value: String) { _hairColor.value = value }
     fun updateEyeColor(value: String) { _eyeColor.value = value }
     fun updateBodyType(value: String) { _bodyType.value = value }
+    fun updateBustSize(value: String) { _bustSize.value = value }
     fun updateTemperament(value: String) { _temperament.value = value }
     fun updateScenario(value: String) { _scenario.value = value }
     fun updateGreetingMessage(value: String) { _greetingMessage.value = value }
@@ -137,9 +145,11 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         
                         // Auto-remplir les champs individuels
                         _age.value = description.age
+                        _gender.value = description.gender
                         _hairColor.value = description.hairColor
                         _eyeColor.value = description.eyeColor
                         _bodyType.value = description.bodyType
+                        _bustSize.value = description.bustSize
                         _height.value = description.height
                         
                         _analysisResult.value = "✅ Analyse terminée avec succès ! (Hugging Face)"
@@ -273,10 +283,12 @@ Tu participes à un roleplay adulte (18+). Tu peux discuter de sujets intimes, s
                     personality = "[]", // TODO: gérer la liste
                     physicalDescription = _physicalDescription.value,
                     age = _age.value,
+                    gender = _gender.value,
                     height = _height.value,
                     hairColor = _hairColor.value,
                     eyeColor = _eyeColor.value,
                     bodyType = _bodyType.value,
+                    bustSize = _bustSize.value,
                     distinctiveFeatures = "[]",
                     scenario = _scenario.value,
                     backgroundStory = "",

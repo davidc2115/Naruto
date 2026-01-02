@@ -15,11 +15,12 @@ data class Character(
     // NOUVEAUX CHAMPS pour présentation détaillée
     val physicalDescription: String = "", // Description physique détaillée
     val age: String = "", // Âge ou tranche d'âge
+    val gender: String = "", // Genre: Homme, Femme, Non-binaire, Autre
     val height: String = "", // Taille
     val hairColor: String = "", // Couleur de cheveux
     val eyeColor: String = "", // Couleur des yeux
     val bodyType: String = "", // Type de corps
-    val bustSize: String = "", // Taille de poitrine (pour personnages féminins)
+    val bustSize: String = "", // Taille de poitrine (pour personnages féminins): Ex: "Bonnet B", "Poitrine généreuse (D)", etc.
     val distinctiveFeatures: List<String> = emptyList(), // Traits distinctifs
     
     val scenario: String = "", // Scénario/Background story

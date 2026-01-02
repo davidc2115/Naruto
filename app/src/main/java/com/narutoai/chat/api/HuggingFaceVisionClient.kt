@@ -192,6 +192,20 @@ class HuggingFaceVisionClient(private val context: Context) {
             else -> "Silhouette équilibrée"
         }
         
+        // Détecter taille de poitrine (si féminin)
+        val bustSize = if (gender == "Femme") {
+            when {
+                lowerDesc.contains("large breast") || lowerDesc.contains("big breast") -> "Poitrine généreuse (Bonnet D+)"
+                lowerDesc.contains("medium breast") || lowerDesc.contains("average breast") -> "Poitrine moyenne (Bonnet C)"
+                lowerDesc.contains("small breast") || lowerDesc.contains("petite breast") -> "Petite poitrine (Bonnet A-B)"
+                lowerDesc.contains("curvy") || lowerDesc.contains("voluptuous") -> "Poitrine généreuse (Bonnet D)"
+                lowerDesc.contains("slim") || lowerDesc.contains("slender") -> "Poitrine petite (Bonnet A)"
+                else -> "Poitrine moyenne (Bonnet B-C)"
+            }
+        } else {
+            ""
+        }
+        
         // Construire description détaillée
         val detailedDescription = buildString {
             append("$gender de $age, ")
@@ -207,6 +221,7 @@ class HuggingFaceVisionClient(private val context: Context) {
             eyeColor = eyeColor,
             skinTone = "Peau naturelle",
             bodyType = bodyType,
+            bustSize = bustSize,
             height = "Taille moyenne",
             facialFeatures = "Traits harmonieux",
             distinctiveFeatures = "Voir description détaillée",

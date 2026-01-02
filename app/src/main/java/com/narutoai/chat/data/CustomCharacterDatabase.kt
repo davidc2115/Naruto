@@ -21,10 +21,12 @@ data class CustomCharacterEntity(
     // Détails physiques
     val physicalDescription: String = "",
     val age: String = "",
+    val gender: String = "", // Genre: Homme, Femme, Non-binaire, Autre
     val height: String = "",
     val hairColor: String = "",
     val eyeColor: String = "",
     val bodyType: String = "",
+    val bustSize: String = "", // Taille de poitrine (personnages féminins)
     val distinctiveFeatures: String = "", // JSON array
     
     // Background
@@ -79,7 +81,7 @@ interface CustomCharacterDao {
  */
 @Database(
     entities = [CustomCharacterEntity::class, CustomGalleryImage::class],
-    version = 2,
+    version = 3, // Incrémenté pour nouveaux champs gender et bustSize
     exportSchema = false
 )
 abstract class CustomCharacterDatabase : RoomDatabase() {

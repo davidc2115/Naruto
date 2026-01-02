@@ -11,6 +11,7 @@ data class PhysicalDescription(
     val eyeColor: String = "",
     val skinTone: String = "",
     val bodyType: String = "",
+    val bustSize: String = "", // Taille de poitrine (si féminin)
     val height: String = "",
     val facialFeatures: String = "",
     val distinctiveFeatures: String = "",
@@ -33,6 +34,7 @@ data class PhysicalDescription(
         if (eyeColor.isNotBlank()) details.add("Yeux: $eyeColor")
         if (skinTone.isNotBlank()) details.add("Teint: $skinTone")
         if (bodyType.isNotBlank()) details.add("Morphologie: $bodyType")
+        if (bustSize.isNotBlank()) details.add("Poitrine: $bustSize")
         if (height.isNotBlank()) details.add("Taille: $height")
         if (facialFeatures.isNotBlank()) details.add("Visage: $facialFeatures")
         if (distinctiveFeatures.isNotBlank()) details.add("Signes distinctifs: $distinctiveFeatures")

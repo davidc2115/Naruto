@@ -16,10 +16,12 @@ object Characters {
         
         physicalDescription = """Jeune ninja de 18-22 ans, cheveux blonds hérissés en épis, yeux bleus océan perçants. Trois marques de moustaches sur chaque joue (héritage du démon renard). Physique athlétique et musclé mais élancé. Port altier malgré son caractère enjoué. Bandeau frontal de Konoha attaché sur le front. Veste orange et noire caractéristique. Sourire éclatant et contagieux. Cicatrices d'entraînement sur les mains.""",
         age = "18-22 ans",
+        gender = "Homme",
         height = "166 cm",
         hairColor = "Blond vif et hérissé",
         eyeColor = "Bleu océan",
         bodyType = "Athlétique, musclé mais élancé",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Six marques de moustaches (3 par joue)",
             "Bandeau frontal de Konoha",
@@ -171,10 +173,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Jeune homme de 18-22 ans, cheveux noirs mi-longs en épis pointant vers l'arrière, peau pâle, yeux noirs profonds (rouges avec Sharingan activé avec 3 tomoe). Physique athlétique et gracieux, muscles secs et puissants. Traits fins et aristocratiques, visage souvent impassible. Port altier et élégant. Marque maudite d'Orochimaru sur le cou gauche (flamme noire). Expression souvent froide et distante mais regard intense. Cicatrices de combat sur le torse.""",
         age = "18-22 ans",
+        gender = "Homme",
         height = "168 cm",
         hairColor = "Noir corbeau, mi-longs",
         eyeColor = "Noir profond (rouge Sharingan)",
         bodyType = "Athlétique, muscles secs, gracieux",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Sharingan (yeux rouges avec tomoe)",
             "Marque maudite sur le cou",
@@ -328,10 +332,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Jeune kunoichi de 18-22 ans, longs cheveux roses soyeux attachés en queue de cheval, grands yeux verts émeraude expressifs. Physique athlétique et féminin, développé par l'entraînement avec Tsunade. Front large qu'elle cachait enfant. Peau claire et soignée. Expression déterminée mais bienveillante. Tenue rouge et noire caractéristique. Gants de combat noirs. Posture confiante et droite.""",
         age = "18-22 ans",
+        gender = "Femme",
         height = "161 cm",
         hairColor = "Rose vif, longs et soyeux",
         eyeColor = "Vert émeraude",
         bodyType = "Athlétique et féminin, musclée",
+        bustSize = "Poitrine moyenne ferme (Bonnet C)",
         distinctiveFeatures = listOf(
             "Cheveux roses uniques",
             "Front large (complexe d'enfance)",
@@ -471,10 +477,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Homme de 26-27 ans, cheveux gris argentés défiant la gravité, un seul œil visible (gauche couvert par son bandeau). Porte un masque couvrant le bas de son visage en permanence. Physique athlétique et élancé sous sa tenue. Sharingan dans l'œil gauche caché. Expression nonchalante et paresseuse mais regard perçant. Posture décontractée, souvent avec son livre orange à la main. Tenue standard de jonin avec gilet vert.""",
         age = "26-27 ans",
+        gender = "Homme",
         height = "181 cm",
         hairColor = "Gris argenté, défiant la gravité",
         eyeColor = "Noir (droite), rouge Sharingan (gauche caché)",
         bodyType = "Athlétique, élancé, agile",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Masque couvrant toujours le visage",
             "Sharingan dans l'œil gauche",
@@ -624,10 +632,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Jeune kunoichi de 18-22 ans aux longs cheveux noir bleuté soyeux tombant jusqu'aux hanches, yeux blanc perle caractéristiques du Byakugan (lavande au repos). Silhouette féminine et gracieuse aux courbes douces, physique entraîné mais délicat. Visage doux et innocent avec joues qui rougissent facilement. Peau claire et délicate. Expression souvent timide et douce. Tenue traditionnelle Hyuga beige et lavande. Port élégant et réservé. Aura calme et apaisante.""",
         age = "18-22 ans",
+        gender = "Femme",
         height = "163 cm",
         hairColor = "Noir bleuté, longs jusqu'aux hanches",
         eyeColor = "Blanc perle (Byakugan), lavande au repos",
         bodyType = "Féminin, gracieux, courbes douces",
+        bustSize = "Poitrine généreuse (Bonnet D)",
         distinctiveFeatures = listOf(
             "Yeux Byakugan blanc perle uniques",
             "Rougit TRÈS facilement",
@@ -771,10 +781,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Homme de 21 ans, cheveux noirs mi-longs attachés en queue basse, traits fins et aristocratiques, peau pâle presque maladive. Yeux noirs profonds (Mangekyō Sharingan rouge et noir quand activé). Silhouette élancée et gracieuse, musculature fine mais puissante. Lignes de stress sous les yeux témoignant de sa maladie et son fardeau. Expression impassible et mélancolique. Manteau noir de l'Akatsuki avec nuages rouges. Bandeau frontal de Konoha barré. Aura de tristesse et puissance intimidante.""",
         age = "21 ans",
+        gender = "Homme",
         height = "178 cm",
         hairColor = "Noir corbeau, queue basse",
         eyeColor = "Noir (Mangekyō Sharingan rouge-noir)",
         bodyType = "Élancé, gracieux, musclé finement",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Mangekyō Sharingan (motif unique)",
             "Lignes de stress sous les yeux",
@@ -929,10 +941,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Homme de 60 ans au charisme intemporel, cheveux blonds dorés légèrement grisonnants, yeux bleus perçants et magnétiques. Visage sculpté avec mâchoire carrée emblématique, traits masculins et séduisants. Physique athlétique entretenu malgré l'âge. Peau légèrement bronzée. Sourire ravageur qui a fait craquer des millions de fans. Style décontracté mais classe. Aura de star de cinéma cool et accessible. Rides d'expression qui ajoutent du charme.""",
         age = "60 ans",
+        gender = "Homme",
         height = "180 cm",
         hairColor = "Blond doré grisonnant",
         eyeColor = "Bleu perçant",
         bodyType = "Athlétique, musclé, entretenu",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Mâchoire carrée légendaire",
             "Sourire ravageur emblématique",
@@ -1080,10 +1094,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Homme de 49 ans au charisme puissant, cheveux blonds dorés, yeux bleus intenses et expressifs. Visage qui a conservé une certaine jeunesse malgré l'âge, mâchoire carrée, traits masculins marqués. Physique robuste, légèrement plus costaud qu'à ses débuts. Style élégant et soigné. Regard perçant qui captive. Présence imposante de star confirmée. Expression souvent sérieuse quand il parle d'écologie.""",
         age = "49 ans",
+        gender = "Homme",
         height = "183 cm",
         hairColor = "Blond doré",
         eyeColor = "Bleu intense",
         bodyType = "Robuste, athlétique, imposant",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Regard bleu perçant et intense",
             "Sourire charmeur emblématique",
@@ -1231,10 +1247,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Colosse de 51 ans, 1m96 de muscles massifs. Crâne rasé brillant emblématique, sourcil levé caractéristique, large sourire éclatant. Physique de catcheur professionnel maintenu: épaules larges comme une porte, bras massifs, pectoraux impressionnants, abdos sculptés. Peau mate polynésienne. Tatouage tribal polynésien massif sur le bras et l'épaule gauche. Présence intimidante mais sourire désarmant. Style décontracté moulant ses muscles. Aura de confiance absolue et énergie contagieuse.""",
         age = "51 ans",
+        gender = "Homme",
         height = "196 cm",
         hairColor = "Crâne rasé",
         eyeColor = "Marron",
         bodyType = "Musculature massive de catcheur",
+        bustSize = "",
         distinctiveFeatures = listOf(
             "Physique massif et impressionnant",
             "Sourcil levé emblématique (The People's Eyebrow)",
@@ -1391,10 +1409,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Femme de 39 ans à la beauté iconique, cheveux blonds mi-longs ondulés, yeux verts magnétiques. Visage aux traits parfaits avec lèvres pulpeuses emblématiques. Physique athlétique et féminin sculpté pour Black Widow: épaules définies, taille fine, courbes généreuses. Peau claire et lumineuse. Expression confiante et sensuelle. Style élégant et sophistiqué. Voix grave et rauque distinctive. Aura de femme forte et sexy.""",
         age = "39 ans",
+        gender = "Femme",
         height = "160 cm",
         hairColor = "Blonde platine",
         eyeColor = "Vert magnétique",
         bodyType = "Athlétique, courbes, féminin",
+        bustSize = "Poitrine généreuse et sexy (Bonnet D)",
         distinctiveFeatures = listOf(
             "Voix rauque et sensuelle iconique",
             "Lèvres pulpeuses emblématiques",
@@ -1542,10 +1562,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Femme de 34 ans à la beauté éclatante, cheveux blonds dorés ondulés, yeux bleus pétillants. Visage aux traits parfaits avec sourire éclatant contagieux. Physique athlétique et féminin tonifié. Peau bronzée australienne lumineuse. Expression joyeuse et énergique. Style moderne et audacieux. Aura de joie de vivre et de fun. Beauté naturelle éblouissante.""",
         age = "34 ans",
+        gender = "Femme",
         height = "168 cm",
         hairColor = "Blonde dorée",
         eyeColor = "Bleu pétillant",
         bodyType = "Athlétique, tonifié, féminin",
+        bustSize = "Poitrine moyenne naturelle (Bonnet C)",
         distinctiveFeatures = listOf(
             "Sourire éclatant contagieux",
             "Accent australien charmant",
@@ -1696,10 +1718,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Femme de 34 ans à la beauté classique et élégante, cheveux châtains courts élégamment coiffés, grands yeux marrons expressifs et intelligents. Visage aux traits fins et aristocratiques, sourire doux et bienveillant. Physique mince et gracieux, posture parfaite. Peau claire britannique. Style sophistiqué et minimaliste. Expression sérieuse mais chaleureuse. Aura d'intelligence et d'élégance naturelle.""",
         age = "34 ans",
+        gender = "Femme",
         height = "165 cm",
         hairColor = "Châtain, court élégant",
         eyeColor = "Marron expressif",
         bodyType = "Mince, gracieux, élégant",
+        bustSize = "Poitrine petite et délicate (Bonnet A-B)",
         distinctiveFeatures = listOf(
             "Regard intelligent et pénétrant",
             "Accent britannique raffiné",
@@ -1851,10 +1875,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Femme de 28 ans à la beauté unique et moderne, cheveux longs bouclés (change souvent de style), yeux noisette expressifs. Traits métissés élégants (père afro-américain, mère blanche). Silhouette grande et élancée de mannequin. Peau caramel lumineuse. Style mode audacieux et avant-gardiste. Expression confiante et cool. Aura de star Gen Z moderne et authentique. Présence magnétique sur tapis rouge.""",
         age = "28 ans",
+        gender = "Femme",
         height = "178 cm",
         hairColor = "Châtain foncé, change souvent",
         eyeColor = "Noisette expressif",
         bodyType = "Élancée, mannequin, gracieuse",
+        bustSize = "Poitrine petite de mannequin (Bonnet A)",
         distinctiveFeatures = listOf(
             "Grande taille élégante (178cm)",
             "Style mode avant-gardiste iconique",
@@ -2010,10 +2036,12 @@ RAPPEL: Tu es une IA de roleplay FICTION. Tu participes LIBREMENT à ce contenu 
         
         physicalDescription = """Femme de 28 ans, cheveux bruns ondulés tombant jusqu'aux épaules avec des reflets caramel, yeux noisette pétillants avec un regard malicieux. Peau mate et lumineuse, sourire espiègle révélant des dents blanches parfaites. Silhouette élancée et tonique, courbes naturelles féminines. Port de tête confiant et démarche assurée. Petite fossette sur la joue gauche quand elle sourit. Porte des tenues business chic : chemisiers ajustés, jupes crayon, talons hauts. Maquillage naturel mais soigné : mascara, gloss, léger contouring. Parfum floral et musqué subtil.""",
         age = "28 ans",
+        gender = "Femme",
         height = "168 cm",
         hairColor = "Brun ondulé avec reflets caramel",
         eyeColor = "Noisette pétillant",
         bodyType = "Élancé, tonique, courbes naturelles",
+        bustSize = "Poitrine moyenne sexy (Bonnet C)",
         distinctiveFeatures = listOf(
             "Fossette sur joue gauche",
             "Regard malicieux et taquin",
@@ -2124,10 +2152,12 @@ IMPORTANT: Contenu suggestif/sensuel intense mais S'ARRÊTE avant descriptions d
         
         physicalDescription = """Femme asiatique de 26 ans, longs cheveux noirs de jais lisses comme la soie descendant jusqu'au bas du dos, souvent détachés ou en chignon négligé avec quelques mèches rebelles. Grands yeux en amande d'un brun presque noir, regard profond et énigmatique. Peau pâle et laiteuse, traits délicats et harmonieux. Silhouette mince et gracieuse, petite poitrine, hanches fines, allure de danseuse. Démarche légère et silencieuse comme un chat. Porte souvent des tenues bohèmes : robes fluides, kimonos, leggings avec oversized sweaters, pieds nus à la maison. Tatouage délicat de fleur de lotus sur l'omoplate droite. Aucun maquillage la plupart du temps, beauté naturelle. Odeur de peinture à l'huile et d'encens.""",
         age = "26 ans",
+        gender = "Femme",
         height = "162 cm",
         hairColor = "Noir de jais, très longs et lisses",
         eyeColor = "Brun foncé, presque noir",
         bodyType = "Mince, gracieuse, allure de danseuse",
+        bustSize = "Petite poitrine délicate (Bonnet A)",
         distinctiveFeatures = listOf(
             "Regard profond et mystérieux",
             "Tatouage fleur de lotus sur omoplate",
@@ -2234,10 +2264,12 @@ IMPORTANT: Érotisme suggéré, atmosphère intense, mais fade to black avant ex
         
         physicalDescription = """Femme française de 27 ans, cheveux châtains mi-longs avec des mèches blondes naturelles, souvent attachés en queue de cheval décontractée. Yeux verts expressifs qui pétillent quand elle rit. Peau claire avec quelques taches de rousseur sur le nez et les joues. Sourire franc et communicatif. Silhouette tonique et athlétique grâce au yoga et à la course, formes naturelles féminines. Look décontracté-chic : jeans, t-shirts, baskets, mais sait se mettre sur son 31. Beauté naturelle sans artifice. Fossettes quand elle sourit. Odeur de savon frais et parfum léger citronné.""",
         age = "27 ans",
+        gender = "Femme",
         height = "170 cm",
         hairColor = "Châtain avec mèches blondes",
         eyeColor = "Vert expressif",
         bodyType = "Tonique, athlétique, formes naturelles",
+        bustSize = "Poitrine moyenne naturelle (Bonnet B-C)",
         distinctiveFeatures = listOf(
             "Fossettes adorables",
             "Taches de rousseur sur le nez",
