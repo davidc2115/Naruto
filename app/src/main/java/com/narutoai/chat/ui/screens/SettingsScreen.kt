@@ -64,8 +64,17 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section Analyse locale (NOUVEAU - 100% local et hors ligne!)
+            // Section Replicate Vision (NOUVEAU - Analyse COMPLÈTE avec IA)
             item {
+                val context = LocalContext.current
+                
+                var replicateKey by remember { 
+                    val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+                    mutableStateOf(prefs.getString("replicate_api_key", "") ?: "")
+                }
+                var showReplicateKeyInput by remember { mutableStateOf(false) }
+                var showReplicatePassword by remember { mutableStateOf(false) }
+                
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -80,16 +89,16 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.PhotoCamera, "Analyse locale")
+                            Icon(Icons.Default.PhotoCamera, "Replicate Vision")
                             Text(
-                                text = "🔍 Analyse d'Images Locale",
+                                text = "🤖 Replicate Vision (LLaVA)",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Analyse BASIQUE et INSTANTANÉE de vos photos, 100% en local sur votre appareil. Aucune connexion internet requise !",
+                            text = "Analyse COMPLÈTE et DÉTAILLÉE avec IA. Utilise LLaVA-13B ou BLIP-2 pour une description physique précise. GRATUIT: 50 req/jour sans carte bancaire !",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                         )
@@ -98,19 +107,88 @@ fun SettingsScreen(
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            InfoChip("✅ Aucune API externe")
-                            InfoChip("✅ 100% hors ligne")
-                            InfoChip("✅ Instantané (< 1 seconde)")
-                            InfoChip("✅ Privacy totale (rien n'est envoyé)")
-                            InfoChip("✅ Toujours fonctionnel")
+                            InfoChip("✅ Analyse COMPLÈTE par IA")
+                            InfoChip("✅ GRATUIT: 50 requêtes/jour")
+                            InfoChip("✅ Clé simple (10 secondes)")
+                            InfoChip("✅ Modèles LLaVA-13B / BLIP-2")
                         }
                         
-                        Text(
-                            text = "Note: L'analyse est basique (teint, couleurs dominantes). Complétez manuellement pour plus de précision.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f),
-                            fontWeight = FontWeight.Light
-                        )
+                        if (replicateKey.isEmpty() || showReplicateKeyInput) {
+                            OutlinedTextField(
+                                value = replicateKey,
+                                onValueChange = { replicateKey = it },
+                                label = { Text("Clé API Replicate") },
+                                placeholder = { Text("r8_...") },
+                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = if (showReplicatePassword) VisualTransformation.None else PasswordVisualTransformation(),
+                                trailingIcon = {
+                                    IconButton(onClick = { showReplicatePassword = !showReplicatePassword }) {
+                                        Icon(
+                                            if (showReplicatePassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                            null
+                                        )
+                                    }
+                                },
+                                singleLine = true
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
+                                        prefs.edit().putString("replicate_api_key", replicateKey).apply()
+                                        showReplicateKeyInput = false
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = replicateKey.startsWith("r8_")
+                                ) {
+                                    Icon(Icons.Default.Save, null)
+                                    Spacer(Modifier.width(4.dp))
+                                    Text("Enregistrer")
+                                }
+                                
+                                if (replicateKey.isNotEmpty()) {
+                                    OutlinedButton(
+                                        onClick = { showReplicateKeyInput = false },
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text("Annuler")
+                                    }
+                                }
+                            }
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "✅ Clé configurée: ${replicateKey.take(10)}...${replicateKey.takeLast(4)}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                IconButton(onClick = { showReplicateKeyInput = true }) {
+                                    Icon(Icons.Default.Edit, "Modifier")
+                                }
+                            }
+                        }
+                        
+                        OutlinedButton(
+                            onClick = { 
+                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                                    data = android.net.Uri.parse("https://replicate.com/account/api-tokens")
+                                }
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.OpenInNew, null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Obtenir clé gratuite (10s)")
+                        }
                     }
                 }
             }
@@ -238,10 +316,10 @@ fun SettingsScreen(
                         }
                         
                         InfoRow("🚀 Groq API", "Chat uniquement (console.groq.com)")
-                        InfoRow("🔍 Analyse locale", "Basique, instantanée, hors ligne")
+                        InfoRow("🤖 Replicate Vision", "Analyse IA COMPLÈTE (LLaVA)")
                         InfoRow("🖼️ Pollination AI", "Génération images/vidéos gratuite")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
-                        InfoRow("📊 Analyse locale", "Illimitée (100% local)")
+                        InfoRow("📊 Limite Replicate", "50 req/jour GRATUIT")
                         InfoRow("🔄 Rotation", "Automatique entre clés Groq")
                     }
                 }
