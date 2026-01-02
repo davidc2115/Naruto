@@ -69,12 +69,20 @@ fun MainScreen(
                 )
             }
             
-            // Create
+            // Create - naviguer immédiatement vers l'écran de création
             composable(BottomNavItem.Create.route) {
-                // Rediriger vers l'écran de création
                 LaunchedEffect(Unit) {
                     onCreateCharacter()
+                    // Retourner à l'onglet Explorer après navigation
+                    navController.navigate(BottomNavItem.Explorer.route) {
+                        popUpTo(BottomNavItem.Explorer.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
                 }
+                // Afficher temporairement Explorer pendant la transition
+                ExplorerScreen(
+                    onCharacterClick = onCharacterClick
+                )
             }
             
             // Admin

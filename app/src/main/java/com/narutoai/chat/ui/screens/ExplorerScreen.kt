@@ -1,5 +1,6 @@
 package com.narutoai.chat.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -14,12 +15,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.narutoai.chat.data.Characters
 import com.narutoai.chat.models.Character
 import com.narutoai.chat.models.CharacterCategory
@@ -47,6 +51,7 @@ fun ExplorerScreen(
             systemPromptSFW = entity.systemPromptSFW,
             systemPromptNSFW = entity.systemPromptNSFW,
             avatarEmoji = "👤",
+            thumbnailUrl = entity.avatarImagePath, // Utiliser l'image du personnage custom
             personality = try { 
                 org.json.JSONArray(entity.personality).let { arr ->
                     (0 until arr.length()).map { arr.getString(it) }
@@ -219,44 +224,76 @@ private fun CharacterCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
+            .height(220.dp)
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Emoji/Avatar
-            Text(
-                text = character.avatarEmoji,
-                fontSize = 48.sp,
-                modifier = Modifier.padding(8.dp)
-            )
+            // Image du personnage (occupe 60% de la carte)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.6f)
+            ) {
+                AsyncImage(
+                    model = when {
+                        character.thumbnailUrl.isNotEmpty() -> character.thumbnailUrl
+                        character.imageResId != 0 -> character.imageResId
+                        else -> null
+                    },
+                    contentDescription = character.name,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentScale = ContentScale.Crop
+                )
+                
+                // Fallback si pas d'image: afficher emoji
+                if (character.thumbnailUrl.isEmpty() && character.imageResId == 0) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = character.avatarEmoji,
+                            fontSize = 48.sp
+                        )
+                    }
+                }
+            }
             
-            // Nom
-            Text(
-                text = character.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            
-            // Description courte
-            Text(
-                text = character.description,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Informations du personnage (40% restants)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.4f)
+                    .padding(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Nom
+                Text(
+                    text = character.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                
+                // Description courte
+                Text(
+                    text = character.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

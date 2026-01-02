@@ -1,9 +1,11 @@
 package com.narutoai.chat.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.narutoai.chat.data.Characters
@@ -15,6 +17,15 @@ import com.narutoai.chat.viewmodel.ChatViewModel
 @Composable
 fun NarutoAIChatApp(viewModel: ChatViewModel) {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    
+    // Gérer le bouton back système
+    BackHandler(enabled = currentRoute != "main") {
+        if (navController.previousBackStackEntry != null) {
+            navController.popBackStack()
+        }
+    }
     
     NavHost(
         navController = navController,
