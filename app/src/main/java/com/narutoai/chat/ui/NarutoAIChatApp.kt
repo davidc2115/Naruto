@@ -109,8 +109,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
             )
         }
         
-        Screen.CREATE_CHARACTER::class -> {
-            val editId = (screen as? Screen.CREATE_CHARACTER)?.editCharacterId
+        is Screen.CREATE_CHARACTER -> {
             CreateCharacterScreen(
                 onNavigateBack = {
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
@@ -119,7 +118,7 @@ fun NarutoAIChatApp(viewModel: ChatViewModel) {
                     // Rediriger vers la liste pour voir le personnage créé
                     currentScreen = Screen.CUSTOM_CHARACTERS_LIST
                 },
-                editCharacterId = editId
+                editCharacterId = screen.editCharacterId
             )
         }
         
