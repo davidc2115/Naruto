@@ -130,7 +130,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
         
         viewModelScope.launch {
             _isAnalyzing.value = true
-            _analysisResult.value = "🔍 Analyse avec Hugging Face Vision AI (GRATUIT)..."
+            _analysisResult.value = "📸 Chargement de l'image..."
             _errorMessage.value = null
             
             try {
@@ -157,9 +157,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         _penisSize.value = description.penisSize
                         _height.value = description.height
                         
-                        _analysisResult.value = "✅ Analyse terminée avec succès ! (Hugging Face)"
+                        _analysisResult.value = "✅ Image chargée ! Remplissez manuellement les champs"
                         
-                        android.util.Log.d("CreateCharacterVM", "✨ Analyse HuggingFace réussie: $description")
+                        android.util.Log.d("CreateCharacterVM", "✨ Image chargée, template créé: $description")
                     } else {
                         _analysisResult.value = "⚠️ Analyse incomplète"
                         _errorMessage.value = "L'analyse n'a pas pu extraire toutes les informations"
@@ -169,7 +169,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                     _analysisResult.value = "❌ Échec de l'analyse"
                     _errorMessage.value = "Erreur: ${error?.message ?: "Inconnue"}"
                     
-                    android.util.Log.e("CreateCharacterVM", "❌ Erreur analyse HuggingFace: ${error?.message}", error)
+                    android.util.Log.e("CreateCharacterVM", "❌ Erreur chargement image: ${error?.message}", error)
                 }
                 
             } catch (e: Exception) {

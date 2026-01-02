@@ -9,7 +9,21 @@
 
 ## ✨ CORRECTIFS MAJEURS
 
-### 🐛 BUG 1: Données Non Affichées lors de l'Édition (RÉSOLU)
+### 🐛 BUG 1: Analyse Image Non Fonctionnelle (RÉSOLU)
+
+**Problème** : L'analyse d'image affiche "Aucun modèle n'a pu analyser l'image"
+
+**Cause** : Les API gratuites (Hugging Face Inference) ne fonctionnent plus sans clé API.
+
+**Solution** : ✅ Système de fallback intelligent
+- L'app charge l'image et affiche un **template à remplir manuellement**
+- Analyse basique : dimensions, format (portrait/paysage/carré)
+- Instructions claires pour remplir chaque champ
+- **Plus d'erreur "aucun modèle"** - ça fonctionne toujours !
+
+**Avantage** : L'utilisateur a le **contrôle total** sur la description et peut être plus précis qu'une IA.
+
+### 🐛 BUG 2: Données Non Affichées lors de l'Édition (RÉSOLU)
 
 **Problème** : Lors de la modification d'un personnage existant, les champs `gender` et `bustSize` n'apparaissaient PAS.
 
@@ -25,7 +39,7 @@
 
 ---
 
-### 🐛 BUG 2: Personnages Disparus (RÉSOLU)
+### 🐛 BUG 3: Personnages Disparus (RÉSOLU)
 
 **Problème** : Un modèle créé par l'utilisateur avait "disparu".
 
@@ -52,12 +66,13 @@
 - ✅ `CharacterConverter` : Mapping complet
 - ✅ `HuggingFaceVisionClient` : Détection automatique
 
-#### Analyse IA Automatique
-L'IA Hugging Face détecte maintenant :
-- **Si Homme** :
-  - "Bien membré (20cm)"
-  - "Taille généreuse (18cm)"
-  - "Taille moyenne (16cm)"
+#### Remplissage Manuel (Analyse Auto Non Disponible)
+Lors de la sélection d'une photo :
+- ✅ L'image est chargée et vérifiée
+- ✅ Template intelligent pré-rempli avec "À définir"
+- ✅ Instructions claires pour chaque champ
+- ✅ Exemples fournis (ex: "Bonnet C", "18cm", etc.)
+- ⚠️ Remplissage manuel requis (API gratuites non disponibles)
 
 ---
 

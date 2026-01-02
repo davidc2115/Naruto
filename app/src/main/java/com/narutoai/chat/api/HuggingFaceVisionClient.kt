@@ -32,55 +32,60 @@ class HuggingFaceVisionClient(private val context: Context) {
     
     /**
      * Analyser une image pour créer un descriptif physique détaillé
-     * GRATUIT et ILLIMITÉ via Hugging Face Inference API
+     * FALLBACK SIMPLE: Retourne un template à remplir manuellement
      */
     suspend fun analyzePhotoForCharacter(imageUri: Uri): Result<PhysicalDescription> = withContext(Dispatchers.IO) {
         try {
-            // 1. Charger et compresser l'image
+            // 1. Charger l'image pour vérifier qu'elle existe
             val bitmap = loadBitmapFromUri(imageUri)
                 ?: return@withContext Result.failure(Exception("Impossible de charger l'image"))
             
-            val base64Image = bitmapToBase64(bitmap)
+            // 2. Analyser les dimensions et luminosité de base
+            val width = bitmap.width
+            val height = bitmap.height
+            val aspectRatio = width.toFloat() / height.toFloat()
             
-            // 2. Essayer plusieurs modèles pour une analyse complète
-            val descriptions = mutableListOf<String>()
+            // 3. Heuristiques simples basées sur l'aspect ratio
+            val isPortrait = aspectRatio < 0.8f
+            val isLandscape = aspectRatio > 1.2f
             
-            // Essayer BLIP-2 (meilleur modèle)
-            try {
-                val blip2Desc = queryHuggingFaceVision(BLIP2_MODEL, base64Image)
-                if (blip2Desc.isNotBlank()) descriptions.add(blip2Desc)
-            } catch (e: Exception) {
-                // Continue avec autres modèles
-            }
-            
-            // Essayer BLIP original (fallback)
-            try {
-                val blipDesc = queryHuggingFaceVision(BLIP_MODEL, base64Image)
-                if (blipDesc.isNotBlank()) descriptions.add(blipDesc)
-            } catch (e: Exception) {
-                // Continue
-            }
-            
-            // Essayer GIT (fallback 2)
-            try {
-                val gitDesc = queryHuggingFaceVision(GIT_MODEL, base64Image)
-                if (gitDesc.isNotBlank()) descriptions.add(gitDesc)
-            } catch (e: Exception) {
-                // Continue
-            }
-            
-            if (descriptions.isEmpty()) {
-                return@withContext Result.failure(Exception("Aucun modèle n'a pu analyser l'image"))
-            }
-            
-            // 3. Combiner les descriptions et extraire infos physiques
-            val combinedDescription = descriptions.joinToString(" • ")
-            val analysis = parsePhysicalDescription(combinedDescription)
+            // 4. Créer un template intelligent
+            val analysis = PhysicalDescription(
+                age = "25-35 ans",
+                gender = if (isPortrait) "À définir" else "À définir",
+                hairColor = "À définir (ex: Blond, Brun, Noir, Roux)",
+                eyeColor = "À définir (ex: Bleu, Vert, Marron, Noisette)",
+                skinTone = "À définir (ex: Claire, Mate, Bronzée, Foncée)",
+                bodyType = "À définir (ex: Athlétique, Mince, Musclé, Courbes)",
+                bustSize = "À définir si féminin (ex: Bonnet A, B, C, D)",
+                penisSize = "À définir si masculin (ex: 16cm, 18cm, 20cm)",
+                height = "À définir (ex: 160cm, 170cm, 180cm)",
+                facialFeatures = "À définir (ex: Traits fins, Mâchoire carrée, Visage rond)",
+                distinctiveFeatures = "À définir (ex: Tatouages, Piercings, Cicatrices)",
+                detailedDescription = """✅ Image chargée avec succès !
+                    
+📐 Dimensions: ${width}x${height}px
+🖼️ Format: ${if (isPortrait) "Portrait" else if (isLandscape) "Paysage" else "Carré"}
+
+⚠️ ANALYSE AUTOMATIQUE NON DISPONIBLE
+Les API gratuites d'analyse d'image ne sont plus accessibles sans clé.
+
+👉 Veuillez REMPLIR MANUELLEMENT les champs ci-dessus :
+- Genre (Homme/Femme/Non-binaire)
+- Âge approximatif
+- Couleur cheveux et yeux
+- Type de corps
+- Taille de poitrine (si féminin)
+- Taille du sexe (si masculin)
+- Description détaillée physique
+
+💡 Astuce: Regardez bien votre photo et décrivez ce que vous voyez !"""
+            )
             
             Result.success(analysis)
             
         } catch (e: Exception) {
-            Result.failure(Exception("Erreur analyse vision: ${e.message}"))
+            Result.failure(Exception("Erreur chargement image: ${e.message}"))
         }
     }
     
