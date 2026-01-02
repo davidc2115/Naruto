@@ -36,6 +36,7 @@ fun CharacterProfileScreen(
     character: Character,
     onBackClick: () -> Unit,
     onStartChat: (loadSaved: Boolean) -> Unit,
+    onEditClick: (() -> Unit)? = null,
     hasSavedConversation: Boolean = false
 ) {
     var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
@@ -63,6 +64,18 @@ fun CharacterProfileScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour")
+                    }
+                },
+                actions = {
+                    // Bouton modifier (visible seulement si onEditClick est fourni)
+                    onEditClick?.let {
+                        IconButton(onClick = it) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Modifier",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

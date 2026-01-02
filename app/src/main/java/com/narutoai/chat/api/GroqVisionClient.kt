@@ -34,7 +34,7 @@ class GroqVisionClient(private val context: Context) {
         )
         
         // Clé API Groq (à déplacer dans BuildConfig en production)
-        private const val GROQ_API_KEY = "gsk_" + "H77IcW3q2ItqE1fOnkGNWGdyb3FYWfTlZS5HfjI2XmfxZZLPAm4P"
+        private const val GROQ_API_KEY = "gsk_" + "FHRl6rM3PBddLdfIJFpaWGdyb3FYisdDFxdZcnhAwFkJhtlsilOl"
     }
     
     /**
