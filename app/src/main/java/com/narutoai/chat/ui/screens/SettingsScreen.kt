@@ -64,17 +64,8 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section Replicate Vision (NOUVEAU - Analyse COMPLÈTE avec IA)
+            // Section Groq Vision (utilise les clés Groq configurées)
             item {
-                val context = LocalContext.current
-                
-                var replicateKey by remember { 
-                    val prefs = context.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
-                    mutableStateOf(prefs.getString("replicate_api_key", "") ?: "")
-                }
-                var showReplicateKeyInput by remember { mutableStateOf(false) }
-                var showReplicatePassword by remember { mutableStateOf(false) }
-                
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -89,16 +80,16 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.PhotoCamera, "Replicate Vision")
+                            Icon(Icons.Default.PhotoCamera, "Groq Vision")
                             Text(
-                                text = "🤖 Replicate Vision (LLaVA)",
+                                text = "👁️ Groq Vision",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
                         Text(
-                            text = "Analyse COMPLÈTE et DÉTAILLÉE avec IA. Utilise LLaVA-13B ou BLIP-2 pour une description physique précise. GRATUIT: 50 req/jour sans carte bancaire !",
+                            text = "Analyse d'images avec Groq Vision. Utilise automatiquement vos clés API Groq configurées ci-dessous. Modèles actifs: llama-3.2-90b-vision-instruct, llama-3.2-11b-vision-preview, llava-v1.5-7b-4096-preview.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                         )
@@ -107,88 +98,10 @@ fun SettingsScreen(
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            InfoChip("✅ Analyse COMPLÈTE par IA")
-                            InfoChip("✅ GRATUIT: 50 requêtes/jour")
-                            InfoChip("✅ Clé simple (10 secondes)")
-                            InfoChip("✅ Modèles LLaVA-13B / BLIP-2")
-                        }
-                        
-                        if (replicateKey.isEmpty() || showReplicateKeyInput) {
-                            OutlinedTextField(
-                                value = replicateKey,
-                                onValueChange = { replicateKey = it },
-                                label = { Text("Clé API Replicate") },
-                                placeholder = { Text("r8_...") },
-                                modifier = Modifier.fillMaxWidth(),
-                                visualTransformation = if (showReplicatePassword) VisualTransformation.None else PasswordVisualTransformation(),
-                                trailingIcon = {
-                                    IconButton(onClick = { showReplicatePassword = !showReplicatePassword }) {
-                                        Icon(
-                                            if (showReplicatePassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                            null
-                                        )
-                                    }
-                                },
-                                singleLine = true
-                            )
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Button(
-                                    onClick = {
-                                        val prefs = context.applicationContext.getSharedPreferences("naruto_ai_prefs", android.content.Context.MODE_PRIVATE)
-                                        prefs.edit().putString("replicate_api_key", replicateKey).apply()
-                                        android.util.Log.d("SettingsScreen", "✅ Clé Replicate sauvegardée: ${replicateKey.take(10)}...${replicateKey.takeLast(4)}")
-                                        showReplicateKeyInput = false
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = replicateKey.startsWith("r8_")
-                                ) {
-                                    Icon(Icons.Default.Save, null)
-                                    Spacer(Modifier.width(4.dp))
-                                    Text("Enregistrer")
-                                }
-                                
-                                if (replicateKey.isNotEmpty()) {
-                                    OutlinedButton(
-                                        onClick = { showReplicateKeyInput = false },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text("Annuler")
-                                    }
-                                }
-                            }
-                        } else {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "✅ Clé configurée: ${replicateKey.take(10)}...${replicateKey.takeLast(4)}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                IconButton(onClick = { showReplicateKeyInput = true }) {
-                                    Icon(Icons.Default.Edit, "Modifier")
-                                }
-                            }
-                        }
-                        
-                        OutlinedButton(
-                            onClick = { 
-                                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
-                                    data = android.net.Uri.parse("https://replicate.com/account/api-tokens")
-                                }
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Default.OpenInNew, null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Obtenir clé gratuite (10s)")
+                            InfoChip("✅ Utilise vos clés Groq existantes")
+                            InfoChip("✅ Fallback automatique entre modèles")
+                            InfoChip("✅ Analyse complète physique")
+                            InfoChip("✅ Modèles vérifiés actifs")
                         }
                     }
                 }
@@ -316,11 +229,10 @@ fun SettingsScreen(
                             )
                         }
                         
-                        InfoRow("🚀 Groq API", "Chat uniquement (console.groq.com)")
-                        InfoRow("🤖 Replicate Vision", "Analyse IA COMPLÈTE (LLaVA)")
+                        InfoRow("🚀 Groq API", "Chat + Vision (console.groq.com)")
+                        InfoRow("👁️ Groq Vision", "Analyse photos (mêmes clés)")
                         InfoRow("🖼️ Pollination AI", "Génération images/vidéos gratuite")
                         InfoRow("📊 Limite Groq", "14,400 req/jour gratuit")
-                        InfoRow("📊 Limite Replicate", "50 req/jour GRATUIT")
                         InfoRow("🔄 Rotation", "Automatique entre clés Groq")
                     }
                 }

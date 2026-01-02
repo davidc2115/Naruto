@@ -118,13 +118,13 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
         
         viewModelScope.launch {
             _isAnalyzing.value = true
-            _analysisResult.value = "🔍 Analyse détaillée avec Replicate (LLaVA)..."
+            _analysisResult.value = "🔍 Analyse avec Groq Vision (modèles actifs)..."
             _errorMessage.value = null
             
             try {
                 val context = getApplication<Application>()
-                // 🆕 Replicate Vision (LLaVA/BLIP-2): Analyse COMPLÈTE et DÉTAILLÉE
-                val visionClient = com.narutoai.chat.api.ReplicateVisionClient(context)
+                // ✅ Retour à Groq Vision avec modèles vérifiés NON décommissionnés
+                val visionClient = com.narutoai.chat.api.GroqVisionClient(context)
                 
                 val result = visionClient.analyzePhotoForCharacter(_avatarImageUri.value!!)
                 
@@ -142,9 +142,9 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         _bodyType.value = description.bodyType
                         _height.value = description.height
                         
-                        _analysisResult.value = "✅ Analyse complète terminée avec Replicate !"
+                        _analysisResult.value = "✅ Analyse terminée avec Groq Vision !"
                         
-                        android.util.Log.d("CreateCharacterVM", "✨ Analyse Replicate réussie: $description")
+                        android.util.Log.d("CreateCharacterVM", "✨ Analyse Groq réussie: $description")
                     } else {
                         _analysisResult.value = "⚠️ Analyse incomplète"
                         _errorMessage.value = "L'analyse n'a pas pu extraire toutes les informations"
@@ -154,14 +154,14 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                     _analysisResult.value = "❌ Échec de l'analyse"
                     _errorMessage.value = "Erreur: ${error?.message ?: "Inconnue"}"
                     
-                    android.util.Log.e("CreateCharacterVM", "❌ Erreur analyse Replicate: ${error?.message}", error)
+                    android.util.Log.e("CreateCharacterVM", "❌ Erreur analyse Groq: ${error?.message}", error)
                 }
                 
             } catch (e: Exception) {
                 _errorMessage.value = "Erreur d'analyse: ${e.message}"
                 _analysisResult.value = "❌ Erreur d'analyse"
                 
-                android.util.Log.e("CreateCharacterVM", "💥 Exception analyse Replicate: ${e.message}", e)
+                android.util.Log.e("CreateCharacterVM", "💥 Exception analyse Groq: ${e.message}", e)
             } finally {
                 _isAnalyzing.value = false
             }
