@@ -85,13 +85,34 @@ class VideoGenerationWorker(
             )
             
             if (imageResult.isFailure) {
-                return@withContext Result.failure(
-                    imageResult.exceptionOrNull() ?: Exception("Échec génération image")
+                val errorMsg = imageResult.exceptionOrNull()?.message ?: "Échec génération image"
+                android.util.Log.e("VideoWorker", "❌ $errorMsg")
+                
+                NotificationHelper.showErrorNotification(
+                    applicationContext,
+                    NotificationHelper.NOTIFICATION_ID_VIDEO,
+                    "Erreur génération image ❌",
+                    errorMsg
                 )
+                
+                val outputData = workDataOf(KEY_ERROR to errorMsg)
+                return@withContext Result.failure(outputData)
             }
             
-            val imageUrl = imageResult.getOrNull() 
-                ?: return@withContext Result.failure(Exception("URL image vide"))
+            val imageUrl = imageResult.getOrNull()
+            if (imageUrl == null) {
+                android.util.Log.e("VideoWorker", "❌ URL image vide")
+                
+                NotificationHelper.showErrorNotification(
+                    applicationContext,
+                    NotificationHelper.NOTIFICATION_ID_VIDEO,
+                    "Erreur génération image ❌",
+                    "URL image vide"
+                )
+                
+                val outputData = workDataOf(KEY_ERROR to "URL image vide")
+                return@withContext Result.failure(outputData)
+            }
             
             android.util.Log.d("VideoWorker", "✅ Image générée: $imageUrl")
             
