@@ -158,7 +158,8 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                     
                     android.util.Log.d("CreateCharacterVM", "✅ Personnage personnalisé chargé pour édition: ${character.name}")
                 } else {
-                    // Pour personnages intégrés, créer/mettre à jour directement avec le même ID
+                    // Si pas trouvé, charger depuis les personnages intégrés
+                    val builtInCharacter = com.narutoai.chat.data.Characters.allCharacters.find { it.id == characterId }
                     if (builtInCharacter != null) {
                         // Modification directe du personnage intégré (pas de copie)
                         _editingCharacterId.value = characterId // Garder le même ID
