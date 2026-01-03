@@ -180,7 +180,20 @@ fun ExplorerScreen(
                                 unifiedCharacter = unified,
                                 onClick = { onCharacterSelected(unified.character) },
                                 onEdit = {
-                                    unified.customEntity?.let { onEditCustomCharacter(it) }
+                                    if (unified.isBuiltIn) {
+                                        // Pour personnages intégrés, passer l'ID du personnage
+                                        onEditCustomCharacter(
+                                            CustomCharacterEntity(
+                                                id = unified.character.id,
+                                                name = "",
+                                                description = "",
+                                                systemPromptSFW = "",
+                                                systemPromptNSFW = ""
+                                            )
+                                        )
+                                    } else {
+                                        unified.customEntity?.let { onEditCustomCharacter(it) }
+                                    }
                                 },
                                 onDelete = {
                                     unified.customEntity?.let {
@@ -376,22 +389,23 @@ fun UnifiedCharacterCard(
                 }
             }
             
-            // Actions (seulement pour personnages créés)
-            if (!isBuiltIn) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+            // Actions (tous les personnages peuvent être édités)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.size(40.dp)
                 ) {
-                    IconButton(
-                        onClick = onEdit,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Éditer",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Éditer",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                // Suppression seulement pour personnages créés
+                if (!isBuiltIn) {
                     IconButton(
                         onClick = onDelete,
                         modifier = Modifier.size(40.dp)

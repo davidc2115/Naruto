@@ -128,6 +128,7 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
     fun loadCharacterForEdit(characterId: String) {
         viewModelScope.launch {
             try {
+                // D'abord essayer de charger depuis la BDD personnalisée
                 val character = repository.getCharacterById(characterId)
                 if (character != null) {
                     _editingCharacterId.value = characterId
@@ -155,9 +156,36 @@ class CreateCharacterViewModel(application: Application) : AndroidViewModel(appl
                         }
                     }
                     
-                    android.util.Log.d("CreateCharacterVM", "✅ Personnage chargé pour édition: ${character.name}")
+                    android.util.Log.d("CreateCharacterVM", "✅ Personnage personnalisé chargé pour édition: ${character.name}")
                 } else {
-                    _errorMessage.value = "Personnage introuvable"
+                    // Si pas trouvé, charger depuis les personnages intégrés
+                    val builtInCharacter = com.narutoai.chat.data.Characters.allCharacters.find { it.id == characterId }
+                    if (builtInCharacter != null) {
+                        // Créer un nouvel ID pour la copie
+                        _editingCharacterId.value = "custom_${java.util.UUID.randomUUID()}"
+                        _name.value = builtInCharacter.name + " (Modifié)"
+                        _description.value = builtInCharacter.description
+                        _physicalDescription.value = builtInCharacter.physicalDescription
+                        _age.value = builtInCharacter.age
+                        _height.value = builtInCharacter.height
+                        _hairColor.value = builtInCharacter.hairColor
+                        _eyeColor.value = builtInCharacter.eyeColor
+                        _bodyType.value = builtInCharacter.bodyType
+                        _gender.value = builtInCharacter.gender
+                        _breastSize.value = builtInCharacter.breastSize
+                        _penisSize.value = builtInCharacter.penisSize
+                        _temperament.value = builtInCharacter.temperament
+                        _scenario.value = builtInCharacter.scenario
+                        _greetingMessage.value = builtInCharacter.greetingMessage
+                        
+                        // Pas d'image pour les personnages intégrés (on utilise imageResId)
+                        _avatarImageUri.value = null
+                        _savedImagePath.value = null
+                        
+                        android.util.Log.d("CreateCharacterVM", "✅ Personnage intégré chargé pour modification: ${builtInCharacter.name}")
+                    } else {
+                        _errorMessage.value = "Personnage introuvable"
+                    }
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Erreur de chargement: ${e.message}"
