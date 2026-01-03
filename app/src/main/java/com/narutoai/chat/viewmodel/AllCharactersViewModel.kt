@@ -38,26 +38,37 @@ class AllCharactersViewModel(application: Application) : AndroidViewModel(applic
     // Liste combinée de tous les personnages
     val allCharacters: StateFlow<List<UnifiedCharacter>> = repository.allCharacters
         .map { customList ->
+            // IDs des personnages modifiés dans la BDD
+            val modifiedBuiltInIds = customList
+                .filter { entity -> Characters.allCharacters.any { it.id == entity.id } }
+                .map { it.id }
+                .toSet()
+            
             val customChars = customList.map { entity ->
+                // Si c'est un personnage intégré modifié, marquer comme tel
+                val isModifiedBuiltIn = entity.id in modifiedBuiltInIds
                 UnifiedCharacter(
                     character = CharacterConverter.toCharacter(entity),
-                    isBuiltIn = false,
+                    isBuiltIn = false, // Toujours false pour les personnages de la BDD
                     customEntity = entity
                 )
             }
             
-            val builtInChars = Characters.allCharacters.map { char ->
-                UnifiedCharacter(
-                    character = char,
-                    isBuiltIn = true,
-                    customEntity = null
-                )
-            }
+            // Filtrer les personnages intégrés qui ont été modifiés (présents dans la BDD)
+            val builtInChars = Characters.allCharacters
+                .filter { char -> char.id !in modifiedBuiltInIds } // Exclure si modifié
+                .map { char ->
+                    UnifiedCharacter(
+                        character = char,
+                        isBuiltIn = true,
+                        customEntity = null
+                    )
+                }
             
-            // Personnages personnalisés en premier, puis intégrés
+            // Personnages personnalisés en premier, puis intégrés non-modifiés
             val combined = customChars + builtInChars
             
-            android.util.Log.d("AllCharactersVM", "📋 Total personnages: ${combined.size} (${customChars.size} créés + ${builtInChars.size} intégrés)")
+            android.util.Log.d("AllCharactersVM", "📋 Total: ${combined.size} personnages (${customChars.size} BDD + ${builtInChars.size} intégrés, ${modifiedBuiltInIds.size} modifiés)")
             
             combined
         }
