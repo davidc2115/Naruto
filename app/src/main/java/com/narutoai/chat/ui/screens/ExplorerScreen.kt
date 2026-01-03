@@ -330,23 +330,8 @@ fun UnifiedCharacterCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     
-                    // Badge "Officiel" pour personnages intégrés
-                    if (isBuiltIn) {
-                        Spacer(Modifier.width(8.dp))
-                        Surface(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(4.dp)
-                        ) {
-                            Text(
-                                text = "OFFICIEL",
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    } else {
-                        // Badge "Créé" pour personnages personnalisés
+                    // Badge "Créé" pour personnages personnalisés
+                    if (!isBuiltIn) {
                         Spacer(Modifier.width(8.dp))
                         Icon(
                             Icons.Default.AutoAwesome,

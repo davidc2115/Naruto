@@ -388,12 +388,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                     
                     Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
                     IMPORTANT: Start with "${character.name}, " to ensure character identity.
-                    Include: ALL physical features listed above (including anatomical details), setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
+                    CRITICAL: YOU MUST include ALL anatomical details (breast size, penis size) explicitly in the generated prompt if they are specified above. DO NOT omit them.
+                    Include: ALL physical features listed above (ESPECIALLY anatomical details like breast size/penis size), setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
                     Respond ONLY with the English prompt, no explanation.
                 """.trimIndent()
                 
                 val promptResult = groqClient.chat(
-                    systemPrompt = "You are an expert at creating detailed prompts for AI image generation. Focus on visual details, lighting, and atmosphere.",
+                    systemPrompt = "You are an expert at creating detailed prompts for AI image generation. Focus on visual details, lighting, and atmosphere. YOU MUST ALWAYS include ALL anatomical details (breast size, penis size) in your prompts when they are specified in the character profile.",
                     userMessage = promptRequest,
                     maxTokens = 150,
                     isNSFW = _isNSFWMode.value // Permettre prompts NSFW
@@ -410,6 +411,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         )
                         return@launch
                     }
+                
+                // Log du prompt final généré par Groq
+                android.util.Log.d("ChatViewModel", "🖼️ PROMPT FINAL pour Pollination AI: $imagePrompt")
                 
                 // Générer en arrière-plan avec notification
                 _messages.value = _messages.value.dropLast(1) + ChatMessage(
