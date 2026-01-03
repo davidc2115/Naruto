@@ -374,46 +374,104 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 android.util.Log.d("ChatViewModel", "🎨 Anatomie pour génération: Poitrine='${character.breastSize}', Pénis='${character.penisSize}'")
                 android.util.Log.d("ChatViewModel", "📝 Détails anatomiques ajoutés au prompt: $anatomyDetails")
                 
-                val promptRequest = """
-                    Based on this conversation with ${character.name}:
-                    $context
+                // NOUVELLE APPROCHE: Construire le prompt DIRECTEMENT sans passer par Groq
+                // pour garantir que TOUS les détails anatomiques sont inclus
+                val imagePrompt = buildString {
+                    append("${character.name}, ")
                     
-                    CHARACTER PROFILE - ${character.name}:
-                    - Name: ${character.name}
-                    - Physical description: ${character.physicalDescription}
-                    - Age: ${character.age}
-                    - Hair: ${character.hairColor}
-                    - Eyes: ${character.eyeColor}
-                    - Body type: ${character.bodyType}$anatomyDetails$nsfwContext
-                    
-                    Create a UNIQUE detailed prompt in ENGLISH (max 75 words) for generating ${if (_isNSFWMode.value) "an NSFW/adult/erotic" else "a hyper-realistic"} image of ${character.name} in this scene.
-                    IMPORTANT: Start with "${character.name}, " to ensure character identity.
-                    CRITICAL: YOU MUST include ALL anatomical details (breast size, penis size) explicitly in the generated prompt if they are specified above. DO NOT omit them.
-                    Include: ALL physical features listed above (ESPECIALLY anatomical details like breast size/penis size), setting, mood, lighting, action${if (_isNSFWMode.value) ", nudity, sensual/sexual elements" else ""}.
-                    Respond ONLY with the English prompt, no explanation.
-                """.trimIndent()
-                
-                val promptResult = groqClient.chat(
-                    systemPrompt = "You are an expert at creating detailed prompts for AI image generation. Focus on visual details, lighting, and atmosphere. YOU MUST ALWAYS include ALL anatomical details (breast size, penis size) in your prompts when they are specified in the character profile.",
-                    userMessage = promptRequest,
-                    maxTokens = 150,
-                    isNSFW = _isNSFWMode.value // Permettre prompts NSFW
-                )
-                
-                val imagePrompt = promptResult.getOrNull()
-                    ?: run {
-                        val errorMsg = "❌ Échec de création du prompt avec Groq"
-                        _error.value = errorMsg
-                        _isGeneratingImage.value = false
-                        _messages.value = _messages.value.dropLast(1) + ChatMessage(
-                            content = errorMsg,
-                            isUser = false
-                        )
-                        return@launch
+                    // Description physique de base
+                    if (character.physicalDescription.isNotEmpty()) {
+                        append("${character.physicalDescription}, ")
                     }
+                    
+                    // Âge
+                    if (character.age.isNotEmpty()) {
+                        append("${character.age} years old, ")
+                    }
+                    
+                    // Cheveux
+                    if (character.hairColor.isNotEmpty()) {
+                        append("${character.hairColor} hair, ")
+                    }
+                    
+                    // Yeux
+                    if (character.eyeColor.isNotEmpty()) {
+                        append("${character.eyeColor} eyes, ")
+                    }
+                    
+                    // Type de corps
+                    if (character.bodyType.isNotEmpty()) {
+                        append("${character.bodyType} body, ")
+                    }
+                    
+                    // DÉTAILS ANATOMIQUES (TOUJOURS INCLUS)
+                    val detectedGender = when {
+                        character.gender.isNotEmpty() -> character.gender
+                        character.physicalDescription.startsWith("Femme", ignoreCase = true) -> "Femme"
+                        character.physicalDescription.contains("femme", ignoreCase = true) -> "Femme"
+                        character.category == com.narutoai.chat.models.CharacterCategory.CELEBRITY_FEMALE -> "Femme"
+                        character.physicalDescription.startsWith("Homme", ignoreCase = true) -> "Homme"
+                        character.physicalDescription.startsWith("Jeune ninja", ignoreCase = true) -> "Homme"
+                        character.category == com.narutoai.chat.models.CharacterCategory.CELEBRITY_MALE -> "Homme"
+                        else -> ""
+                    }
+                    
+                    val isFemale = detectedGender.lowercase().contains("femme") || detectedGender.lowercase() == "f"
+                    val isMale = detectedGender.lowercase().contains("homme") || detectedGender.lowercase() == "m"
+                    
+                    // TAILLE DE POITRINE (pour femmes)
+                    if (isFemale) {
+                        val breastSize = if (character.breastSize.isNotEmpty()) {
+                            character.breastSize
+                        } else {
+                            // Inférer depuis description
+                            when {
+                                character.physicalDescription.contains("généreuse", ignoreCase = true) -> "generous"
+                                character.physicalDescription.contains("poitrine", ignoreCase = true) -> "generous"
+                                character.bodyType.contains("athlétique", ignoreCase = true) -> "medium"
+                                character.bodyType.contains("mince", ignoreCase = true) -> "small"
+                                else -> "generous"
+                            }
+                        }
+                        // Traduire en anglais si nécessaire
+                        val breastSizeEn = when(breastSize.lowercase()) {
+                            "petite" -> "small"
+                            "moyenne" -> "medium"
+                            "généreuse" -> "generous"
+                            "très généreuse" -> "very generous"
+                            else -> breastSize
+                        }
+                        append("$breastSizeEn breasts, ")
+                    }
+                    
+                    // TAILLE DU PÉNIS (pour hommes)
+                    if (isMale && character.penisSize.isNotEmpty()) {
+                        val penisSizeEn = when(character.penisSize.lowercase()) {
+                            "moyenne" -> "average"
+                            "au-dessus de la moyenne" -> "above average"
+                            "grande" -> "large"
+                            "très grande" -> "very large"
+                            else -> character.penisSize
+                        }
+                        append("$penisSizeEn size, ")
+                    }
+                    
+                    // Contexte de la scène depuis la conversation
+                    if (context.isNotEmpty()) {
+                        val lastMessage = _messages.value.takeLast(3).lastOrNull { it.isUser }?.content ?: ""
+                        if (lastMessage.isNotEmpty()) {
+                            append("${lastMessage.take(50)}, ")
+                        }
+                    }
+                    
+                    // Style et qualité
+                    if (_isNSFWMode.value) {
+                        append("adult content 18+, explicit, sensual pose, detailed anatomy, ")
+                    }
+                    append("photorealistic, ultra detailed, professional photography, natural lighting, 8k uhd, sharp focus, masterpiece")
+                }.trim()
                 
-                // Log du prompt final généré par Groq
-                android.util.Log.d("ChatViewModel", "🖼️ PROMPT FINAL pour Pollination AI: $imagePrompt")
+                android.util.Log.d("ChatViewModel", "🖼️ PROMPT DIRECT pour Pollination AI: $imagePrompt")
                 
                 // Générer en arrière-plan avec notification
                 _messages.value = _messages.value.dropLast(1) + ChatMessage(

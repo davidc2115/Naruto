@@ -180,20 +180,16 @@ fun ExplorerScreen(
                                 unifiedCharacter = unified,
                                 onClick = { onCharacterSelected(unified.character) },
                                 onEdit = {
-                                    if (unified.isBuiltIn) {
-                                        // Pour personnages intégrés, passer l'ID du personnage
-                                        onEditCustomCharacter(
-                                            CustomCharacterEntity(
-                                                id = unified.character.id,
-                                                name = "",
-                                                description = "",
-                                                systemPromptSFW = "",
-                                                systemPromptNSFW = ""
-                                            )
-                                        )
-                                    } else {
-                                        unified.customEntity?.let { onEditCustomCharacter(it) }
-                                    }
+                                    // Toujours passer l'entité si elle existe (personnage modifié ou créé)
+                                    // Sinon, créer une entité avec juste l'ID pour les personnages intégrés
+                                    val entityToEdit = unified.customEntity ?: CustomCharacterEntity(
+                                        id = unified.character.id,
+                                        name = "",
+                                        description = "",
+                                        systemPromptSFW = "",
+                                        systemPromptNSFW = ""
+                                    )
+                                    onEditCustomCharacter(entityToEdit)
                                 },
                                 onDelete = {
                                     unified.customEntity?.let {
