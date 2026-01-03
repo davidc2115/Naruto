@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,7 +29,8 @@ import com.narutoai.chat.viewmodel.CreateCharacterViewModel
 fun CreateCharacterScreen(
     onNavigateBack: () -> Unit,
     onCharacterCreated: () -> Unit,
-    viewModel: CreateCharacterViewModel = viewModel()
+    viewModel: CreateCharacterViewModel = viewModel(),
+    editCharacterId: String? = null // Nouveau paramètre pour l'édition
 ) {
     val name by viewModel.name.collectAsState()
     val description by viewModel.description.collectAsState()
@@ -38,6 +40,9 @@ fun CreateCharacterScreen(
     val hairColor by viewModel.hairColor.collectAsState()
     val eyeColor by viewModel.eyeColor.collectAsState()
     val bodyType by viewModel.bodyType.collectAsState()
+    val gender by viewModel.gender.collectAsState()
+    val breastSize by viewModel.breastSize.collectAsState()
+    val penisSize by viewModel.penisSize.collectAsState()
     val temperament by viewModel.temperament.collectAsState()
     val scenario by viewModel.scenario.collectAsState()
     val greetingMessage by viewModel.greetingMessage.collectAsState()
@@ -47,6 +52,21 @@ fun CreateCharacterScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val saveSuccess by viewModel.saveSuccess.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val editingCharacterId by viewModel.editingCharacterId.collectAsState()
+    
+    // Charger le personnage pour édition si un ID est fourni
+    // Ne pas réinitialiser si on édite
+    LaunchedEffect(editCharacterId) {
+        android.util.Log.d("CreateCharacterScreen", "LaunchedEffect triggered with editCharacterId=$editCharacterId")
+        if (editCharacterId != null && editCharacterId.isNotEmpty()) {
+            android.util.Log.d("CreateCharacterScreen", "Loading character for edit: $editCharacterId")
+            viewModel.loadCharacterForEdit(editCharacterId)
+        } else if (editingCharacterId == null) {
+            // Réinitialiser le formulaire SEULEMENT si on n'est pas déjà en train d'éditer
+            android.util.Log.d("CreateCharacterScreen", "Resetting form for new character")
+            viewModel.resetForm()
+        }
+    }
     
     // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -68,7 +88,9 @@ fun CreateCharacterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("✨ Créer un personnage") },
+                title = { 
+                    Text(if (editingCharacterId != null) "✏️ Modifier un personnage" else "✨ Créer un personnage") 
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, "Retour")
@@ -142,6 +164,32 @@ fun CreateCharacterScreen(
                         Icon(Icons.Default.PhotoLibrary, "Galerie", modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
                         Text("Choisir une photo")
+                    }
+                    
+                    // Import rapide depuis photo
+                    if (avatarImageUri != null && editingCharacterId == null) {
+                        Button(
+                            onClick = { viewModel.createCharacterFromPhoto(avatarImageUri!!) },
+                            enabled = !isAnalyzing,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary
+                            )
+                        ) {
+                            if (isAnalyzing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text("Création automatique...")
+                            } else {
+                                Icon(Icons.Default.AutoAwesome, "Import", modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Import rapide depuis photo")
+                            }
+                        }
                     }
                     
                     // Analyse automatique
@@ -289,6 +337,116 @@ fun CreateCharacterScreen(
                         singleLine = true,
                         placeholder = { Text("Ex: Athlétique, musclé") }
                     )
+                    
+                    // Sélecteur de genre (Dropdown)
+                    var genderExpanded by rememberSaveable { mutableStateOf(false) }
+                    val genderOptions = listOf("Homme", "Femme", "Autre")
+                    
+                    ExposedDropdownMenuBox(
+                        expanded = genderExpanded,
+                        onExpandedChange = { genderExpanded = it }
+                    ) {
+                        OutlinedTextField(
+                            value = gender,
+                            onValueChange = { },
+                            readOnly = true,
+                            label = { Text("Genre *") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = genderExpanded,
+                            onDismissRequest = { genderExpanded = false }
+                        ) {
+                            genderOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        viewModel.updateGender(option)
+                                        genderExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Champs conditionnels selon le genre
+                    if (gender.lowercase().contains("femme") || gender.lowercase() == "f") {
+                        // Dropdown pour taille de poitrine
+                        var breastExpanded by rememberSaveable { mutableStateOf(false) }
+                        val breastSizeOptions = listOf("Petite", "Moyenne", "Généreuse", "Très généreuse")
+                        
+                        ExposedDropdownMenuBox(
+                            expanded = breastExpanded,
+                            onExpandedChange = { breastExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = breastSize,
+                                onValueChange = { },
+                                readOnly = true,
+                                label = { Text("Taille de poitrine") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = breastExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = breastExpanded,
+                                onDismissRequest = { breastExpanded = false }
+                            ) {
+                                breastSizeOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            viewModel.updateBreastSize(option)
+                                            breastExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (gender.lowercase().contains("homme") || gender.lowercase() == "h" || gender.lowercase() == "m") {
+                        // Dropdown pour taille du pénis
+                        var penisExpanded by rememberSaveable { mutableStateOf(false) }
+                        val penisSizeOptions = listOf("Moyenne", "Au-dessus de la moyenne", "Grande", "Très grande")
+                        
+                        ExposedDropdownMenuBox(
+                            expanded = penisExpanded,
+                            onExpandedChange = { penisExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = penisSize,
+                                onValueChange = { },
+                                readOnly = true,
+                                label = { Text("Taille du pénis") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = penisExpanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                            )
+                            ExposedDropdownMenu(
+                                expanded = penisExpanded,
+                                onDismissRequest = { penisExpanded = false }
+                            ) {
+                                penisSizeOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            viewModel.updatePenisSize(option)
+                                            penisExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
             
@@ -382,7 +540,10 @@ fun CreateCharacterScreen(
                 } else {
                     Icon(Icons.Default.Save, "Sauvegarder", modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(12.dp))
-                    Text("Créer le personnage", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        if (editingCharacterId != null) "Enregistrer les modifications" else "Créer le personnage",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
             

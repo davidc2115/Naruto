@@ -55,6 +55,16 @@ class ImageGenerationWorker(
                 val imagePath = result.getOrNull()
                 android.util.Log.d("ImageWorker", "✅ Image générée: $imagePath")
                 
+                // Sauvegarder dans SharedPreferences pour que ChatViewModel puisse le récupérer
+                val prefs = applicationContext.getSharedPreferences("image_worker_results", Context.MODE_PRIVATE)
+                prefs.edit().apply {
+                    putString("latest_image_url", imagePath)
+                    putString("latest_image_source", "Pollination AI")
+                    apply()
+                }
+                
+                android.util.Log.d("ImageWorker", "💾 URL sauvegardée dans SharedPrefs: ${imagePath?.take(100)}")
+                
                 // Notification de succès
                 NotificationHelper.showProgressNotification(
                     applicationContext,

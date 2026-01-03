@@ -19,6 +19,9 @@ data class Character(
     val hairColor: String = "", // Couleur de cheveux
     val eyeColor: String = "", // Couleur des yeux
     val bodyType: String = "", // Type de corps
+    val breastSize: String = "", // Taille de poitrine (pour femmes)
+    val penisSize: String = "", // Taille du pénis (pour hommes)
+    val gender: String = "", // Genre du personnage
     val distinctiveFeatures: List<String> = emptyList(), // Traits distinctifs
     
     val scenario: String = "", // Scénario/Background story

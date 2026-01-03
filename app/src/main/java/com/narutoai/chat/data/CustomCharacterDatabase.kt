@@ -25,6 +25,9 @@ data class CustomCharacterEntity(
     val hairColor: String = "",
     val eyeColor: String = "",
     val bodyType: String = "",
+    val breastSize: String = "", // Taille de poitrine (pour femmes)
+    val penisSize: String = "", // Taille du pénis (pour hommes)
+    val gender: String = "", // Genre du personnage
     val distinctiveFeatures: String = "", // JSON array
     
     // Background
@@ -79,7 +82,7 @@ interface CustomCharacterDao {
  */
 @Database(
     entities = [CustomCharacterEntity::class, CustomGalleryImage::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class CustomCharacterDatabase : RoomDatabase() {
