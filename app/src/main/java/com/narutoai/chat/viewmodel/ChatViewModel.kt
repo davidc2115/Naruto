@@ -331,20 +331,47 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 
                 // Construire description anatomique détaillée
                 val anatomyDetails = buildString {
-                    if (character.gender.isNotEmpty()) {
-                        append("\n- Gender: ${character.gender}")
+                    // Détecter le genre si non spécifié
+                    val detectedGender = when {
+                        character.gender.isNotEmpty() -> character.gender
+                        character.physicalDescription.startsWith("Femme", ignoreCase = true) -> "Femme"
+                        character.physicalDescription.contains("femme", ignoreCase = true) -> "Femme"
+                        character.category == com.narutoai.chat.models.CharacterCategory.CELEBRITY_FEMALE -> "Femme"
+                        character.physicalDescription.startsWith("Homme", ignoreCase = true) -> "Homme"
+                        character.physicalDescription.startsWith("Jeune ninja", ignoreCase = true) -> "Homme" // Pour Naruto
+                        character.category == com.narutoai.chat.models.CharacterCategory.CELEBRITY_MALE -> "Homme"
+                        else -> ""
                     }
-                    if (character.breastSize.isNotEmpty() && 
-                        (character.gender.lowercase().contains("femme") || character.gender.lowercase() == "f")) {
+                    
+                    if (detectedGender.isNotEmpty()) {
+                        append("\n- Gender: $detectedGender")
+                    }
+                    
+                    // Détecter taille de poitrine pour les femmes
+                    val isFemale = detectedGender.lowercase().contains("femme") || detectedGender.lowercase() == "f"
+                    val isMale = detectedGender.lowercase().contains("homme") || detectedGender.lowercase() == "m"
+                    
+                    if (character.breastSize.isNotEmpty() && isFemale) {
                         append("\n- Breast size: ${character.breastSize}")
+                    } else if (isFemale && character.breastSize.isEmpty()) {
+                        // Pour personnages femmes sans breastSize spécifié, détecter depuis description
+                        val breastHint = when {
+                            character.physicalDescription.contains("généreuse", ignoreCase = true) -> "Généreuse"
+                            character.physicalDescription.contains("poitrine", ignoreCase = true) -> "Généreuse"
+                            character.bodyType.contains("athlétique", ignoreCase = true) -> "Moyenne"
+                            character.bodyType.contains("mince", ignoreCase = true) -> "Petite"
+                            else -> "Généreuse" // Par défaut pour célébrités féminines
+                        }
+                        append("\n- Breast size: $breastHint")
                     }
-                    if (character.penisSize.isNotEmpty() && 
-                        (character.gender.lowercase().contains("homme") || character.gender.lowercase() == "m")) {
+                    
+                    if (character.penisSize.isNotEmpty() && isMale) {
                         append("\n- Penis size: ${character.penisSize}")
                     }
                 }
                 
-                android.util.Log.d("ChatViewModel", "🎨 Anatomie pour génération: Genre='${character.gender}', Poitrine='${character.breastSize}', Pénis='${character.penisSize}'")
+                android.util.Log.d("ChatViewModel", "🎨 Genre du personnage: '${character.gender}', Description: '${character.physicalDescription.take(50)}'")
+                android.util.Log.d("ChatViewModel", "🎨 Anatomie pour génération: Poitrine='${character.breastSize}', Pénis='${character.penisSize}'")
                 android.util.Log.d("ChatViewModel", "📝 Détails anatomiques ajoutés au prompt: $anatomyDetails")
                 
                 val promptRequest = """
