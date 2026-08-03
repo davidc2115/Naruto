@@ -3,166 +3,198 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#050b14" />
-  <title>NewJarvis AI — Assistant Mobile v2.2</title>
+  <meta name="theme-color" content="#030712" />
+  <title>NewJarvis AI — Assistant Cybernetic Premium</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #050b14;
-      --surface: #0f1823;
-      --surface2: #1a2535;
-      --border: rgba(0,240,255,0.15);
+      --bg: #030712;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
+      --surface: rgba(15, 23, 42, 0.75);
+      --surface-card: rgba(30, 41, 59, 0.65);
+      --border-cyan: rgba(0, 240, 255, 0.25);
+      --border-purple: rgba(168, 85, 247, 0.25);
       --cyan: #00f0ff;
+      --cyan-glow: rgba(0, 240, 255, 0.4);
       --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.4);
       --pink: #ec4899;
       --amber: #f59e0b;
       --emerald: #10b981;
       --rose: #f43f5e;
-      --text: #e2e8f0;
-      --muted: #64748b;
-      --font-main: 'Inter', system-ui, sans-serif;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
       --font-orb: 'Orbitron', monospace;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    html, body { height: 100%; overflow: hidden; }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); }
 
     body {
       font-family: var(--font-main);
-      background: var(--bg);
+      background: var(--bg-gradient);
       color: var(--text);
       display: flex;
       flex-direction: column;
       height: 100vh;
       height: 100dvh;
+      position: relative;
     }
 
-    /* ── HEADER ── */
+    /* ── BACKGROUND ANIMATED GRID ── */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+      animation: grid-scroll 20s linear infinite;
+    }
+    @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+    /* ── HEADER PREMIUM ── */
     header {
-      background: rgba(15,24,35,0.95);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
+      background: rgba(3, 7, 18, 0.85);
+      border-bottom: 1px solid var(--border-cyan);
+      padding: 12px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-shrink: 0;
-      backdrop-filter: blur(20px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      backdrop-filter: blur(25px);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
-    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
     .logo-badge {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
-      border-radius: 10px;
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink));
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-family: var(--font-orb);
       font-weight: 900;
-      font-size: 11px;
+      font-size: 13px;
       color: #000;
       position: relative;
+      box-shadow: 0 0 20px var(--cyan-glow);
+      animation: logo-glow 3s ease-in-out infinite alternate;
     }
+    @keyframes logo-glow { 0% { box-shadow: 0 0 15px var(--cyan-glow); } 100% { box-shadow: 0 0 25px var(--purple-glow); } }
     .logo-badge::after {
       content: '';
       position: absolute;
       top: -2px; right: -2px;
-      width: 8px; height: 8px;
+      width: 10px; height: 10px;
       background: var(--emerald);
       border-radius: 50%;
       border: 2px solid var(--bg);
-      animation: blink 2s ease-in-out infinite;
+      animation: blink 1.8s ease-in-out infinite;
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .logo-text h1 { font-family: var(--font-orb); font-size: 13px; font-weight: 900; background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 1px; }
-    .logo-text p { font-size: 9px; color: var(--muted); font-family: var(--font-mono); margin-top: 1px; }
+    @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
+    .logo-text h1 { font-family: var(--font-orb); font-size: 14px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1.5px; }
+    .logo-text p { font-size: 9.5px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
 
-    /* ── TABS TOP ── */
+    /* ── TABS BAR PREMIUM ── */
     .tabs-bar {
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 8px 14px;
       display: flex;
-      gap: 6px;
+      gap: 8px;
       overflow-x: auto;
       flex-shrink: 0;
       scrollbar-width: none;
+      position: relative;
+      z-index: 10;
     }
     .tabs-bar::-webkit-scrollbar { display: none; }
     .tab-btn {
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 8px 16px;
+      border-radius: 30px;
       font-size: 11px;
       font-family: var(--font-orb);
       font-weight: 700;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       background: var(--surface);
       color: var(--muted);
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
       -webkit-tap-highlight-color: transparent;
     }
     .tab-btn.active {
-      background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(168,85,247,0.15));
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
       border-color: var(--cyan);
       color: var(--cyan);
-      box-shadow: 0 0 12px rgba(0,240,255,0.2);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
+      transform: translateY(-1px);
     }
 
-    /* ── MAIN ── */
+    /* ── MAIN CONTENT AREA ── */
     main {
       flex: 1;
       overflow-y: auto;
-      padding: 12px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--surface2) transparent;
+      padding: 14px;
+      position: relative;
+      z-index: 5;
     }
-    main::-webkit-scrollbar { width: 4px; }
-    main::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 4px; }
+    .panel { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+    .panel.active { display: block; opacity: 1; transform: translateY(0); }
 
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    /* ── CARDS & BUTTONS ── */
+    /* ── CARDS GLASSMORPHISM ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-cyan);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
     }
+    .card:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 12px 40px rgba(0, 240, 255, 0.15); }
     .card-title {
       font-family: var(--font-orb);
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 11.5px;
+      font-weight: 800;
       color: var(--cyan);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
     .card-title .dot {
-      width: 8px; height: 8px;
+      width: 9px; height: 9px;
       border-radius: 50%;
       background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
       animation: blink 1.5s ease-in-out infinite;
     }
 
-    /* ── ORB 3D ── */
+    /* ── 3D HOLOGRAPHIC ORB ── */
     .orb-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px 16px;
+      padding: 30px 16px;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 70%);
+      border-radius: 24px;
+      margin-bottom: 14px;
     }
-    .orb-wrapper { position: relative; width: 160px; height: 160px; margin-bottom: 16px; }
+    .orb-wrapper { position: relative; width: 180px; height: 180px; margin-bottom: 20px; }
     .orb-ring {
       position: absolute;
       border-radius: 50%;
@@ -171,144 +203,124 @@
       transform: translate(-50%, -50%);
       animation: orbit linear infinite;
     }
-    .orb-ring:nth-child(1) { width: 160px; height: 160px; border-color: rgba(0,240,255,0.3); animation-duration: 8s; }
-    .orb-ring:nth-child(2) { width: 130px; height: 130px; border-color: rgba(168,85,247,0.3); animation-duration: 6s; animation-direction: reverse; }
-    .orb-ring:nth-child(3) { width: 100px; height: 100px; border-color: rgba(236,72,153,0.3); animation-duration: 4s; }
-    @keyframes orbit { to { transform: translate(-50%,-50%) rotate(360deg); } }
+    .orb-ring:nth-child(1) { width: 180px; height: 180px; border-color: rgba(0, 240, 255, 0.4); animation-duration: 10s; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
+    .orb-ring:nth-child(2) { width: 145px; height: 145px; border-color: rgba(168, 85, 247, 0.4); animation-duration: 7s; animation-direction: reverse; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
+    .orb-ring:nth-child(3) { width: 110px; height: 110px; border-color: rgba(236, 72, 153, 0.4); animation-duration: 5s; }
+    .orb-ring:nth-child(4) { width: 80px; height: 80px; border-color: rgba(16, 185, 129, 0.4); animation-duration: 3.5s; animation-direction: reverse; }
+    @keyframes orbit { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
     .orb-core {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 70px; height: 70px;
+      width: 75px; height: 75px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, var(--cyan), var(--purple), rgba(168,85,247,0.3));
-      box-shadow: 0 0 30px var(--cyan), 0 0 60px rgba(168,85,247,0.4), inset 0 0 20px rgba(255,255,255,0.1);
-      animation: pulse-orb 3s ease-in-out infinite;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--cyan), var(--purple), rgba(236, 72, 153, 0.8));
+      box-shadow: 0 0 40px var(--cyan), 0 0 80px var(--purple), inset 0 0 25px rgba(255, 255, 255, 0.6);
+      animation: pulse-orb 2.5s ease-in-out infinite alternate;
     }
-    @keyframes pulse-orb { 0%,100%{transform:translate(-50%,-50%) scale(1);box-shadow:0 0 30px var(--cyan),0 0 60px rgba(168,85,247,0.4)} 50%{transform:translate(-50%,-50%) scale(1.1);box-shadow:0 0 50px var(--cyan),0 0 90px rgba(168,85,247,0.6)} }
+    @keyframes pulse-orb {
+      0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px var(--cyan), 0 0 60px var(--purple); }
+      100% { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 50px var(--cyan), 0 0 100px var(--pink); }
+    }
 
     .orb-state {
       font-family: var(--font-orb);
-      font-size: 11px;
-      letter-spacing: 2px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
       color: var(--cyan);
+      text-shadow: 0 0 12px var(--cyan-glow);
       text-align: center;
-      animation: blink 2s ease-in-out infinite;
     }
 
-    /* ── INPUT & BUTTONS ── */
-    .input-row { display: flex; gap: 8px; margin-top: 10px; }
+    /* ── INPUTS & CONTROLS ── */
+    .input-row { display: flex; gap: 10px; margin-top: 12px; }
     .input-field {
       flex: 1;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-cyan);
+      border-radius: 14px;
+      padding: 14px 16px;
       font-size: 14px;
       color: var(--text);
       font-family: var(--font-main);
       outline: none;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
     }
-    .input-field:focus { border-color: var(--cyan); }
+    .input-field:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.25); }
     .btn {
-      padding: 12px 18px;
-      border-radius: 12px;
+      padding: 14px 22px;
+      border-radius: 14px;
       font-family: var(--font-orb);
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       border: none;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       -webkit-tap-highlight-color: transparent;
     }
-    .btn-cyan { background: linear-gradient(135deg, var(--cyan), #0088ff); color: #000; }
-    .btn-purple { background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; }
-    .btn-amber { background: linear-gradient(135deg, var(--amber), #f97316); color: #000; }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-cyan { background: linear-gradient(135deg, var(--cyan), #0088ff); color: #000; box-shadow: 0 0 15px var(--cyan-glow); }
+    .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--cyan-glow); }
+    .btn-purple { background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; box-shadow: 0 0 15px var(--purple-glow); }
+    .btn-amber { background: linear-gradient(135deg, var(--amber), #f97316); color: #000; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+    .btn-outline { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-cyan); color: var(--text); }
     .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── VOICE CONTROLS ── */
+    .voice-controls { display: flex; gap: 10px; }
+    .mic-btn {
+      flex: 1; padding: 16px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 1px solid var(--border-cyan); cursor: pointer; font-family: var(--font-orb); font-size: 10px; font-weight: 800; transition: all 0.3s ease;
+    }
+    .mic-btn svg { width: 26px; height: 26px; }
+    .mic-btn.idle { background: rgba(15, 23, 42, 0.8); color: var(--muted); }
+    .mic-btn.listening { background: rgba(244, 63, 94, 0.25); border-color: var(--rose); color: var(--rose); box-shadow: 0 0 25px rgba(244, 63, 94, 0.4); animation: pulse-btn 1s ease-in-out infinite; }
+    .mic-btn.permanent { background: rgba(0, 240, 255, 0.25); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 25px var(--cyan-glow); animation: pulse-btn 1.5s ease-in-out infinite; }
+    @keyframes pulse-btn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 
     /* ── RESPONSE BOX ── */
     .response-box {
-      margin-top: 12px;
-      background: rgba(0,240,255,0.05);
-      border: 1px solid rgba(0,240,255,0.2);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 13px;
-      line-height: 1.6;
+      margin-top: 14px;
+      background: rgba(0, 240, 255, 0.04);
+      border: 1px solid var(--border-cyan);
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 13.5px;
+      line-height: 1.65;
       color: var(--text);
       display: none;
+      backdrop-filter: blur(15px);
+      box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
     }
-    .response-box.visible { display: block; }
-    .response-label {
-      font-family: var(--font-orb);
-      font-size: 9px;
-      color: var(--cyan);
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .response-label .model-badge {
-      background: rgba(168,85,247,0.2);
-      border: 1px solid rgba(168,85,247,0.3);
-      border-radius: 6px;
-      padding: 2px 6px;
-      font-size: 8px;
-      color: var(--purple);
-    }
+    .response-box.visible { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .response-label { font-family: var(--font-orb); font-size: 9.5px; color: var(--cyan); letter-spacing: 1.2px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .model-badge { background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25)); border: 1px solid var(--purple); border-radius: 8px; padding: 3px 8px; font-size: 8.5px; color: #e9d5ff; font-weight: 700; }
 
-    /* ── GALLERY ── */
-    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .gallery-item { border-radius: 12px; overflow: hidden; background: var(--surface2); border: 1px solid var(--border); }
+    /* ── GALLERY GRID ── */
+    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .gallery-item { border-radius: 16px; overflow: hidden; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-cyan); transition: transform 0.3s ease; }
+    .gallery-item:hover { transform: scale(1.02); }
     .gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
-    .gallery-item-info { padding: 8px 10px; }
-    .gallery-item-title { font-size: 10px; font-family: var(--font-orb); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gallery-item-info { padding: 10px; font-size: 11px; font-family: var(--font-orb); color: var(--text); }
 
-    /* ── API KEYS ── */
-    .api-row { margin-bottom: 10px; }
-    .api-label { font-size: 10px; font-family: var(--font-orb); color: var(--muted); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .api-saved { color: var(--emerald); font-size: 8px; }
-    .api-input-row { display: flex; gap: 6px; }
-    .api-input {
-      flex: 1;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 12px;
-      color: var(--text);
-      font-family: var(--font-mono);
-      outline: none;
-    }
+    /* ── INSTALLED APPS LIST ── */
+    .installed-app-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-cyan); border-radius: 12px; margin-bottom: 8px; transition: all 0.2s ease; }
+    .installed-app-item:hover { border-color: var(--cyan); background: rgba(0, 240, 255, 0.08); }
+    .installed-app-name { font-size: 12.5px; font-weight: 700; color: #fff; }
 
-    /* ── VOICE CONTROLS ── */
-    .voice-controls { display: flex; gap: 8px; flex-wrap: wrap; }
-    .mic-btn {
-      flex: 1; min-width: 100px; padding: 14px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; border: none; cursor: pointer; font-family: var(--font-orb); font-size: 10px; font-weight: 700; transition: all 0.2s;
-    }
-    .mic-btn svg { width: 24px; height: 24px; }
-    .mic-btn.idle { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
-    .mic-btn.listening { background: rgba(244,63,94,0.2); border: 1px solid var(--rose); color: var(--rose); animation: pulse-btn 0.8s ease-in-out infinite; }
-    .mic-btn.permanent { background: rgba(0,240,255,0.2); border: 1px solid var(--cyan); color: var(--cyan); animation: pulse-btn 1.5s ease-in-out infinite; }
-    @keyframes pulse-btn { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
-
-    /* ── INSTALLED APPS ── */
-    .installed-app-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; cursor: pointer; }
-    .installed-app-item:hover { border-color: var(--cyan); }
-    .installed-app-name { font-size: 12px; font-weight: 600; color: var(--text); }
-
-    /* ── TOAST ── */
-    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(0,240,255,0.15); border: 1px solid var(--cyan); backdrop-filter: blur(20px); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-family: var(--font-orb); color: var(--cyan); pointer-events: none; opacity: 0; transition: all 0.3s; z-index: 9999; white-space: nowrap; }
+    /* ── TOAST PREMIUM ── */
+    .toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(30px); background: rgba(3, 7, 18, 0.9); border: 1px solid var(--cyan); backdrop-filter: blur(20px); padding: 12px 24px; border-radius: 30px; font-size: 12px; font-family: var(--font-orb); color: var(--cyan); box-shadow: 0 0 25px var(--cyan-glow); opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ── BOTTOM NAV ── */
-    nav { background: rgba(5,11,20,0.97); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 12px; flex-shrink: 0; backdrop-filter: blur(20px); }
-    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 12px; border: none; background: none; cursor: pointer; color: var(--muted); font-family: var(--font-orb); font-size: 8px; transition: color 0.2s; }
+    nav { background: rgba(3, 7, 18, 0.92); border-top: 1px solid var(--border-cyan); display: flex; justify-content: space-around; padding: 10px 0 14px; flex-shrink: 0; backdrop-filter: blur(25px); position: relative; z-index: 10; }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 14px; border: none; background: none; cursor: pointer; color: var(--muted); font-family: var(--font-orb); font-size: 8.5px; transition: all 0.3s ease; }
     .nav-btn.active { color: var(--cyan); }
-    .nav-btn.active svg { filter: drop-shadow(0 0 6px var(--cyan)); }
+    .nav-btn.active svg { filter: drop-shadow(0 0 8px var(--cyan)); }
   </style>
 </head>
 <body>
@@ -318,8 +330,8 @@
   <div class="logo">
     <div class="logo-badge">NJ</div>
     <div class="logo-text">
-      <h1>NEWJARVIS MOBILE v2.2</h1>
-      <p>TTS Haut-Parleur • Vocal Natif • Maj Compatible</p>
+      <h1>NEWJARVIS CYBER v2.2</h1>
+      <p>Assistant IA • Haut-Parleurs • Synthèse Vocale</p>
     </div>
   </div>
 </header>
@@ -329,7 +341,7 @@
   <button class="tab-btn active" onclick="showTab('hud',this)">⚡ Orbe 3D</button>
   <button class="tab-btn" onclick="showTab('keys',this)">🔑 Clés API</button>
   <button class="tab-btn" onclick="showTab('gallery',this)">🖼️ Galerie HD</button>
-  <button class="tab-btn" onclick="showTab('apk',this)">📦 Modificateur APK</button>
+  <button class="tab-btn" onclick="showTab('apk',this)">📦 Modif APK</button>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -342,13 +354,14 @@
         <div class="orb-ring"></div>
         <div class="orb-ring"></div>
         <div class="orb-ring"></div>
+        <div class="orb-ring"></div>
         <div class="orb-core" id="orbCore"></div>
       </div>
       <div class="orb-state" id="orbState">SYSTÈME EN VEILLE</div>
     </div>
 
     <div class="card">
-      <div class="card-title"><div class="dot"></div>Commande Vocale &amp; Haut-Parleur Smartphone</div>
+      <div class="card-title"><div class="dot"></div>Commande Vocale &amp; Lecture Haut-Parleur</div>
       <div class="voice-controls">
         <button class="mic-btn idle" id="micBtn" onclick="toggleListening()">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11h-2z"/></svg>
@@ -360,14 +373,14 @@
         </button>
       </div>
 
-      <div class="input-row" style="margin-top:12px;">
-        <input class="input-field" id="textInput" type="text" placeholder="Dites ou tapez une question..." onkeydown="if(event.key==='Enter')sendText()" />
+      <div class="input-row">
+        <input class="input-field" id="textInput" type="text" placeholder="Dites ou tapez votre question..." onkeydown="if(event.key==='Enter')sendText()" />
         <button class="btn btn-cyan" id="sendBtn" onclick="sendText()">➤</button>
       </div>
 
       <div class="response-box" id="responseBox">
         <div class="response-label">
-          <span>RÉPONSE EN DIRECT (VOCAL LANCE)</span>
+          <span>RÉPONSE JARVIS (HAUT-PARLEUR ACTIF)</span>
           <span class="model-badge" id="modelBadge">—</span>
         </div>
         <div id="responseText"></div>
@@ -379,7 +392,7 @@
   <div id="tab-keys" class="panel">
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--emerald)"></div>Gestionnaire de Clés API</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Entrez vos clés. Elles sont sauvegardées localement et exécutées via pont natif sans blocage.</p>
+      <p style="font-size:11.5px;color:var(--muted);margin-bottom:16px;">Saisissez vos clés. Elles s'exécutent en direct sans blocage via le pont natif.</p>
       <div id="apiFormContainer"></div>
     </div>
   </div>
@@ -387,9 +400,9 @@
   <!-- ── TAB 3 : GALLERY HD ── -->
   <div id="tab-gallery" class="panel">
     <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Génération d'Images Exactes</div>
+      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Génération d'Images Photoréalistes</div>
       <div class="input-row">
-        <input class="input-field" id="imgPrompt" type="text" placeholder="Description exacte..." onkeydown="if(event.key==='Enter')generateImage()" />
+        <input class="input-field" id="imgPrompt" type="text" placeholder="Description exacte de l'image (ex: berger australien blue merle)..." onkeydown="if(event.key==='Enter')generateImage()" />
         <button class="btn btn-amber" onclick="generateImage()">Générer</button>
       </div>
     </div>
@@ -410,8 +423,8 @@
 
     <div class="card" id="apkModPromptCard" style="display:none;">
       <div class="card-title" style="color:var(--cyan);" id="selectedAppTitle">App Sélectionnée</div>
-      <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;" placeholder="Consignes de modification IA..."></textarea>
-      <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="processAiApkModification()">🤖 Appliquer la Modification</button>
+      <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;" placeholder="Consignes de modification..."></textarea>
+      <button class="btn btn-cyan" style="width:100%;margin-top:10px;" onclick="processAiApkModification()">🤖 Exécuter la Modification</button>
       <div class="response-box" id="aiApkResult"></div>
     </div>
   </div>
@@ -442,23 +455,19 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────
-// STORAGE & PONT NATIVE HTTP
-// ─────────────────────────────────────────────
 const Storage = {
   get: (key, def = null) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e){ return def; } },
-  set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+  set: (key, val) => { try { localStoragesetItem(key, JSON.stringify(val)); } catch(e){} }
 };
 
 function showToast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  setTimeout(() => el.classList.remove('show'), 3200);
   if (window.AndroidBridge && window.AndroidBridge.showToast) window.AndroidBridge.showToast(msg);
 }
 
-// Speak out loud through phone speakers using Native TextToSpeech engine
 function speakTextOutLoud(text) {
   if (!text) return;
   const clean = text.replace(/[*#_~`]/g,'').slice(0,350);
@@ -472,7 +481,6 @@ function speakTextOutLoud(text) {
   }
 }
 
-// Callback appelé par Android SpeechRecognizer natif
 window.onNativeSpeechResult = function(text) {
   if (!text) return;
   document.getElementById('textInput').value = text;
@@ -505,9 +513,6 @@ async function httpFetch(url, options = {}) {
   return fetch(url, options);
 }
 
-// ─────────────────────────────────────────────
-// TABS
-// ─────────────────────────────────────────────
 function showTab(id, tabEl, navId) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -526,9 +531,6 @@ function showTab(id, tabEl, navId) {
   if (id === 'keys') renderApiForm();
 }
 
-// ─────────────────────────────────────────────
-// ORB STATE
-// ─────────────────────────────────────────────
 const ORB_STATES = {
   idle: { label: 'SYSTÈME EN VEILLE', color: '#00f0ff' },
   listening: { label: 'ÉCOUTE ACTIVE...', color: '#ec4899' },
@@ -541,9 +543,6 @@ function setOrbState(state) {
   document.getElementById('orbCore').style.background = `radial-gradient(circle at 30% 30%, ${s.color}, #a855f7, rgba(168,85,247,0.3))`;
 }
 
-// ─────────────────────────────────────────────
-// VOICE (NATIVE ANDROID SPEECH + WEB SPEECH FALLBACK)
-// ─────────────────────────────────────────────
 let isListening = false;
 let isPermanentListening = false;
 let recognition = null;
@@ -641,9 +640,6 @@ function stopPermanentListening() {
   setOrbState('idle');
 }
 
-// ─────────────────────────────────────────────
-// SEND TEXT / LIVE AI
-// ─────────────────────────────────────────────
 async function sendText() {
   const input = document.getElementById('textInput');
   const query = input.value.trim();
@@ -660,7 +656,6 @@ async function sendText() {
     document.getElementById('responseText').textContent = result.text;
     document.getElementById('modelBadge').textContent = result.model;
 
-    // VRAI HAUT PARLEUR SMARTPHONE
     speakTextOutLoud(result.text);
 
   } catch(e) {
@@ -677,7 +672,6 @@ async function processLiveAiQuery(query) {
   const keys = Storage.get('nj_api_keys', {});
   const errors = [];
 
-  // GROQ
   if (keys.groq) {
     try {
       const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -693,12 +687,11 @@ async function processLiveAiQuery(query) {
       if (res.ok && data.choices?.[0]?.message?.content) {
         return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
       } else {
-        errors.push(`Groq (${res.status}): ${data.error?.message || 'Erreur d\'authentification'}`);
+        errors.push(`Groq (${res.status}): ${data.error?.message || 'Erreur API'}`);
       }
     } catch(e) { errors.push(`Groq: ${e.message}`); }
   }
 
-  // OPENAI
   if (keys.openai) {
     try {
       const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
@@ -714,12 +707,11 @@ async function processLiveAiQuery(query) {
       if (res.ok && data.choices?.[0]?.message?.content) {
         return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
       } else {
-        errors.push(`OpenAI (${res.status}): ${data.error?.message || 'Erreur d\'authentification'}`);
+        errors.push(`OpenAI (${res.status}): ${data.error?.message || 'Erreur API'}`);
       }
     } catch(e) { errors.push(`OpenAI: ${e.message}`); }
   }
 
-  // GOOGLE GEMINI
   if (keys.gemini) {
     try {
       const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
@@ -731,12 +723,11 @@ async function processLiveAiQuery(query) {
       if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
         return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
       } else {
-        errors.push(`Gemini (${res.status}): ${data.error?.message || 'Erreur clé API'}`);
+        errors.push(`Gemini (${res.status}): ${data.error?.message || 'Erreur API'}`);
       }
     } catch(e) { errors.push(`Gemini: ${e.message}`); }
   }
 
-  // ANTHROPIC CLAUDE
   if (keys.anthropic) {
     try {
       const res = await httpFetch('https://api.anthropic.com/v1/messages', {
@@ -756,22 +747,19 @@ async function processLiveAiQuery(query) {
       if (res.ok && data.content?.[0]?.text) {
         return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
       } else {
-        errors.push(`Claude (${res.status}): ${data.error?.message || 'Erreur clé API'}`);
+        errors.push(`Claude (${res.status}): ${data.error?.message || 'Erreur API'}`);
       }
     } catch(e) { errors.push(`Claude: ${e.message}`); }
   }
 
   const hasConfiguredKeys = Object.keys(keys).length > 0;
   if (!hasConfiguredKeys) {
-    return { text: `Aucune clé API configurée. Veuillez ajouter votre clé Groq, OpenAI, Gemini ou Anthropic dans l'onglet Clés API pour obtenir des réponses IA en direct !`, model: 'Configuration Requise' };
+    return { text: `Aucune clé API configurée. Ajoutez votre clé Groq, OpenAI, Gemini ou Anthropic dans l'onglet Clés API pour obtenir des réponses IA en direct !`, model: 'Configuration Requise' };
   } else {
-    return { text: `⚠️ Impossible de contacter le service IA avec vos clés configurées :\n${errors.join('\n')}\n\nVérifiez vos clés dans l'onglet Clés API.`, model: 'Erreur Clés API' };
+    return { text: `⚠️ Impossible de contacter le service IA :\n${errors.join('\n')}\n\nVérifiez vos clés dans l'onglet Clés API.`, model: 'Erreur Clés API' };
   }
 }
 
-// ─────────────────────────────────────────────
-// API KEYS FORM & TEST
-// ─────────────────────────────────────────────
 const API_SERVICES = [
   { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
   { id: 'openai', label: 'OpenAI API (GPT-4o)', placeholder: 'sk-proj-...', url: 'https://platform.openai.com/api-keys' },
@@ -810,7 +798,7 @@ async function testAllKeys() {
   const keys = Storage.get('nj_api_keys', {});
   const res = document.getElementById('keyTestResult');
   res.classList.add('visible');
-  res.textContent = '🔬 Test des clés API...';
+  res.textContent = '🔬 Test en direct des clés API...';
   const results = [];
 
   if (keys.groq) {
@@ -848,9 +836,6 @@ async function testAllKeys() {
   res.textContent = results.join('\n');
 }
 
-// ─────────────────────────────────────────────
-// GENERATION D'IMAGES
-// ─────────────────────────────────────────────
 async function generateImage() {
   const prompt = document.getElementById('imgPrompt').value.trim();
   if (!prompt) { showToast('Entrez une description'); return; }
@@ -871,9 +856,6 @@ function loadGallery() {
   grid.innerHTML = gallery.map(i => `<div class="gallery-item"><img src="${i.url}" /><div class="gallery-item-info"><div class="gallery-item-title">${i.title}</div></div></div>`).join('');
 }
 
-// ─────────────────────────────────────────────
-// MODIFICATEUR APK
-// ─────────────────────────────────────────────
 function loadInstalledPhoneApps() {
   const container = document.getElementById('installedAppsContainer');
   container.style.display = 'block';
@@ -905,9 +887,6 @@ function processAiApkModification() {
   document.getElementById('aiApkResult').textContent = `✅ Consigne enregistrée : "${prompt}". L'IA adapte l'APK...`;
 }
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   renderApiForm();
   loadGallery();
