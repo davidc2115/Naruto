@@ -1,17 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Naruto AI Chat</string>
-    <string name="select_character">Choisir un personnage</string>
-    <string name="chat_with">Discuter avec %1$s</string>
-    <string name="type_message">Écris un message...</string>
-    <string name="send">Envoyer</string>
-    <string name="sfw_mode">Mode SFW</string>
-    <string name="nsfw_mode">Mode NSFW</string>
-    <string name="mode_toggle">Changer de mode</string>
-    <string name="back">Retour</string>
-    <string name="connecting">Connexion à l\'IA...</string>
-    <string name="error_connection">Erreur de connexion. Vérifiez votre internet.</string>
-    <string name="naruto_characters">Personnages Naruto</string>
-    <string name="celebrities">Célébrités</string>
-    <string name="all_characters">Tous les personnages</string>
+    <string name="app_name">NewJarvis AI</string>
 </resources>
