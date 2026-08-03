@@ -53,19 +53,16 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             webView = WebView(this)
             setContentView(webView)
 
-            webView.settings.apply {
+            with(webView.settings) {
                 javaScriptEnabled = true
                 domStorageEnabled = true
+                databaseEnabled = true
                 allowFileAccess = true
                 allowContentAccess = true
-                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                cacheMode = WebSettings.LOAD_DEFAULT
-                mediaPlaybackRequiresUserGesture = false
-                setSupportZoom(false)
-                builtInZoomControls = false
-                displayZoomControls = false
                 useWideViewPort = true
                 loadWithOverviewMode = true
+                mediaPlaybackRequiresUserGesture = false
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             }
 
             webView.addJavascriptInterface(AndroidBridge(), "AndroidBridge")
@@ -82,14 +79,8 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             webView.webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                     if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
-                        if (!url.contains("localhost") && !url.contains("file://")) {
-                            try {
-                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                                return true
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        return true
                     }
                     return false
                 }
@@ -173,10 +164,11 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     inner class AndroidBridge {
+
         @JavascriptInterface
-        fun showToast(msg: String) {
+        fun showToast(message: String) {
             runOnUiThread {
-                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -208,71 +200,53 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         @JavascriptInterface
         fun openUrl(url: String) {
-            runOnUiThread {
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                } catch (e: Exception) {
-                    Toast.makeText(this@MainActivity, "Impossible d'ouvrir: $url", Toast.LENGTH_SHORT).show()
-                }
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 
         @JavascriptInterface
         fun getInstalledApps(): String {
             val jsonArray = JSONArray()
-            try {
-                val pm = packageManager
-                val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+            val pm = packageManager
+            val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
-                for (appInfo in packages) {
-                    if ((appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0 ||
-                        (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
-
-                        val appName = pm.getApplicationLabel(appInfo).toString()
-                        val pkgName = appInfo.packageName
-                        val pInfo = try { pm.getPackageInfo(pkgName, 0) } catch (e: Exception) { null }
-                        val versionName = pInfo?.versionName ?: "1.0"
-                        val sourceDir = appInfo.sourceDir
-
-                        val obj = JSONObject().apply {
-                            put("name", appName)
-                            put("packageName", pkgName)
-                            put("versionName", versionName)
-                            put("sourceDir", sourceDir)
-                        }
-                        jsonArray.put(obj)
-                    }
+            for (appInfo in packages) {
+                if (appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
+                    val appJson = JSONObject()
+                    appJson.put("name", pm.getApplicationLabel(appInfo).toString())
+                    appJson.put("packageName", appInfo.packageName)
+                    jsonArray.put(appJson)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
             return jsonArray.toString()
         }
 
+        // Pont Native HTTP pour contourner 100% des erreurs CORS sur Groq, OpenAI, Gemini, Anthropic
         @JavascriptInterface
         fun nativeFetch(urlStr: String, method: String, headersJsonStr: String, bodyStr: String): String {
             val resultJson = JSONObject()
             try {
                 val url = URL(urlStr)
                 val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = if (method.isEmpty()) "GET" else method.uppercase()
+                conn.requestMethod = method.uppercase(Locale.ROOT)
                 conn.connectTimeout = 15000
                 conn.readTimeout = 15000
-                conn.doInput = true
 
-                if (headersJsonStr.isNotEmpty() && headersJsonStr != "{}") {
-                    val headers = JSONObject(headersJsonStr)
-                    val keys = headers.keys()
+                if (headersJsonStr.isNotBlank() && headersJsonStr != "{}") {
+                    val headersObj = JSONObject(headersJsonStr)
+                    val keys = headersObj.keys()
                     while (keys.hasNext()) {
                         val key = keys.next()
-                        conn.setRequestProperty(key, headers.getString(key))
+                        conn.setRequestProperty(key, headersObj.getString(key))
                     }
                 }
 
-                if ((conn.requestMethod == "POST" || conn.requestMethod == "PUT") && bodyStr.isNotEmpty()) {
+                if (method.equals("POST", ignoreCase = true) || method.equals("PUT", ignoreCase = true)) {
                     conn.doOutput = true
-                    val os = conn.outputStream
-                    val writer = OutputStreamWriter(os, "UTF-8")
+                    val writer = OutputStreamWriter(conn.outputStream, "UTF-8")
                     writer.write(bodyStr)
                     writer.flush()
                     writer.close()
@@ -280,23 +254,25 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
                 val responseCode = conn.responseCode
                 resultJson.put("status", responseCode)
+                resultJson.put("ok", responseCode in 200..299)
 
                 val inputStream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-                val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
-                val sb = StringBuilder()
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    sb.append(line)
+                if (inputStream != null) {
+                    val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
+                    val sb = StringBuilder()
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        sb.append(line)
+                    }
+                    reader.close()
+                    resultJson.put("data", sb.toString())
+                } else {
+                    resultJson.put("data", "")
                 }
-                reader.close()
-
-                resultJson.put("ok", responseCode in 200..299)
-                resultJson.put("data", sb.toString())
             } catch (e: Exception) {
-                e.printStackTrace()
-                resultJson.put("ok", false)
                 resultJson.put("status", 500)
-                resultJson.put("error", e.message ?: "Network error")
+                resultJson.put("ok", false)
+                resultJson.put("data", JSONObject().put("error", JSONObject().put("message", e.message ?: "Network error")).toString())
             }
             return resultJson.toString()
         }
