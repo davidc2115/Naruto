@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#050b14" />
-  <title>NewJarvis AI — Assistant Mobile v2.1</title>
+  <title>NewJarvis AI — Assistant Mobile v2.2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
@@ -266,11 +266,6 @@
     .gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
     .gallery-item-info { padding: 8px 10px; }
     .gallery-item-title { font-size: 10px; font-family: var(--font-orb); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .gallery-item-date { font-size: 9px; color: var(--muted); font-family: var(--font-mono); }
-    .gallery-item-actions { display: flex; gap: 6px; padding: 0 10px 10px; }
-    .btn-sm { flex: 1; padding: 6px 10px; border-radius: 8px; font-family: var(--font-orb); font-size: 9px; font-weight: 700; border: none; cursor: pointer; }
-    .btn-sm-dl { background: linear-gradient(135deg, var(--amber), #f97316); color: #000; }
-    .btn-sm-del { background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); color: var(--rose); }
 
     /* ── API KEYS ── */
     .api-row { margin-bottom: 10px; }
@@ -288,7 +283,6 @@
       font-family: var(--font-mono);
       outline: none;
     }
-    .api-input:focus { border-color: var(--cyan); }
 
     /* ── VOICE CONTROLS ── */
     .voice-controls { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -305,7 +299,6 @@
     .installed-app-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; cursor: pointer; }
     .installed-app-item:hover { border-color: var(--cyan); }
     .installed-app-name { font-size: 12px; font-weight: 600; color: var(--text); }
-    .installed-app-pkg { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
 
     /* ── TOAST ── */
     .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(0,240,255,0.15); border: 1px solid var(--cyan); backdrop-filter: blur(20px); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-family: var(--font-orb); color: var(--cyan); pointer-events: none; opacity: 0; transition: all 0.3s; z-index: 9999; white-space: nowrap; }
@@ -325,8 +318,8 @@
   <div class="logo">
     <div class="logo-badge">NJ</div>
     <div class="logo-text">
-      <h1>NEWJARVIS MOBILE v2.1</h1>
-      <p>Pont Native HTTP • 100% Clés API Opérationnelles</p>
+      <h1>NEWJARVIS MOBILE v2.2</h1>
+      <p>TTS Haut-Parleur • Vocal Natif • Maj Compatible</p>
     </div>
   </div>
 </header>
@@ -337,7 +330,6 @@
   <button class="tab-btn" onclick="showTab('keys',this)">🔑 Clés API</button>
   <button class="tab-btn" onclick="showTab('gallery',this)">🖼️ Galerie HD</button>
   <button class="tab-btn" onclick="showTab('apk',this)">📦 Modificateur APK</button>
-  <button class="tab-btn" onclick="showTab('studio',this)">💻 Studio Code</button>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -356,7 +348,7 @@
     </div>
 
     <div class="card">
-      <div class="card-title"><div class="dot"></div>Commande Vocale &amp; Détection Mot-Clé "JARVIS"</div>
+      <div class="card-title"><div class="dot"></div>Commande Vocale &amp; Haut-Parleur Smartphone</div>
       <div class="voice-controls">
         <button class="mic-btn idle" id="micBtn" onclick="toggleListening()">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11h-2z"/></svg>
@@ -375,7 +367,7 @@
 
       <div class="response-box" id="responseBox">
         <div class="response-label">
-          <span>RÉPONSE IA EN DIRECT</span>
+          <span>RÉPONSE EN DIRECT (VOCAL LANCE)</span>
           <span class="model-badge" id="modelBadge">—</span>
         </div>
         <div id="responseText"></div>
@@ -383,11 +375,11 @@
     </div>
   </div>
 
-  <!-- ── TAB 2 : API KEYS (SUPPORT GROQ, OPENAI, GEMINI, ANTHROPIC, SERPER, KLING) ── -->
+  <!-- ── TAB 2 : API KEYS ── -->
   <div id="tab-keys" class="panel">
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--emerald)"></div>Gestionnaire de Clés API</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Entrez vos clés. Elles sont sauvegardées localement et testées en direct via pont HTTP natif sans blocage CORS.</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Entrez vos clés. Elles sont sauvegardées localement et exécutées via pont natif sans blocage.</p>
       <div id="apiFormContainer"></div>
     </div>
   </div>
@@ -397,16 +389,13 @@
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Génération d'Images Exactes</div>
       <div class="input-row">
-        <input class="input-field" id="imgPrompt" type="text" placeholder="Description exacte (ex: berger australien blue merle)..." onkeydown="if(event.key==='Enter')generateImage()" />
+        <input class="input-field" id="imgPrompt" type="text" placeholder="Description exacte..." onkeydown="if(event.key==='Enter')generateImage()" />
         <button class="btn btn-amber" onclick="generateImage()">Générer</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title" style="justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:8px;"><div class="dot" style="background:var(--amber)"></div>Galerie Photos</div>
-        <button class="btn btn-outline" style="padding:4px 10px;font-size:9px;" onclick="loadGallery()">↻ Actualiser</button>
-      </div>
+      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Galerie Photos</div>
       <div class="gallery-grid" id="galleryGrid"></div>
     </div>
   </div>
@@ -414,24 +403,16 @@
   <!-- ── TAB 4 : APK MODIFIER ── -->
   <div id="tab-apk" class="panel">
     <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--rose)"></div>Modificateur d'Applications du Téléphone</div>
-      <button class="btn btn-purple" style="width:100%;margin-bottom:12px;" onclick="loadInstalledPhoneApps()">📱 Lister les Apps de ce Téléphone</button>
+      <div class="card-title"><div class="dot" style="background:var(--rose)"></div>Modificateur d'Applications</div>
+      <button class="btn btn-purple" style="width:100%;margin-bottom:12px;" onclick="loadInstalledPhoneApps()">📱 Lister les Apps du Téléphone</button>
       <div id="installedAppsContainer" style="max-height:220px;overflow-y:auto;display:none;margin-bottom:12px;"></div>
     </div>
 
     <div class="card" id="apkModPromptCard" style="display:none;">
-      <div class="card-title" style="color:var(--cyan);" id="selectedAppTitle">Application Sélectionnée</div>
-      <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;" placeholder="Consignes pour l'IA... (ex: Thème cyberpunk, fonctionnalités premium...)"></textarea>
-      <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="processAiApkModification()">🤖 Appliquer la Modification IA</button>
+      <div class="card-title" style="color:var(--cyan);" id="selectedAppTitle">App Sélectionnée</div>
+      <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;" placeholder="Consignes de modification IA..."></textarea>
+      <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="processAiApkModification()">🤖 Appliquer la Modification</button>
       <div class="response-box" id="aiApkResult"></div>
-    </div>
-  </div>
-
-  <!-- ── TAB 5 : STUDIO ── -->
-  <div id="tab-studio" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--purple)"></div>Studio Code &amp; Web Apps</div>
-      <p style="font-size:11px;color:var(--muted)">Génération d'applications et jeux HTML/JS interactifs en direct.</p>
     </div>
   </div>
 
@@ -462,7 +443,7 @@
 
 <script>
 // ─────────────────────────────────────────────
-// STORAGE & PONT HTTP NATIVE
+// STORAGE & PONT NATIVE HTTP
 // ─────────────────────────────────────────────
 const Storage = {
   get: (key, def = null) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e){ return def; } },
@@ -477,7 +458,33 @@ function showToast(msg) {
   if (window.AndroidBridge && window.AndroidBridge.showToast) window.AndroidBridge.showToast(msg);
 }
 
-// Contourne les blocages CORS via AndroidBridge.nativeFetch quand disponible
+// Speak out loud through phone speakers using Native TextToSpeech engine
+function speakTextOutLoud(text) {
+  if (!text) return;
+  const clean = text.replace(/[*#_~`]/g,'').slice(0,350);
+  if (window.AndroidBridge && window.AndroidBridge.speak) {
+    window.AndroidBridge.speak(clean);
+  } else if (window.speechSynthesis) {
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = 'fr-FR';
+    speechSynthesis.speak(utt);
+  }
+}
+
+// Callback appelé par Android SpeechRecognizer natif
+window.onNativeSpeechResult = function(text) {
+  if (!text) return;
+  document.getElementById('textInput').value = text;
+  if (text.toLowerCase().includes('jarvis')) {
+    const clean = text.replace(/.*jarvis/i,'').trim();
+    if (clean.length > 2) {
+      document.getElementById('textInput').value = clean;
+      sendText();
+    }
+  }
+};
+
 async function httpFetch(url, options = {}) {
   const method = options.method || 'GET';
   const headers = options.headers || {};
@@ -495,8 +502,6 @@ async function httpFetch(url, options = {}) {
       };
     } catch(e) {}
   }
-
-  // Standard web fetch fallback
   return fetch(url, options);
 }
 
@@ -513,7 +518,7 @@ function showTab(id, tabEl, navId) {
   if (tabEl) tabEl.classList.add('active');
   if (navId) document.getElementById(navId).classList.add('active');
   else {
-    const map = { hud: 'nav-hud', keys: 'nav-keys', gallery: 'nav-gallery', apk: 'nav-apk', studio: 'nav-studio' };
+    const map = { hud: 'nav-hud', keys: 'nav-keys', gallery: 'nav-gallery', apk: 'nav-apk' };
     if (map[id]) document.getElementById(map[id]).classList.add('active');
   }
 
@@ -537,7 +542,7 @@ function setOrbState(state) {
 }
 
 // ─────────────────────────────────────────────
-// VOICE
+// VOICE (NATIVE ANDROID SPEECH + WEB SPEECH FALLBACK)
 // ─────────────────────────────────────────────
 let isListening = false;
 let isPermanentListening = false;
@@ -554,6 +559,20 @@ function togglePermanentListening() {
 }
 
 function startListening(permanent = false) {
+  if (window.AndroidBridge && window.AndroidBridge.startNativeListening) {
+    if (permanent) {
+      isPermanentListening = true;
+      document.getElementById('permMicBtn').className = 'mic-btn permanent';
+      setOrbState('permanent');
+    } else {
+      isListening = true;
+      document.getElementById('micBtn').className = 'mic-btn listening';
+      setOrbState('listening');
+    }
+    window.AndroidBridge.startNativeListening(permanent);
+    return;
+  }
+
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SR();
@@ -603,6 +622,9 @@ function startListening(permanent = false) {
 }
 
 function stopListening() {
+  if (window.AndroidBridge && window.AndroidBridge.stopNativeListening) {
+    window.AndroidBridge.stopNativeListening();
+  }
   if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
   isListening = false;
   document.getElementById('micBtn').className = 'mic-btn idle';
@@ -611,13 +633,16 @@ function stopListening() {
 
 function stopPermanentListening() {
   isPermanentListening = false;
+  if (window.AndroidBridge && window.AndroidBridge.stopNativeListening) {
+    window.AndroidBridge.stopNativeListening();
+  }
   if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
   document.getElementById('permMicBtn').className = 'mic-btn idle';
   setOrbState('idle');
 }
 
 // ─────────────────────────────────────────────
-// SEND TEXT / LIVE AI WITH NATIVE FETCH
+// SEND TEXT / LIVE AI
 // ─────────────────────────────────────────────
 async function sendText() {
   const input = document.getElementById('textInput');
@@ -634,6 +659,10 @@ async function sendText() {
     document.getElementById('responseBox').classList.add('visible');
     document.getElementById('responseText').textContent = result.text;
     document.getElementById('modelBadge').textContent = result.model;
+
+    // VRAI HAUT PARLEUR SMARTPHONE
+    speakTextOutLoud(result.text);
+
   } catch(e) {
     document.getElementById('responseBox').classList.add('visible');
     document.getElementById('responseText').textContent = `Erreur : ${e.message}`;
@@ -646,8 +675,9 @@ async function sendText() {
 
 async function processLiveAiQuery(query) {
   const keys = Storage.get('nj_api_keys', {});
+  const errors = [];
 
-  // 1. GROQ
+  // GROQ
   if (keys.groq) {
     try {
       const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -660,13 +690,15 @@ async function processLiveAiQuery(query) {
         })
       });
       const data = await res.json();
-      if (data.choices?.[0]?.message?.content) {
+      if (res.ok && data.choices?.[0]?.message?.content) {
         return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
+      } else {
+        errors.push(`Groq (${res.status}): ${data.error?.message || 'Erreur d\'authentification'}`);
       }
-    } catch(e) {}
+    } catch(e) { errors.push(`Groq: ${e.message}`); }
   }
 
-  // 2. OPENAI
+  // OPENAI
   if (keys.openai) {
     try {
       const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
@@ -679,30 +711,32 @@ async function processLiveAiQuery(query) {
         })
       });
       const data = await res.json();
-      if (data.choices?.[0]?.message?.content) {
+      if (res.ok && data.choices?.[0]?.message?.content) {
         return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
+      } else {
+        errors.push(`OpenAI (${res.status}): ${data.error?.message || 'Erreur d\'authentification'}`);
       }
-    } catch(e) {}
+    } catch(e) { errors.push(`OpenAI: ${e.message}`); }
   }
 
-  // 3. GOOGLE GEMINI
+  // GOOGLE GEMINI
   if (keys.gemini) {
     try {
       const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: query }] }]
-        })
+        body: JSON.stringify({ contents: [{ parts: [{ text: query }] }] })
       });
       const data = await res.json();
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
         return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
+      } else {
+        errors.push(`Gemini (${res.status}): ${data.error?.message || 'Erreur clé API'}`);
       }
-    } catch(e) {}
+    } catch(e) { errors.push(`Gemini: ${e.message}`); }
   }
 
-  // 4. ANTHROPIC CLAUDE
+  // ANTHROPIC CLAUDE
   if (keys.anthropic) {
     try {
       const res = await httpFetch('https://api.anthropic.com/v1/messages', {
@@ -719,17 +753,24 @@ async function processLiveAiQuery(query) {
         })
       });
       const data = await res.json();
-      if (data.content?.[0]?.text) {
+      if (res.ok && data.content?.[0]?.text) {
         return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
+      } else {
+        errors.push(`Claude (${res.status}): ${data.error?.message || 'Erreur clé API'}`);
       }
-    } catch(e) {}
+    } catch(e) { errors.push(`Claude: ${e.message}`); }
   }
 
-  return { text: `Bonjour ! Votre question "${query}" a été reçue. Renseignez une clé API dans l'onglet Clés API pour obtenir des réponses en direct de Groq, OpenAI, Gemini ou Anthropic.`, model: 'NewJarvis Local' };
+  const hasConfiguredKeys = Object.keys(keys).length > 0;
+  if (!hasConfiguredKeys) {
+    return { text: `Aucune clé API configurée. Veuillez ajouter votre clé Groq, OpenAI, Gemini ou Anthropic dans l'onglet Clés API pour obtenir des réponses IA en direct !`, model: 'Configuration Requise' };
+  } else {
+    return { text: `⚠️ Impossible de contacter le service IA avec vos clés configurées :\n${errors.join('\n')}\n\nVérifiez vos clés dans l'onglet Clés API.`, model: 'Erreur Clés API' };
+  }
 }
 
 // ─────────────────────────────────────────────
-// API KEYS MANAGEMENT & TEST ALL PROVIDERS
+// API KEYS FORM & TEST
 // ─────────────────────────────────────────────
 const API_SERVICES = [
   { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
@@ -769,34 +810,30 @@ async function testAllKeys() {
   const keys = Storage.get('nj_api_keys', {});
   const res = document.getElementById('keyTestResult');
   res.classList.add('visible');
-  res.textContent = '🔬 Test en direct de TOUTES les clés configurées...';
+  res.textContent = '🔬 Test des clés API...';
   const results = [];
 
-  // GROQ
   if (keys.groq) {
     try {
       const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq}` } });
-      results.push(r.ok ? '✅ Groq API : Connectée avec succès (Llama 3.3 70B)' : `❌ Groq API : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ Groq API : Erreur réseau (${e.message})`); }
+      results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ Groq API : Erreur (${e.message})`); }
   } else results.push('⚪ Groq API : Non configurée');
 
-  // OPENAI
   if (keys.openai) {
     try {
       const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai}` } });
-      results.push(r.ok ? '✅ OpenAI API : Connectée avec succès (GPT-4o)' : `❌ OpenAI API : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ OpenAI API : Erreur réseau (${e.message})`); }
+      results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ OpenAI API : Erreur (${e.message})`); }
   } else results.push('⚪ OpenAI API : Non configurée');
 
-  // GOOGLE GEMINI
   if (keys.gemini) {
     try {
       const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini}`);
-      results.push(r.ok ? '✅ Google Gemini : Connectée avec succès (Gemini 1.5 Flash)' : `❌ Google Gemini : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ Google Gemini : Erreur réseau (${e.message})`); }
+      results.push(r.ok ? '✅ Google Gemini : Connectée (Gemini 1.5 Flash)' : `❌ Google Gemini : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ Google Gemini : Erreur (${e.message})`); }
   } else results.push('⚪ Google Gemini : Non configurée');
 
-  // ANTHROPIC CLAUDE
   if (keys.anthropic) {
     try {
       const r = await httpFetch('https://api.anthropic.com/v1/messages', {
@@ -804,19 +841,9 @@ async function testAllKeys() {
         headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic, 'anthropic-version': '2023-06-01' },
         body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 10, messages: [{ role: 'user', content: 'hi' }] })
       });
-      results.push(r.ok ? '✅ Anthropic Claude : Connectée avec succès (Claude 3.5 Sonnet)' : `❌ Anthropic Claude : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ Anthropic Claude : Erreur réseau (${e.message})`); }
+      results.push(r.ok ? '✅ Anthropic Claude : Connectée (Claude 3.5 Sonnet)' : `❌ Anthropic Claude : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ Anthropic Claude : Erreur (${e.message})`); }
   } else results.push('⚪ Anthropic Claude : Non configurée');
-
-  // SERPER
-  if (keys.serper) {
-    results.push('✅ Serper API : Clé enregistrée');
-  } else results.push('⚪ Serper API : Non configurée');
-
-  // KLING
-  if (keys.kling) {
-    results.push('✅ Kling AI : Clé enregistrée');
-  } else results.push('⚪ Kling AI : Non configurée');
 
   res.textContent = results.join('\n');
 }
@@ -826,16 +853,13 @@ async function testAllKeys() {
 // ─────────────────────────────────────────────
 async function generateImage() {
   const prompt = document.getElementById('imgPrompt').value.trim();
-  if (!prompt) { showToast('Entrez une description d\'image'); return; }
-
+  if (!prompt) { showToast('Entrez une description'); return; }
   const timestamp = Date.now();
   const enhanced = `${prompt}, 8k resolution photorealistic detailed photography`;
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1024&height=1024&nologo=true&seed=${timestamp}`;
-  
   const gallery = Storage.get('nj_gallery', []);
   gallery.unshift({ id: 'img_'+timestamp, title: prompt, url, date: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
   Storage.set('nj_gallery', gallery);
-
   showToast('✅ Image générée !');
   loadGallery();
 }
@@ -844,28 +868,22 @@ function loadGallery() {
   const gallery = Storage.get('nj_gallery', []);
   const grid = document.getElementById('galleryGrid');
   if (!gallery.length) { grid.innerHTML = '<div style="color:var(--muted);grid-column:1/-1;text-align:center;padding:12px;">Aucune image.</div>'; return; }
-  grid.innerHTML = gallery.map(i => `
-    <div class="gallery-item">
-      <img src="${i.url}" />
-      <div class="gallery-item-info"><div class="gallery-item-title">${i.title}</div></div>
-    </div>
-  `).join('');
+  grid.innerHTML = gallery.map(i => `<div class="gallery-item"><img src="${i.url}" /><div class="gallery-item-info"><div class="gallery-item-title">${i.title}</div></div></div>`).join('');
 }
 
 // ─────────────────────────────────────────────
-// MODIFICATEUR APK PHONE APPS
+// MODIFICATEUR APK
 // ─────────────────────────────────────────────
 function loadInstalledPhoneApps() {
   const container = document.getElementById('installedAppsContainer');
   container.style.display = 'block';
-
   if (window.AndroidBridge && window.AndroidBridge.getInstalledApps) {
     try {
       const apps = JSON.parse(window.AndroidBridge.getInstalledApps());
       if (apps.length > 0) {
         container.innerHTML = apps.map(app => `
           <div class="installed-app-item" onclick="selectPhoneApp('${app.name.replace(/'/g,"")}','${app.packageName}')">
-            <div><div class="installed-app-name">📱 ${app.name}</div><div class="installed-app-pkg">${app.packageName}</div></div>
+            <div><div class="installed-app-name">📱 ${app.name}</div></div>
             <button class="btn btn-cyan" style="padding:4px 8px;font-size:9px;">Choisir</button>
           </div>
         `).join('');
@@ -873,7 +891,7 @@ function loadInstalledPhoneApps() {
       }
     } catch(e) {}
   }
-  container.innerHTML = '<div style="color:var(--muted);padding:10px;">Lancement sur smartphone requis pour lister les apps Android.</div>';
+  container.innerHTML = '<div style="color:var(--muted);padding:10px;">Lancement sur smartphone requis.</div>';
 }
 
 function selectPhoneApp(name, pkg) {
@@ -884,7 +902,7 @@ function selectPhoneApp(name, pkg) {
 function processAiApkModification() {
   const prompt = document.getElementById('aiApkPrompt').value;
   document.getElementById('aiApkResult').classList.add('visible');
-  document.getElementById('aiApkResult').textContent = `✅ Consigne enregistrée : "${prompt}". L'IA modifie l'APK...`;
+  document.getElementById('aiApkResult').textContent = `✅ Consigne enregistrée : "${prompt}". L'IA adapte l'APK...`;
 }
 
 // ─────────────────────────────────────────────

@@ -26,15 +26,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build Signed Release APK
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Find APK
         run: find . -name "*.apk" -type f
 
-      - name: Upload NewJarvis APK
+      - name: Upload NewJarvis Release APK
         uses: actions/upload-artifact@v4
         with:
           name: NewJarvis-WebView-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/release/app-release.apk
           retention-days: 30
