@@ -11,10 +11,19 @@ android {
         applicationId = "com.narutoai.chat"
         minSdk = 26
         targetSdk = 35
-        versionCode = 70
-        versionName = "2.2.0"
+        versionCode = 65
+        versionName = "3.0.0-NewJarvis"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("naruto-debug.keystore")
+            storePassword = "narutoai123"
+            keyAlias = "naruto-ai"
+            keyPassword = "narutoai123"
+        }
     }
 
     buildTypes {
@@ -24,9 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
-            applicationIdSuffix = ""
+            applicationIdSuffix = ".debug"
         }
     }
 
@@ -47,9 +57,11 @@ android {
 }
 
 dependencies {
+    // Android core
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
+    // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
