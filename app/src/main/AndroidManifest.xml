@@ -16,7 +16,7 @@
         android:label="NewJarvis AI"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:theme="@style/Theme.NewJarvis"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
