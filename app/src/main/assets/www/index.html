@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#030712" />
-  <title>NewJarvis AI — Assistant Cybernetic Ultra-Premium</title>
+  <title>NewJarvis AI — Assistant Cybernetic Integral</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -158,43 +158,6 @@
     }
     .strip-val { color: var(--cyan); font-weight: 600; }
 
-    /* ── NAVIGATION TABS ── */
-    .tabs-nav {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      gap: 6px;
-      padding: 8px 16px;
-      background: rgba(3, 7, 18, 0.6);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      overflow-x: auto;
-    }
-
-    .tab-btn {
-      flex: 1;
-      min-width: max-content;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(15, 23, 42, 0.5);
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
-      border-color: var(--cyan);
-      color: var(--cyan);
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
-    }
-
     /* ── MAIN CONTENT AREA ── */
     .main-container {
       position: relative;
@@ -215,14 +178,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px 0;
+      padding: 16px 0;
       position: relative;
     }
 
     .orb-wrapper {
       position: relative;
-      width: 140px;
-      height: 140px;
+      width: 130px;
+      height: 130px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -250,8 +213,8 @@
     @keyframes rotateRingRev { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
     .orb-core {
-      width: 90px;
-      height: 90px;
+      width: 84px;
+      height: 84px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, var(--cyan), var(--purple), rgba(168,85,247,0.3));
       box-shadow: 0 0 35px var(--cyan-glow), inset 0 0 25px #fff;
@@ -266,12 +229,13 @@
     }
 
     .orb-state-label {
-      margin-top: 14px;
+      margin-top: 12px;
       font-family: var(--font-orb);
-      font-size: 11px;
+      font-size: 10.5px;
       letter-spacing: 1.5px;
       color: var(--cyan);
       text-shadow: 0 0 10px var(--cyan-glow);
+      text-align: center;
     }
 
     /* ── CHAT & RESPONSE CARDS ── */
@@ -308,7 +272,7 @@
     }
 
     .response-body {
-      font-size: 13.5px;
+      font-size: 13px;
       line-height: 1.6;
       color: var(--text);
       white-space: pre-wrap;
@@ -342,7 +306,7 @@
       color: var(--text);
       font-family: var(--font-main);
       font-weight: 700;
-      font-size: 12px;
+      font-size: 11.5px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -574,7 +538,7 @@
       <div class="brand-icon">J</div>
       <div>
         <div class="brand-title">NEWJARVIS 3.0</div>
-        <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono);">SYSTEM HUD V3.0 — ULTIMATE ENGINE</div>
+        <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono);">SYSTEM HUD V3.0 — INTEGRAL ENGINE</div>
       </div>
     </div>
     <div class="status-badge">
@@ -587,7 +551,7 @@
   <div class="system-strip">
     <div class="strip-item">AUDIO: <span class="strip-val" id="hudAudio">HAUT-PARLEUR NATIVE</span></div>
     <div class="strip-item">| MIC: <span class="strip-val" id="hudMic">DETECTION JARVIS</span></div>
-    <div class="strip-item">| CLÉS: <span class="strip-val" id="hudKeysCount">0 CONFIGURÉES</span></div>
+    <div class="strip-item">| CLÉS: <span class="strip-val" id="hudKeysCount">0 CONFIGURÉE(S)</span></div>
   </div>
 
   <!-- MAIN CONTAINER -->
@@ -608,23 +572,23 @@
       <!-- RESPONSE CARD -->
       <div class="response-card" id="responseBox">
         <div class="response-header">
-          <span style="font-size:11px;font-weight:700;color:var(--cyan);">RÉPONSE REÇUE</span>
+          <span style="font-size:11px;font-weight:700;color:var(--cyan);">RÉPONSE IA REÇUE</span>
           <span class="model-badge" id="modelBadge">IA ENGINE</span>
         </div>
         <div class="response-body" id="responseText"></div>
       </div>
     </div>
 
-    <!-- PANEL CLÉS API -->
+    <!-- PANEL CLÉS API INTÉGRAL -->
     <div class="panel" id="tab-keys">
       <div class="card">
         <div class="card-title">
-          <span>CONFIGURATION DES CLÉS API IA</span>
+          <span>GESTIONNAIRE CLÉS API & INTEGRATIONS</span>
           <span style="font-size:10px;color:var(--emerald);" id="savedStatusText">Sauvegardé</span>
         </div>
-        <p style="font-size:11.5px;color:var(--muted);">Renseignez au moins une clé API. Elles sont enregistrées de façon permanente dans la mémoire native sécurisée de votre téléphone.</p>
+        <p style="font-size:11.5px;color:var(--muted);">Renseignez vos clés. Elles sont sauvegardées dans les SharedPreferences du téléphone.</p>
         <div id="apiFormContainer"></div>
-        <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="saveAllKeysAndTest()">💾 SAUVEGARDER ET TESTER EN DIRECT</button>
+        <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="saveAllKeysAndTest()">💾 SAUVEGARDER & TESTER TOUTES LES CLÉS</button>
         <div class="response-card" id="keyTestResult" style="margin-top:10px;"></div>
       </div>
     </div>
@@ -722,13 +686,11 @@
       if (!text) return;
       const cleanText = text.replace(/[*#_`]/g, '').trim();
       
-      // 1. Priorité au pont Android natif (TextToSpeech dans haut-parleur)
       if (window.AndroidBridge && window.AndroidBridge.speak) {
         window.AndroidBridge.speak(cleanText);
         return;
       }
 
-      // 2. Fallback WebSpeech API
       if ('speechSynthesis' in window) {
         try {
           window.speechSynthesis.cancel();
@@ -912,49 +874,119 @@
       const keys = Storage.get('nj_api_keys', {});
       const errors = [];
 
-      if (keys.groq) {
+      // 1. GROQ (Llama 3.3 70B)
+      if (keys.groq && keys.groq.trim()) {
         try {
           const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq.trim()}` },
             body: JSON.stringify({
               model: 'llama-3.3-70b-versatile',
               messages: [{ role: 'user', content: query }],
-              max_tokens: 300
+              max_tokens: 400
             })
           });
           const data = await res.json();
           if (res.ok && data.choices?.[0]?.message?.content) {
             return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
           } else {
-            errors.push(`Groq (${res.status}): ${data.error?.message || 'Erreur API'}`);
+            errors.push(`Groq (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
           }
         } catch(e) { errors.push(`Groq: ${e.message}`); }
       }
 
-      if (keys.openai) {
+      // 2. OPENAI (GPT-4o-mini / GPT-4o)
+      if (keys.openai && keys.openai.trim()) {
         try {
           const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai.trim()}` },
             body: JSON.stringify({
               model: 'gpt-4o-mini',
               messages: [{ role: 'user', content: query }],
-              max_tokens: 300
+              max_tokens: 400
             })
           });
           const data = await res.json();
           if (res.ok && data.choices?.[0]?.message?.content) {
             return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
           } else {
-            errors.push(`OpenAI (${res.status}): ${data.error?.message || 'Erreur API'}`);
+            errors.push(`OpenAI (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
           }
         } catch(e) { errors.push(`OpenAI: ${e.message}`); }
       }
 
-      if (keys.gemini) {
+      // 3. ANTHROPIC (Claude 3.5 Sonnet)
+      if (keys.anthropic && keys.anthropic.trim()) {
         try {
-          const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
+          const res = await httpFetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': keys.anthropic.trim(),
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: 'claude-3-5-sonnet-20241022',
+              max_tokens: 400,
+              messages: [{ role: 'user', content: query }]
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.content?.[0]?.text) {
+            return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
+          } else {
+            errors.push(`Claude (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+          }
+        } catch(e) { errors.push(`Claude: ${e.message}`); }
+      }
+
+      // 4. MISTRAL AI (Mistral Small / Pixtral)
+      if (keys.mistral && keys.mistral.trim()) {
+        try {
+          const res = await httpFetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.mistral.trim()}` },
+            body: JSON.stringify({
+              model: 'mistral-small-latest',
+              messages: [{ role: 'user', content: query }],
+              max_tokens: 400
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.choices?.[0]?.message?.content) {
+            return { text: data.choices[0].message.content, model: 'Mistral AI (Mistral Small)' };
+          } else {
+            errors.push(`Mistral (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+          }
+        } catch(e) { errors.push(`Mistral: ${e.message}`); }
+      }
+
+      // 5. xAI (Grok Beta)
+      if (keys.xai && keys.xai.trim()) {
+        try {
+          const res = await httpFetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.xai.trim()}` },
+            body: JSON.stringify({
+              model: 'grok-beta',
+              messages: [{ role: 'user', content: query }],
+              max_tokens: 400
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.choices?.[0]?.message?.content) {
+            return { text: data.choices[0].message.content, model: 'xAI (Grok)' };
+          } else {
+            errors.push(`xAI (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+          }
+        } catch(e) { errors.push(`xAI: ${e.message}`); }
+      }
+
+      // 6. GOOGLE GEMINI (1.5 Flash)
+      if (keys.gemini && keys.gemini.trim()) {
+        try {
+          const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini.trim()}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: query }] }] })
@@ -963,49 +995,35 @@
           if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
             return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
           } else {
-            errors.push(`Gemini (${res.status}): ${data.error?.message || 'Erreur API'}`);
+            errors.push(`Gemini (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
           }
         } catch(e) { errors.push(`Gemini: ${e.message}`); }
       }
 
-      if (keys.anthropic) {
-        try {
-          const res = await httpFetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': keys.anthropic,
-              'anthropic-version': '2023-06-01'
-            },
-            body: JSON.stringify({
-              model: 'claude-3-5-sonnet-20241022',
-              max_tokens: 300,
-              messages: [{ role: 'user', content: query }]
-            })
-          });
-          const data = await res.json();
-          if (res.ok && data.content?.[0]?.text) {
-            return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
-          } else {
-            errors.push(`Claude (${res.status}): ${data.error?.message || 'Erreur API'}`);
-          }
-        } catch(e) { errors.push(`Claude: ${e.message}`); }
-      }
-
       const hasConfiguredKeys = Object.keys(keys).length > 0;
       if (!hasConfiguredKeys) {
-        return { text: `Aucune clé API configurée. Veuillez ajouter votre clé Groq, OpenAI, Gemini ou Anthropic dans l'onglet CLÉS API !`, model: 'Configuration Requise' };
+        return { text: `Aucune clé API configurée. Veuillez ajouter vos clés dans l'onglet CLÉS API !`, model: 'Configuration Requise' };
       } else {
-        return { text: `⚠️ Impossible de contacter les serveurs IA :\n${errors.join('\n')}\n\nVérifiez la validité de vos clés dans l'onglet CLÉS API.`, model: 'Erreur Clés API' };
+        return { text: `⚠️ Diagnostic des APIs :\n${errors.join('\n')}\n\nVérifiez la validité de vos clés dans l'onglet CLÉS API.`, model: 'Erreur Clés API' };
       }
     }
 
-    /* ── FORMULAIRE DE GESTION ET TEST DES CLÉS API ── */
+    /* ── FORMULAIRE DE GESTION COMPLET DE TOUTES LES APIS ── */
     const API_SERVICES = [
       { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
       { id: 'openai', label: 'OpenAI API (GPT-4o)', placeholder: 'sk-proj-...', url: 'https://platform.openai.com/api-keys' },
-      { id: 'gemini', label: 'Google Gemini', placeholder: 'AIzaSy...', url: 'https://aistudio.google.com/app/apikey' },
-      { id: 'anthropic', label: 'Anthropic Claude', placeholder: 'sk-ant-api...', url: 'https://console.anthropic.com/settings/keys' }
+      { id: 'anthropic', label: 'Anthropic Claude API', placeholder: 'sk-ant-api...', url: 'https://console.anthropic.com/settings/keys' },
+      { id: 'mistral', label: 'Mistral AI API', placeholder: 'LKoO...', url: 'https://console.mistral.ai/api-keys/' },
+      { id: 'gemini', label: 'Google Gemini API', placeholder: 'AIzaSy...', url: 'https://aistudio.google.com/app/apikey' },
+      { id: 'xai', label: 'xAI Grok API', placeholder: 'xai-...', url: 'https://console.x.ai/' },
+      { id: 'serpapi', label: 'SerpAPI / Serper (Recherche Google)', placeholder: 'serper_key_...', url: 'https://serper.dev/' },
+      { id: 'ha_url', label: 'Home Assistant URL', placeholder: 'https://maisoncortot.duckdns.org:47000', url: '#' },
+      { id: 'ha_token', label: 'Home Assistant Token (Bearer)', placeholder: 'eyJhbGci...', url: '#' },
+      { id: 'freebox_host', label: 'Freebox Host URL', placeholder: 'http://mafreebox.freebox.fr', url: '#' },
+      { id: 'freebox_app_id', label: 'Freebox App ID', placeholder: 'fr.jarvis.assistant', url: '#' },
+      { id: 'freebox_app_token', label: 'Freebox App Token', placeholder: 'wJAfICaa...', url: '#' },
+      { id: 'youtube', label: 'YouTube API Key', placeholder: 'AIzaSy...', url: '#' },
+      { id: 'spotify', label: 'Spotify Musique URI', placeholder: 'spotify:user:...', url: '#' }
     ];
 
     function renderApiForm() {
@@ -1018,9 +1036,9 @@
           <div class="api-label">
             <span>${svc.label}</span>
             ${keys[svc.id] ? '<span class="api-saved-badge">✅ Configurée</span>' : ''}
-            <a href="${svc.url}" target="_blank" style="color:var(--cyan);font-size:10px;margin-left:auto;">Obtenir →</a>
+            ${svc.url !== '#' ? `<a href="${svc.url}" target="_blank" style="color:var(--cyan);font-size:10px;margin-left:auto;">Obtenir →</a>` : ''}
           </div>
-          <input class="api-input" type="password" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" oninput="updateTempKey('${svc.id}', this.value)" />
+          <input class="api-input" type="text" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" oninput="updateTempKey('${svc.id}', this.value)" />
         </div>
       `).join('');
     }
@@ -1034,7 +1052,7 @@
 
     async function saveAllKeysAndTest() {
       const keys = Storage.get('nj_api_keys', {});
-      showToast('💾 Clés sauvegardées dans le téléphone !');
+      showToast('💾 Clés sauvegardées de façon permanente !');
       renderApiForm();
 
       const resBox = document.getElementById('keyTestResult');
@@ -1042,42 +1060,58 @@
       resBox.textContent = '🔬 Test en direct des clés API...';
       const results = [];
 
-      if (keys.groq) {
+      // TEST GROQ
+      if (keys.groq && keys.groq.trim()) {
         try {
-          const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq}` } });
-          results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur (${r.status})`);
+          const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq.trim()}` } });
+          results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur Code ${r.status} (${r.text ? await r.text() : ''})`);
         } catch(e) { results.push(`❌ Groq API : ${e.message}`); }
       } else results.push('⚪ Groq API : Non renseignée');
 
-      if (keys.openai) {
+      // TEST OPENAI
+      if (keys.openai && keys.openai.trim()) {
         try {
-          const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai}` } });
-          results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur (${r.status})`);
+          const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai.trim()}` } });
+          results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur Code ${r.status}`);
         } catch(e) { results.push(`❌ OpenAI API : ${e.message}`); }
       } else results.push('⚪ OpenAI API : Non renseignée');
 
-      if (keys.gemini) {
-        try {
-          const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini}`);
-          results.push(r.ok ? '✅ Google Gemini : Connectée (Gemini 1.5)' : `❌ Google Gemini : Erreur (${r.status})`);
-        } catch(e) { results.push(`❌ Google Gemini : ${e.message}`); }
-      } else results.push('⚪ Google Gemini : Non renseignée');
-
-      if (keys.anthropic) {
+      // TEST ANTHROPIC
+      if (keys.anthropic && keys.anthropic.trim()) {
         try {
           const r = await httpFetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic, 'anthropic-version': '2023-06-01' },
+            headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic.trim(), 'anthropic-version': '2023-06-01' },
             body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 5, messages: [{ role: 'user', content: 'hi' }] })
           });
-          results.push(r.ok ? '✅ Anthropic Claude : Connectée (Claude 3.5)' : `❌ Anthropic Claude : Erreur (${r.status})`);
+          results.push(r.ok ? '✅ Anthropic Claude : Connectée (Claude 3.5)' : `❌ Anthropic Claude : Erreur Code ${r.status}`);
         } catch(e) { results.push(`❌ Anthropic Claude : ${e.message}`); }
       } else results.push('⚪ Anthropic Claude : Non renseignée');
+
+      // TEST MISTRAL
+      if (keys.mistral && keys.mistral.trim()) {
+        try {
+          const r = await httpFetch('https://api.mistral.ai/v1/models', { headers: { 'Authorization': `Bearer ${keys.mistral.trim()}` } });
+          results.push(r.ok ? '✅ Mistral AI : Connectée' : `❌ Mistral AI : Erreur Code ${r.status}`);
+        } catch(e) { results.push(`❌ Mistral AI : ${e.message}`); }
+      } else results.push('⚪ Mistral AI : Non renseignée');
+
+      // TEST GEMINI
+      if (keys.gemini && keys.gemini.trim()) {
+        try {
+          const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini.trim()}`);
+          if (r.ok) {
+            results.push('✅ Google Gemini : Connectée (Gemini 1.5)');
+          } else {
+            results.push(`❌ Google Gemini : Erreur Code ${r.status} (Note: La clé doit commencer par AIzaSy sur aistudio.google.com)`);
+          }
+        } catch(e) { results.push(`❌ Google Gemini : ${e.message}`); }
+      } else results.push('⚪ Google Gemini : Non renseignée');
 
       resBox.textContent = results.join('\n');
     }
 
-    /* ── GÉNÉRATION D'IMAGES ── */
+    /* ── GENERATION D'IMAGES ── */
     async function generateImage() {
       const prompt = document.getElementById('imgPrompt').value.trim();
       if (!prompt) { showToast('Entrez une description d\'image'); return; }

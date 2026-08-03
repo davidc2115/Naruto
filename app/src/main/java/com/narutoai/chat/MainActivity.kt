@@ -294,7 +294,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             return jsonArray.toString()
         }
 
-        // Pont Native HTTP (Sans CORS)
+        // Pont Native HTTP (Sans CORS, avec User-Agent Android moderne)
         @JavascriptInterface
         fun nativeFetch(urlStr: String, method: String, headersJsonStr: String, bodyStr: String): String {
             val resultJson = JSONObject()
@@ -305,6 +305,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 conn.connectTimeout = 15000
                 conn.readTimeout = 15000
                 conn.doInput = true
+
+                // Default User-Agent moderne pour éviter le blocage par Cloudflare / API firewalls
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) NewJarvis/3.0")
 
                 if (headersJsonStr.isNotEmpty() && headersJsonStr != "{}") {
                     val headers = JSONObject(headersJsonStr)
