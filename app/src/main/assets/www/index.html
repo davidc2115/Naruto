@@ -586,9 +586,9 @@
           <span>GESTIONNAIRE CLÉS API & INTEGRATIONS</span>
           <span style="font-size:10px;color:var(--emerald);" id="savedStatusText">Sauvegardé</span>
         </div>
-        <p style="font-size:11.5px;color:var(--muted);">Renseignez vos clés. Elles sont sauvegardées dans les SharedPreferences du téléphone.</p>
+        <p style="font-size:11.5px;color:var(--muted);">Collez vos clés ci-dessous puis appuyez sur le bouton de sauvegarde. Elles sont conservées sur votre téléphone.</p>
         <div id="apiFormContainer"></div>
-        <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="saveAllKeysAndTest()">💾 SAUVEGARDER & TESTER TOUTES LES CLÉS</button>
+        <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="saveAllKeysAndTest()">💾 SAUVEGARDER & TESTER EN DIRECT</button>
         <div class="response-card" id="keyTestResult" style="margin-top:10px;"></div>
       </div>
     </div>
@@ -657,7 +657,7 @@
   </nav>
 
   <script>
-    /* ── MULTI-STORAGE UNIVERSEL (Natif Android SharedPreferences + LocalStorage) ── */
+    /* ── MULTI-STORAGE UNIVERSEL (SharedPreferences Natif + LocalStorage) ── */
     const Storage = {
       get: (key, defaultValue) => {
         try {
@@ -681,7 +681,7 @@
       }
     };
 
-    /* ── SYNTHÈSE VOCALE PAR HAUT-PARLEURS DU TÉLÉPHONE ── */
+    /* ── SYNTHÈSE VOCALE HAUT-PARLEURS TÉLÉPHONE ── */
     function speakTextOutLoud(text) {
       if (!text) return;
       const cleanText = text.replace(/[*#_`]/g, '').trim();
@@ -702,7 +702,7 @@
       }
     }
 
-    /* ── RECONNAISSANCE VOCALE & DÉTECTION DU MOT CLÉ "JARVIS" ── */
+    /* ── RECONNAISSANCE VOCALE & MOT-CLÉ "JARVIS" ── */
     let isListening = false;
     let isPermanentListening = false;
     let webSpeechRecognition = null;
@@ -768,7 +768,6 @@
       if (webSpeechRecognition) { try { webSpeechRecognition.stop(); } catch(e){} webSpeechRecognition = null; }
     }
 
-    // Réception du texte reconnu depuis le pont Android Natif
     window.onNativeSpeechResult = function(text) {
       handleRecognizedText(text);
     };
@@ -819,7 +818,7 @@
       }
     }
 
-    /* ── PONT RESEAU NATIVE HTTP (SANS ERREUR CORS) ── */
+    /* ── PONT RESEAU NATIVE HTTP ROBUSTE ── */
     async function httpFetch(url, options = {}) {
       const method = options.method || 'GET';
       const headers = options.headers || {};
@@ -829,15 +828,33 @@
         try {
           const resStr = window.AndroidBridge.nativeFetch(url, method, JSON.stringify(headers), typeof body === 'string' ? body : JSON.stringify(body));
           const res = JSON.parse(resStr);
+          const dataStr = res.data || '';
           return {
             ok: res.ok,
             status: res.status,
-            json: async () => JSON.parse(res.data),
-            text: async () => res.data
+            json: async () => {
+              try {
+                return JSON.parse(dataStr);
+              } catch(e) {
+                return { error: { message: dataStr || `Erreur HTTP ${res.status}` } };
+              }
+            },
+            text: async () => dataStr
           };
         } catch(e) {}
       }
-      return fetch(url, options);
+
+      try {
+        const res = await fetch(url, options);
+        return res;
+      } catch(e) {
+        return {
+          ok: false,
+          status: 500,
+          json: async () => ({ error: { message: e.message } }),
+          text: async () => e.message
+        };
+      }
     }
 
     /* ── GESTION DE L'ENVOI DU TEXTE ── */
@@ -857,7 +874,6 @@
         document.getElementById('responseText').textContent = result.text;
         document.getElementById('modelBadge').textContent = result.model;
 
-        // VÉRITABLE RÉPONSE EN PAROLE VIA HAUT-PARLEUR DU TÉLÉPHONE
         speakTextOutLoud(result.text);
 
       } catch(e) {
@@ -874,7 +890,7 @@
       const keys = Storage.get('nj_api_keys', {});
       const errors = [];
 
-      // 1. GROQ (Llama 3.3 70B)
+      // 1. GROQ
       if (keys.groq && keys.groq.trim()) {
         try {
           const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -890,12 +906,12 @@
           if (res.ok && data.choices?.[0]?.message?.content) {
             return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
           } else {
-            errors.push(`Groq (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+            errors.push(`Groq (${res.status}): ${data.error?.message || data.message || await res.text()}`);
           }
         } catch(e) { errors.push(`Groq: ${e.message}`); }
       }
 
-      // 2. OPENAI (GPT-4o-mini / GPT-4o)
+      // 2. OPENAI
       if (keys.openai && keys.openai.trim()) {
         try {
           const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
@@ -911,12 +927,12 @@
           if (res.ok && data.choices?.[0]?.message?.content) {
             return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
           } else {
-            errors.push(`OpenAI (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+            errors.push(`OpenAI (${res.status}): ${data.error?.message || data.message || await res.text()}`);
           }
         } catch(e) { errors.push(`OpenAI: ${e.message}`); }
       }
 
-      // 3. ANTHROPIC (Claude 3.5 Sonnet)
+      // 3. ANTHROPIC
       if (keys.anthropic && keys.anthropic.trim()) {
         try {
           const res = await httpFetch('https://api.anthropic.com/v1/messages', {
@@ -936,12 +952,12 @@
           if (res.ok && data.content?.[0]?.text) {
             return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
           } else {
-            errors.push(`Claude (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+            errors.push(`Claude (${res.status}): ${data.error?.message || data.message || await res.text()}`);
           }
         } catch(e) { errors.push(`Claude: ${e.message}`); }
       }
 
-      // 4. MISTRAL AI (Mistral Small / Pixtral)
+      // 4. MISTRAL AI
       if (keys.mistral && keys.mistral.trim()) {
         try {
           const res = await httpFetch('https://api.mistral.ai/v1/chat/completions', {
@@ -957,12 +973,12 @@
           if (res.ok && data.choices?.[0]?.message?.content) {
             return { text: data.choices[0].message.content, model: 'Mistral AI (Mistral Small)' };
           } else {
-            errors.push(`Mistral (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+            errors.push(`Mistral (${res.status}): ${data.error?.message || data.message || await res.text()}`);
           }
         } catch(e) { errors.push(`Mistral: ${e.message}`); }
       }
 
-      // 5. xAI (Grok Beta)
+      // 5. xAI (Grok)
       if (keys.xai && keys.xai.trim()) {
         try {
           const res = await httpFetch('https://api.x.ai/v1/chat/completions', {
@@ -978,12 +994,12 @@
           if (res.ok && data.choices?.[0]?.message?.content) {
             return { text: data.choices[0].message.content, model: 'xAI (Grok)' };
           } else {
-            errors.push(`xAI (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+            errors.push(`xAI (${res.status}): ${data.error?.message || data.message || await res.text()}`);
           }
         } catch(e) { errors.push(`xAI: ${e.message}`); }
       }
 
-      // 6. GOOGLE GEMINI (1.5 Flash)
+      // 6. GEMINI
       if (keys.gemini && keys.gemini.trim()) {
         try {
           const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini.trim()}`, {
@@ -995,20 +1011,20 @@
           if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
             return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
           } else {
-            errors.push(`Gemini (${res.status}): ${data.error?.message || JSON.stringify(data)}`);
+            errors.push(`Gemini (${res.status}): ${data.error?.message || data.message || await res.text()}`);
           }
         } catch(e) { errors.push(`Gemini: ${e.message}`); }
       }
 
       const hasConfiguredKeys = Object.keys(keys).length > 0;
       if (!hasConfiguredKeys) {
-        return { text: `Aucune clé API configurée. Veuillez ajouter vos clés dans l'onglet CLÉS API !`, model: 'Configuration Requise' };
+        return { text: `Aucune clé API enregistrée. Rendez-vous dans l'onglet CLÉS API, collez vos clés puis appuyez sur "💾 SAUVEGARDER & TESTER" !`, model: 'Configuration Requise' };
       } else {
-        return { text: `⚠️ Diagnostic des APIs :\n${errors.join('\n')}\n\nVérifiez la validité de vos clés dans l'onglet CLÉS API.`, model: 'Erreur Clés API' };
+        return { text: `⚠️ Diagnostic des APIs :\n${errors.join('\n')}\n\nRendez-vous dans l'onglet CLÉS API pour vérifier vos clés.`, model: 'Erreur Clés API' };
       }
     }
 
-    /* ── FORMULAIRE DE GESTION COMPLET DE TOUTES LES APIS ── */
+    /* ── FORMULAIRE DE GESTION COMPLET DES APIS ── */
     const API_SERVICES = [
       { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
       { id: 'openai', label: 'OpenAI API (GPT-4o)', placeholder: 'sk-proj-...', url: 'https://platform.openai.com/api-keys' },
@@ -1016,9 +1032,9 @@
       { id: 'mistral', label: 'Mistral AI API', placeholder: 'LKoO...', url: 'https://console.mistral.ai/api-keys/' },
       { id: 'gemini', label: 'Google Gemini API', placeholder: 'AIzaSy...', url: 'https://aistudio.google.com/app/apikey' },
       { id: 'xai', label: 'xAI Grok API', placeholder: 'xai-...', url: 'https://console.x.ai/' },
-      { id: 'serpapi', label: 'SerpAPI / Serper (Recherche Google)', placeholder: 'serper_key_...', url: 'https://serper.dev/' },
+      { id: 'serpapi', label: 'SerpAPI / Serper (Google Search)', placeholder: 'serper_key_...', url: 'https://serper.dev/' },
       { id: 'ha_url', label: 'Home Assistant URL', placeholder: 'https://maisoncortot.duckdns.org:47000', url: '#' },
-      { id: 'ha_token', label: 'Home Assistant Token (Bearer)', placeholder: 'eyJhbGci...', url: '#' },
+      { id: 'ha_token', label: 'Home Assistant Token', placeholder: 'eyJhbGci...', url: '#' },
       { id: 'freebox_host', label: 'Freebox Host URL', placeholder: 'http://mafreebox.freebox.fr', url: '#' },
       { id: 'freebox_app_id', label: 'Freebox App ID', placeholder: 'fr.jarvis.assistant', url: '#' },
       { id: 'freebox_app_token', label: 'Freebox App Token', placeholder: 'wJAfICaa...', url: '#' },
@@ -1038,72 +1054,71 @@
             ${keys[svc.id] ? '<span class="api-saved-badge">✅ Configurée</span>' : ''}
             ${svc.url !== '#' ? `<a href="${svc.url}" target="_blank" style="color:var(--cyan);font-size:10px;margin-left:auto;">Obtenir →</a>` : ''}
           </div>
-          <input class="api-input" type="text" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" oninput="updateTempKey('${svc.id}', this.value)" />
+          <input class="api-input" type="text" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" />
         </div>
       `).join('');
     }
 
-    function updateTempKey(id, val) {
-      const keys = Storage.get('nj_api_keys', {});
-      if (val.trim()) keys[id] = val.trim(); else delete keys[id];
-      Storage.set('nj_api_keys', keys);
-      document.getElementById('hudKeysCount').textContent = `${Object.keys(keys).length} CONFIGURÉE(S)`;
-    }
-
     async function saveAllKeysAndTest() {
-      const keys = Storage.get('nj_api_keys', {});
-      showToast('💾 Clés sauvegardées de façon permanente !');
+      // 1. Lire directement tous les champs de saisie du DOM
+      const keys = {};
+      API_SERVICES.forEach(svc => {
+        const el = document.getElementById(`key-${svc.id}`);
+        if (el && el.value && el.value.trim()) {
+          keys[svc.id] = el.value.trim();
+        }
+      });
+
+      // 2. Sauvegarder dans SharedPreferences natif + LocalStorage
+      Storage.set('nj_api_keys', keys);
+      showToast('💾 Toutes vos clés sont sauvegardées de façon permanente !');
       renderApiForm();
 
+      // 3. Tester chaque clé immédiatement en direct
       const resBox = document.getElementById('keyTestResult');
       resBox.classList.add('visible');
-      resBox.textContent = '🔬 Test en direct des clés API...';
+      resBox.textContent = '🔬 Test en direct de vos clés...';
       const results = [];
 
-      // TEST GROQ
-      if (keys.groq && keys.groq.trim()) {
+      if (keys.groq) {
         try {
-          const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq.trim()}` } });
-          results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur Code ${r.status} (${r.text ? await r.text() : ''})`);
+          const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq}` } });
+          results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur ${r.status}`);
         } catch(e) { results.push(`❌ Groq API : ${e.message}`); }
       } else results.push('⚪ Groq API : Non renseignée');
 
-      // TEST OPENAI
-      if (keys.openai && keys.openai.trim()) {
+      if (keys.openai) {
         try {
-          const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai.trim()}` } });
-          results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur Code ${r.status}`);
+          const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai}` } });
+          results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur ${r.status}`);
         } catch(e) { results.push(`❌ OpenAI API : ${e.message}`); }
       } else results.push('⚪ OpenAI API : Non renseignée');
 
-      // TEST ANTHROPIC
-      if (keys.anthropic && keys.anthropic.trim()) {
+      if (keys.anthropic) {
         try {
           const r = await httpFetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic.trim(), 'anthropic-version': '2023-06-01' },
+            headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic, 'anthropic-version': '2023-06-01' },
             body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 5, messages: [{ role: 'user', content: 'hi' }] })
           });
-          results.push(r.ok ? '✅ Anthropic Claude : Connectée (Claude 3.5)' : `❌ Anthropic Claude : Erreur Code ${r.status}`);
+          results.push(r.ok ? '✅ Anthropic Claude : Connectée' : `❌ Anthropic Claude : Erreur ${r.status}`);
         } catch(e) { results.push(`❌ Anthropic Claude : ${e.message}`); }
       } else results.push('⚪ Anthropic Claude : Non renseignée');
 
-      // TEST MISTRAL
-      if (keys.mistral && keys.mistral.trim()) {
+      if (keys.mistral) {
         try {
-          const r = await httpFetch('https://api.mistral.ai/v1/models', { headers: { 'Authorization': `Bearer ${keys.mistral.trim()}` } });
-          results.push(r.ok ? '✅ Mistral AI : Connectée' : `❌ Mistral AI : Erreur Code ${r.status}`);
+          const r = await httpFetch('https://api.mistral.ai/v1/models', { headers: { 'Authorization': `Bearer ${keys.mistral}` } });
+          results.push(r.ok ? '✅ Mistral AI : Connectée' : `❌ Mistral AI : Erreur ${r.status}`);
         } catch(e) { results.push(`❌ Mistral AI : ${e.message}`); }
       } else results.push('⚪ Mistral AI : Non renseignée');
 
-      // TEST GEMINI
-      if (keys.gemini && keys.gemini.trim()) {
+      if (keys.gemini) {
         try {
-          const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini.trim()}`);
+          const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini}`);
           if (r.ok) {
-            results.push('✅ Google Gemini : Connectée (Gemini 1.5)');
+            results.push('✅ Google Gemini : Connectée');
           } else {
-            results.push(`❌ Google Gemini : Erreur Code ${r.status} (Note: La clé doit commencer par AIzaSy sur aistudio.google.com)`);
+            results.push(`❌ Google Gemini : Erreur ${r.status} (Nécessite clé AIzaSy... de aistudio.google.com)`);
           }
         } catch(e) { results.push(`❌ Google Gemini : ${e.message}`); }
       } else results.push('⚪ Google Gemini : Non renseignée');
@@ -1111,7 +1126,7 @@
       resBox.textContent = results.join('\n');
     }
 
-    /* ── GENERATION D'IMAGES ── */
+    /* ── GÉNÉRATION D'IMAGES ── */
     async function generateImage() {
       const prompt = document.getElementById('imgPrompt').value.trim();
       if (!prompt) { showToast('Entrez une description d\'image'); return; }

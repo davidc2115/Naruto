@@ -294,7 +294,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             return jsonArray.toString()
         }
 
-        // Pont Native HTTP (Sans CORS, avec User-Agent Android moderne)
+        // Pont Native HTTP ultra-robuste avec gestion des erreurs 401/403/500 et User-Agent
         @JavascriptInterface
         fun nativeFetch(urlStr: String, method: String, headersJsonStr: String, bodyStr: String): String {
             val resultJson = JSONObject()
@@ -341,13 +341,14 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                     reader.close()
                 }
 
+                val dataStr = if (sb.isNotEmpty()) sb.toString() else "{\"error\":{\"message\":\"HTTP Status $responseCode\"}}"
                 resultJson.put("ok", responseCode in 200..299)
-                resultJson.put("data", sb.toString())
+                resultJson.put("data", dataStr)
             } catch (e: Exception) {
                 e.printStackTrace()
                 resultJson.put("ok", false)
                 resultJson.put("status", 500)
-                resultJson.put("error", e.message ?: "Erreur réseau")
+                resultJson.put("data", "{\"error\":{\"message\":\"${e.message?.replace("\"", "'") ?: "Erreur réseau"}\"}}")
             }
             return resultJson.toString()
         }
