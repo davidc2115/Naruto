@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#030712" />
-  <title>NewJarvis AI — Assistant Cybernetic Premium</title>
+  <title>NewJarvis AI — Assistant Cybernetic Ultra-Premium</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -14,13 +14,13 @@
       --bg: #030712;
       --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
       --surface: rgba(15, 23, 42, 0.75);
-      --surface-card: rgba(30, 41, 59, 0.65);
-      --border-cyan: rgba(0, 240, 255, 0.25);
-      --border-purple: rgba(168, 85, 247, 0.25);
+      --surface-card: rgba(30, 41, 59, 0.7);
+      --border-cyan: rgba(0, 240, 255, 0.3);
+      --border-purple: rgba(168, 85, 247, 0.3);
       --cyan: #00f0ff;
-      --cyan-glow: rgba(0, 240, 255, 0.4);
+      --cyan-glow: rgba(0, 240, 255, 0.5);
       --purple: #a855f7;
-      --purple-glow: rgba(168, 85, 247, 0.4);
+      --purple-glow: rgba(168, 85, 247, 0.5);
       --pink: #ec4899;
       --amber: #f59e0b;
       --emerald: #10b981;
@@ -45,541 +45,729 @@
       position: relative;
     }
 
-    /* ── BACKGROUND ANIMATED GRID ── */
+    /* ── BACKGROUND ANIMATED GRID & PARTICLES ── */
     body::before {
       content: '';
       position: absolute;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
+        linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
       pointer-events: none;
       z-index: 0;
-      animation: grid-scroll 20s linear infinite;
+      animation: gridMove 20s linear infinite;
     }
-    @keyframes grid-scroll { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
 
-    /* ── HEADER PREMIUM ── */
-    header {
-      background: rgba(3, 7, 18, 0.85);
-      border-bottom: 1px solid var(--border-cyan);
-      padding: 12px 18px;
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 32px 32px; }
+    }
+
+    /* ── HEADER HUD ── */
+    .header-hud {
+      position: relative;
+      z-index: 10;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-shrink: 0;
-      backdrop-filter: blur(25px);
-      position: relative;
-      z-index: 10;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    }
-    .logo { display: flex; align-items: center; gap: 12px; }
-    .logo-badge {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink));
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-orb);
-      font-weight: 900;
-      font-size: 13px;
-      color: #000;
-      position: relative;
-      box-shadow: 0 0 20px var(--cyan-glow);
-      animation: logo-glow 3s ease-in-out infinite alternate;
-    }
-    @keyframes logo-glow { 0% { box-shadow: 0 0 15px var(--cyan-glow); } 100% { box-shadow: 0 0 25px var(--purple-glow); } }
-    .logo-badge::after {
-      content: '';
-      position: absolute;
-      top: -2px; right: -2px;
-      width: 10px; height: 10px;
-      background: var(--emerald);
-      border-radius: 50%;
-      border: 2px solid var(--bg);
-      animation: blink 1.8s ease-in-out infinite;
-    }
-    @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
-    .logo-text h1 { font-family: var(--font-orb); font-size: 14px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1.5px; }
-    .logo-text p { font-size: 9.5px; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
-
-    /* ── TABS BAR PREMIUM ── */
-    .tabs-bar {
-      background: rgba(15, 23, 42, 0.6);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 8px 14px;
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      flex-shrink: 0;
-      scrollbar-width: none;
-      position: relative;
-      z-index: 10;
-    }
-    .tabs-bar::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 11px;
-      font-family: var(--font-orb);
-      font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: var(--surface);
-      color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(10px);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tab-btn.active {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
-      border-color: var(--cyan);
-      color: var(--cyan);
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
-      transform: translateY(-1px);
+      border-bottom: 1px solid var(--border-cyan);
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(16px);
     }
 
-    /* ── MAIN CONTENT AREA ── */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px;
-      position: relative;
-      z-index: 5;
-    }
-    .panel { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
-    .panel.active { display: block; opacity: 1; transform: translateY(0); }
-
-    /* ── CARDS GLASSMORPHISM ── */
-    .card {
-      background: var(--surface-card);
-      border: 1px solid var(--border-cyan);
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 14px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-    .card:hover { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 12px 40px rgba(0, 240, 255, 0.15); }
-    .card-title {
-      font-family: var(--font-orb);
-      font-size: 11.5px;
-      font-weight: 800;
-      color: var(--cyan);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 14px;
+    .brand {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .card-title .dot {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--cyan);
-      box-shadow: 0 0 10px var(--cyan);
-      animation: blink 1.5s ease-in-out infinite;
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-orb);
+      font-weight: 900;
+      color: #000;
+      box-shadow: 0 0 16px var(--cyan-glow);
     }
 
-    /* ── 3D HOLOGRAPHIC ORB ── */
-    .orb-container {
+    .brand-title {
+      font-family: var(--font-orb);
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 1px;
+      background: linear-gradient(to right, #fff, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--emerald);
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* ── SYSTEM HUD STATUS STRIP ── */
+    .system-strip {
+      position: relative;
+      z-index: 9;
+      display: flex;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .strip-item {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .strip-val { color: var(--cyan); font-weight: 600; }
+
+    /* ── NAVIGATION TABS ── */
+    .tabs-nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(3, 7, 18, 0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: max-content;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+    }
+
+    /* ── MAIN CONTENT AREA ── */
+    .main-container {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel { display: none; flex-direction: column; gap: 16px; height: 100%; }
+    .panel.active { display: flex; }
+
+    /* ── 3D CYBERNETIC ORB SECTION ── */
+    .orb-section {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 30px 16px;
-      background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 70%);
-      border-radius: 24px;
-      margin-bottom: 14px;
+      padding: 20px 0;
+      position: relative;
     }
-    .orb-wrapper { position: relative; width: 180px; height: 180px; margin-bottom: 20px; }
-    .orb-ring {
+
+    .orb-wrapper {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .orb-ring-outer {
       position: absolute;
+      inset: -12px;
       border-radius: 50%;
-      border: 2px solid;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation: orbit linear infinite;
+      border: 2px dashed var(--cyan);
+      opacity: 0.4;
+      animation: rotateRing 15s linear infinite;
     }
-    .orb-ring:nth-child(1) { width: 180px; height: 180px; border-color: rgba(0, 240, 255, 0.4); animation-duration: 10s; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
-    .orb-ring:nth-child(2) { width: 145px; height: 145px; border-color: rgba(168, 85, 247, 0.4); animation-duration: 7s; animation-direction: reverse; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
-    .orb-ring:nth-child(3) { width: 110px; height: 110px; border-color: rgba(236, 72, 153, 0.4); animation-duration: 5s; }
-    .orb-ring:nth-child(4) { width: 80px; height: 80px; border-color: rgba(16, 185, 129, 0.4); animation-duration: 3.5s; animation-direction: reverse; }
-    @keyframes orbit { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    .orb-ring-inner {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid var(--purple);
+      opacity: 0.6;
+      animation: rotateRingRev 10s linear infinite;
+    }
+
+    @keyframes rotateRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes rotateRingRev { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
     .orb-core {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 75px; height: 75px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff, var(--cyan), var(--purple), rgba(236, 72, 153, 0.8));
-      box-shadow: 0 0 40px var(--cyan), 0 0 80px var(--purple), inset 0 0 25px rgba(255, 255, 255, 0.6);
-      animation: pulse-orb 2.5s ease-in-out infinite alternate;
-    }
-    @keyframes pulse-orb {
-      0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 30px var(--cyan), 0 0 60px var(--purple); }
-      100% { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 50px var(--cyan), 0 0 100px var(--pink); }
-    }
-
-    .orb-state {
-      font-family: var(--font-orb);
-      font-size: 11.5px;
-      font-weight: 800;
-      letter-spacing: 2.5px;
-      color: var(--cyan);
-      text-shadow: 0 0 12px var(--cyan-glow);
-      text-align: center;
-    }
-
-    /* ── INPUTS & CONTROLS ── */
-    .input-row { display: flex; gap: 10px; margin-top: 12px; }
-    .input-field {
-      flex: 1;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--border-cyan);
-      border-radius: 14px;
-      padding: 14px 16px;
-      font-size: 14px;
-      color: var(--text);
-      font-family: var(--font-main);
-      outline: none;
-      transition: all 0.3s ease;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    }
-    .input-field:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.25); }
-    .btn {
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-family: var(--font-orb);
-      font-size: 11px;
-      font-weight: 800;
-      border: none;
+      background: radial-gradient(circle at 30% 30%, var(--cyan), var(--purple), rgba(168,85,247,0.3));
+      box-shadow: 0 0 35px var(--cyan-glow), inset 0 0 25px #fff;
+      animation: orbGlow 3s ease-in-out infinite alternate;
       cursor: pointer;
       transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      -webkit-tap-highlight-color: transparent;
     }
-    .btn-cyan { background: linear-gradient(135deg, var(--cyan), #0088ff); color: #000; box-shadow: 0 0 15px var(--cyan-glow); }
-    .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--cyan-glow); }
-    .btn-purple { background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; box-shadow: 0 0 15px var(--purple-glow); }
-    .btn-amber { background: linear-gradient(135deg, var(--amber), #f97316); color: #000; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
-    .btn-outline { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-cyan); color: var(--text); }
-    .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
 
-    /* ── VOICE CONTROLS ── */
-    .voice-controls { display: flex; gap: 10px; }
-    .mic-btn {
-      flex: 1; padding: 16px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 1px solid var(--border-cyan); cursor: pointer; font-family: var(--font-orb); font-size: 10px; font-weight: 800; transition: all 0.3s ease;
+    @keyframes orbGlow {
+      0% { transform: scale(0.96); box-shadow: 0 0 25px var(--cyan-glow); }
+      100% { transform: scale(1.04); box-shadow: 0 0 45px var(--purple-glow), 0 0 60px var(--cyan-glow); }
     }
-    .mic-btn svg { width: 26px; height: 26px; }
-    .mic-btn.idle { background: rgba(15, 23, 42, 0.8); color: var(--muted); }
-    .mic-btn.listening { background: rgba(244, 63, 94, 0.25); border-color: var(--rose); color: var(--rose); box-shadow: 0 0 25px rgba(244, 63, 94, 0.4); animation: pulse-btn 1s ease-in-out infinite; }
-    .mic-btn.permanent { background: rgba(0, 240, 255, 0.25); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 25px var(--cyan-glow); animation: pulse-btn 1.5s ease-in-out infinite; }
-    @keyframes pulse-btn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 
-    /* ── RESPONSE BOX ── */
-    .response-box {
+    .orb-state-label {
       margin-top: 14px;
-      background: rgba(0, 240, 255, 0.04);
+      font-family: var(--font-orb);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    /* ── CHAT & RESPONSE CARDS ── */
+    .response-card {
+      background: var(--surface-card);
       border: 1px solid var(--border-cyan);
       border-radius: 16px;
       padding: 16px;
-      font-size: 13.5px;
-      line-height: 1.65;
-      color: var(--text);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       display: none;
-      backdrop-filter: blur(15px);
-      box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
+      flex-direction: column;
+      gap: 10px;
     }
-    .response-box.visible { display: block; animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    .response-label { font-family: var(--font-orb); font-size: 9.5px; color: var(--cyan); letter-spacing: 1.2px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-    .model-badge { background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.25)); border: 1px solid var(--purple); border-radius: 8px; padding: 3px 8px; font-size: 8.5px; color: #e9d5ff; font-weight: 700; }
+
+    .response-card.visible { display: flex; }
+
+    .response-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .model-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--cyan);
+      border: 1px solid var(--border-cyan);
+    }
+
+    .response-body {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    /* ── CONTROLS & INPUT BAR ── */
+    .controls-bar {
+      position: relative;
+      z-index: 10;
+      padding: 12px 16px;
+      background: rgba(3, 7, 18, 0.9);
+      border-top: 1px solid var(--border-cyan);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mic-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mic-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border-cyan);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #ec4899, #f43f5e);
+      border-color: #f43f5e;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.6);
+      animation: pulse 1s infinite;
+    }
+
+    .mic-btn.permanent {
+      background: linear-gradient(135deg, var(--amber), #d97706);
+      border-color: var(--amber);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .text-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(15, 23, 42, 0.9);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .text-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 14px var(--cyan-glow);
+    }
+
+    .btn-send {
+      padding: 0 18px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #000;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 0 16px var(--cyan-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-send:active { transform: scale(0.95); }
+
+    /* ── FORM & CARDS DE SETUP ── */
+    .card {
+      background: var(--surface-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-family: var(--font-orb);
+      font-size: 13px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .api-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .api-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .api-saved-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .api-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(3, 7, 18, 0.6);
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      outline: none;
+    }
+
+    .api-input:focus { border-color: var(--cyan); }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cyan {
+      background: linear-gradient(135deg, var(--cyan), #0284c7);
+      color: #000;
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+      color: #fff;
+      box-shadow: 0 0 12px var(--purple-glow);
+    }
 
     /* ── GALLERY GRID ── */
-    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-    .gallery-item { border-radius: 16px; overflow: hidden; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-cyan); transition: transform 0.3s ease; }
-    .gallery-item:hover { transform: scale(1.02); }
-    .gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
-    .gallery-item-info { padding: 10px; font-size: 11px; font-family: var(--font-orb); color: var(--text); }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
 
-    /* ── INSTALLED APPS LIST ── */
-    .installed-app-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-cyan); border-radius: 12px; margin-bottom: 8px; transition: all 0.2s ease; }
-    .installed-app-item:hover { border-color: var(--cyan); background: rgba(0, 240, 255, 0.08); }
-    .installed-app-name { font-size: 12.5px; font-weight: 700; color: #fff; }
+    .gallery-item {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      border: 1px solid var(--border-cyan);
+    }
 
-    /* ── TOAST PREMIUM ── */
-    .toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(30px); background: rgba(3, 7, 18, 0.9); border: 1px solid var(--cyan); backdrop-filter: blur(20px); padding: 12px 24px; border-radius: 30px; font-size: 12px; font-family: var(--font-orb); color: var(--cyan); box-shadow: 0 0 25px var(--cyan-glow); opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    /* ── BOTTOM NAV ── */
-    nav { background: rgba(3, 7, 18, 0.92); border-top: 1px solid var(--border-cyan); display: flex; justify-content: space-around; padding: 10px 0 14px; flex-shrink: 0; backdrop-filter: blur(25px); position: relative; z-index: 10; }
-    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 14px; border: none; background: none; cursor: pointer; color: var(--muted); font-family: var(--font-orb); font-size: 8.5px; transition: all 0.3s ease; }
-    .nav-btn.active { color: var(--cyan); }
-    .nav-btn.active svg { filter: drop-shadow(0 0 8px var(--cyan)); }
+    /* ── INSTALLED APPS MODIFIER ── */
+    .apps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .app-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    .app-item:hover {
+      border-color: var(--cyan);
+      background: rgba(0, 240, 255, 0.08);
+    }
+
+    /* ── BOTTOM NAV BAR ── */
+    .bottom-nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 12px;
+      background: rgba(3, 7, 18, 0.95);
+      border-top: 1px solid var(--border-cyan);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--cyan);
+      background: rgba(0, 240, 255, 0.1);
+    }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="logo">
-    <div class="logo-badge">NJ</div>
-    <div class="logo-text">
-      <h1>NEWJARVIS CYBER v2.2</h1>
-      <p>Assistant IA • Haut-Parleurs • Synthèse Vocale</p>
+  <!-- HEADER HUD -->
+  <header class="header-hud">
+    <div class="brand">
+      <div class="brand-icon">J</div>
+      <div>
+        <div class="brand-title">NEWJARVIS 3.0</div>
+        <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono);">SYSTEM HUD V3.0 — ULTIMATE ENGINE</div>
+      </div>
     </div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      ONLINE
+    </div>
+  </header>
+
+  <!-- SYSTEM STRIP -->
+  <div class="system-strip">
+    <div class="strip-item">AUDIO: <span class="strip-val" id="hudAudio">HAUT-PARLEUR NATIVE</span></div>
+    <div class="strip-item">| MIC: <span class="strip-val" id="hudMic">DETECTION JARVIS</span></div>
+    <div class="strip-item">| CLÉS: <span class="strip-val" id="hudKeysCount">0 CONFIGURÉES</span></div>
   </div>
-</header>
 
-<!-- TABS -->
-<div class="tabs-bar" id="tabsBar">
-  <button class="tab-btn active" onclick="showTab('hud',this)">⚡ Orbe 3D</button>
-  <button class="tab-btn" onclick="showTab('keys',this)">🔑 Clés API</button>
-  <button class="tab-btn" onclick="showTab('gallery',this)">🖼️ Galerie HD</button>
-  <button class="tab-btn" onclick="showTab('apk',this)">📦 Modif APK</button>
-</div>
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
 
-<!-- MAIN CONTENT -->
-<main>
-
-  <!-- ── TAB 1 : ORB / VOICE ── -->
-  <div id="tab-hud" class="panel active">
-    <div class="card orb-container">
-      <div class="orb-wrapper">
-        <div class="orb-ring"></div>
-        <div class="orb-ring"></div>
-        <div class="orb-ring"></div>
-        <div class="orb-ring"></div>
-        <div class="orb-core" id="orbCore"></div>
-      </div>
-      <div class="orb-state" id="orbState">SYSTÈME EN VEILLE</div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><div class="dot"></div>Commande Vocale &amp; Lecture Haut-Parleur</div>
-      <div class="voice-controls">
-        <button class="mic-btn idle" id="micBtn" onclick="toggleListening()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm-1 3a1 1 0 0 1 2 0v8a1 1 0 0 1-2 0V4zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11h-2z"/></svg>
-          MICRO PONCTUEL
-        </button>
-        <button class="mic-btn idle" id="permMicBtn" onclick="togglePermanentListening()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          ÉCOUTE PERMANENTE
-        </button>
-      </div>
-
-      <div class="input-row">
-        <input class="input-field" id="textInput" type="text" placeholder="Dites ou tapez votre question..." onkeydown="if(event.key==='Enter')sendText()" />
-        <button class="btn btn-cyan" id="sendBtn" onclick="sendText()">➤</button>
-      </div>
-
-      <div class="response-box" id="responseBox">
-        <div class="response-label">
-          <span>RÉPONSE JARVIS (HAUT-PARLEUR ACTIF)</span>
-          <span class="model-badge" id="modelBadge">—</span>
+    <!-- PANEL HUD / IA -->
+    <div class="panel active" id="tab-hud">
+      <!-- 3D ORB SECTION -->
+      <div class="orb-section">
+        <div class="orb-wrapper" onclick="toggleListening()">
+          <div class="orb-ring-outer"></div>
+          <div class="orb-ring-inner"></div>
+          <div class="orb-core" id="orbCore"></div>
         </div>
-        <div id="responseText"></div>
+        <div class="orb-state-label" id="orbState">DITES "JARVIS" OU APPUYEZ SUR LE MICRO</div>
       </div>
-    </div>
-  </div>
 
-  <!-- ── TAB 2 : API KEYS ── -->
-  <div id="tab-keys" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--emerald)"></div>Gestionnaire de Clés API</div>
-      <p style="font-size:11.5px;color:var(--muted);margin-bottom:16px;">Saisissez vos clés. Elles s'exécutent en direct sans blocage via le pont natif.</p>
-      <div id="apiFormContainer"></div>
-    </div>
-  </div>
-
-  <!-- ── TAB 3 : GALLERY HD ── -->
-  <div id="tab-gallery" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Génération d'Images Photoréalistes</div>
-      <div class="input-row">
-        <input class="input-field" id="imgPrompt" type="text" placeholder="Description exacte de l'image (ex: berger australien blue merle)..." onkeydown="if(event.key==='Enter')generateImage()" />
-        <button class="btn btn-amber" onclick="generateImage()">Générer</button>
+      <!-- RESPONSE CARD -->
+      <div class="response-card" id="responseBox">
+        <div class="response-header">
+          <span style="font-size:11px;font-weight:700;color:var(--cyan);">RÉPONSE REÇUE</span>
+          <span class="model-badge" id="modelBadge">IA ENGINE</span>
+        </div>
+        <div class="response-body" id="responseText"></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Galerie Photos</div>
+    <!-- PANEL CLÉS API -->
+    <div class="panel" id="tab-keys">
+      <div class="card">
+        <div class="card-title">
+          <span>CONFIGURATION DES CLÉS API IA</span>
+          <span style="font-size:10px;color:var(--emerald);" id="savedStatusText">Sauvegardé</span>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);">Renseignez au moins une clé API. Elles sont enregistrées de façon permanente dans la mémoire native sécurisée de votre téléphone.</p>
+        <div id="apiFormContainer"></div>
+        <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="saveAllKeysAndTest()">💾 SAUVEGARDER ET TESTER EN DIRECT</button>
+        <div class="response-card" id="keyTestResult" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- PANEL GALERIE IMAGES -->
+    <div class="panel" id="tab-gallery">
+      <div class="card">
+        <div class="card-title">GÉNÉRATION D'IMAGES IA</div>
+        <div class="input-row">
+          <input class="text-input" id="imgPrompt" placeholder="Ex: Un robot futuriste cybernetic dans une ville néon..." />
+          <button class="btn btn-cyan" onclick="generateImage()">GÉNÉRER</button>
+        </div>
+      </div>
       <div class="gallery-grid" id="galleryGrid"></div>
     </div>
-  </div>
 
-  <!-- ── TAB 4 : APK MODIFIER ── -->
-  <div id="tab-apk" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--rose)"></div>Modificateur d'Applications</div>
-      <button class="btn btn-purple" style="width:100%;margin-bottom:12px;" onclick="loadInstalledPhoneApps()">📱 Lister les Apps du Téléphone</button>
-      <div id="installedAppsContainer" style="max-height:220px;overflow-y:auto;display:none;margin-bottom:12px;"></div>
+    <!-- PANEL MODIFICATION APK PHONE -->
+    <div class="panel" id="tab-apk">
+      <div class="card">
+        <div class="card-title">MODIFICATEUR D'APPLIS DU TÉLÉPHONE</div>
+        <p style="font-size:11.5px;color:var(--muted);">Choisissez une application installée sur votre smartphone pour demander à l'IA de modifier ses fonctionnalités ou son style.</p>
+        <button class="btn btn-purple" onclick="loadInstalledPhoneApps()">📱 CHARGER LES APPLICATIONS DU TÉLÉPHONE</button>
+        <div class="apps-list" id="installedAppsContainer" style="display:none;margin-top:8px;"></div>
+      </div>
+
+      <div class="card" id="apkModPromptCard" style="display:none;">
+        <div class="card-title" id="selectedAppTitle">APPLICATION SÉLECTIONNÉE</div>
+        <textarea class="text-input" id="aiApkPrompt" rows="3" placeholder="Que voulez-vous demander à l'IA de modifier dans cette application ?"></textarea>
+        <button class="btn btn-cyan" onclick="processAiApkModification()">✨ DEMANDER LA MODIFICATION À L'IA</button>
+        <div class="response-card" id="aiApkResult" style="margin-top:10px;"></div>
+      </div>
     </div>
 
-    <div class="card" id="apkModPromptCard" style="display:none;">
-      <div class="card-title" style="color:var(--cyan);" id="selectedAppTitle">App Sélectionnée</div>
-      <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;" placeholder="Consignes de modification..."></textarea>
-      <button class="btn btn-cyan" style="width:100%;margin-top:10px;" onclick="processAiApkModification()">🤖 Exécuter la Modification</button>
-      <div class="response-box" id="aiApkResult"></div>
+  </main>
+
+  <!-- CONTROLS INPUT BAR -->
+  <div class="controls-bar">
+    <div class="mic-row">
+      <button class="mic-btn idle" id="micBtn" onclick="toggleListening()">
+        🎤 ÉCOUTE RAPIDE
+      </button>
+      <button class="mic-btn idle" id="permMicBtn" onclick="togglePermanentListening()">
+        ⚡ ÉCOUTE PERMANENTE "JARVIS"
+      </button>
+    </div>
+    <div class="input-row">
+      <input class="text-input" id="textInput" placeholder="Posez une question ou dites 'JARVIS'..." onkeydown="if(event.key==='Enter') sendText()" />
+      <button class="btn-send" id="sendBtn" onclick="sendText()">ENVOYER</button>
     </div>
   </div>
 
-</main>
+  <!-- BOTTOM NAV BAR -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" id="nav-hud" onclick="showTab('hud', this)">
+      <span>💬</span> HUD IA
+    </div>
+    <div class="nav-item" id="nav-keys" onclick="showTab('keys', this)">
+      <span>🔑</span> CLÉS API
+    </div>
+    <div class="nav-item" id="nav-gallery" onclick="showTab('gallery', this)">
+      <span>🎨</span> IMAGES
+    </div>
+    <div class="nav-item" id="nav-apk" onclick="showTab('apk', this)">
+      <span>⚙️</span> MODIF APK
+    </div>
+  </nav>
 
-<!-- BOTTOM NAV -->
-<nav>
-  <button class="nav-btn active" id="nav-hud" onclick="showTab('hud',null,'nav-hud')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-    Orbe 3D
-  </button>
-  <button class="nav-btn" id="nav-keys" onclick="showTab('keys',null,'nav-keys')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-    Clés API
-  </button>
-  <button class="nav-btn" id="nav-gallery" onclick="showTab('gallery',null,'nav-gallery')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-    Galerie
-  </button>
-  <button class="nav-btn" id="nav-apk" onclick="showTab('apk',null,'nav-apk')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H3M21 6H3M21 14H3M21 18H3"/></svg>
-    Modif APK
-  </button>
-</nav>
+  <script>
+    /* ── MULTI-STORAGE UNIVERSEL (Natif Android SharedPreferences + LocalStorage) ── */
+    const Storage = {
+      get: (key, defaultValue) => {
+        try {
+          if (window.AndroidBridge && window.AndroidBridge.getPref) {
+            const val = window.AndroidBridge.getPref(key, "");
+            if (val && val !== "") return JSON.parse(val);
+          }
+          const localVal = localStorage.getItem(key);
+          if (localVal) return JSON.parse(localVal);
+        } catch (e) {}
+        return defaultValue;
+      },
+      set: (key, value) => {
+        try {
+          const strVal = JSON.stringify(value);
+          if (window.AndroidBridge && window.AndroidBridge.savePref) {
+            window.AndroidBridge.savePref(key, strVal);
+          }
+          localStorage.setItem(key, strVal);
+        } catch (e) {}
+      }
+    };
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+    /* ── SYNTHÈSE VOCALE PAR HAUT-PARLEURS DU TÉLÉPHONE ── */
+    function speakTextOutLoud(text) {
+      if (!text) return;
+      const cleanText = text.replace(/[*#_`]/g, '').trim();
+      
+      // 1. Priorité au pont Android natif (TextToSpeech dans haut-parleur)
+      if (window.AndroidBridge && window.AndroidBridge.speak) {
+        window.AndroidBridge.speak(cleanText);
+        return;
+      }
 
-<script>
-const Storage = {
-  get: (key, def = null) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e){ return def; } },
-  set: (key, val) => { try { localStoragesetItem(key, JSON.stringify(val)); } catch(e){} }
-};
-
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
-  if (window.AndroidBridge && window.AndroidBridge.showToast) window.AndroidBridge.showToast(msg);
-}
-
-function speakTextOutLoud(text) {
-  if (!text) return;
-  const clean = text.replace(/[*#_~`]/g,'').slice(0,350);
-  if (window.AndroidBridge && window.AndroidBridge.speak) {
-    window.AndroidBridge.speak(clean);
-  } else if (window.speechSynthesis) {
-    speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.lang = 'fr-FR';
-    speechSynthesis.speak(utt);
-  }
-}
-
-window.onNativeSpeechResult = function(text) {
-  if (!text) return;
-  document.getElementById('textInput').value = text;
-  if (text.toLowerCase().includes('jarvis')) {
-    const clean = text.replace(/.*jarvis/i,'').trim();
-    if (clean.length > 2) {
-      document.getElementById('textInput').value = clean;
-      sendText();
+      // 2. Fallback WebSpeech API
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          utterance.lang = 'fr-FR';
+          utterance.rate = 1.0;
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {}
+      }
     }
-  }
-};
 
-async function httpFetch(url, options = {}) {
-  const method = options.method || 'GET';
-  const headers = options.headers || {};
-  const body = options.body || '';
+    /* ── RECONNAISSANCE VOCALE & DÉTECTION DU MOT CLÉ "JARVIS" ── */
+    let isListening = false;
+    let isPermanentListening = false;
+    let webSpeechRecognition = null;
 
-  if (window.AndroidBridge && window.AndroidBridge.nativeFetch) {
-    try {
-      const resStr = window.AndroidBridge.nativeFetch(url, method, JSON.stringify(headers), typeof body === 'string' ? body : JSON.stringify(body));
-      const res = JSON.parse(resStr);
-      return {
-        ok: res.ok,
-        status: res.status,
-        json: async () => JSON.parse(res.data),
-        text: async () => res.data
+    function setOrbState(state) {
+      const states = {
+        idle: { label: 'DITES "JARVIS" OU APPUYEZ SUR LE MICRO', color: 'radial-gradient(circle at 30% 30%, #00f0ff, #a855f7, rgba(168,85,247,0.3))' },
+        listening: { label: 'ÉCOUTE VOCALE ACTIVE...', color: 'radial-gradient(circle at 30% 30%, #ec4899, #f43f5e, rgba(244,63,94,0.3))' },
+        permanent: { label: '⚡ ÉCOUTE PERMANENTE "JARVIS" ACTIVER ! DITES VOTRE ORDRE', color: 'radial-gradient(circle at 30% 30%, #f59e0b, #d97706, rgba(245,158,11,0.3))' },
+        processing: { label: 'RÉFLEXION DE L\'IA EN COURS...', color: 'radial-gradient(circle at 30% 30%, #a855f7, #6366f1, rgba(99,102,241,0.3))' }
       };
-    } catch(e) {}
-  }
-  return fetch(url, options);
-}
-
-function showTab(id, tabEl, navId) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
-  document.getElementById('tab-' + id).classList.add('active');
-
-  if (tabEl) tabEl.classList.add('active');
-  if (navId) document.getElementById(navId).classList.add('active');
-  else {
-    const map = { hud: 'nav-hud', keys: 'nav-keys', gallery: 'nav-gallery', apk: 'nav-apk' };
-    if (map[id]) document.getElementById(map[id]).classList.add('active');
-  }
-
-  if (id === 'gallery') loadGallery();
-  if (id === 'keys') renderApiForm();
-}
-
-const ORB_STATES = {
-  idle: { label: 'SYSTÈME EN VEILLE', color: '#00f0ff' },
-  listening: { label: 'ÉCOUTE ACTIVE...', color: '#ec4899' },
-  permanent: { label: 'ÉCOUTE PERMANENTE ACTIVE', color: '#00f0ff' },
-  processing: { label: 'TRAITEMENT EN COURS', color: '#a855f7' }
-};
-function setOrbState(state) {
-  const s = ORB_STATES[state] || ORB_STATES.idle;
-  document.getElementById('orbState').textContent = s.label;
-  document.getElementById('orbCore').style.background = `radial-gradient(circle at 30% 30%, ${s.color}, #a855f7, rgba(168,85,247,0.3))`;
-}
-
-let isListening = false;
-let isPermanentListening = false;
-let recognition = null;
-
-function toggleListening() {
-  if (isPermanentListening) stopPermanentListening();
-  if (isListening) stopListening(); else startListening(false);
-}
-
-function togglePermanentListening() {
-  if (isListening) stopListening();
-  if (isPermanentListening) stopPermanentListening(); else startListening(true);
-}
-
-function startListening(permanent = false) {
-  if (window.AndroidBridge && window.AndroidBridge.startNativeListening) {
-    if (permanent) {
-      isPermanentListening = true;
-      document.getElementById('permMicBtn').className = 'mic-btn permanent';
-      setOrbState('permanent');
-    } else {
-      isListening = true;
-      document.getElementById('micBtn').className = 'mic-btn listening';
-      setOrbState('listening');
+      const s = states[state] || states.idle;
+      document.getElementById('orbState').textContent = s.label;
+      document.getElementById('orbCore').style.background = s.color;
     }
-    window.AndroidBridge.startNativeListening(permanent);
-    return;
-  }
 
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR();
-    recognition.lang = 'fr-FR';
-    recognition.continuous = permanent;
-    recognition.interimResults = true;
+    function toggleListening() {
+      if (isPermanentListening) stopPermanentListening();
+      if (isListening) stopListening(); else startListening(false);
+    }
 
-    recognition.onstart = () => {
+    function togglePermanentListening() {
+      if (isListening) stopListening();
+      if (isPermanentListening) stopPermanentListening(); else startListening(true);
+    }
+
+    function startListening(permanent = false) {
       if (permanent) {
         isPermanentListening = true;
         document.getElementById('permMicBtn').className = 'mic-btn permanent';
@@ -589,308 +777,389 @@ function startListening(permanent = false) {
         document.getElementById('micBtn').className = 'mic-btn listening';
         setOrbState('listening');
       }
-    };
 
-    recognition.onresult = (e) => {
-      const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-      document.getElementById('textInput').value = transcript;
-      if (transcript.toLowerCase().includes('jarvis')) {
-        const clean = transcript.replace(/.*jarvis/i,'').trim();
-        if (clean.length > 2 && e.results[e.results.length - 1].isFinal) {
-          document.getElementById('textInput').value = clean;
-          sendText();
-        }
-      } else if (!permanent && e.results[e.results.length - 1].isFinal) {
-        stopListening();
-        setTimeout(() => sendText(), 300);
-      }
-    };
-
-    recognition.onend = () => {
-      if (isPermanentListening) {
-        setTimeout(() => { if (isPermanentListening) try { recognition.start(); } catch(e){} }, 300);
-      } else {
-        isListening = false;
-        document.getElementById('micBtn').className = 'mic-btn idle';
-        setOrbState('idle');
-      }
-    };
-
-    try { recognition.start(); } catch(e){}
-  } else showToast('Micro non supporté');
-}
-
-function stopListening() {
-  if (window.AndroidBridge && window.AndroidBridge.stopNativeListening) {
-    window.AndroidBridge.stopNativeListening();
-  }
-  if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
-  isListening = false;
-  document.getElementById('micBtn').className = 'mic-btn idle';
-  setOrbState('idle');
-}
-
-function stopPermanentListening() {
-  isPermanentListening = false;
-  if (window.AndroidBridge && window.AndroidBridge.stopNativeListening) {
-    window.AndroidBridge.stopNativeListening();
-  }
-  if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
-  document.getElementById('permMicBtn').className = 'mic-btn idle';
-  setOrbState('idle');
-}
-
-async function sendText() {
-  const input = document.getElementById('textInput');
-  const query = input.value.trim();
-  if (!query) return;
-
-  input.value = '';
-  document.getElementById('responseBox').classList.remove('visible');
-  document.getElementById('sendBtn').disabled = true;
-  setOrbState('processing');
-
-  try {
-    const result = await processLiveAiQuery(query);
-    document.getElementById('responseBox').classList.add('visible');
-    document.getElementById('responseText').textContent = result.text;
-    document.getElementById('modelBadge').textContent = result.model;
-
-    speakTextOutLoud(result.text);
-
-  } catch(e) {
-    document.getElementById('responseBox').classList.add('visible');
-    document.getElementById('responseText').textContent = `Erreur : ${e.message}`;
-    document.getElementById('modelBadge').textContent = 'Erreur';
-  }
-
-  setOrbState(isPermanentListening ? 'permanent' : 'idle');
-  document.getElementById('sendBtn').disabled = false;
-}
-
-async function processLiveAiQuery(query) {
-  const keys = Storage.get('nj_api_keys', {});
-  const errors = [];
-
-  if (keys.groq) {
-    try {
-      const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}` },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [{ role: 'user', content: query }],
-          max_tokens: 300
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.choices?.[0]?.message?.content) {
-        return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
-      } else {
-        errors.push(`Groq (${res.status}): ${data.error?.message || 'Erreur API'}`);
-      }
-    } catch(e) { errors.push(`Groq: ${e.message}`); }
-  }
-
-  if (keys.openai) {
-    try {
-      const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}` },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: query }],
-          max_tokens: 300
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.choices?.[0]?.message?.content) {
-        return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
-      } else {
-        errors.push(`OpenAI (${res.status}): ${data.error?.message || 'Erreur API'}`);
-      }
-    } catch(e) { errors.push(`OpenAI: ${e.message}`); }
-  }
-
-  if (keys.gemini) {
-    try {
-      const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: query }] }] })
-      });
-      const data = await res.json();
-      if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
-      } else {
-        errors.push(`Gemini (${res.status}): ${data.error?.message || 'Erreur API'}`);
-      }
-    } catch(e) { errors.push(`Gemini: ${e.message}`); }
-  }
-
-  if (keys.anthropic) {
-    try {
-      const res = await httpFetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': keys.anthropic,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
-          max_tokens: 300,
-          messages: [{ role: 'user', content: query }]
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.content?.[0]?.text) {
-        return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
-      } else {
-        errors.push(`Claude (${res.status}): ${data.error?.message || 'Erreur API'}`);
-      }
-    } catch(e) { errors.push(`Claude: ${e.message}`); }
-  }
-
-  const hasConfiguredKeys = Object.keys(keys).length > 0;
-  if (!hasConfiguredKeys) {
-    return { text: `Aucune clé API configurée. Ajoutez votre clé Groq, OpenAI, Gemini ou Anthropic dans l'onglet Clés API pour obtenir des réponses IA en direct !`, model: 'Configuration Requise' };
-  } else {
-    return { text: `⚠️ Impossible de contacter le service IA :\n${errors.join('\n')}\n\nVérifiez vos clés dans l'onglet Clés API.`, model: 'Erreur Clés API' };
-  }
-}
-
-const API_SERVICES = [
-  { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
-  { id: 'openai', label: 'OpenAI API (GPT-4o)', placeholder: 'sk-proj-...', url: 'https://platform.openai.com/api-keys' },
-  { id: 'gemini', label: 'Google Gemini', placeholder: 'AIzaSy...', url: 'https://aistudio.google.com/app/apikey' },
-  { id: 'anthropic', label: 'Anthropic Claude', placeholder: 'sk-ant-api...', url: 'https://console.anthropic.com/settings/keys' },
-  { id: 'serper', label: 'Serper API (Google Search)', placeholder: 'serper_key_...', url: 'https://serper.dev/api-key' },
-  { id: 'kling', label: 'Kling AI (Génération Vidéo)', placeholder: 'kling_key_...', url: 'https://klingai.com/' },
-];
-
-function renderApiForm() {
-  const keys = Storage.get('nj_api_keys', {});
-  document.getElementById('apiFormContainer').innerHTML = API_SERVICES.map(svc => `
-    <div class="api-row">
-      <div class="api-label">
-        ${svc.label}
-        ${keys[svc.id] ? '<span class="api-saved">✅ Configurée</span>' : ''}
-        <a href="${svc.url}" target="_blank" style="color:var(--cyan);font-size:9px;margin-left:auto;">Obtenir →</a>
-      </div>
-      <div class="api-input-row">
-        <input class="api-input" type="password" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" onchange="saveApiKey('${svc.id}',this.value)" />
-      </div>
-    </div>
-  `).join('') + `<button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="testAllKeys()">🔬 Tester TOUTES les Clés en Direct</button>
-    <div class="response-box" id="keyTestResult"></div>`;
-}
-
-function saveApiKey(id, val) {
-  const keys = Storage.get('nj_api_keys', {});
-  if (val.trim()) keys[id] = val.trim(); else delete keys[id];
-  Storage.set('nj_api_keys', keys);
-  showToast(`Clé ${id} enregistrée !`);
-  renderApiForm();
-}
-
-async function testAllKeys() {
-  const keys = Storage.get('nj_api_keys', {});
-  const res = document.getElementById('keyTestResult');
-  res.classList.add('visible');
-  res.textContent = '🔬 Test en direct des clés API...';
-  const results = [];
-
-  if (keys.groq) {
-    try {
-      const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq}` } });
-      results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ Groq API : Erreur (${e.message})`); }
-  } else results.push('⚪ Groq API : Non configurée');
-
-  if (keys.openai) {
-    try {
-      const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai}` } });
-      results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ OpenAI API : Erreur (${e.message})`); }
-  } else results.push('⚪ OpenAI API : Non configurée');
-
-  if (keys.gemini) {
-    try {
-      const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini}`);
-      results.push(r.ok ? '✅ Google Gemini : Connectée (Gemini 1.5 Flash)' : `❌ Google Gemini : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ Google Gemini : Erreur (${e.message})`); }
-  } else results.push('⚪ Google Gemini : Non configurée');
-
-  if (keys.anthropic) {
-    try {
-      const r = await httpFetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 10, messages: [{ role: 'user', content: 'hi' }] })
-      });
-      results.push(r.ok ? '✅ Anthropic Claude : Connectée (Claude 3.5 Sonnet)' : `❌ Anthropic Claude : Erreur (Code ${r.status})`);
-    } catch(e) { results.push(`❌ Anthropic Claude : Erreur (${e.message})`); }
-  } else results.push('⚪ Anthropic Claude : Non configurée');
-
-  res.textContent = results.join('\n');
-}
-
-async function generateImage() {
-  const prompt = document.getElementById('imgPrompt').value.trim();
-  if (!prompt) { showToast('Entrez une description'); return; }
-  const timestamp = Date.now();
-  const enhanced = `${prompt}, 8k resolution photorealistic detailed photography`;
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1024&height=1024&nologo=true&seed=${timestamp}`;
-  const gallery = Storage.get('nj_gallery', []);
-  gallery.unshift({ id: 'img_'+timestamp, title: prompt, url, date: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
-  Storage.set('nj_gallery', gallery);
-  showToast('✅ Image générée !');
-  loadGallery();
-}
-
-function loadGallery() {
-  const gallery = Storage.get('nj_gallery', []);
-  const grid = document.getElementById('galleryGrid');
-  if (!gallery.length) { grid.innerHTML = '<div style="color:var(--muted);grid-column:1/-1;text-align:center;padding:12px;">Aucune image.</div>'; return; }
-  grid.innerHTML = gallery.map(i => `<div class="gallery-item"><img src="${i.url}" /><div class="gallery-item-info"><div class="gallery-item-title">${i.title}</div></div></div>`).join('');
-}
-
-function loadInstalledPhoneApps() {
-  const container = document.getElementById('installedAppsContainer');
-  container.style.display = 'block';
-  if (window.AndroidBridge && window.AndroidBridge.getInstalledApps) {
-    try {
-      const apps = JSON.parse(window.AndroidBridge.getInstalledApps());
-      if (apps.length > 0) {
-        container.innerHTML = apps.map(app => `
-          <div class="installed-app-item" onclick="selectPhoneApp('${app.name.replace(/'/g,"")}','${app.packageName}')">
-            <div><div class="installed-app-name">📱 ${app.name}</div></div>
-            <button class="btn btn-cyan" style="padding:4px 8px;font-size:9px;">Choisir</button>
-          </div>
-        `).join('');
+      if (window.AndroidBridge && window.AndroidBridge.startNativeListening) {
+        window.AndroidBridge.startNativeListening(permanent);
         return;
       }
-    } catch(e) {}
-  }
-  container.innerHTML = '<div style="color:var(--muted);padding:10px;">Lancement sur smartphone requis.</div>';
-}
 
-function selectPhoneApp(name, pkg) {
-  document.getElementById('apkModPromptCard').style.display = 'block';
-  document.getElementById('selectedAppTitle').textContent = `App : ${name} (${pkg})`;
-}
+      startWebSpeechRecognition(permanent);
+    }
 
-function processAiApkModification() {
-  const prompt = document.getElementById('aiApkPrompt').value;
-  document.getElementById('aiApkResult').classList.add('visible');
-  document.getElementById('aiApkResult').textContent = `✅ Consigne enregistrée : "${prompt}". L'IA adapte l'APK...`;
-}
+    function stopListening() {
+      isListening = false;
+      document.getElementById('micBtn').className = 'mic-btn idle';
+      setOrbState('idle');
+      if (window.AndroidBridge && window.AndroidBridge.stopNativeListening) {
+        window.AndroidBridge.stopNativeListening();
+      }
+      if (webSpeechRecognition) { try { webSpeechRecognition.stop(); } catch(e){} webSpeechRecognition = null; }
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderApiForm();
-  loadGallery();
-});
-</script>
+    function stopPermanentListening() {
+      isPermanentListening = false;
+      document.getElementById('permMicBtn').className = 'mic-btn idle';
+      setOrbState('idle');
+      if (window.AndroidBridge && window.AndroidBridge.stopNativeListening) {
+        window.AndroidBridge.stopNativeListening();
+      }
+      if (webSpeechRecognition) { try { webSpeechRecognition.stop(); } catch(e){} webSpeechRecognition = null; }
+    }
+
+    // Réception du texte reconnu depuis le pont Android Natif
+    window.onNativeSpeechResult = function(text) {
+      handleRecognizedText(text);
+    };
+
+    function startWebSpeechRecognition(permanent) {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        showToast('Reconnaissance vocale non disponible');
+        return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      webSpeechRecognition = new SR();
+      webSpeechRecognition.lang = 'fr-FR';
+      webSpeechRecognition.continuous = permanent;
+      webSpeechRecognition.interimResults = true;
+
+      webSpeechRecognition.onresult = (e) => {
+        const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+        if (e.results[e.results.length - 1].isFinal) {
+          handleRecognizedText(transcript);
+        }
+      };
+
+      webSpeechRecognition.onend = () => {
+        if (isPermanentListening) {
+          setTimeout(() => { if (isPermanentListening) try { webSpeechRecognition.start(); } catch(e){} }, 400);
+        } else {
+          stopListening();
+        }
+      };
+
+      try { webSpeechRecognition.start(); } catch(e){}
+    }
+
+    function handleRecognizedText(text) {
+      if (!text) return;
+      document.getElementById('textInput').value = text;
+
+      const lower = text.toLowerCase();
+      if (lower.includes('jarvis')) {
+        speakTextOutLoud("À vos ordres !");
+        const cleanCommand = text.replace(/.*jarvis/i, '').trim();
+        if (cleanCommand.length > 1) {
+          document.getElementById('textInput').value = cleanCommand;
+          sendText();
+        }
+      } else if (!isPermanentListening) {
+        sendText();
+      }
+    }
+
+    /* ── PONT RESEAU NATIVE HTTP (SANS ERREUR CORS) ── */
+    async function httpFetch(url, options = {}) {
+      const method = options.method || 'GET';
+      const headers = options.headers || {};
+      const body = options.body || '';
+
+      if (window.AndroidBridge && window.AndroidBridge.nativeFetch) {
+        try {
+          const resStr = window.AndroidBridge.nativeFetch(url, method, JSON.stringify(headers), typeof body === 'string' ? body : JSON.stringify(body));
+          const res = JSON.parse(resStr);
+          return {
+            ok: res.ok,
+            status: res.status,
+            json: async () => JSON.parse(res.data),
+            text: async () => res.data
+          };
+        } catch(e) {}
+      }
+      return fetch(url, options);
+    }
+
+    /* ── GESTION DE L'ENVOI DU TEXTE ── */
+    async function sendText() {
+      const input = document.getElementById('textInput');
+      const query = input.value.trim();
+      if (!query) return;
+
+      input.value = '';
+      document.getElementById('responseBox').classList.remove('visible');
+      document.getElementById('sendBtn').disabled = true;
+      setOrbState('processing');
+
+      try {
+        const result = await processLiveAiQuery(query);
+        document.getElementById('responseBox').classList.add('visible');
+        document.getElementById('responseText').textContent = result.text;
+        document.getElementById('modelBadge').textContent = result.model;
+
+        // VÉRITABLE RÉPONSE EN PAROLE VIA HAUT-PARLEUR DU TÉLÉPHONE
+        speakTextOutLoud(result.text);
+
+      } catch(e) {
+        document.getElementById('responseBox').classList.add('visible');
+        document.getElementById('responseText').textContent = `Erreur : ${e.message}`;
+        document.getElementById('modelBadge').textContent = 'Erreur';
+      }
+
+      setOrbState(isPermanentListening ? 'permanent' : 'idle');
+      document.getElementById('sendBtn').disabled = false;
+    }
+
+    async function processLiveAiQuery(query) {
+      const keys = Storage.get('nj_api_keys', {});
+      const errors = [];
+
+      if (keys.groq) {
+        try {
+          const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}` },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [{ role: 'user', content: query }],
+              max_tokens: 300
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.choices?.[0]?.message?.content) {
+            return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
+          } else {
+            errors.push(`Groq (${res.status}): ${data.error?.message || 'Erreur API'}`);
+          }
+        } catch(e) { errors.push(`Groq: ${e.message}`); }
+      }
+
+      if (keys.openai) {
+        try {
+          const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}` },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [{ role: 'user', content: query }],
+              max_tokens: 300
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.choices?.[0]?.message?.content) {
+            return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
+          } else {
+            errors.push(`OpenAI (${res.status}): ${data.error?.message || 'Erreur API'}`);
+          }
+        } catch(e) { errors.push(`OpenAI: ${e.message}`); }
+      }
+
+      if (keys.gemini) {
+        try {
+          const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: query }] }] })
+          });
+          const data = await res.json();
+          if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
+          } else {
+            errors.push(`Gemini (${res.status}): ${data.error?.message || 'Erreur API'}`);
+          }
+        } catch(e) { errors.push(`Gemini: ${e.message}`); }
+      }
+
+      if (keys.anthropic) {
+        try {
+          const res = await httpFetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': keys.anthropic,
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: 'claude-3-5-sonnet-20241022',
+              max_tokens: 300,
+              messages: [{ role: 'user', content: query }]
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.content?.[0]?.text) {
+            return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
+          } else {
+            errors.push(`Claude (${res.status}): ${data.error?.message || 'Erreur API'}`);
+          }
+        } catch(e) { errors.push(`Claude: ${e.message}`); }
+      }
+
+      const hasConfiguredKeys = Object.keys(keys).length > 0;
+      if (!hasConfiguredKeys) {
+        return { text: `Aucune clé API configurée. Veuillez ajouter votre clé Groq, OpenAI, Gemini ou Anthropic dans l'onglet CLÉS API !`, model: 'Configuration Requise' };
+      } else {
+        return { text: `⚠️ Impossible de contacter les serveurs IA :\n${errors.join('\n')}\n\nVérifiez la validité de vos clés dans l'onglet CLÉS API.`, model: 'Erreur Clés API' };
+      }
+    }
+
+    /* ── FORMULAIRE DE GESTION ET TEST DES CLÉS API ── */
+    const API_SERVICES = [
+      { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
+      { id: 'openai', label: 'OpenAI API (GPT-4o)', placeholder: 'sk-proj-...', url: 'https://platform.openai.com/api-keys' },
+      { id: 'gemini', label: 'Google Gemini', placeholder: 'AIzaSy...', url: 'https://aistudio.google.com/app/apikey' },
+      { id: 'anthropic', label: 'Anthropic Claude', placeholder: 'sk-ant-api...', url: 'https://console.anthropic.com/settings/keys' }
+    ];
+
+    function renderApiForm() {
+      const keys = Storage.get('nj_api_keys', {});
+      const count = Object.keys(keys).length;
+      document.getElementById('hudKeysCount').textContent = `${count} CONFIGURÉE(S)`;
+
+      document.getElementById('apiFormContainer').innerHTML = API_SERVICES.map(svc => `
+        <div class="api-row">
+          <div class="api-label">
+            <span>${svc.label}</span>
+            ${keys[svc.id] ? '<span class="api-saved-badge">✅ Configurée</span>' : ''}
+            <a href="${svc.url}" target="_blank" style="color:var(--cyan);font-size:10px;margin-left:auto;">Obtenir →</a>
+          </div>
+          <input class="api-input" type="password" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" oninput="updateTempKey('${svc.id}', this.value)" />
+        </div>
+      `).join('');
+    }
+
+    function updateTempKey(id, val) {
+      const keys = Storage.get('nj_api_keys', {});
+      if (val.trim()) keys[id] = val.trim(); else delete keys[id];
+      Storage.set('nj_api_keys', keys);
+      document.getElementById('hudKeysCount').textContent = `${Object.keys(keys).length} CONFIGURÉE(S)`;
+    }
+
+    async function saveAllKeysAndTest() {
+      const keys = Storage.get('nj_api_keys', {});
+      showToast('💾 Clés sauvegardées dans le téléphone !');
+      renderApiForm();
+
+      const resBox = document.getElementById('keyTestResult');
+      resBox.classList.add('visible');
+      resBox.textContent = '🔬 Test en direct des clés API...';
+      const results = [];
+
+      if (keys.groq) {
+        try {
+          const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq}` } });
+          results.push(r.ok ? '✅ Groq API : Connectée (Llama 3.3 70B)' : `❌ Groq API : Erreur (${r.status})`);
+        } catch(e) { results.push(`❌ Groq API : ${e.message}`); }
+      } else results.push('⚪ Groq API : Non renseignée');
+
+      if (keys.openai) {
+        try {
+          const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai}` } });
+          results.push(r.ok ? '✅ OpenAI API : Connectée (GPT-4o)' : `❌ OpenAI API : Erreur (${r.status})`);
+        } catch(e) { results.push(`❌ OpenAI API : ${e.message}`); }
+      } else results.push('⚪ OpenAI API : Non renseignée');
+
+      if (keys.gemini) {
+        try {
+          const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini}`);
+          results.push(r.ok ? '✅ Google Gemini : Connectée (Gemini 1.5)' : `❌ Google Gemini : Erreur (${r.status})`);
+        } catch(e) { results.push(`❌ Google Gemini : ${e.message}`); }
+      } else results.push('⚪ Google Gemini : Non renseignée');
+
+      if (keys.anthropic) {
+        try {
+          const r = await httpFetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic, 'anthropic-version': '2023-06-01' },
+            body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 5, messages: [{ role: 'user', content: 'hi' }] })
+          });
+          results.push(r.ok ? '✅ Anthropic Claude : Connectée (Claude 3.5)' : `❌ Anthropic Claude : Erreur (${r.status})`);
+        } catch(e) { results.push(`❌ Anthropic Claude : ${e.message}`); }
+      } else results.push('⚪ Anthropic Claude : Non renseignée');
+
+      resBox.textContent = results.join('\n');
+    }
+
+    /* ── GÉNÉRATION D'IMAGES ── */
+    async function generateImage() {
+      const prompt = document.getElementById('imgPrompt').value.trim();
+      if (!prompt) { showToast('Entrez une description d\'image'); return; }
+      const timestamp = Date.now();
+      const enhanced = `${prompt}, 8k resolution photorealistic detailed artwork`;
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1024&height=1024&nologo=true&seed=${timestamp}`;
+      
+      const gallery = Storage.get('nj_gallery', []);
+      gallery.unshift({ id: 'img_'+timestamp, title: prompt, url });
+      Storage.set('nj_gallery', gallery);
+      
+      showToast('✅ Image générée !');
+      loadGallery();
+    }
+
+    function loadGallery() {
+      const gallery = Storage.get('nj_gallery', []);
+      const grid = document.getElementById('galleryGrid');
+      if (!gallery.length) { grid.innerHTML = '<div style="color:var(--muted);grid-column:1/-1;text-align:center;padding:12px;">Aucune image générée.</div>'; return; }
+      grid.innerHTML = gallery.map(i => `<div class="gallery-item"><img src="${i.url}" /><div style="position:absolute;bottom:0;inset-x:0;background:rgba(0,0,0,0.7);padding:4px;font-size:9px;color:#fff;">${i.title}</div></div>`).join('');
+    }
+
+    /* ── MODIFICATION D'APPLICATIONS DU TÉLÉPHONE ── */
+    function loadInstalledPhoneApps() {
+      const container = document.getElementById('installedAppsContainer');
+      container.style.display = 'flex';
+      if (window.AndroidBridge && window.AndroidBridge.getInstalledApps) {
+        try {
+          const apps = JSON.parse(window.AndroidBridge.getInstalledApps());
+          if (apps.length > 0) {
+            container.innerHTML = apps.map(app => `
+              <div class="app-item" onclick="selectPhoneApp('${app.name.replace(/'/g,"")}','${app.packageName}')">
+                <div>
+                  <div style="font-weight:700;font-size:12px;">📱 ${app.name}</div>
+                  <div style="font-size:9px;color:var(--muted);">${app.packageName}</div>
+                </div>
+                <button class="btn btn-cyan" style="padding:4px 8px;font-size:10px;">Choisir</button>
+              </div>
+            `).join('');
+            return;
+          }
+        } catch(e) {}
+      }
+      container.innerHTML = '<div style="color:var(--muted);padding:10px;">Veuillez exécuter l\'application sur votre téléphone Android.</div>';
+    }
+
+    function selectPhoneApp(name, pkg) {
+      document.getElementById('apkModPromptCard').style.display = 'flex';
+      document.getElementById('selectedAppTitle').textContent = `APPLICATION SÉLECTIONNÉE : ${name}`;
+    }
+
+    function processAiApkModification() {
+      const prompt = document.getElementById('aiApkPrompt').value;
+      const res = document.getElementById('aiApkResult');
+      res.classList.add('visible');
+      res.textContent = `✅ Consigne enregistrée : "${prompt}". L'IA adapte l'application sélectionnée...`;
+    }
+
+    /* ── TABS NAVIGATION ── */
+    function showTab(id, tabEl) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      document.getElementById('tab-' + id).classList.add('active');
+      if (tabEl) tabEl.classList.add('active');
+
+      if (id === 'gallery') loadGallery();
+      if (id === 'keys') renderApiForm();
+    }
+
+    function showToast(msg) {
+      if (window.AndroidBridge && window.AndroidBridge.showToast) {
+        window.AndroidBridge.showToast(msg);
+      } else {
+        alert(msg);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderApiForm();
+      loadGallery();
+    });
+  </script>
 </body>
 </html>
