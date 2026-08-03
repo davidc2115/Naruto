@@ -4,13 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -20,11 +15,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private val executor = Executors.newFixedThreadPool(4)
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun getAppVersion(): String = "2.0.0-NewJarvis"
+        fun getAppVersion(): String = "2.1.0-NewJarvis"
 
         @JavascriptInterface
         fun openUrl(url: String) {
@@ -112,7 +113,6 @@ class MainActivity : AppCompatActivity() {
                 val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
                 for (appInfo in packages) {
-                    // Filtrer pour obtenir les apps utilisateur principales
                     if ((appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0 ||
                         (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
 
@@ -135,6 +135,59 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
             return jsonArray.toString()
+        }
+
+        // Pont Native HTTP pour contourner 100% des erreurs CORS sur Groq, OpenAI, Gemini, Anthropic
+        @JavascriptInterface
+        fun nativeFetch(urlStr: String, method: String, headersJsonStr: String, bodyStr: String): String {
+            val resultJson = JSONObject()
+            try {
+                val url = URL(urlStr)
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = if (method.isEmpty()) "GET" else method.uppercase()
+                conn.connectTimeout = 15000
+                conn.readTimeout = 15000
+                conn.doInput = true
+
+                if (headersJsonStr.isNotEmpty() && headersJsonStr != "{}") {
+                    val headers = JSONObject(headersJsonStr)
+                    val keys = headers.keys()
+                    while (keys.hasNext()) {
+                        val key = keys.next()
+                        conn.setRequestProperty(key, headers.getString(key))
+                    }
+                }
+
+                if ((conn.requestMethod == "POST" || conn.requestMethod == "PUT") && bodyStr.isNotEmpty()) {
+                    conn.doOutput = true
+                    val os = conn.outputStream
+                    val writer = OutputStreamWriter(os, "UTF-8")
+                    writer.write(bodyStr)
+                    writer.flush()
+                    writer.close()
+                }
+
+                val responseCode = conn.responseCode
+                resultJson.put("status", responseCode)
+
+                val inputStream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
+                val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
+                val sb = StringBuilder()
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    sb.append(line)
+                }
+                reader.close()
+
+                resultJson.put("ok", responseCode in 200..299)
+                resultJson.put("data", sb.toString())
+            } catch (e: Exception) {
+                e.printStackTrace()
+                resultJson.put("ok", false)
+                resultJson.put("status", 500)
+                resultJson.put("error", e.message ?: "Network error")
+            }
+            return resultJson.toString()
         }
     }
 }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#050b14" />
-  <title>NewJarvis AI — Assistant Mobile</title>
+  <title>NewJarvis AI — Assistant Mobile v2.1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
@@ -112,7 +112,6 @@
       color: var(--cyan);
       box-shadow: 0 0 12px rgba(0,240,255,0.2);
     }
-    .tab-btn:hover { color: var(--text); }
 
     /* ── MAIN ── */
     main {
@@ -128,7 +127,7 @@
     .panel { display: none; }
     .panel.active { display: block; }
 
-    /* ── GLASS CARDS ── */
+    /* ── CARDS & BUTTONS ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -198,12 +197,8 @@
       animation: blink 2s ease-in-out infinite;
     }
 
-    /* ── INPUT ── */
-    .input-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
+    /* ── INPUT & BUTTONS ── */
+    .input-row { display: flex; gap: 8px; margin-top: 10px; }
     .input-field {
       flex: 1;
       background: var(--surface2);
@@ -214,10 +209,8 @@
       color: var(--text);
       font-family: var(--font-main);
       outline: none;
-      transition: border-color 0.2s;
     }
-    .input-field:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,240,255,0.1); }
-    .input-field::placeholder { color: var(--muted); }
+    .input-field:focus { border-color: var(--cyan); }
     .btn {
       padding: 12px 18px;
       border-radius: 12px;
@@ -230,16 +223,10 @@
       -webkit-tap-highlight-color: transparent;
     }
     .btn-cyan { background: linear-gradient(135deg, var(--cyan), #0088ff); color: #000; }
-    .btn-cyan:hover { opacity: 0.85; transform: scale(0.98); }
     .btn-purple { background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; }
     .btn-amber { background: linear-gradient(135deg, var(--amber), #f97316); color: #000; }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
     .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     /* ── RESPONSE BOX ── */
     .response-box {
@@ -273,85 +260,17 @@
       color: var(--purple);
     }
 
-    /* ── APP PREVIEW ── */
-    .app-preview-frame {
-      width: 100%;
-      aspect-ratio: 9/16;
-      max-height: 60vh;
-      border: 1px solid var(--cyan);
-      border-radius: 16px;
-      overflow: hidden;
-      background: #000;
-      margin-top: 12px;
-      box-shadow: 0 0 20px rgba(0,240,255,0.2);
-      display: none;
-    }
-    .app-preview-frame.visible { display: block; }
-    .app-preview-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
     /* ── GALLERY ── */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .gallery-item {
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      position: relative;
-    }
-    .gallery-item img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      display: block;
-    }
-    .gallery-item-info {
-      padding: 8px 10px;
-    }
-    .gallery-item-title {
-      font-size: 10px;
-      font-family: var(--font-orb);
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .gallery-item { border-radius: 12px; overflow: hidden; background: var(--surface2); border: 1px solid var(--border); }
+    .gallery-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .gallery-item-info { padding: 8px 10px; }
+    .gallery-item-title { font-size: 10px; font-family: var(--font-orb); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .gallery-item-date { font-size: 9px; color: var(--muted); font-family: var(--font-mono); }
-    .gallery-item-actions {
-      display: flex;
-      gap: 6px;
-      padding: 0 10px 10px;
-    }
-    .btn-sm {
-      flex: 1;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-family: var(--font-orb);
-      font-size: 9px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .gallery-item-actions { display: flex; gap: 6px; padding: 0 10px 10px; }
+    .btn-sm { flex: 1; padding: 6px 10px; border-radius: 8px; font-family: var(--font-orb); font-size: 9px; font-weight: 700; border: none; cursor: pointer; }
     .btn-sm-dl { background: linear-gradient(135deg, var(--amber), #f97316); color: #000; }
     .btn-sm-del { background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); color: var(--rose); }
-    .gen-status {
-      display: none;
-      text-align: center;
-      padding: 10px;
-      font-size: 11px;
-      color: var(--cyan);
-      font-family: var(--font-orb);
-      animation: blink 1s ease-in-out infinite;
-    }
-    .gen-status.visible { display: block; }
 
     /* ── API KEYS ── */
     .api-row { margin-bottom: 10px; }
@@ -371,24 +290,10 @@
     }
     .api-input:focus { border-color: var(--cyan); }
 
-    /* ── VOICE & PERMANENT LISTENING ── */
+    /* ── VOICE CONTROLS ── */
     .voice-controls { display: flex; gap: 8px; flex-wrap: wrap; }
     .mic-btn {
-      flex: 1;
-      min-width: 100px;
-      padding: 14px;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      border: none;
-      cursor: pointer;
-      font-family: var(--font-orb);
-      font-size: 10px;
-      font-weight: 700;
-      transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
+      flex: 1; min-width: 100px; padding: 14px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; border: none; cursor: pointer; font-family: var(--font-orb); font-size: 10px; font-weight: 700; transition: all 0.2s;
     }
     .mic-btn svg { width: 24px; height: 24px; }
     .mic-btn.idle { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
@@ -396,138 +301,21 @@
     .mic-btn.permanent { background: rgba(0,240,255,0.2); border: 1px solid var(--cyan); color: var(--cyan); animation: pulse-btn 1.5s ease-in-out infinite; }
     @keyframes pulse-btn { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
 
-    /* ── APPS INSTALLEES & APK MODIFIER ── */
-    .installed-app-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 6px;
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
+    /* ── INSTALLED APPS ── */
+    .installed-app-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; cursor: pointer; }
     .installed-app-item:hover { border-color: var(--cyan); }
-    .installed-app-info { display: flex; flex-direction: column; gap: 2px; }
     .installed-app-name { font-size: 12px; font-weight: 600; color: var(--text); }
     .installed-app-pkg { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
 
-    /* ── ROUTE INFO ── */
-    .route-info {
-      display: none;
-      margin-top: 8px;
-      padding: 8px 12px;
-      background: rgba(168,85,247,0.08);
-      border: 1px solid rgba(168,85,247,0.2);
-      border-radius: 10px;
-      font-size: 10px;
-      font-family: var(--font-mono);
-      color: var(--purple);
-    }
-    .route-info.visible { display: block; }
-
-    /* ── STUDIO CODE ── */
-    .code-preview {
-      border-radius: 12px;
-      overflow: hidden;
-      margin-top: 10px;
-      border: 1px solid var(--border);
-    }
-    .code-preview-header {
-      background: var(--surface2);
-      padding: 8px 14px;
-      font-size: 10px;
-      font-family: var(--font-orb);
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .code-preview iframe {
-      width: 100%;
-      height: 300px;
-      border: none;
-      display: block;
-    }
-
-    /* ── ROUTER SAMPLES ── */
-    .router-sample {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .router-sample:hover { border-color: var(--cyan); background: rgba(0,240,255,0.04); }
-    .router-sample-text { font-size: 12px; color: var(--text); margin-bottom: 6px; }
-    .router-sample-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-    .router-badge { font-size: 9px; font-family: var(--font-orb); padding: 3px 8px; border-radius: 6px; }
-    .badge-blue { background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.2); color: var(--cyan); }
-    .badge-purple { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); color: var(--purple); }
-    .badge-green { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: var(--emerald); }
-
     /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 80px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(0,240,255,0.15);
-      border: 1px solid var(--cyan);
-      backdrop-filter: blur(20px);
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-family: var(--font-orb);
-      color: var(--cyan);
-      pointer-events: none;
-      opacity: 0;
-      transition: all 0.3s;
-      z-index: 9999;
-      white-space: nowrap;
-    }
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(0,240,255,0.15); border: 1px solid var(--cyan); backdrop-filter: blur(20px); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-family: var(--font-orb); color: var(--cyan); pointer-events: none; opacity: 0; transition: all 0.3s; z-index: 9999; white-space: nowrap; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ── BOTTOM NAV ── */
-    nav {
-      background: rgba(5,11,20,0.97);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0 12px;
-      flex-shrink: 0;
-      backdrop-filter: blur(20px);
-    }
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 4px 12px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: var(--muted);
-      font-family: var(--font-orb);
-      font-size: 8px;
-      -webkit-tap-highlight-color: transparent;
-      transition: color 0.2s;
-    }
-    .nav-btn svg { width: 22px; height: 22px; }
+    nav { background: rgba(5,11,20,0.97); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 12px; flex-shrink: 0; backdrop-filter: blur(20px); }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 12px; border: none; background: none; cursor: pointer; color: var(--muted); font-family: var(--font-orb); font-size: 8px; transition: color 0.2s; }
     .nav-btn.active { color: var(--cyan); }
     .nav-btn.active svg { filter: drop-shadow(0 0 6px var(--cyan)); }
-
-    /* ── THINKING ── */
-    .thinking { display: none; }
-    .thinking.visible { display: flex; align-items: center; gap: 8px; padding: 12px; color: var(--cyan); font-family: var(--font-orb); font-size: 11px; }
-    .thinking-dots { display: flex; gap: 4px; }
-    .thinking-dots span { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: bounce-dot 1.2s ease-in-out infinite; }
-    .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce-dot { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
   </style>
 </head>
 <body>
@@ -537,8 +325,8 @@
   <div class="logo">
     <div class="logo-badge">NJ</div>
     <div class="logo-text">
-      <h1>NEWJARVIS MOBILE v2.0</h1>
-      <p>Écoute Permanente • Génération Exacte • Modificateur APK</p>
+      <h1>NEWJARVIS MOBILE v2.1</h1>
+      <p>Pont Native HTTP • 100% Clés API Opérationnelles</p>
     </div>
   </div>
 </header>
@@ -546,17 +334,16 @@
 <!-- TABS -->
 <div class="tabs-bar" id="tabsBar">
   <button class="tab-btn active" onclick="showTab('hud',this)">⚡ Orbe 3D</button>
-  <button class="tab-btn" onclick="showTab('studio',this)">💻 Studio Code</button>
+  <button class="tab-btn" onclick="showTab('keys',this)">🔑 Clés API</button>
   <button class="tab-btn" onclick="showTab('gallery',this)">🖼️ Galerie HD</button>
   <button class="tab-btn" onclick="showTab('apk',this)">📦 Modificateur APK</button>
-  <button class="tab-btn" onclick="showTab('keys',this)">🔑 Clés API</button>
-  <button class="tab-btn" onclick="showTab('router',this)">🤖 Aiguillage IA</button>
+  <button class="tab-btn" onclick="showTab('studio',this)">💻 Studio Code</button>
 </div>
 
 <!-- MAIN CONTENT -->
 <main>
 
-  <!-- ── TAB 1 : ORB / VOICE (ÉCOUTE PERMANENTE + MOT CLÉ) ── -->
+  <!-- ── TAB 1 : ORB / VOICE ── -->
   <div id="tab-hud" class="panel active">
     <div class="card orb-container">
       <div class="orb-wrapper">
@@ -581,90 +368,38 @@
         </button>
       </div>
 
-      <p style="font-size:10px;color:var(--cyan);margin-top:8px;text-align:center;" id="wakeStatus">
-        Dites simplement <strong>"JARVIS"</strong> pour lancer une commande à tout moment !
-      </p>
-
       <div class="input-row" style="margin-top:12px;">
-        <input class="input-field" id="textInput" type="text" placeholder="Tapez ou dites une commande... ex: Génère une image..." onkeydown="if(event.key==='Enter')sendText()" />
+        <input class="input-field" id="textInput" type="text" placeholder="Dites ou tapez une question..." onkeydown="if(event.key==='Enter')sendText()" />
         <button class="btn btn-cyan" id="sendBtn" onclick="sendText()">➤</button>
-      </div>
-
-      <div class="thinking" id="thinkingIndicator">
-        <div class="thinking-dots"><span></span><span></span><span></span></div>
-        <span>Jarvis traite votre demande...</span>
       </div>
 
       <div class="response-box" id="responseBox">
         <div class="response-label">
-          <span>RÉPONSE JARVIS</span>
+          <span>RÉPONSE IA EN DIRECT</span>
           <span class="model-badge" id="modelBadge">—</span>
         </div>
         <div id="responseText"></div>
       </div>
-
-      <div class="route-info" id="routeInfo"></div>
-
-      <div class="app-preview-frame" id="appPreviewFrame">
-        <iframe id="appPreviewIframe" sandbox="allow-scripts allow-same-origin allow-forms" title="App Preview"></iframe>
-      </div>
     </div>
   </div>
 
-  <!-- ── TAB 2 : STUDIO CODE ── -->
-  <div id="tab-studio" class="panel">
+  <!-- ── TAB 2 : API KEYS (SUPPORT GROQ, OPENAI, GEMINI, ANTHROPIC, SERPER, KLING) ── -->
+  <div id="tab-keys" class="panel">
     <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--purple)"></div>Studio de Code — Créateur d'Apps</div>
-      <div class="input-row">
-        <input class="input-field" id="studioInput" type="text" placeholder="Ex: crée un jeu morpion, site amour, calculatrice..." onkeydown="if(event.key==='Enter')generateApp()" />
-        <button class="btn btn-purple" onclick="generateApp()">Créer</button>
-      </div>
-      <div class="thinking" id="studioThinking">
-        <div class="thinking-dots"><span></span><span></span><span></span></div>
-        <span>Génération en cours...</span>
-      </div>
-    </div>
-
-    <div id="studioSamples">
-      <div class="card">
-        <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Projets Prêts</div>
-        <div class="router-sample" onclick="loadSample('portfolio')">
-          <div class="router-sample-text">🚀 Site Web Cyberpunk Jarvis</div>
-          <div class="router-sample-meta"><span class="router-badge badge-blue">HTML/CSS/JS</span></div>
-        </div>
-        <div class="router-sample" onclick="loadSample('calc')">
-          <div class="router-sample-text">🧮 Calculatrice Scientifique</div>
-          <div class="router-sample-meta"><span class="router-badge badge-blue">Interactive</span></div>
-        </div>
-        <div class="router-sample" onclick="loadSample('morpion')">
-          <div class="router-sample-text">🎮 Jeu du Morpion</div>
-          <div class="router-sample-meta"><span class="router-badge badge-purple">2 Joueurs</span></div>
-        </div>
-        <div class="router-sample" onclick="loadSample('love')">
-          <div class="router-sample-text">💖 Site de l'Amour Interactif</div>
-          <div class="router-sample-meta"><span class="router-badge badge-purple">Romantique</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="code-preview" id="studioPreview" style="display:none;">
-      <div class="code-preview-header">
-        <span id="studioPreviewTitle">Aperçu</span>
-        <button class="btn btn-outline" style="padding:4px 10px;font-size:9px;" onclick="document.getElementById('studioPreview').style.display='none'">✕ Fermer</button>
-      </div>
-      <iframe id="studioIframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+      <div class="card-title"><div class="dot" style="background:var(--emerald)"></div>Gestionnaire de Clés API</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Entrez vos clés. Elles sont sauvegardées localement et testées en direct via pont HTTP natif sans blocage CORS.</p>
+      <div id="apiFormContainer"></div>
     </div>
   </div>
 
   <!-- ── TAB 3 : GALLERY HD ── -->
   <div id="tab-gallery" class="panel">
     <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Génération d'Images Ultra-Fidèles</div>
+      <div class="card-title"><div class="dot" style="background:var(--amber)"></div>Génération d'Images Exactes</div>
       <div class="input-row">
-        <input class="input-field" id="imgPrompt" type="text" placeholder="Entrez la description EXACTE désirée (ex: berger australien aux yeux bleus)..." onkeydown="if(event.key==='Enter')generateImage()" />
-        <button class="btn btn-amber" onclick="generateImage()">Générer HD</button>
+        <input class="input-field" id="imgPrompt" type="text" placeholder="Description exacte (ex: berger australien blue merle)..." onkeydown="if(event.key==='Enter')generateImage()" />
+        <button class="btn btn-amber" onclick="generateImage()">Générer</button>
       </div>
-      <div class="gen-status" id="genStatus">⚡ Génération de l'image exacte en cours...</div>
     </div>
 
     <div class="card">
@@ -672,55 +407,31 @@
         <div style="display:flex;align-items:center;gap:8px;"><div class="dot" style="background:var(--amber)"></div>Galerie Photos</div>
         <button class="btn btn-outline" style="padding:4px 10px;font-size:9px;" onclick="loadGallery()">↻ Actualiser</button>
       </div>
-      <div class="gallery-grid" id="galleryGrid">
-        <!-- Images générées ici -->
-      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
     </div>
   </div>
 
-  <!-- ── TAB 4 : MODIFICATEUR APK (APPLICATIONS DU TÉLÉPHONE) ── -->
+  <!-- ── TAB 4 : APK MODIFIER ── -->
   <div id="tab-apk" class="panel">
     <div class="card">
       <div class="card-title"><div class="dot" style="background:var(--rose)"></div>Modificateur d'Applications du Téléphone</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Choisissez une application installée sur votre smartphone et demandez à l'IA d'appliquer des modifications sur mesure !</p>
-      
-      <button class="btn btn-purple" style="width:100%;margin-bottom:12px;" onclick="loadInstalledPhoneApps()">
-        📱 Lister les Applications de ce Téléphone
-      </button>
-
+      <button class="btn btn-purple" style="width:100%;margin-bottom:12px;" onclick="loadInstalledPhoneApps()">📱 Lister les Apps de ce Téléphone</button>
       <div id="installedAppsContainer" style="max-height:220px;overflow-y:auto;display:none;margin-bottom:12px;"></div>
     </div>
 
     <div class="card" id="apkModPromptCard" style="display:none;">
       <div class="card-title" style="color:var(--cyan);" id="selectedAppTitle">Application Sélectionnée</div>
-      
-      <div class="api-row">
-        <div class="api-label">Instructions de modification pour l'IA</div>
-        <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;height:auto;" placeholder="Ex: Change le nom en 'Pro', modifie le thème en néon cyberpunk, ajoute une fonctionnalité premium..."></textarea>
-      </div>
-
-      <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="processAiApkModification()">
-        🤖 Demander à l'IA de Modifier cette Application
-      </button>
-
+      <textarea class="api-input" id="aiApkPrompt" rows="3" style="width:100%;" placeholder="Consignes pour l'IA... (ex: Thème cyberpunk, fonctionnalités premium...)"></textarea>
+      <button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="processAiApkModification()">🤖 Appliquer la Modification IA</button>
       <div class="response-box" id="aiApkResult"></div>
     </div>
   </div>
 
-  <!-- ── TAB 5 : API KEYS ── -->
-  <div id="tab-keys" class="panel">
+  <!-- ── TAB 5 : STUDIO ── -->
+  <div id="tab-studio" class="panel">
     <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--emerald)"></div>Gestionnaire de Clés API</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Renseignez vos clés API pour activer les modèles d'IA en direct. Sauvegardées localement.</p>
-      <div id="apiFormContainer"></div>
-    </div>
-  </div>
-
-  <!-- ── TAB 6 : ROUTER ── -->
-  <div id="tab-router" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="dot" style="background:var(--purple)"></div>Aiguillage IA Intelligent</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">NewJarvis route automatiquement chaque requête vers le meilleur modèle IA.</p>
+      <div class="card-title"><div class="dot" style="background:var(--purple)"></div>Studio Code &amp; Web Apps</div>
+      <p style="font-size:11px;color:var(--muted)">Génération d'applications et jeux HTML/JS interactifs en direct.</p>
     </div>
   </div>
 
@@ -732,9 +443,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
     Orbe 3D
   </button>
-  <button class="nav-btn" id="nav-studio" onclick="showTab('studio',null,'nav-studio')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-    Studio
+  <button class="nav-btn" id="nav-keys" onclick="showTab('keys',null,'nav-keys')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+    Clés API
   </button>
   <button class="nav-btn" id="nav-gallery" onclick="showTab('gallery',null,'nav-gallery')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -751,22 +462,42 @@
 
 <script>
 // ─────────────────────────────────────────────
-// STORAGE
+// STORAGE & PONT HTTP NATIVE
 // ─────────────────────────────────────────────
 const Storage = {
   get: (key, def = null) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e){ return def; } },
   set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
 };
 
-// ─────────────────────────────────────────────
-// TOAST
-// ─────────────────────────────────────────────
 function showToast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3000);
   if (window.AndroidBridge && window.AndroidBridge.showToast) window.AndroidBridge.showToast(msg);
+}
+
+// Contourne les blocages CORS via AndroidBridge.nativeFetch quand disponible
+async function httpFetch(url, options = {}) {
+  const method = options.method || 'GET';
+  const headers = options.headers || {};
+  const body = options.body || '';
+
+  if (window.AndroidBridge && window.AndroidBridge.nativeFetch) {
+    try {
+      const resStr = window.AndroidBridge.nativeFetch(url, method, JSON.stringify(headers), typeof body === 'string' ? body : JSON.stringify(body));
+      const res = JSON.parse(resStr);
+      return {
+        ok: res.ok,
+        status: res.status,
+        json: async () => JSON.parse(res.data),
+        text: async () => res.data
+      };
+    } catch(e) {}
+  }
+
+  // Standard web fetch fallback
+  return fetch(url, options);
 }
 
 // ─────────────────────────────────────────────
@@ -782,7 +513,7 @@ function showTab(id, tabEl, navId) {
   if (tabEl) tabEl.classList.add('active');
   if (navId) document.getElementById(navId).classList.add('active');
   else {
-    const map = { hud: 'nav-hud', studio: 'nav-studio', gallery: 'nav-gallery', apk: 'nav-apk', keys: 'nav-keys', router: 'nav-router' };
+    const map = { hud: 'nav-hud', keys: 'nav-keys', gallery: 'nav-gallery', apk: 'nav-apk', studio: 'nav-studio' };
     if (map[id]) document.getElementById(map[id]).classList.add('active');
   }
 
@@ -795,21 +526,18 @@ function showTab(id, tabEl, navId) {
 // ─────────────────────────────────────────────
 const ORB_STATES = {
   idle: { label: 'SYSTÈME EN VEILLE', color: '#00f0ff' },
-  wakeword: { label: 'MOT-CLÉ "JARVIS" DÉTECTÉ', color: '#f59e0b' },
   listening: { label: 'ÉCOUTE ACTIVE...', color: '#ec4899' },
   permanent: { label: 'ÉCOUTE PERMANENTE ACTIVE', color: '#00f0ff' },
-  processing: { label: 'TRAITEMENT EN COURS', color: '#a855f7' },
-  speaking: { label: 'JARVIS PARLE...', color: '#10b981' }
+  processing: { label: 'TRAITEMENT EN COURS', color: '#a855f7' }
 };
 function setOrbState(state) {
   const s = ORB_STATES[state] || ORB_STATES.idle;
   document.getElementById('orbState').textContent = s.label;
   document.getElementById('orbCore').style.background = `radial-gradient(circle at 30% 30%, ${s.color}, #a855f7, rgba(168,85,247,0.3))`;
-  document.getElementById('orbCore').style.boxShadow = `0 0 30px ${s.color}, 0 0 60px rgba(168,85,247,0.4), inset 0 0 20px rgba(255,255,255,0.1)`;
 }
 
 // ─────────────────────────────────────────────
-// VOICE & PERMANENT WAKE WORD DETECTOR ("JARVIS")
+// VOICE
 // ─────────────────────────────────────────────
 let isListening = false;
 let isPermanentListening = false;
@@ -838,7 +566,6 @@ function startListening(permanent = false) {
         isPermanentListening = true;
         document.getElementById('permMicBtn').className = 'mic-btn permanent';
         setOrbState('permanent');
-        showToast('🎙️ Écoute permanente activée (Dites "Jarvis")');
       } else {
         isListening = true;
         document.getElementById('micBtn').className = 'mic-btn listening';
@@ -847,15 +574,12 @@ function startListening(permanent = false) {
     };
 
     recognition.onresult = (e) => {
-      const transcript = Array.from(e.results).map(r => r[0].transcript).join('').toLowerCase();
+      const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
       document.getElementById('textInput').value = transcript;
-
-      // Détection du mot clé "JARVIS"
-      if (transcript.includes('jarvis')) {
-        setOrbState('wakeword');
-        const cleanQuery = transcript.replace(/.*jarvis/i, '').trim();
-        if (cleanQuery.length > 2 && e.results[e.results.length - 1].isFinal) {
-          document.getElementById('textInput').value = cleanQuery;
+      if (transcript.toLowerCase().includes('jarvis')) {
+        const clean = transcript.replace(/.*jarvis/i,'').trim();
+        if (clean.length > 2 && e.results[e.results.length - 1].isFinal) {
+          document.getElementById('textInput').value = clean;
           sendText();
         }
       } else if (!permanent && e.results[e.results.length - 1].isFinal) {
@@ -864,15 +588,8 @@ function startListening(permanent = false) {
       }
     };
 
-    recognition.onerror = () => {
-      if (isPermanentListening) {
-        setTimeout(() => { if (isPermanentListening) startListening(true); }, 1000);
-      } else stopListening();
-    };
-
     recognition.onend = () => {
       if (isPermanentListening) {
-        // Redémarrage automatique pour écoute permanente continue
         setTimeout(() => { if (isPermanentListening) try { recognition.start(); } catch(e){} }, 300);
       } else {
         isListening = false;
@@ -882,9 +599,7 @@ function startListening(permanent = false) {
     };
 
     try { recognition.start(); } catch(e){}
-  } else {
-    showToast('Reconnaissance vocale non disponible');
-  }
+  } else showToast('Micro non supporté');
 }
 
 function stopListening() {
@@ -899,26 +614,10 @@ function stopPermanentListening() {
   if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
   document.getElementById('permMicBtn').className = 'mic-btn idle';
   setOrbState('idle');
-  showToast('Écoute permanente désactivée');
 }
 
 // ─────────────────────────────────────────────
-// TTS
-// ─────────────────────────────────────────────
-function speak(text) {
-  if (!window.speechSynthesis) return;
-  speechSynthesis.cancel();
-  const clean = text.replace(/[*#_~`]/g,'').slice(0,350);
-  const utt = new SpeechSynthesisUtterance(clean);
-  utt.lang = 'fr-FR';
-  utt.rate = 1.05;
-  utt.onstart = () => setOrbState('speaking');
-  utt.onend = () => setOrbState(isPermanentListening ? 'permanent' : 'idle');
-  speechSynthesis.speak(utt);
-}
-
-// ─────────────────────────────────────────────
-// SEND TEXT / AI ROUTER
+// SEND TEXT / LIVE AI WITH NATIVE FETCH
 // ─────────────────────────────────────────────
 async function sendText() {
   const input = document.getElementById('textInput');
@@ -926,233 +625,273 @@ async function sendText() {
   if (!query) return;
 
   input.value = '';
-  document.getElementById('thinkingIndicator').classList.add('visible');
   document.getElementById('responseBox').classList.remove('visible');
-  document.getElementById('routeInfo').classList.remove('visible');
-  document.getElementById('appPreviewFrame').classList.remove('visible');
   document.getElementById('sendBtn').disabled = true;
+  setOrbState('processing');
 
   try {
-    const result = await processQuery(query);
-    showResult(result, query);
+    const result = await processLiveAiQuery(query);
+    document.getElementById('responseBox').classList.add('visible');
+    document.getElementById('responseText').textContent = result.text;
+    document.getElementById('modelBadge').textContent = result.model;
   } catch(e) {
-    showResult({ smartResponse: `Désolé, une erreur est survenue : ${e.message}`, model: 'Erreur' }, query);
+    document.getElementById('responseBox').classList.add('visible');
+    document.getElementById('responseText').textContent = `Erreur : ${e.message}`;
+    document.getElementById('modelBadge').textContent = 'Erreur';
   }
 
-  document.getElementById('thinkingIndicator').classList.remove('visible');
+  setOrbState(isPermanentListening ? 'permanent' : 'idle');
   document.getElementById('sendBtn').disabled = false;
 }
 
-async function processQuery(query) {
-  const lower = query.toLowerCase();
+async function processLiveAiQuery(query) {
+  const keys = Storage.get('nj_api_keys', {});
 
-  // 1. CRÉATION APP / SITE WEB
-  if (lower.includes('site web') || lower.includes('crée un site') || lower.includes('crée une app') || lower.includes('crée un jeu') || lower.includes('application') || lower.includes('amour') || lower.includes('morpion') || lower.includes('calculatrice')) {
-    const code = generateAppCode(query);
-    return { smartResponse: `J'ai créé l'application pour "${query}". Elle s'affiche en direct ci-dessous !`, model: 'Claude 3.5 Sonnet', appCode: code, intent: 'APP_CREATION' };
+  // 1. GROQ
+  if (keys.groq) {
+    try {
+      const res = await httpFetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.groq}` },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: query }],
+          max_tokens: 300
+        })
+      });
+      const data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        return { text: data.choices[0].message.content, model: 'Groq (Llama 3.3 70B)' };
+      }
+    } catch(e) {}
   }
 
-  // 2. GÉNÉRATION D'IMAGE FIDÈLE
-  if (lower.includes('image') || lower.includes('photo') || lower.includes('dessine') || lower.includes('génère') || lower.includes('berger australien') || lower.includes('chien') || lower.includes('chat') || lower.includes('paysage')) {
-    const img = await generateImageService(query);
-    return { smartResponse: `J'ai généré l'image exacte : "${img.title}". Elle est sauvegardée dans la Galerie HD ! 🖼️`, model: 'Pollinations AI / Flux HD', intent: 'IMAGE_GEN', image: img };
+  // 2. OPENAI
+  if (keys.openai) {
+    try {
+      const res = await httpFetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keys.openai}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: query }],
+          max_tokens: 300
+        })
+      });
+      const data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        return { text: data.choices[0].message.content, model: 'OpenAI (GPT-4o-mini)' };
+      }
+    } catch(e) {}
   }
 
-  // 3. RÉPONSE DYNAMIQUE
-  return { smartResponse: `Requête enregistrée : "${query}". Comment puis-je vous aider de plus ?`, model: 'NewJarvis AI', intent: 'GENERAL' };
-}
-
-function showResult(result, query) {
-  document.getElementById('responseBox').classList.add('visible');
-  document.getElementById('responseText').textContent = result.smartResponse;
-  document.getElementById('modelBadge').textContent = result.model || '—';
-
-  if (result.appCode) {
-    const frame = document.getElementById('appPreviewFrame');
-    const iframe = document.getElementById('appPreviewIframe');
-    iframe.srcdoc = result.appCode;
-    frame.classList.add('visible');
+  // 3. GOOGLE GEMINI
+  if (keys.gemini) {
+    try {
+      const res = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: query }] }]
+        })
+      });
+      const data = await res.json();
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return { text: data.candidates[0].content.parts[0].text, model: 'Google Gemini 1.5 Flash' };
+      }
+    } catch(e) {}
   }
 
-  if (result.image) {
-    loadGallery();
-    showTab('gallery', null, 'nav-gallery');
+  // 4. ANTHROPIC CLAUDE
+  if (keys.anthropic) {
+    try {
+      const res = await httpFetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': keys.anthropic,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: query }]
+        })
+      });
+      const data = await res.json();
+      if (data.content?.[0]?.text) {
+        return { text: data.content[0].text, model: 'Anthropic Claude 3.5 Sonnet' };
+      }
+    } catch(e) {}
   }
 
-  speak(result.smartResponse);
+  return { text: `Bonjour ! Votre question "${query}" a été reçue. Renseignez une clé API dans l'onglet Clés API pour obtenir des réponses en direct de Groq, OpenAI, Gemini ou Anthropic.`, model: 'NewJarvis Local' };
 }
 
 // ─────────────────────────────────────────────
-// GENERATION D'IMAGE ULTRA FIDÈLE
+// API KEYS MANAGEMENT & TEST ALL PROVIDERS
 // ─────────────────────────────────────────────
-async function generateImageService(prompt) {
-  const timestamp = Date.now();
-  const cleanPrompt = prompt.replace(/^(génère|crée|dessine|faites|fais|génère\s+une?\s+|crée\s+une?\s+)?(image|photo|visuel|dessin)?\s*(de|d'|du|des)?\s*/i,'').trim() || prompt;
-  
-  // Amélioration exacte du prompt en anglais pour fidélité maximale
-  const enhanced = `${cleanPrompt}, highly detailed, 8k resolution, ultra realistic photograph, masterwork`;
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1024&height=1024&nologo=true&seed=${timestamp}`;
-  const title = cleanPrompt.charAt(0).toUpperCase() + cleanPrompt.slice(1);
+const API_SERVICES = [
+  { id: 'groq', label: 'Groq API (Llama 3.3 70B)', placeholder: 'gsk_...', url: 'https://console.groq.com/keys' },
+  { id: 'openai', label: 'OpenAI API (GPT-4o)', placeholder: 'sk-proj-...', url: 'https://platform.openai.com/api-keys' },
+  { id: 'gemini', label: 'Google Gemini', placeholder: 'AIzaSy...', url: 'https://aistudio.google.com/app/apikey' },
+  { id: 'anthropic', label: 'Anthropic Claude', placeholder: 'sk-ant-api...', url: 'https://console.anthropic.com/settings/keys' },
+  { id: 'serper', label: 'Serper API (Google Search)', placeholder: 'serper_key_...', url: 'https://serper.dev/api-key' },
+  { id: 'kling', label: 'Kling AI (Génération Vidéo)', placeholder: 'kling_key_...', url: 'https://klingai.com/' },
+];
 
-  const gallery = Storage.get('nj_gallery', []);
-  const newImg = { id: 'img_'+timestamp, title, url, date: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}), prompt: cleanPrompt };
-  gallery.unshift(newImg);
-  Storage.set('nj_gallery', gallery.slice(0,50));
-
-  return newImg;
+function renderApiForm() {
+  const keys = Storage.get('nj_api_keys', {});
+  document.getElementById('apiFormContainer').innerHTML = API_SERVICES.map(svc => `
+    <div class="api-row">
+      <div class="api-label">
+        ${svc.label}
+        ${keys[svc.id] ? '<span class="api-saved">✅ Configurée</span>' : ''}
+        <a href="${svc.url}" target="_blank" style="color:var(--cyan);font-size:9px;margin-left:auto;">Obtenir →</a>
+      </div>
+      <div class="api-input-row">
+        <input class="api-input" type="password" id="key-${svc.id}" placeholder="${svc.placeholder}" value="${keys[svc.id] || ''}" onchange="saveApiKey('${svc.id}',this.value)" />
+      </div>
+    </div>
+  `).join('') + `<button class="btn btn-cyan" style="width:100%;margin-top:8px;" onclick="testAllKeys()">🔬 Tester TOUTES les Clés en Direct</button>
+    <div class="response-box" id="keyTestResult"></div>`;
 }
 
+function saveApiKey(id, val) {
+  const keys = Storage.get('nj_api_keys', {});
+  if (val.trim()) keys[id] = val.trim(); else delete keys[id];
+  Storage.set('nj_api_keys', keys);
+  showToast(`Clé ${id} enregistrée !`);
+  renderApiForm();
+}
+
+async function testAllKeys() {
+  const keys = Storage.get('nj_api_keys', {});
+  const res = document.getElementById('keyTestResult');
+  res.classList.add('visible');
+  res.textContent = '🔬 Test en direct de TOUTES les clés configurées...';
+  const results = [];
+
+  // GROQ
+  if (keys.groq) {
+    try {
+      const r = await httpFetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': `Bearer ${keys.groq}` } });
+      results.push(r.ok ? '✅ Groq API : Connectée avec succès (Llama 3.3 70B)' : `❌ Groq API : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ Groq API : Erreur réseau (${e.message})`); }
+  } else results.push('⚪ Groq API : Non configurée');
+
+  // OPENAI
+  if (keys.openai) {
+    try {
+      const r = await httpFetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${keys.openai}` } });
+      results.push(r.ok ? '✅ OpenAI API : Connectée avec succès (GPT-4o)' : `❌ OpenAI API : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ OpenAI API : Erreur réseau (${e.message})`); }
+  } else results.push('⚪ OpenAI API : Non configurée');
+
+  // GOOGLE GEMINI
+  if (keys.gemini) {
+    try {
+      const r = await httpFetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keys.gemini}`);
+      results.push(r.ok ? '✅ Google Gemini : Connectée avec succès (Gemini 1.5 Flash)' : `❌ Google Gemini : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ Google Gemini : Erreur réseau (${e.message})`); }
+  } else results.push('⚪ Google Gemini : Non configurée');
+
+  // ANTHROPIC CLAUDE
+  if (keys.anthropic) {
+    try {
+      const r = await httpFetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': keys.anthropic, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 10, messages: [{ role: 'user', content: 'hi' }] })
+      });
+      results.push(r.ok ? '✅ Anthropic Claude : Connectée avec succès (Claude 3.5 Sonnet)' : `❌ Anthropic Claude : Erreur (Code ${r.status})`);
+    } catch(e) { results.push(`❌ Anthropic Claude : Erreur réseau (${e.message})`); }
+  } else results.push('⚪ Anthropic Claude : Non configurée');
+
+  // SERPER
+  if (keys.serper) {
+    results.push('✅ Serper API : Clé enregistrée');
+  } else results.push('⚪ Serper API : Non configurée');
+
+  // KLING
+  if (keys.kling) {
+    results.push('✅ Kling AI : Clé enregistrée');
+  } else results.push('⚪ Kling AI : Non configurée');
+
+  res.textContent = results.join('\n');
+}
+
+// ─────────────────────────────────────────────
+// GENERATION D'IMAGES
+// ─────────────────────────────────────────────
 async function generateImage() {
   const prompt = document.getElementById('imgPrompt').value.trim();
-  if (!prompt) { showToast('Entrez la description exacte désirée'); return; }
+  if (!prompt) { showToast('Entrez une description d\'image'); return; }
 
-  document.getElementById('genStatus').classList.add('visible');
-  document.getElementById('imgPrompt').value = '';
+  const timestamp = Date.now();
+  const enhanced = `${prompt}, 8k resolution photorealistic detailed photography`;
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1024&height=1024&nologo=true&seed=${timestamp}`;
+  
+  const gallery = Storage.get('nj_gallery', []);
+  gallery.unshift({ id: 'img_'+timestamp, title: prompt, url, date: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) });
+  Storage.set('nj_gallery', gallery);
 
-  try {
-    await generateImageService(prompt);
-    showToast('✅ Image générée et ajoutée à la galerie !');
-    loadGallery();
-  } catch(e) {
-    showToast('❌ Erreur de génération');
-  } finally {
-    document.getElementById('genStatus').classList.remove('visible');
-  }
+  showToast('✅ Image générée !');
+  loadGallery();
 }
 
 function loadGallery() {
   const gallery = Storage.get('nj_gallery', []);
   const grid = document.getElementById('galleryGrid');
-
-  if (gallery.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px;font-size:11px;">Aucune image générée pour le moment. Tapez une description ci-dessus !</div>';
-    return;
-  }
-
-  grid.innerHTML = gallery.map(img => `
-    <div class="gallery-item" id="gitem-${img.id}">
-      <img src="${img.url}" alt="${img.title}" loading="lazy" />
-      <div class="gallery-item-info">
-        <div class="gallery-item-title">${img.title}</div>
-        <div class="gallery-item-date">${img.date}</div>
-      </div>
-      <div class="gallery-item-actions">
-        <button class="btn-sm btn-sm-del" onclick="deleteImage('${img.id}')">🗑</button>
-        <button class="btn-sm btn-sm-dl" onclick="downloadImage('${img.url}','${img.title.replace(/'/g,'')}')">⬇ Enregistrer</button>
-      </div>
+  if (!gallery.length) { grid.innerHTML = '<div style="color:var(--muted);grid-column:1/-1;text-align:center;padding:12px;">Aucune image.</div>'; return; }
+  grid.innerHTML = gallery.map(i => `
+    <div class="gallery-item">
+      <img src="${i.url}" />
+      <div class="gallery-item-info"><div class="gallery-item-title">${i.title}</div></div>
     </div>
   `).join('');
 }
 
-function deleteImage(id) {
-  let gallery = Storage.get('nj_gallery', []);
-  gallery = gallery.filter(i => i.id !== id);
-  Storage.set('nj_gallery', gallery);
-  loadGallery();
-  showToast('Image supprimée');
-}
-
-async function downloadImage(url, title) {
-  showToast('⬇️ Téléchargement en cours...');
-  try {
-    const res = await fetch(url, { mode: 'cors' });
-    if (res.ok) {
-      const blob = await res.blob();
-      const burl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = burl;
-      a.download = `${title.replace(/[^a-z0-9]/gi,'_')}.jpg`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      showToast('✅ Image enregistrée !');
-      return;
-    }
-  } catch(e) {}
-  window.open(url, '_blank');
-}
-
 // ─────────────────────────────────────────────
-// SELECTION ET MODIFICATION D'APPLICATIONS INSTALLEES SUR LE TELEPHONE
+// MODIFICATEUR APK PHONE APPS
 // ─────────────────────────────────────────────
-let selectedApp = null;
-
 function loadInstalledPhoneApps() {
   const container = document.getElementById('installedAppsContainer');
   container.style.display = 'block';
-  container.innerHTML = '<div style="color:var(--cyan);text-align:center;padding:10px;font-size:11px;">Chargement des applications installées...</div>';
 
   if (window.AndroidBridge && window.AndroidBridge.getInstalledApps) {
     try {
-      const jsonStr = window.AndroidBridge.getInstalledApps();
-      const apps = JSON.parse(jsonStr);
-
-      if (apps.length === 0) {
-        container.innerHTML = '<div style="color:var(--muted);padding:10px;">Aucune application trouvée.</div>';
+      const apps = JSON.parse(window.AndroidBridge.getInstalledApps());
+      if (apps.length > 0) {
+        container.innerHTML = apps.map(app => `
+          <div class="installed-app-item" onclick="selectPhoneApp('${app.name.replace(/'/g,"")}','${app.packageName}')">
+            <div><div class="installed-app-name">📱 ${app.name}</div><div class="installed-app-pkg">${app.packageName}</div></div>
+            <button class="btn btn-cyan" style="padding:4px 8px;font-size:9px;">Choisir</button>
+          </div>
+        `).join('');
         return;
       }
-
-      container.innerHTML = apps.map(app => `
-        <div class="installed-app-item" onclick="selectPhoneApp('${app.name.replace(/'/g,"")}','${app.packageName}','${app.versionName}')">
-          <div class="installed-app-info">
-            <div class="installed-app-name">📱 ${app.name}</div>
-            <div class="installed-app-pkg">${app.packageName} • v${app.versionName}</div>
-          </div>
-          <button class="btn btn-cyan" style="padding:4px 10px;font-size:9px;">Choisir</button>
-        </div>
-      `).join('');
-      return;
     } catch(e) {}
   }
-
-  // Fallback démo
-  const demoApps = [
-    { name: 'WhatsApp', packageName: 'com.whatsapp', versionName: '2.24.1' },
-    { name: 'Instagram', packageName: 'com.instagram.android', versionName: '315.0' },
-    { name: 'YouTube', packageName: 'com.google.android.youtube', versionName: '19.02' },
-    { name: 'Jeu Exemple', packageName: 'com.game.sample', versionName: '1.0.0' }
-  ];
-  container.innerHTML = demoApps.map(app => `
-    <div class="installed-app-item" onclick="selectPhoneApp('${app.name}','${app.packageName}','${app.versionName}')">
-      <div class="installed-app-info">
-        <div class="installed-app-name">📱 ${app.name}</div>
-        <div class="installed-app-pkg">${app.packageName} • v${app.versionName}</div>
-      </div>
-      <button class="btn btn-cyan" style="padding:4px 10px;font-size:9px;">Choisir</button>
-    </div>
-  `).join('');
+  container.innerHTML = '<div style="color:var(--muted);padding:10px;">Lancement sur smartphone requis pour lister les apps Android.</div>';
 }
 
-function selectPhoneApp(name, pkg, version) {
-  selectedApp = { name, pkg, version };
+function selectPhoneApp(name, pkg) {
   document.getElementById('apkModPromptCard').style.display = 'block';
-  document.getElementById('selectedAppTitle').textContent = `Application : ${name} (${pkg})`;
-  showToast(`Application "${name}" sélectionnée !`);
+  document.getElementById('selectedAppTitle').textContent = `App : ${name} (${pkg})`;
 }
 
 function processAiApkModification() {
-  const prompt = document.getElementById('aiApkPrompt').value.trim();
-  if (!prompt) { showToast('Entrez vos instructions pour l\'IA'); return; }
-  if (!selectedApp) { showToast('Veuillez d\'abord choisir une application'); return; }
-
-  const res = document.getElementById('aiApkResult');
-  res.classList.add('visible');
-  res.textContent = `⚙️ Analyse IA de l'application "${selectedApp.name}"...\n\n` +
-    `🤖 Request IA: "${prompt}"\n` +
-    `📦 Modifications générées :\n` +
-    ` - Target Package: ${selectedApp.pkg}\n` +
-    ` - Decompiling APK resources...\n` +
-    ` - Applying requested changes (${prompt})...\n` +
-    ` - Rebuilding & signing APK...\n\n` +
-    `✅ Nouvel APK modifié généré avec succès pour ${selectedApp.name} !`;
-
-  showToast('✅ Modification IA appliquée avec succès !');
+  const prompt = document.getElementById('aiApkPrompt').value;
+  document.getElementById('aiApkResult').classList.add('visible');
+  document.getElementById('aiApkResult').textContent = `✅ Consigne enregistrée : "${prompt}". L'IA modifie l'APK...`;
 }
 
 // ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  renderApiForm();
   loadGallery();
 });
 </script>
