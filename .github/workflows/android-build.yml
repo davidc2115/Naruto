@@ -1,0 +1,84 @@
+name: Build APK
+
+# Cette CI est la vraie vérification du projet : ni le SDK Android ni un GPU Vulkan ne sont
+# disponibles dans l'environnement où ce projet a été généré, donc c'est ici — sur les runners
+# GitHub, qui fournissent le SDK/NDK Android — que la compilation native (llama.cpp + Vulkan) et
+# Kotlin/Compose est réellement validée à chaque push.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloner le dépôt (avec le sous-module llama.cpp)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/libs.versions.toml') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Cache configuration/objets CMake natifs
+        uses: actions/cache@v4
+        with:
+          path: app/.cxx
+          key: cxx-${{ runner.os }}-${{ hashFiles('app/src/main/cpp/**', 'external/llama.cpp/**/*.cmake', 'external/llama.cpp/**/CMakeLists.txt') }}
+          restore-keys: cxx-${{ runner.os }}-
+
+      - name: Installer la plateforme et le NDK Android requis
+        run: |
+          ANDROID_SDK_ROOT="$ANDROID_HOME"
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" \
+            "platforms;android-36" "build-tools;36.0.0" "ndk;28.0.13004108" "cmake;3.31.5" > /dev/null
+
+      - name: Installer les outils hôte requis par le backend Vulkan de ggml
+        # Outils HÔTE (rien de tout ça n'est embarqué dans l'APK) : ggml-vulkan compile ses
+        # shaders GLSL en SPIR-V au moment du build et a besoin des en-têtes SPIR-V/Vulkan
+        # pour se configurer. Sans eux, CMake échoue avec "Could NOT find Vulkan (missing:
+        # glslc)" puis "Could not find a package configuration file... SPIRV-Headers".
+        run: sudo apt-get update -qq && sudo apt-get install -y glslc spirv-headers libvulkan-dev
+
+      - name: Rendre gradlew exécutable
+        run: chmod +x ./gradlew
+
+      - name: Build APK debug (arm64-v8a, avec Vulkan)
+        run: ./gradlew :app:assembleDebug --stacktrace -PabiFilters=arm64-v8a
+
+      - name: Uploader l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencompanion-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+      - name: Uploader les logs de build natif en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-build-logs
+          path: |
+            app/.cxx/**/*.log
+            app/build/intermediates/cxx/**/*.log
+          if-no-files-found: ignore
+          retention-days: 7

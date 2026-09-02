@@ -1,368 +1,131 @@
-# 🍜 Naruto AI Chat
-
-AI-powered chat application featuring Naruto characters and celebrities with realistic personalities. Choose between SFW and NSFW modes for different conversation styles.
-
-**Powered by Groq Multi-Keys** - Fast, unlimited, uncensored AI with automatic rotation!
-
----
-
-## ✨ Features
-
-### 💬 Chat Features
-- **13 Characters**: 6 Naruto characters + 7 celebrities
-- **Dual Modes**: SFW (appropriate) and NSFW (uncensored) conversations
-- **Realistic Personalities**: Each character has unique traits and speaking styles
-- **Modern UI**: Material Design 3 with smooth animations
-- **Context-Aware**: AI remembers your conversation history
-
-### 🔑 Multi-Key System (NEW!)
-- **Automatic Rotation**: Multiple Groq API keys rotate automatically
-- **No Rate Limits**: Add 3-5 keys for virtually unlimited usage
-- **Smart Management**: Automatic error detection and key switching
-- **Real-time Stats**: Monitor usage for each key
-
-### 🎨 Media Generation (NEW!)
-- **📸 Image Generation**: Create images with Freebox Stable Diffusion (local & unlimited!)
-- **🎬 Video Generation**: Generate short animated videos locally
-- **Powered by Freebox**: 100% gratuit, local, illimité
-- **Pollination AI**: Vignettes et galeries hyper-réalistes
-
-### 👤 Character Details (NEW!)
-- **Page de Présentation**: Description physique complète, scénario, tempérament
-- **Galerie Photos**: 6 images hyper-réalistes par personnage (Pollination AI)
-- **Vignettes Générées**: Images automatiques pour chaque personnage
-- **Profil Détaillé**: Âge, taille, traits distinctifs, compétences
-
----
-
-## 🎭 Characters
-
-### Naruto Characters (6)
-- 🍜 **Naruto Uzumaki** - Hyperactive, determined, never gives up
-- ⚡ **Sasuke Uchiha** - Serious, calculated, complex past
-- 🌸 **Sakura Haruno** - Strong, caring, medical expert
-- 📖 **Kakashi Hatake** - Calm, wise, protective
-- 💜 **Hinata Hyuga** - Shy, gentle, determined
-- 🌙 **Itachi Uchiha** - Mysterious, sacrificing, complex
-
-### Celebrities (7)
-- 🎬 **Brad Pitt** - Charismatic, philosophical, legendary actor
-- 🌊 **Leonardo DiCaprio** - Environmental, adventurous, intense
-- 💪 **Dwayne Johnson** - Motivational, positive, "The Rock"
-- 🕷️ **Scarlett Johansson** - Intelligent, direct, sophisticated
-- 💎 **Margot Robbie** - Australian, fun, natural
-- 📚 **Emma Watson** - Feminist, eloquent, activist
-- ✨ **Zendaya** - Elegant, authentic, inspiring
-
----
-
-## 🚀 Quick Setup (5 minutes!)
-
-### Step 1: Get Groq API Keys (3-5 recommended)
-
-1. Go to: **https://console.groq.com**
-2. Sign up with 3-5 different emails:
-   - Use Gmail+ trick: your-email+1@gmail.com, your-email+2@gmail.com
-   - Or ask friends to create accounts
-3. For each account:
-   - Go to: **https://console.groq.com/keys**
-   - Click "Create API Key"
-   - Copy the key (starts with `gsk_`)
-
-### Step 2: Install App
-
-1. Download APK from [Releases](https://github.com/mel805/naruto-ai-chat/releases)
-2. Install on Android device (enable "Unknown sources" if needed)
-
-### Step 3: Configure Multi-Keys
-
-1. Open "Naruto AI Chat"
-2. Click **⚙️ Settings** (top right)
-3. Section "Groq API Keys"
-4. Click **"Add Groq Key"** for each key
-5. Paste each key (starts with `gsk_`)
-6. Click **"Test Connection"** → ✅ Connected
-7. **Done!** Enjoy unlimited chat!
-
-### Step 4: (Optional) Enable Images/Videos
-
-1. Create free account on **https://replicate.com**
-2. Get API token from **Account → API Tokens**
-3. In app Settings, paste Replicate key (starts with `r8_`)
-4. Click **"Save"**
-5. Now you can generate images and videos!
-
-**📄 Detailed guides:** 
-- [Multi-Key Setup](GROQ_MULTIKEY_SETUP.md) ← **NEW!**
-- [Old Single-Key Guide](GROQ_API_SETUP.md)
-
----
-
-## 🎯 Why Groq Multi-Keys?
-
-| Feature | Groq Multi-Keys | Freebox (Old) | Oracle Cloud |
-|---------|-----------------|---------------|--------------|
-| Setup Time | **5 min** | 30-60 min | 30-60 min |
-| Server Required | ❌ **No** | ✅ Yes | ✅ Yes |
-| Speed | ⚡ **~200 tok/s** | 🐢 5-10 tok/s | 🐢 Medium |
-| Free Capacity | **43K-72K/day** | ∞ Unlimited | Limited |
-| Maintenance | ❌ **None** | ✅ Yes | ✅ Yes |
-| Reliability | ✅ **99.9%** | Depends | 95% |
-| Model Quality | **Llama 3.3 70B** | TinyLlama 1B | Llama 3.2 3B |
-| Images/Videos | ✅ **Yes** | ❌ No | ❌ No |
-| Auto-Rotation | ✅ **Yes** | N/A | N/A |
-
----
-
-## 🎮 How to Use
-
-### Basic Chat
-
-1. **Select a character** from the main screen
-2. **Choose your mode:**
-   - 🔒 **SFW Mode**: Appropriate, respectful conversations
-   - 🔓 **NSFW Mode**: Uncensored, adult conversations
-3. **Type your message** and send
-4. **AI responds** in the character's unique personality
-
-### Generate Images/Videos (NEW!)
-
-1. **During conversation**, click **📸** icon (top right)
-2. Choose:
-   - **📸 Generate Image**: Creates an image from conversation (~30-60s)
-   - **🎬 Generate Video**: Creates animated short video (~2-4min)
-3. **Image/Video appears** in the chat
-4. **Continue chatting** with visual context!
-
-### Manage API Keys
-
-1. Click **⚙️ Settings** (top right on character selection)
-2. **Add/Remove Groq keys** for chat
-3. **Add Replicate key** for images/videos
-4. **View statistics** for each key
-5. **Test connection** anytime
-
----
-
-## 🛠️ Technical Stack
-
-- **Language**: Kotlin
-- **UI**: Jetpack Compose (Material Design 3)
-- **Architecture**: MVVM (AndroidViewModel)
-- **HTTP**: OkHttp 4.12
-- **Storage**: DataStore Preferences
-- **Image Loading**: Coil
-
-**APIs:**
-- **Chat**: Groq API (Llama 3.3 70B)
-- **Images**: Replicate (Stable Diffusion XL)
-- **Videos**: Replicate (Stable Video Diffusion)
-
-**Features:**
-- **Multi-Key Management**: Custom ApiKeyManager
-- **Auto-Rotation**: Intelligent key switching
-- **Error Recovery**: Automatic failover
-- **Statistics**: Real-time usage tracking
-
-**Requirements:**
-- **Min SDK**: 26 (Android 8.0)
-- **Target SDK**: 35
-
----
-
-## 📊 Free Limits (Massive with Multi-Keys!)
-
-**Groq Free Tier (per key):**
-- ✅ **14,400 requests per day**
-- ✅ **Llama 3.3 70B** model (very intelligent)
-- ✅ **No credit card** required
-- ✅ **Uncensored** responses
-- ✅ **~200 tokens/second** (ultra fast!)
-
-**With 3 Keys:**
-- 🚀 **43,200 requests/day** (3x capacity!)
-- 🚀 **~4,320 conversations/day**
-- 🚀 **Perfect for 150-300 active users**
-
-**With 5 Keys:**
-- 🚀 **72,000 requests/day** (5x capacity!)
-- 🚀 **~7,200 conversations/day**
-- 🚀 **Perfect for 250-500 active users**
-
-**Replicate Free Tier:**
-- ✅ **$5 free credit** (no card required)
-- ✅ **~2,500 free images** ($0.002 each)
-- ✅ **~250 free videos** ($0.02 each)
-
-**More than enough for extensive personal use!**
-
----
-
-## 🔐 Privacy & Security
-
-- ✅ Conversations sent to Groq via **HTTPS** (encrypted)
-- ✅ No data stored on Groq servers after response
-- ✅ **You control** your API key
-- ✅ **Open source** - audit the code yourself
-- ✅ No tracking or analytics
-
----
-
-## 🐛 Troubleshooting
-
-### "No API key configured"
-**Solution:**
-1. Go to Settings (⚙️)
-2. Add at least 1 Groq API key
-3. Test connection
-
-### "Rate limit exceeded" (Auto-Fixed!)
-**This is normal!** The app automatically:
-1. Detects rate limit
-2. Rotates to next key
-3. Continues without interruption
-
-**If happens frequently:**
-- Add more keys (3-5 recommended)
-- Check key statistics in Settings
-
-### All Keys Show Errors
-**Causes:**
-1. All keys reached daily limit → Wait 24h
-2. Invalid keys → Check on console.groq.com
-3. Network issue → Check internet
-
-**Solution:**
-- Add fresh keys
-- Wait for daily reset (midnight UTC)
-
-### Image/Video Generation Fails
-**Check:**
-1. ✅ Replicate key configured in Settings
-2. ✅ Key starts with `r8_`
-3. ✅ Free credit available on replicate.com
-4. ✅ Good internet connection
-
-### App Crashes
-- Ensure Android 8.0+ (API 26+)
-- Check logs: `adb logcat | grep Naruto`
-- [Report issue](https://github.com/mel805/naruto-ai-chat/issues)
-
----
-
-## 📱 Requirements
-
-- **Android**: 8.0+ (API 26)
-- **Internet**: Required
-- **Storage**: ~50-70 MB
-- **Groq API Key**: Free from https://console.groq.com
-
----
-
-## 📄 License
-
-This project is for **educational purposes**.
-
-Naruto characters © Masashi Kishimoto  
-AI powered by Meta's Llama 3.3 via Groq
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-- 🐛 [Report bugs](https://github.com/mel805/naruto-ai-chat/issues)
-- 💡 [Request features](https://github.com/mel805/naruto-ai-chat/issues)
-- 🔧 [Submit pull requests](https://github.com/mel805/naruto-ai-chat/pulls)
-
----
-
-## 🙏 Credits
-
-- **Naruto** characters © Masashi Kishimoto
-- **AI** powered by Meta's Llama 3.3 via [Groq](https://groq.com)
-- **Icons** by Google Material Design
-
----
-
-## 📞 Support
-
-- 📖 [Multi-Key Setup Guide](GROQ_MULTIKEY_SETUP.md) ← **Start Here!**
-- 📖 [Old Single-Key Guide](GROQ_API_SETUP.md)
-- 📖 [Freebox Setup (Deprecated)](FREEBOX_SETUP.md)
-- 🐛 [Report Issues](https://github.com/mel805/naruto-ai-chat/issues)
-- 💬 [Discussions](https://github.com/mel805/naruto-ai-chat/discussions)
-
----
-
-## 🎊 Ready to Chat?
-
-### Quick Start (5 minutes):
-
-1. **Get 3-5 Groq keys**: https://console.groq.com
-2. **Download APK**: [Releases](https://github.com/mel805/naruto-ai-chat/releases)
-3. **Add keys in Settings**: Click ⚙️ → Add each key
-4. **(Optional) Add Replicate key**: For images/videos
-5. **Start chatting!** 🎉
-
-### What You Get:
-
-- ✅ **43K+ messages/day** (with 3 keys)
-- ✅ **Automatic rotation** (no interruptions)
-- ✅ **Image generation** (with Replicate)
-- ✅ **Video generation** (with Replicate)
-- ✅ **Real-time stats** (monitor usage)
-- ✅ **Best AI quality** (Llama 70B)
-- ✅ **Ultra-fast** (~200 tok/s)
-
-**Dattebayo!** 🍜
-
----
-
-## 🔄 Migration from Old System
-
-### Freebox Users
-
-**Old System (Deprecated):**
-- ❌ Freebox TinyLlama 1B
-- ❌ Requires server maintenance
-- ❌ Slow (5-10 tok/s)
-- ❌ No images/videos
-
-**New System:**
-- ✅ Groq Llama 70B (much better!)
-- ✅ No maintenance needed
-- ✅ Super fast (200 tok/s)
-- ✅ Images & videos support
-
-**To migrate:**
-1. Update to latest APK
-2. Add Groq keys in Settings
-3. Done! Old system automatically replaced
-
-### Single-Key Groq Users
-
-**Upgrade to Multi-Key:**
-1. Create 2-4 more accounts
-2. Add all keys in Settings
-3. Enjoy 3-5x more capacity!
-
----
-
-## 📈 Version History
-
-**v2.0.0 (Current)** - Dec 26, 2025
-- ✨ Multi-key system with auto-rotation
-- ✨ Image generation (Stable Diffusion)
-- ✨ Video generation (Stable Video Diffusion)
-- ✨ Settings screen for key management
-- ✨ Real-time statistics
-- ✨ Removed Freebox dependency
-- 🔥 Replaced LlamaClient → GroqClient
-- 🎨 Enhanced UI with media controls
-
-**v1.x** - Previous
-- Basic Groq single-key
-- Freebox TinyLlama support
-- Chat-only functionality
+# OpenCompanion
+
+Application Android de chat avec des personnages, propulsée par un moteur
+d'IA **entièrement local** : aucune clé d'API, aucun compte, aucun appel à
+HuggingFace ni à un service cloud quelconque. Une fois un modèle importé,
+l'app fonctionne hors ligne.
+
+> Ce dépôt a été reconstruit de zéro à partir de rien (voir historique git) :
+> il ne contient plus le contenu précédent.
+
+## Pourquoi ce projet existe (et ce qu'il n'est pas)
+
+L'idée de départ était de repartir d'un chatbot de personnages, mais sans
+aucun des ingrédients qui posaient problème dans la version précédente :
+pas de clé d'API à payer/partager, pas de service tiers auquel envoyer ses
+conversations, et surtout **aucun personnage calqué sur une personne réelle
+ou un personnage sous droit d'auteur**. Les trois personnages fournis par
+défaut sont entièrement fictifs et originaux, tout public — ce sont des
+exemples pour comprendre le format de fiche personnage, pas une proposition
+de contenu figée. Créer ou importer d'autres personnages est libre, mais
+reste sous la responsabilité de l'utilisateur.
+
+## Fonctionnalités
+
+- **Moteur IA local** : [llama.cpp](https://github.com/ggml-org/llama.cpp)
+  embarqué (sous-module git, `external/llama.cpp`), compilé pour Android via
+  le NDK, avec le backend **Vulkan** (GPU) en plus du backend CPU. Le GPU est
+  utilisé quand il est disponible et stable ; en cas de plantage du pilote
+  (ça arrive sur certains GPU Adreno, voir
+  [`docs/VULKAN_NOTES.md`](docs/VULKAN_NOTES.md)), l'app retombe
+  automatiquement sur le CPU sans planter.
+- **Aucune clé, aucun compte** : ni pour discuter, ni pour importer un
+  modèle ou un personnage. Le seul accès réseau optionnel est un
+  téléchargement HTTP direct d'un fichier `.gguf` ou d'une fiche personnage
+  depuis une URL que *tu* fournis.
+- **Personnages créables ou importables**, au format ouvert
+  [Character Card V2](https://github.com/malfoyslastname/character-card-spec-v2)
+  (JSON, éventuellement embarqué dans un avatar PNG) — voir
+  [`docs/CHARACTER_IMPORT.md`](docs/CHARACTER_IMPORT.md). Trois façons
+  d'importer, toutes aussi directes :
+  1. **Partager** une image ou un JSON depuis une autre application
+     (navigateur, galerie…) → "Envoyer vers OpenCompanion".
+  2. **Choisir un fichier** déjà sur l'appareil.
+  3. **Coller une URL** directe.
+- **Réglages fins** : taille de contexte, threads CPU, nombre de couches sur
+  GPU, température, top-k/top-p, pénalité de répétition.
+
+**Android 9 (API 28) minimum.** Le backend Vulkan de llama.cpp appelle une
+fonction "core" de Vulkan 1.1 (`vkGetPhysicalDeviceFeatures2`) que le loader
+Vulkan d'Android n'exporte qu'à partir de l'API 28 — voir
+[`docs/VULKAN_NOTES.md`](docs/VULKAN_NOTES.md) pour le détail. En dessous,
+même le repli CPU serait affecté puisque les deux backends sont compilés
+dans la même bibliothèque native.
+
+## Construire l'application
+
+```bash
+git clone --recurse-submodules <url-de-ce-depot>
+cd OpenCompanion
+# Si cloné sans --recurse-submodules :
+git submodule update --init --recursive
+
+./gradlew :app:assembleDebug -PabiFilters=arm64-v8a
+```
+
+L'APK debug se trouve ensuite dans `app/build/outputs/apk/debug/`.
+
+Prérequis : JDK 17, Android SDK (plateforme 36), NDK `28.0.13004108`, CMake
+`3.31+`, et sur la machine qui compile, les outils hôte du backend Vulkan de
+ggml — sur Debian/Ubuntu : `sudo apt-get install glslc spirv-headers
+libvulkan-dev` (Vulkan SDK LunarG sur Windows/macOS). Sans eux, la
+configuration CMake échoue (voir [`docs/VULKAN_NOTES.md`](docs/VULKAN_NOTES.md)
+pour le détail des erreurs rencontrées). Le workflow
+[`.github/workflows/android-build.yml`](.github/workflows/android-build.yml)
+installe tout cela automatiquement et compile l'APK à chaque push — c'est la
+référence si un build local coince sur une histoire de version d'outils.
+
+`-PabiFilters=arm64-v8a` limite le build à l'architecture 64 bits (la
+quasi-totalité des appareils depuis 2018) ; `-PabiFilters=arm64-v8a,armeabi-v7a`
+couvre aussi les appareils 32 bits plus anciens, au prix d'un APK plus gros
+et d'un temps de build plus long.
+
+## Obtenir un modèle
+
+L'app n'embarque aucun modèle (ça ferait plusieurs Go dans l'APK) et ne
+propose aucun catalogue intégré — c'est un choix délibéré pour rester
+indépendant de toute plateforme. Dans **Réglages → Modèle** :
+
+- **Importer un fichier** : si tu as déjà un `.gguf` sur ton téléphone
+  (copié par USB, téléchargé dans un navigateur, etc.).
+- **Depuis une URL** : colle un lien HTTP(S) direct vers un `.gguf`, où
+  que ce fichier soit hébergé.
+
+N'importe quel modèle au format **GGUF** convient. Pour un premier essai sur
+mobile, vise un modèle "small/mini" quantifié (`Q4_K_M` par exemple,
+2 à 4 Go) : au-delà, le chargement et la vitesse de génération deviennent
+pénibles sur la plupart des téléphones.
+
+## Personnaliser un personnage / en importer un
+
+Voir [`docs/CHARACTER_IMPORT.md`](docs/CHARACTER_IMPORT.md) pour le détail
+du format et des trois voies d'import.
+
+## Vulkan : ce qui marche, ce qui est fragile
+
+Voir [`docs/VULKAN_NOTES.md`](docs/VULKAN_NOTES.md) — en résumé, la
+compilation Vulkan pour Android via llama.cpp a longtemps été instable sur
+certaines combinaisons GPU/pilote (plantages `DeviceLostError` sur certains
+Adreno). Le code de ce dépôt est écrit pour s'en protéger (repli CPU
+automatique, aucune exception ne doit jamais traverser la frontière JNI),
+mais la seule vraie validation possible est sur de vrais appareils — voir ce
+document pour savoir quoi tester et comment lire les logs.
+
+## Architecture du code
+
+```
+app/src/main/cpp/            Pont JNI C++ vers llama.cpp (opencompanion_bridge.cpp)
+app/src/main/java/.../engine/        Moteur : LlamaBridge (JNI brut), InferenceEngine
+                                      (façade coroutines/Flow), ModelManager, décodage UTF-8
+app/src/main/java/.../data/          Room (personnages, historique), DataStore (réglages)
+app/src/main/java/.../charactercard/ Import/export Character Card V2 (JSON + PNG)
+app/src/main/java/.../prompt/        Construction du prompt (patron de dialogue + historique)
+app/src/main/java/.../ui/            Écrans Compose (liste, éditeur, chat, réglages)
+external/llama.cpp/           Sous-module git : moteur d'inférence (licence MIT)
+```
+
+## Licence
+
+Code de ce dépôt : MIT (voir [`LICENSE`](LICENSE)). `external/llama.cpp` est
+un sous-module distinct, également sous licence MIT — voir sa propre licence
+dans ce dossier une fois le sous-module initialisé.

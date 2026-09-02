@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icône vectorielle simple : une bulle de dialogue stylisée. Pas d'asset binaire nécessaire. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24 C34,24 20,37 20,53 C20,62 25,70 33,75 L30,88 L46,79 C48.5,79.6 51.2,80 54,80 C74,80 88,67 88,51 C88,37 74,24 54,24 Z" />
+    <path
+        android:fillColor="#1B1035"
+        android:pathData="M40,50 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path
+        android:fillColor="#1B1035"
+        android:pathData="M54,50 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path
+        android:fillColor="#1B1035"
+        android:pathData="M68,50 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+</vector>

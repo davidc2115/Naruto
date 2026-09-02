@@ -1,35 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Uniquement pour le téléchargement optionnel d'un modèle GGUF ou d'une fiche personnage
+         depuis une URL directe fournie par l'utilisateur (voir ModelManager, CharacterImportManager).
+         L'app ne contacte aucun service au démarrage et ne fonctionne à aucun moment moins bien
+         hors ligne, une fois un modèle importé. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Déclaratif : signale que l'app tire parti d'un GPU Vulkan sans le rendre obligatoire
+         (voir engine/InferenceEngine.kt — repli CPU automatique si absent ou instable). -->
+    <uses-feature
+        android:name="android.hardware.vulkan.level"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.vulkan.version"
+        android:required="false" />
 
     <application
+        android:name=".OpenCompanionApplication"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="NewJarvis AI"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NewJarvis"
-        android:usesCleartextTraffic="true"
-        tools:targetApi="31">
+        android:theme="@style/Theme.OpenCompanion"
+        android:extractNativeLibs="false">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="adjustResize">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.OpenCompanion">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Import "fluide" d'un personnage : partager une image PNG (fiche embarquée) ou
+                 un fichier JSON depuis n'importe quelle autre application (navigateur, galerie,
+                 gestionnaire de fichiers…) directement vers OpenCompanion. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/png" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/json" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
     </application>
-
 </manifest>

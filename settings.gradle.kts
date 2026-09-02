@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Naruto AI Chat"
+rootProject.name = "OpenCompanion"
 include(":app")

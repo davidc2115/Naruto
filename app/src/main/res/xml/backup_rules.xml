@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- On exclut explicitement le dossier des modèles GGUF (plusieurs Go) de toute sauvegarde. -->
 <full-backup-content>
-    <include domain="sharedpref" path="."/>
+    <exclude domain="file" path="models/" />
 </full-backup-content>
