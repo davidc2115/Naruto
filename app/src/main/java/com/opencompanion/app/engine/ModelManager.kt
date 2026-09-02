@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.HttpURLConnection
@@ -81,6 +82,14 @@ class ModelManager(private val context: Context) {
      * Télécharge un modèle depuis une URL directe fournie par l'utilisateur.
      * Émet la progression puis le résultat final via un [Flow] (annulable en
      * annulant la collecte).
+     *
+     * [flowOn] est indispensable ici : sans lui, tout ce bloc (connexion réseau, lecture du
+     * flux HTTP, écriture disque) s'exécuterait sur le dispatcher de qui collecte ce flow —
+     * `viewModelScope.launch` par défaut, c'est-à-dire le thread principal — et plantait avec
+     * `android.os.NetworkOnMainThreadException` dès la connexion. `callbackFlow` ne bascule
+     * jamais de dispatcher tout seul, contrairement à `flow { }` combiné à `withContext`
+     * ailleurs dans ce fichier ; `trySend`/`close` restent thread-safe depuis n'importe quel
+     * thread, donc `flowOn` suffit sans autre changement au corps de la fonction.
      */
     fun importFromDirectUrl(url: String, suggestedName: String): Flow<ImportProgress> = callbackFlow {
         val destName = sanitizeFileName(suggestedName.ifBlank { url.substringAfterLast('/') })
@@ -123,7 +132,7 @@ class ModelManager(private val context: Context) {
             close()
         }
         awaitClose { connection?.disconnect() }
-    }
+    }.flowOn(Dispatchers.IO)
 
     private fun uniqueDestination(name: String): File {
         var candidate = File(modelsDir, name)
