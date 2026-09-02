@@ -50,6 +50,11 @@ class MainActivity : ComponentActivity() {
                 streamUri != null -> app.characterImportManager.importFromUri(streamUri)
                 !sharedText.isNullOrBlank() && looksLikeUrl(sharedText) ->
                     app.characterImportManager.importFromUrl(sharedText.trim())
+                // Certains sites proposent "copier/partager le JSON" plutôt qu'un fichier : sans
+                // cette branche, ce texte partagé (ni fichier, ni URL) ne déclenchait
+                // strictement rien — aucun message, comme si le bouton de partage ne faisait
+                // rien du tout. On tente maintenant de l'interpréter comme une fiche JSON brute.
+                !sharedText.isNullOrBlank() -> app.characterImportManager.importFromText(sharedText.trim())
                 else -> null
             }
             val message = when (result) {

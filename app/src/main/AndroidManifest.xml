@@ -56,6 +56,19 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
+            <!-- De nombreuses apps sources (gestionnaires de fichiers, certains navigateurs)
+                 partagent un .png ou .json sous ce type MIME générique plutôt que le type
+                 précis, quand elles ne peuvent pas le déterminer avec certitude. Sans ce filtre,
+                 OpenCompanion n'apparaissait tout simplement pas dans la feuille de partage pour
+                 ces fichiers — ça ressemble à "l'import est impossible" alors que l'app n'était
+                 même jamais proposée comme destination. Le contenu réel est revérifié dans
+                 CharacterImportManager (signature PNG / premier caractère '{'), donc élargir ce
+                 filtre ne fait qu'élargir la liste des sources visibles, pas ce qui est accepté. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
         </activity>
     </application>
 </manifest>

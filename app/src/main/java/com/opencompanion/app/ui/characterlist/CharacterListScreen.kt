@@ -111,7 +111,21 @@ fun CharacterListScreen(
                         leadingIcon = { Icon(Icons.Filled.FileUpload, contentDescription = null) },
                         onClick = {
                             menuExpanded = false
-                            filePicker.launch(arrayOf("image/png", "application/json", "text/plain"))
+                            // "application/octet-stream" en plus des types attendus : de nombreux
+                            // gestionnaires de fichiers / fournisseurs de documents annoncent ce
+                            // type générique pour un .png ou .json dont l'origine ne renseigne pas
+                            // le vrai type MIME (fichier extrait d'une archive, sans extension,
+                            // etc.) — sans lui, ces fichiers pourtant valides étaient invisibles
+                            // dans le sélecteur. Le contenu réel est de toute façon revérifié dans
+                            // CharacterImportManager (signature PNG / premier caractère '{').
+                            filePicker.launch(
+                                arrayOf(
+                                    "image/png",
+                                    "application/json",
+                                    "text/plain",
+                                    "application/octet-stream",
+                                ),
+                            )
                         },
                     )
                     DropdownMenuItem(

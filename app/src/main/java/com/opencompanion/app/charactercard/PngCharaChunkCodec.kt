@@ -2,6 +2,7 @@ package com.opencompanion.app.charactercard
 
 import android.util.Base64
 import java.util.zip.CRC32
+import java.util.zip.Inflater
 
 /**
  * Lecture/écriture d'une fiche personnage encodée en base64 dans un chunk
@@ -9,7 +10,11 @@ import java.util.zip.CRC32
  * "character cards" encodent une fiche dans son image d'avatar, pour qu'un
  * seul fichier PNG suffise à tout transporter. Mot-clé "chara" (spec v2,
  * dominante) ou "ccv3" (spec v3) reconnus en lecture ; écriture en "chara"
- * pour rester compatible avec le plus d'outils possible.
+ * pour rester compatible avec le plus d'outils possible. Chunks `tEXt` (le cas très
+ * majoritaire) ET `iTXt` (texte international, parfois compressé zlib) sont lus : certains
+ * outils qui rouvrent puis réenregistrent l'image (éditeurs, certains navigateurs) convertissent
+ * silencieusement `tEXt` en `iTXt`, ce qui rendait la fiche illisible pour ce dépôt avant cet
+ * ajout, alors que le PNG restait par ailleurs parfaitement valide.
  *
  * Implémentation volontairement indépendante de toute bibliothèque externe :
  * on ne fait que naviguer la structure de chunks PNG (signature + suite de
@@ -50,6 +55,14 @@ object PngCharaChunkCodec {
                         "ccv3" -> ccv3Base64 = text
                     }
                 }
+            } else if (type == "iTXt") {
+                val chunk = bytes.copyOfRange(dataStart, dataStart + length)
+                readItxtChunk(chunk)?.let { (keyword, text) ->
+                    when (keyword) {
+                        "chara" -> if (charaBase64 == null) charaBase64 = text
+                        "ccv3" -> if (ccv3Base64 == null) ccv3Base64 = text
+                    }
+                }
             }
 
             offset = dataStart + length + 4 // + CRC
@@ -62,6 +75,68 @@ object PngCharaChunkCodec {
         } catch (e: IllegalArgumentException) {
             null
         }
+    }
+
+    /**
+     * Décode le contenu d'un chunk `iTXt` (International text) : mot-clé (latin-1, terminé par
+     * un octet nul), drapeau de compression (1 octet), méthode de compression (1 octet, seule la
+     * valeur 0 = zlib/deflate est définie par la spec PNG), balise de langue (ASCII, terminée par
+     * un octet nul, ignorée ici), mot-clé traduit (UTF-8, terminé par un octet nul, ignoré ici),
+     * puis le texte lui-même (UTF-8, éventuellement compressé zlib si le drapeau est à 1).
+     * Renvoie `null` si la structure du chunk ne correspond pas à ce format (chunk malformé ou
+     * tronqué) plutôt que de lever une exception — un PNG "avatar" contient presque toujours
+     * d'autres chunks `iTXt`/`tEXt` sans rapport (titre, logiciel d'origine, etc.) qu'il faut
+     * pouvoir ignorer silencieusement.
+     */
+    private fun readItxtChunk(chunk: ByteArray): Pair<String, String>? {
+        val keywordEnd = chunk.indexOf(0.toByte())
+        if (keywordEnd <= 0) return null
+        val keyword = String(chunk, 0, keywordEnd, Charsets.ISO_8859_1)
+
+        // + 2 : drapeau de compression (1 octet) + méthode de compression (1 octet).
+        var pos = keywordEnd + 1 + 2
+        if (pos > chunk.size) return null
+        val compressionFlag = chunk[keywordEnd + 1].toInt()
+
+        val langEnd = chunk.indexOfFrom(0.toByte(), pos)
+        if (langEnd < 0) return null
+        pos = langEnd + 1
+
+        val translatedKeywordEnd = chunk.indexOfFrom(0.toByte(), pos)
+        if (translatedKeywordEnd < 0) return null
+        pos = translatedKeywordEnd + 1
+
+        val textBytes = chunk.copyOfRange(pos, chunk.size)
+        val decodedBytes = if (compressionFlag == 1) {
+            inflateZlib(textBytes) ?: return null
+        } else {
+            textBytes
+        }
+        return keyword to String(decodedBytes, Charsets.UTF_8)
+    }
+
+    /** Renvoie l'index de la première occurrence de [element] à partir de [startIndex], ou -1. */
+    private fun ByteArray.indexOfFrom(element: Byte, startIndex: Int): Int {
+        for (i in startIndex until size) if (this[i] == element) return i
+        return -1
+    }
+
+    private fun inflateZlib(data: ByteArray): ByteArray? = try {
+        val inflater = Inflater()
+        inflater.setInput(data)
+        val output = java.io.ByteArrayOutputStream(data.size * 3)
+        val buffer = ByteArray(4096)
+        while (!inflater.finished()) {
+            val n = inflater.inflate(buffer)
+            if (n == 0) {
+                if (inflater.needsInput() || inflater.needsDictionary()) break
+            }
+            output.write(buffer, 0, n)
+        }
+        inflater.end()
+        output.toByteArray()
+    } catch (e: Exception) {
+        null
     }
 
     /**

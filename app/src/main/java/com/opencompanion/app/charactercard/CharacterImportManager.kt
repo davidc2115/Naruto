@@ -38,6 +38,18 @@ class CharacterImportManager(
         }
     }
 
+    /**
+     * Import direct depuis un texte brut — un JSON de fiche personnage collé ou partagé tel
+     * quel, sans passer par un fichier (certains sites communautaires proposent "copier/partager
+     * le JSON" plutôt qu'un téléchargement). Voir aussi MainActivity.handleIncomingShare : avant
+     * cet ajout, un partage de texte qui n'était pas reconnu comme une URL ne faisait
+     * strictement rien — aucun message, aucune erreur — ce qui donnait l'impression que l'import
+     * était cassé alors que rien n'avait simplement été tenté.
+     */
+    suspend fun importFromText(text: String): ImportResult = withContext(Dispatchers.IO) {
+        importFromBytes(text.toByteArray(Charsets.UTF_8))
+    }
+
     /** Import direct depuis une URL (image PNG avec fiche embarquée, ou JSON brut). */
     suspend fun importFromUrl(url: String): ImportResult = withContext(Dispatchers.IO) {
         var connection: HttpURLConnection? = null
@@ -72,7 +84,11 @@ class CharacterImportManager(
                 )
             avatarBytes = bytes
         } else {
-            jsonText = bytes.toString(Charsets.UTF_8).trim()
+            // .removePrefix(UTF8_BOM) : un fichier JSON téléchargé depuis un navigateur (Windows
+            // en particulier) commence très souvent par un BOM UTF-8 invisible. Sans ce
+            // nettoyage, jsonText.first() n'est jamais '{' et un fichier par ailleurs
+            // parfaitement valide est rejeté ici avant même d'atteindre CharacterCardCodec.
+            jsonText = bytes.toString(Charsets.UTF_8).removePrefix(CharacterCardCodec.UTF8_BOM).trim()
             if (jsonText.isEmpty() || jsonText.first() != '{') {
                 return ImportResult.Failure("Format non reconnu : ni PNG avec fiche embarquée, ni JSON")
             }

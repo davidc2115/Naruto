@@ -17,6 +17,11 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 object CharacterCardCodec {
 
+    /** BOM UTF-8 (U+FEFF), construit à partir de son point de code plutôt qu'écrit comme
+     *  caractère littéral dans le fichier source, pour éviter toute ambiguïté d'encodage à
+     *  l'édition — un caractère littéralement invisible dans un éditeur. Voir [decode]. */
+    val UTF8_BOM: String = 0xFEFF.toChar().toString()
+
     private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
@@ -24,7 +29,12 @@ object CharacterCardCodec {
     }
 
     fun decode(jsonText: String): CharacterCardData {
-        val root = json.parseToJsonElement(jsonText).jsonObject
+        // Un BOM UTF-8 en tête (très courant sur des fichiers exportés/enregistrés depuis un
+        // navigateur ou un éditeur Windows) fait échouer le parseur JSON, qui ne l'accepte pas
+        // avant le premier '{' — voir aussi CharacterImportManager.importFromBytes qui applique
+        // le même nettoyage avant même d'arriver ici ; on le refait ici en garde-fou, au cas où
+        // decode() est appelé directement avec un texte qui n'est jamais passé par ce filtre.
+        val root = json.parseToJsonElement(jsonText.removePrefix(UTF8_BOM)).jsonObject
         val dataObject: JsonObject = if (root["spec"]?.jsonPrimitive?.contentOrNull?.startsWith("chara_card") == true) {
             root["data"]?.jsonObject ?: root
         } else {
