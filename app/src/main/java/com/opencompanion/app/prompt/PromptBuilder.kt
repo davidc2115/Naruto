@@ -41,7 +41,12 @@ object PromptBuilder {
             "conversation orale entre deux personnes : phrases courtes et vivantes, vocabulaire " +
             "courant, quelques hésitations ou tournures naturelles si ça correspond au " +
             "personnage. Jamais de tournure robotique, de traduction mot à mot depuis l'anglais, " +
-            "de liste à puces, ni de réponse démesurément longue pour un simple message de chat."
+            "de liste à puces, ni de réponse démesurément longue pour un simple message de chat. " +
+            "Ne réfléchis jamais à voix haute et n'utilise jamais de balises comme <think> ou " +
+            "<thinking> : écris directement ta réplique, sans aucun raisonnement affiché avant. " +
+            "À chaque message, fais avancer la conversation avec une idée nouvelle : ne répète " +
+            "jamais, ni ne reformule, une réplique que tu as déjà dite plus tôt (y compris ta " +
+            "toute première réplique)."
 
     fun buildSystemPrompt(character: CharacterEntity): String = buildString {
         append(LANGUAGE_AND_TONE_DIRECTIVE)

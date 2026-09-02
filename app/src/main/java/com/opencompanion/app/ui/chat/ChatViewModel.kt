@@ -253,7 +253,16 @@ class ChatViewModel(
                     val text = _streamingText.value
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
-                    if (text.isNotBlank()) repository.appendMessage(characterId, MessageRole.ASSISTANT, text)
+                    if (text.isNotBlank()) {
+                        repository.appendMessage(characterId, MessageRole.ASSISTANT, text)
+                    } else {
+                        // Peut arriver si le modèle a épuisé tout son budget de tokens dans un
+                        // bloc <think>...</think> (voir ThinkBlockFilter) sans jamais produire de
+                        // réponse visible — sans ce message, l'appli semblait n'avoir rien fait.
+                        _statusMessage.value = "Réponse vide : le modèle a peut-être épuisé son " +
+                            "budget de tokens en réflexion interne. Réessaie, ou augmente la " +
+                            "limite de tokens de réponse dans les réglages."
+                    }
                 }
                 is GenerationEvent.Error -> {
                     _status.value = EngineStatus.LOAD_ERROR

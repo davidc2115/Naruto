@@ -15,7 +15,7 @@ data class ChatTurn(val role: String, val content: String)
 
 data class GenerationParams(
     val prompt: String,
-    val maxTokens: Int = 512,
+    val maxTokens: Int = 768,
     val temperature: Float = 0.8f,
     val topK: Int = 40,
     val topP: Float = 0.95f,
@@ -147,9 +147,12 @@ class InferenceEngine(private val context: Context) {
         }
 
         val decoder = Utf8StreamDecoder()
+        // Retire les blocs <think>...</think> (modèles "raisonneurs" type Qwen3) avant que le
+        // texte n'atteigne l'UI/l'historique — voir ThinkBlockFilter pour le contexte complet.
+        val thinkFilter = ThinkBlockFilter()
         val callback = LlamaBridge.TokenCallback { bytes ->
-            val text = decoder.push(bytes)
-            if (text.isNotEmpty()) trySend(GenerationEvent.Token(text))
+            val visible = thinkFilter.push(decoder.push(bytes))
+            if (visible.isNotEmpty()) trySend(GenerationEvent.Token(visible))
             isActive
         }
 
@@ -167,7 +170,7 @@ class InferenceEngine(private val context: Context) {
             )
         }
 
-        val tail = decoder.flush()
+        val tail = thinkFilter.push(decoder.flush()) + thinkFilter.flush()
         if (tail.isNotEmpty()) send(GenerationEvent.Token(tail))
 
         when {

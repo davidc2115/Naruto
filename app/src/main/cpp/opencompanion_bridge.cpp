@@ -27,6 +27,7 @@
 #include <jni.h>
 #include <android/log.h>
 
+#include <algorithm>
 #include <atomic>
 #include <cstdint>
 #include <cstring>
@@ -117,8 +118,17 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeLoadModel(
 
     llama_context_params ctx_params = llama_context_default_params();
     ctx_params.n_ctx = static_cast<uint32_t>(nCtx > 0 ? nCtx : 4096);
-    ctx_params.n_batch = 512;
-    ctx_params.n_ubatch = 512;
+    // n_batch/n_ubatch bornent le nombre de tokens qu'un seul appel à llama_decode() peut
+    // traiter : un prompt (personnage + historique) qui dépasse cette valeur en une fois faisait
+    // planter l'appli (GGML_ASSERT non rattrapable dans llama.cpp), ce qui arrivait dès le 2e ou
+    // 3e message d'une conversation avec un personnage un peu détaillé, bien avant d'atteindre la
+    // limite réelle du contexte. On aligne désormais n_batch sur n_ctx (borné à 2048 : au-delà,
+    // le gain de débit du batching est marginal alors que le pic mémoire grimpe vite sur mobile)
+    // — et nativeGenerate() découpe de toute façon tout prompt plus long en plusieurs appels de
+    // llama_decode() respectant cette limite, donc cette valeur n'est plus un plafond dur, juste
+    // un compromis vitesse/mémoire pour le traitement du prompt.
+    ctx_params.n_batch = std::min<uint32_t>(ctx_params.n_ctx, 2048);
+    ctx_params.n_ubatch = ctx_params.n_batch;
     const int32_t threads = nThreads > 0 ? nThreads : 4;
     ctx_params.n_threads = threads;
     ctx_params.n_threads_batch = threads;
@@ -252,6 +262,22 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
         }
         prompt_tokens.resize(static_cast<size_t>(n_prompt_tokens));
 
+        // Filet de sécurité : PromptBuilder.kt côté Kotlin est censé garder l'historique dans
+        // la fenêtre de contexte, mais un patron de dialogue plus verbeux que prévu (balises,
+        // system prompt du modèle, etc.) peut faire déborder le compte réel de quelques tokens.
+        // Sans cette troncature, llama_decode() échouerait simplement (contexte plein) plutôt que
+        // de planter — mais autant garder la fin du prompt (les échanges les plus récents, donc
+        // les plus pertinents) qu'échouer bêtement sur un dépassement de quelques tokens.
+        const int32_t n_ctx = static_cast<int32_t>(llama_n_ctx(session->ctx));
+        if (n_prompt_tokens >= n_ctx) {
+            const int32_t keep = std::max(1, n_ctx - 1);
+            const int32_t drop = n_prompt_tokens - keep;
+            LOGE("Prompt tronqué : %d tokens > n_ctx=%d, on retire les %d plus anciens",
+                 n_prompt_tokens, n_ctx, drop);
+            prompt_tokens.erase(prompt_tokens.begin(), prompt_tokens.begin() + drop);
+            n_prompt_tokens = static_cast<int32_t>(prompt_tokens.size());
+        }
+
         // Contexte réinitialisé à chaque appel : voir note en tête de fichier.
         llama_memory_clear(llama_get_memory(session->ctx), true);
 
@@ -272,22 +298,57 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
             llama_sampler_chain_add(sampler, llama_sampler_init_greedy());
         }
 
-        llama_batch batch = llama_batch_get_one(prompt_tokens.data(), n_prompt_tokens);
-
         int32_t n_generated = 0;
         int32_t result_code = 0;
+        bool aborted = false;
         char piece_buf[512];
 
-        while (true) {
-            if (session->stop_requested.load()) { result_code = 1; break; }
-
-            if (llama_decode(session->ctx, batch) != 0) {
-                LOGE("llama_decode a échoué (contexte plein ou erreur backend)");
+        // Étape 1 : traitement du prompt, découpé en blocs d'au plus n_batch tokens. Un seul
+        // appel à llama_decode() avec plus de tokens que n_batch abandonne tout le processus
+        // (GGML_ASSERT interne à llama.cpp, pas une exception rattrapable par le try/catch
+        // ci-dessus) — un personnage un peu détaillé plus quelques tours d'historique dépassait
+        // très vite les 512 tokens qu'on envoyait auparavant en un seul bloc, d'où le crash
+        // signalé pour toute conversation un peu suivie. Les positions dans le cache KV sont
+        // recalculées automatiquement par llama.cpp à chaque appel (llama_batch_get_one ne fixe
+        // pas de position explicite), donc découper ainsi ne change rien au résultat, seulement à
+        // la façon dont il est calculé.
+        const int32_t n_batch = std::max<int32_t>(1, llama_n_batch(session->ctx));
+        int32_t n_fed = 0;
+        while (n_fed < n_prompt_tokens) {
+            if (session->stop_requested.load()) { result_code = 1; aborted = true; break; }
+            const int32_t chunk = std::min(n_batch, n_prompt_tokens - n_fed);
+            llama_batch prompt_batch = llama_batch_get_one(prompt_tokens.data() + n_fed, chunk);
+            if (llama_decode(session->ctx, prompt_batch) != 0) {
+                LOGE("llama_decode a échoué pendant le traitement du prompt (contexte plein ou erreur backend)");
                 result_code = -4;
+                aborted = true;
                 break;
             }
+            n_fed += chunk;
+        }
 
-            llama_token new_token = llama_sampler_sample(sampler, session->ctx, -1);
+        // Étape 2 : génération token par token. Le tout premier tour saute son propre
+        // llama_decode() (le prompt vient d'être traité ci-dessus, par blocs) et échantillonne
+        // directement depuis les logits laissés par le dernier bloc ; chaque tour suivant décode
+        // d'abord le token précédemment généré (un seul token : jamais besoin de découpage ici)
+        // avant d'échantillonner le suivant — comportement autoregressif inchangé par ailleurs.
+        llama_token new_token = 0;
+        bool first_iteration = true;
+
+        while (!aborted) {
+            if (session->stop_requested.load()) { result_code = 1; break; }
+
+            if (!first_iteration) {
+                llama_batch batch = llama_batch_get_one(&new_token, 1);
+                if (llama_decode(session->ctx, batch) != 0) {
+                    LOGE("llama_decode a échoué (contexte plein ou erreur backend)");
+                    result_code = -4;
+                    break;
+                }
+            }
+            first_iteration = false;
+
+            new_token = llama_sampler_sample(sampler, session->ctx, -1);
             llama_sampler_accept(sampler, new_token);
 
             if (llama_vocab_is_eog(session->vocab, new_token)) {
@@ -311,8 +372,6 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
             n_generated++;
             if (nPredict > 0 && n_generated >= nPredict) break;
             if (session->stop_requested.load()) { result_code = 1; break; }
-
-            batch = llama_batch_get_one(&new_token, 1);
         }
 
         llama_sampler_free(sampler);

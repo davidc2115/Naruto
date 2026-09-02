@@ -24,7 +24,11 @@ data class EngineSettings(
     val selectedModelPath: String? = null,
     val useGpu: Boolean = true,
     val contextSize: Int = 4096,
-    val maxResponseTokens: Int = 512,
+    // 768 plutôt que 512 : un modèle "raisonneur" (Qwen3, preset par défaut) consomme souvent
+    // 150 à 250 tokens dans un bloc <think>...</think> retiré de l'affichage (voir
+    // ThinkBlockFilter) avant même de commencer sa vraie réponse — avec seulement 512, la
+    // réponse visible pouvait être tronquée à quelques mots, voire totalement vide.
+    val maxResponseTokens: Int = 768,
     val temperature: Float = 0.8f,
     val topK: Int = 40,
     val topP: Float = 0.95f,
@@ -60,7 +64,7 @@ class SettingsRepository(private val context: Context) {
             selectedModelPath = prefs[Keys.MODEL_PATH],
             useGpu = (prefs[Keys.USE_GPU] ?: true) && !(prefs[Keys.GPU_DISABLED_AFTER_FAILURE] ?: false),
             contextSize = prefs[Keys.CONTEXT_SIZE] ?: 4096,
-            maxResponseTokens = prefs[Keys.MAX_TOKENS] ?: 512,
+            maxResponseTokens = prefs[Keys.MAX_TOKENS] ?: 768,
             temperature = prefs[Keys.TEMPERATURE] ?: 0.8f,
             topK = prefs[Keys.TOP_K] ?: 40,
             topP = prefs[Keys.TOP_P] ?: 0.95f,
