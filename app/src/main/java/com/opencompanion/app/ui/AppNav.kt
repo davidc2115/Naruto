@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.opencompanion.app.OpenCompanionApplication
+import com.opencompanion.app.ui.browse.CharacterBrowserScreen
+import com.opencompanion.app.ui.browse.CharacterBrowserViewModel
 import com.opencompanion.app.ui.chat.ChatScreen
 import com.opencompanion.app.ui.chat.ChatViewModel
 import com.opencompanion.app.ui.charactereditor.CharacterEditorScreen
@@ -22,6 +24,7 @@ private object Routes {
     const val EDITOR = "editor?characterId={characterId}"
     const val CHAT = "chat/{characterId}"
     const val SETTINGS = "settings"
+    const val BROWSE_IMPORT = "browse_import"
 
     fun editor(characterId: Long? = null) = "editor?characterId=${characterId ?: -1}"
     fun chat(characterId: Long) = "chat/$characterId"
@@ -44,7 +47,15 @@ fun AppNav(app: OpenCompanionApplication) {
                 onCreateCharacter = { navController.navigate(Routes.editor()) },
                 onEditCharacter = { id -> navController.navigate(Routes.editor(id)) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onBrowseImport = { navController.navigate(Routes.BROWSE_IMPORT) },
             )
+        }
+
+        composable(Routes.BROWSE_IMPORT) {
+            val vm: CharacterBrowserViewModel = viewModel(
+                factory = AppViewModelFactory { CharacterBrowserViewModel(app.characterImportManager) },
+            )
+            CharacterBrowserScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
 
         composable(

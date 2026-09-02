@@ -32,7 +32,7 @@ class CharacterImportManager(
         try {
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 ?: return@withContext ImportResult.Failure("Impossible de lire le fichier sélectionné")
-            importFromBytes(bytes)
+            importFromBytesInternal(bytes)
         } catch (e: Exception) {
             ImportResult.Failure(e.message ?: "Erreur d'import")
         }
@@ -47,11 +47,18 @@ class CharacterImportManager(
      * était cassé alors que rien n'avait simplement été tenté.
      */
     suspend fun importFromText(text: String): ImportResult = withContext(Dispatchers.IO) {
-        importFromBytes(text.toByteArray(Charsets.UTF_8))
+        importFromBytesInternal(text.toByteArray(Charsets.UTF_8))
     }
 
-    /** Import direct depuis une URL (image PNG avec fiche embarquée, ou JSON brut). */
-    suspend fun importFromUrl(url: String): ImportResult = withContext(Dispatchers.IO) {
+    /**
+     * Import direct depuis une URL (image PNG avec fiche embarquée, ou JSON brut).
+     * @param cookieHeader en-tête `Cookie` optionnel (session du site), utilisé quand ce lien de
+     * téléchargement provient du navigateur intégré ([com.opencompanion.app.ui.browse.CharacterBrowserScreen])
+     * et que le site exige d'être connecté pour servir le fichier — une requête HTTP "à froid"
+     * sans les cookies de la page recevrait sinon une erreur 401/403 alors que le fichier est
+     * bien accessible depuis la page elle-même.
+     */
+    suspend fun importFromUrl(url: String, cookieHeader: String? = null): ImportResult = withContext(Dispatchers.IO) {
         var connection: HttpURLConnection? = null
         try {
             connection = (URL(url).openConnection() as HttpURLConnection).apply {
@@ -59,13 +66,14 @@ class CharacterImportManager(
                 connectTimeout = 15_000
                 readTimeout = 15_000
                 instanceFollowRedirects = true
+                if (!cookieHeader.isNullOrBlank()) setRequestProperty("Cookie", cookieHeader)
             }
             connection.connect()
             if (connection.responseCode !in 200..299) {
                 return@withContext ImportResult.Failure("Le serveur a répondu ${connection.responseCode}")
             }
             val bytes = connection.inputStream.use { it.readBytes() }
-            importFromBytes(bytes)
+            importFromBytesInternal(bytes)
         } catch (e: Exception) {
             ImportResult.Failure(e.message ?: "Erreur réseau")
         } finally {
@@ -73,7 +81,18 @@ class CharacterImportManager(
         }
     }
 
-    private suspend fun importFromBytes(bytes: ByteArray): ImportResult {
+    /**
+     * Point d'entrée public pour un import déjà réduit à des octets bruts — utilisé par
+     * [importFromUri]/[importFromText]/[importFromUrl] ci-dessus, et directement par le
+     * navigateur intégré pour les téléchargements servis en `blob:` (le contenu n'existe que
+     * dans la mémoire de la page ; il est relu et renvoyé en base64 par du JavaScript injecté,
+     * voir CharacterBrowserScreen, puisqu'aucune requête réseau "classique" ne peut y accéder).
+     */
+    suspend fun importFromBytes(bytes: ByteArray): ImportResult = withContext(Dispatchers.IO) {
+        importFromBytesInternal(bytes)
+    }
+
+    private suspend fun importFromBytesInternal(bytes: ByteArray): ImportResult {
         val jsonText: String
         var avatarBytes: ByteArray? = null
 

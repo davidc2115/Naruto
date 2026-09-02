@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -62,6 +63,7 @@ fun CharacterListScreen(
     onCreateCharacter: () -> Unit,
     onEditCharacter: (Long) -> Unit,
     onOpenSettings: () -> Unit,
+    onBrowseImport: () -> Unit,
 ) {
     val characters by viewModel.characters.collectAsState()
     val importMessage by viewModel.importMessage.collectAsState()
@@ -132,6 +134,11 @@ fun CharacterListScreen(
                         text = { Text("Importer depuis une URL") },
                         leadingIcon = { Icon(Icons.Filled.Link, contentDescription = null) },
                         onClick = { menuExpanded = false; showUrlDialog = true },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Parcourir un site pour importer") },
+                        leadingIcon = { Icon(Icons.Filled.Language, contentDescription = null) },
+                        onClick = { menuExpanded = false; onBrowseImport() },
                     )
                 }
             }
