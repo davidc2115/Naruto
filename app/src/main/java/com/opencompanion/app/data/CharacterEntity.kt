@@ -36,3 +36,17 @@ data class CharacterEntity(
     val tags: List<String>
         get() = tagsCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
 }
+
+/**
+ * Remplace les jetons `{{user}}`/`{{char}}` — convention standard du format Character Card V2
+ * (voir charactercard/), utilisée aussi bien dans les fiches importées que dans les personnages
+ * fournis par défaut (voir `exampleDialogue` dans CharacterRepository.SampleCharacters) — par du
+ * texte lisible, avant tout affichage dans le chat ou envoi au moteur d'inférence. Un modèle qui
+ * voit ces jetons non résolus tels quels dans son prompt a tendance à les reproduire
+ * littéralement dans ses réponses, ce qui casse immédiatement l'illusion d'une conversation
+ * naturelle. Appliqué à la volée (plutôt qu'au moment de l'enregistrement) pour couvrir aussi
+ * les fiches déjà en base avant cet ajout, sans migration.
+ */
+fun resolveCharacterPlaceholders(text: String, character: CharacterEntity): String =
+    text.replace("{{user}}", "Utilisateur", ignoreCase = true)
+        .replace("{{char}}", character.name, ignoreCase = true)

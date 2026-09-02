@@ -3,6 +3,7 @@ package com.opencompanion.app.prompt
 import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
+import com.opencompanion.app.data.resolveCharacterPlaceholders
 import com.opencompanion.app.engine.ChatTurn
 import com.opencompanion.app.engine.InferenceEngine
 
@@ -23,17 +24,44 @@ object PromptBuilder {
     /** Marge réservée à la réponse du modèle, en tokens, en plus de [reservedForResponse]. */
     private const val SAFETY_MARGIN_TOKENS = 64
 
+    /**
+     * Instruction de langue et de ton, ajoutée en tête de **tout** prompt système, y compris
+     * quand [CharacterEntity.systemPromptOverride] est renseigné (une fiche importée peut très
+     * bien avoir un system prompt en anglais — sans ce garde-fou, le modèle basculerait de
+     * langue au milieu de la conversation dès qu'il reproduit son registre). Explicitement
+     * formulée pour éviter deux travers fréquents des petits modèles quantifiés : répondre en
+     * anglais (ou mélanger les deux langues) dès que le prompt contient ne serait-ce qu'un mot
+     * anglais, et produire un français correct mais mécanique/traduit plutôt qu'une réplique de
+     * conversation normale.
+     */
+    private const val LANGUAGE_AND_TONE_DIRECTIVE =
+        "Tu écris exclusivement en français, sans aucune exception : même si une partie de la " +
+            "description ci-dessous est dans une autre langue, ou si l'utilisateur t'écrit dans " +
+            "une autre langue, tu réponds toujours en français. Ton style est celui d'une vraie " +
+            "conversation orale entre deux personnes : phrases courtes et vivantes, vocabulaire " +
+            "courant, quelques hésitations ou tournures naturelles si ça correspond au " +
+            "personnage. Jamais de tournure robotique, de traduction mot à mot depuis l'anglais, " +
+            "de liste à puces, ni de réponse démesurément longue pour un simple message de chat."
+
     fun buildSystemPrompt(character: CharacterEntity): String = buildString {
+        append(LANGUAGE_AND_TONE_DIRECTIVE)
+        append("\n\n")
         if (character.systemPromptOverride.isNotBlank()) {
-            append(character.systemPromptOverride)
+            append(resolveCharacterPlaceholders(character.systemPromptOverride, character))
             return@buildString
         }
         append("Tu incarnes ${character.name}. Reste toujours dans ce rôle et réponds à la première personne.\n\n")
-        if (character.description.isNotBlank()) append("Description : ${character.description}\n")
-        if (character.personality.isNotBlank()) append("Personnalité : ${character.personality}\n")
-        if (character.scenario.isNotBlank()) append("Contexte : ${character.scenario}\n")
+        if (character.description.isNotBlank()) {
+            append("Description : ${resolveCharacterPlaceholders(character.description, character)}\n")
+        }
+        if (character.personality.isNotBlank()) {
+            append("Personnalité : ${resolveCharacterPlaceholders(character.personality, character)}\n")
+        }
+        if (character.scenario.isNotBlank()) {
+            append("Contexte : ${resolveCharacterPlaceholders(character.scenario, character)}\n")
+        }
         if (character.exampleDialogue.isNotBlank()) {
-            append("\nExemples de style de réponse :\n${character.exampleDialogue}\n")
+            append("\nExemples de style de réponse :\n${resolveCharacterPlaceholders(character.exampleDialogue, character)}\n")
         }
     }.trim()
 

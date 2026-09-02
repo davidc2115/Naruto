@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.CharacterEntity
+import com.opencompanion.app.data.resolveCharacterPlaceholders
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,7 +178,7 @@ private fun CharacterRow(
                 Text(character.name, style = MaterialTheme.typography.titleMedium)
                 if (character.description.isNotBlank()) {
                     Text(
-                        character.description,
+                        resolveCharacterPlaceholders(character.description, character),
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,

@@ -9,6 +9,7 @@ import com.opencompanion.app.data.EngineBackend
 import com.opencompanion.app.data.EngineSettings
 import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.SettingsRepository
+import com.opencompanion.app.data.resolveCharacterPlaceholders
 import com.opencompanion.app.engine.GenerationEvent
 import com.opencompanion.app.engine.GenerationParams
 import com.opencompanion.app.engine.InferenceEngine
@@ -60,7 +61,8 @@ class ChatViewModel(
             if (character != null && character.firstMessage.isNotBlank() &&
                 repository.getMessages(characterId).isEmpty()
             ) {
-                repository.appendMessage(characterId, MessageRole.ASSISTANT, character.firstMessage)
+                val firstMessage = resolveCharacterPlaceholders(character.firstMessage, character)
+                repository.appendMessage(characterId, MessageRole.ASSISTANT, firstMessage)
             }
         }
     }
