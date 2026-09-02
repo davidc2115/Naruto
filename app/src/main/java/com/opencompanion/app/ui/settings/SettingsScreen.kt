@@ -46,7 +46,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.opencompanion.app.data.EngineBackend
 import com.opencompanion.app.engine.ModelManager
+import com.opencompanion.app.engine.NanoBridge
+import com.opencompanion.app.engine.RecommendedModels
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +81,50 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             Modifier.padding(padding).padding(16.dp).fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            SectionTitle("Moteur d'IA")
+            Text(
+                "« Auto » essaie d'abord Gemini Nano (rapide, intégré à Android) quand il est " +
+                    "disponible sur cet appareil, et bascule automatiquement sur le modèle GGUF " +
+                    "local sinon.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            EngineBackend.entries.forEach { backend ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = state.settings.enginePreference == backend,
+                        onClick = { viewModel.setEnginePreference(backend) },
+                    )
+                    Text(engineBackendLabel(backend))
+                }
+            }
+            NanoAvailabilityRow(
+                availability = state.nanoAvailability,
+                onDownload = viewModel::downloadNano,
+            )
+
+            Divider()
             SectionTitle("Modèle (GGUF)")
+
+            Text(
+                "Préréglages recommandés : un tap pour télécharger, aucune clé ni compte requis.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            RecommendedModels.Tier.entries.forEach { tier ->
+                Text(
+                    if (tier == RecommendedModels.Tier.RAPIDE) "⚡ Rapide" else "★ Qualité",
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                RecommendedModels.ALL.filter { it.tier == tier }.forEach { entry ->
+                    RecommendedModelRow(
+                        entry = entry,
+                        downloading = state.downloadProgress != null,
+                        onDownload = { viewModel.downloadRecommendedModel(entry) },
+                    )
+                }
+            }
 
             state.downloadProgress?.let { progress ->
                 LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
@@ -221,6 +267,54 @@ private fun ModelRow(
                 }
             }
             IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, contentDescription = "Supprimer") }
+        }
+    }
+}
+
+private fun engineBackendLabel(backend: EngineBackend): String = when (backend) {
+    EngineBackend.AUTO -> "Auto (recommandé)"
+    EngineBackend.AICORE -> "Gemini Nano (AICore, appareil compatible uniquement)"
+    EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp)"
+}
+
+@Composable
+private fun NanoAvailabilityRow(availability: NanoBridge.NanoAvailability, onDownload: () -> Unit) {
+    val (text, showDownload) = when (availability) {
+        NanoBridge.NanoAvailability.AVAILABLE -> "Gemini Nano est prêt sur cet appareil." to false
+        NanoBridge.NanoAvailability.DOWNLOADABLE -> "Gemini Nano peut être téléchargé sur cet appareil." to true
+        NanoBridge.NanoAvailability.DOWNLOADING -> "Téléchargement de Gemini Nano en cours…" to false
+        NanoBridge.NanoAvailability.UNAVAILABLE ->
+            "Gemini Nano n'est pas disponible sur cet appareil (surtout Pixel récents pour l'instant) : le modèle local sera utilisé." to false
+    }
+    Column {
+        Text(text, style = MaterialTheme.typography.bodySmall)
+        if (showDownload) {
+            TextButton(onClick = onDownload) { Text("Télécharger Gemini Nano") }
+        }
+    }
+}
+
+@Composable
+private fun RecommendedModelRow(
+    entry: RecommendedModels.Entry,
+    downloading: Boolean,
+    onDownload: () -> Unit,
+) {
+    Card(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.padding(8.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(entry.displayName, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    "${entry.paramCount} · %.2f Go · %s".format(entry.approxSizeGb, entry.license),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Text(entry.note, style = MaterialTheme.typography.bodySmall)
+            }
+            TextButton(onClick = onDownload, enabled = !downloading) { Text("Télécharger") }
         }
     }
 }

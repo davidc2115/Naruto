@@ -84,7 +84,11 @@ fun ChatScreen(
                         Text(state.character?.name ?: "…")
                         if (state.character != null) {
                             Text(
-                                if (state.usingGpu) "GPU (Vulkan)" else "CPU",
+                                when {
+                                    state.usingNano -> "⚡ Gemini Nano"
+                                    state.usingGpu -> "GPU (Vulkan)"
+                                    else -> "CPU"
+                                },
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         }

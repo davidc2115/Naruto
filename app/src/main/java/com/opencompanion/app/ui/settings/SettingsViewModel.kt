@@ -3,10 +3,13 @@ package com.opencompanion.app.ui.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.opencompanion.app.data.EngineBackend
 import com.opencompanion.app.data.EngineSettings
 import com.opencompanion.app.data.SettingsRepository
 import com.opencompanion.app.engine.InferenceEngine
 import com.opencompanion.app.engine.ModelManager
+import com.opencompanion.app.engine.NanoBridge
+import com.opencompanion.app.engine.RecommendedModels
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,23 +24,30 @@ data class SettingsUiState(
     val message: String? = null,
     val vulkanCompiledIn: Boolean = false,
     val deviceReportsVulkan: Boolean = false,
+    val nanoAvailability: NanoBridge.NanoAvailability = NanoBridge.NanoAvailability.UNAVAILABLE,
 )
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val modelManager: ModelManager,
     private val engine: InferenceEngine,
+    private val nanoBridge: NanoBridge,
 ) : ViewModel() {
 
     private val _localModels = MutableStateFlow(modelManager.listLocalModels())
     private val _downloadProgress = MutableStateFlow<Float?>(null)
     private val _message = MutableStateFlow<String?>(null)
+    private val _nanoAvailability = MutableStateFlow(NanoBridge.NanoAvailability.UNAVAILABLE)
+
+    init {
+        refreshNanoAvailability()
+    }
 
     val uiState: StateFlow<SettingsUiState> = settingsRepository.settings
         .let { settingsFlow ->
             kotlinx.coroutines.flow.combine(
-                settingsFlow, _localModels, _downloadProgress, _message,
-            ) { settings, models, progress, message ->
+                settingsFlow, _localModels, _downloadProgress, _message, _nanoAvailability,
+            ) { settings, models, progress, message, nanoAvailability ->
                 SettingsUiState(
                     settings = settings,
                     localModels = models,
@@ -45,10 +55,59 @@ class SettingsViewModel(
                     message = message,
                     vulkanCompiledIn = engine.vulkanCompiledIn,
                     deviceReportsVulkan = engine.deviceReportsVulkanHardware(),
+                    nanoAvailability = nanoAvailability,
                 )
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsUiState())
+
+    fun refreshNanoAvailability() {
+        viewModelScope.launch { _nanoAvailability.value = nanoBridge.checkAvailability() }
+    }
+
+    /** Déclenche le téléchargement de Gemini Nano par AICore quand l'état est DOWNLOADABLE. */
+    fun downloadNano() {
+        viewModelScope.launch {
+            nanoBridge.download().collect { event ->
+                when (event) {
+                    is NanoBridge.NanoDownloadEvent.Completed -> {
+                        _message.value = "Gemini Nano est prêt sur cet appareil."
+                        refreshNanoAvailability()
+                    }
+                    is NanoBridge.NanoDownloadEvent.Failed -> _message.value = event.message
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    fun setEnginePreference(value: EngineBackend) =
+        viewModelScope.launch { settingsRepository.setEnginePreference(value) }
+
+    /** Télécharge un modèle depuis la liste [RecommendedModels.ALL] (Réglages → Modèle). */
+    fun downloadRecommendedModel(entry: RecommendedModels.Entry) {
+        viewModelScope.launch {
+            modelManager.importFromDirectUrl(entry.downloadUrl, entry.fileName).collect { progress ->
+                when (progress) {
+                    is ModelManager.ImportProgress.Downloading -> {
+                        _downloadProgress.value = if (progress.totalBytes > 0) {
+                            progress.bytesRead.toFloat() / progress.totalBytes
+                        } else null
+                    }
+                    is ModelManager.ImportProgress.Done -> {
+                        _downloadProgress.value = null
+                        refreshLocalModels()
+                        _message.value = "Modèle « ${progress.model.displayName} » téléchargé."
+                        selectModel(progress.model.file.absolutePath)
+                    }
+                    is ModelManager.ImportProgress.Failed -> {
+                        _downloadProgress.value = null
+                        _message.value = "Échec du téléchargement : ${progress.message}"
+                    }
+                }
+            }
+        }
+    }
 
     private fun refreshLocalModels() {
         _localModels.value = modelManager.listLocalModels()

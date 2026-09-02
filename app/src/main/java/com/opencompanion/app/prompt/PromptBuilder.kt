@@ -100,4 +100,60 @@ object PromptBuilder {
         }
         append("<|assistant|>\n")
     }
+
+    // --- Backend Gemini Nano (AICore) ------------------------------------------------------
+
+    /** Estimation grossière (≈ 4 caractères/token) utilisée uniquement pour respecter le
+     *  budget de [buildNanoPrompt] : Gemini Nano n'expose pas de tokenizer côté app (contrairement
+     *  à [InferenceEngine.tokenCount] pour llama.cpp), donc pas de compte exact possible ici. */
+    private fun estimateTokens(text: String): Int = (text.length / 4).coerceAtLeast(1)
+
+    /**
+     * Construit un prompt en langage naturel (pas de patron de dialogue propre à un modèle,
+     * Gemini Nano suit des instructions directement) pour le backend AICore, en respectant le
+     * budget strict imposé par AICore (~4000 tokens en entrée+sortie au total — voir
+     * docs/MODELES_ET_AICORE.md). L'historique le plus ancien est tronqué en premier, comme
+     * pour [buildTurns].
+     */
+    fun buildNanoPrompt(
+        character: CharacterEntity,
+        history: List<ChatMessageEntity>,
+        newUserMessage: String,
+        maxOutputTokens: Int = 512,
+    ): String {
+        // Marge de sécurité généreuse : ~4000 tokens au total pour AICore, on réserve la sortie
+        // demandée plus une marge, et on garde le reste pour system + historique + message.
+        val budget = (NANO_TOKEN_BUDGET - maxOutputTokens - SAFETY_MARGIN_TOKENS).coerceAtLeast(256)
+        val systemPrompt = buildSystemPrompt(character)
+
+        var used = estimateTokens(systemPrompt) + estimateTokens(newUserMessage)
+        val kept = ArrayDeque<ChatTurn>()
+        for (message in history.asReversed()) {
+            val turn = ChatTurn(
+                role = if (message.role == MessageRole.USER) "user" else "assistant",
+                content = message.content,
+            )
+            val cost = estimateTokens(message.content)
+            if (used + cost > budget) break
+            used += cost
+            kept.addFirst(turn)
+        }
+
+        return buildString {
+            append(systemPrompt)
+            append("\n\n")
+            if (kept.isNotEmpty()) {
+                append("Historique récent de la conversation :\n")
+                for (turn in kept) {
+                    val speaker = if (turn.role == "user") "Utilisateur" else character.name
+                    append("$speaker : ${turn.content}\n")
+                }
+                append("\n")
+            }
+            append("Utilisateur : $newUserMessage\n")
+            append("${character.name} :")
+        }
+    }
+
+    private const val NANO_TOKEN_BUDGET = 4000
 }

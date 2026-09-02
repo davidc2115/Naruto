@@ -65,7 +65,13 @@ fun AppNav(app: OpenCompanionApplication) {
             val characterId = backStackEntry.arguments?.getLong("characterId") ?: return@composable
             val vm: ChatViewModel = viewModel(
                 factory = AppViewModelFactory {
-                    ChatViewModel(characterId, app.characterRepository, app.inferenceEngine, app.settingsRepository)
+                    ChatViewModel(
+                        characterId,
+                        app.characterRepository,
+                        app.inferenceEngine,
+                        app.nanoBridge,
+                        app.settingsRepository,
+                    )
                 },
             )
             ChatScreen(
@@ -78,7 +84,7 @@ fun AppNav(app: OpenCompanionApplication) {
         composable(Routes.SETTINGS) {
             val vm: SettingsViewModel = viewModel(
                 factory = AppViewModelFactory {
-                    SettingsViewModel(app.settingsRepository, app.modelManager, app.inferenceEngine)
+                    SettingsViewModel(app.settingsRepository, app.modelManager, app.inferenceEngine, app.nanoBridge)
                 },
             )
             SettingsScreen(viewModel = vm, onBack = { navController.popBackStack() })

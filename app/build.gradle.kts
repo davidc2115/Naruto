@@ -139,4 +139,14 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+
+    // Backend "rapide" optionnel : Gemini Nano via AICore (service système Android), exposé
+    // par ML Kit GenAI. Purement sur l'appareil (aucun appel réseau au moment de la
+    // génération), mais nécessite Google Play Services et n'est réellement disponible que sur
+    // les appareils où Gemini Nano est supporté et déjà téléchargé (Pixel récents surtout) —
+    // voir docs/MODELES_ET_AICORE.md. Le backend llama.cpp (ci-dessus) reste le moteur
+    // principal, garanti 100% local sur n'importe quel appareil : NanoBridge.checkAvailability()
+    // détecte l'absence de ce service à l'exécution et ChatViewModel retombe automatiquement
+    // sur llama.cpp.
+    implementation(libs.mlkit.genai.prompt)
 }

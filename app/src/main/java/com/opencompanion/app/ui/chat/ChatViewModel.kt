@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.CharacterRepository
 import com.opencompanion.app.data.ChatMessageEntity
+import com.opencompanion.app.data.EngineBackend
 import com.opencompanion.app.data.EngineSettings
 import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.SettingsRepository
 import com.opencompanion.app.engine.GenerationEvent
 import com.opencompanion.app.engine.GenerationParams
 import com.opencompanion.app.engine.InferenceEngine
+import com.opencompanion.app.engine.NanoBridge
 import com.opencompanion.app.prompt.PromptBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,18 +34,23 @@ data class ChatUiState(
     val status: EngineStatus = EngineStatus.IDLE,
     val statusMessage: String? = null,
     val usingGpu: Boolean = false,
+    /** true si la réponse en cours (ou la dernière) a été générée par Gemini Nano (AICore)
+     *  plutôt que par le moteur llama.cpp embarqué — voir [ChatViewModel.resolveActiveBackend]. */
+    val usingNano: Boolean = false,
 )
 
 class ChatViewModel(
     private val characterId: Long,
     private val repository: CharacterRepository,
     private val engine: InferenceEngine,
+    private val nanoBridge: NanoBridge,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _streamingText = MutableStateFlow("")
     private val _status = MutableStateFlow(EngineStatus.IDLE)
     private val _statusMessage = MutableStateFlow<String?>(null)
+    private val _usingNano = MutableStateFlow(false)
     private var generationJob: Job? = null
     private var gpuRetryUsed = false
 
@@ -63,7 +70,8 @@ class ChatViewModel(
         repository.observeMessages(characterId),
         _streamingText,
         _status,
-    ) { character, messages, streaming, status ->
+        _usingNano,
+    ) { character, messages, streaming, status, usingNano ->
         ChatUiState(
             character = character,
             messages = messages,
@@ -71,6 +79,7 @@ class ChatViewModel(
             status = status,
             statusMessage = _statusMessage.value,
             usingGpu = engine.isUsingGpu,
+            usingNano = usingNano,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChatUiState())
 
@@ -84,6 +93,21 @@ class ChatViewModel(
             repository.appendMessage(characterId, MessageRole.USER, trimmed)
 
             val settings = settingsRepository.settings.first()
+            val backend = resolveActiveBackend(settings.enginePreference)
+
+            if (backend == EngineBackend.AICORE) {
+                // Gemini Nano ne nécessite aucun fichier .gguf : contrairement au backend
+                // llama.cpp ci-dessous, rien à charger, le service système fait le travail.
+                _usingNano.value = true
+                runNanoGeneration(
+                    character = character,
+                    settings = settings,
+                    allowFallbackToLlama = settings.enginePreference == EngineBackend.AUTO,
+                )
+                return@launch
+            }
+
+            _usingNano.value = false
             if (settings.selectedModelPath == null) {
                 _status.value = EngineStatus.NO_MODEL_CONFIGURED
                 _statusMessage.value = "Choisis un modèle dans les réglages avant de discuter."
@@ -94,6 +118,83 @@ class ChatViewModel(
             if (!loaded) return@launch
 
             runGeneration(character, settings, allowGpuRetry = true)
+        }
+    }
+
+    /**
+     * Détermine le moteur à utiliser pour ce message. En [EngineBackend.AUTO] (réglage par
+     * défaut), on essaie Gemini Nano si AICore le rapporte disponible *maintenant* — pas
+     * "téléchargeable" ni "en cours de téléchargement", ces deux états déclenchent le repli
+     * immédiat sur llama.cpp plutôt que d'attendre. Voir docs/MODELES_ET_AICORE.md.
+     */
+    private suspend fun resolveActiveBackend(preference: EngineBackend): EngineBackend = when (preference) {
+        EngineBackend.LLAMA_CPP -> EngineBackend.LLAMA_CPP
+        EngineBackend.AICORE -> EngineBackend.AICORE
+        EngineBackend.AUTO -> {
+            if (nanoBridge.checkAvailability() == NanoBridge.NanoAvailability.AVAILABLE) {
+                EngineBackend.AICORE
+            } else {
+                EngineBackend.LLAMA_CPP
+            }
+        }
+    }
+
+    /**
+     * Génère une réponse via Gemini Nano (AICore). Si [allowFallbackToLlama] est vrai (mode
+     * AUTO uniquement — un choix explicite de "Gemini Nano" par l'utilisateur ne bascule
+     * jamais tout seul) et qu'un modèle llama.cpp est configuré, un échec ici relance
+     * automatiquement la génération sur ce modèle local, exactement comme le repli GPU→CPU
+     * de [runGeneration].
+     */
+    private suspend fun runNanoGeneration(
+        character: CharacterEntity,
+        settings: EngineSettings,
+        allowFallbackToLlama: Boolean,
+    ) {
+        _status.value = EngineStatus.GENERATING
+        _streamingText.value = ""
+
+        val fullHistory = repository.getMessages(characterId)
+        val lastUserMessage = fullHistory.lastOrNull { it.role == MessageRole.USER }?.content.orEmpty()
+        val prompt = PromptBuilder.buildNanoPrompt(
+            character = character,
+            history = fullHistory.dropLast(1),
+            newUserMessage = lastUserMessage,
+            maxOutputTokens = settings.maxResponseTokens,
+        )
+
+        var nanoFailed = false
+        var nanoErrorMessage: String? = null
+        nanoBridge.generate(prompt).collectLatest { event ->
+            when (event) {
+                is GenerationEvent.Token -> _streamingText.value += event.text
+                is GenerationEvent.Done -> {
+                    val text = _streamingText.value
+                    _streamingText.value = ""
+                    _status.value = EngineStatus.IDLE
+                    if (text.isNotBlank()) repository.appendMessage(characterId, MessageRole.ASSISTANT, text)
+                }
+                is GenerationEvent.Error -> {
+                    nanoFailed = true
+                    nanoErrorMessage = event.message
+                }
+                is GenerationEvent.GpuFailure -> Unit // ne peut pas arriver pour ce backend
+            }
+        }
+
+        if (nanoFailed) {
+            _streamingText.value = ""
+            if (allowFallbackToLlama && settings.selectedModelPath != null) {
+                _usingNano.value = false
+                _statusMessage.value = "Gemini Nano indisponible ($nanoErrorMessage) : bascule sur le modèle local."
+                if (loadModelIfNeeded(settings)) {
+                    runGeneration(character, settings, allowGpuRetry = true)
+                }
+            } else {
+                _status.value = EngineStatus.LOAD_ERROR
+                _statusMessage.value = nanoErrorMessage
+                    ?: "Gemini Nano (AICore) est indisponible sur cet appareil."
+            }
         }
     }
 

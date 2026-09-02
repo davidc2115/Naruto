@@ -29,10 +29,24 @@ reste sous la responsabilité de l'utilisateur.
   (ça arrive sur certains GPU Adreno, voir
   [`docs/VULKAN_NOTES.md`](docs/VULKAN_NOTES.md)), l'app retombe
   automatiquement sur le CPU sans planter.
+- **Backend rapide optionnel : Gemini Nano (AICore)**. Réglages → « Moteur
+  d'IA » → *Auto* essaie Gemini Nano quand l'appareil le supporte (surtout
+  Pixel récents) et retombe automatiquement sur llama.cpp sinon — aucun
+  fichier à télécharger pour ce backend, c'est un service système Android.
+  Limites réelles (quota ~4000 tokens, dépendance à Google Play Services,
+  API encore Beta) détaillées dans
+  [`docs/MODELES_ET_AICORE.md`](docs/MODELES_ET_AICORE.md).
+- **Modèles GGUF recommandés en un tap** : six préréglages (Qwen3, Gemma 3,
+  Llama 3.2, Phi-4-mini — profils *Rapide* et *Qualité*) directement dans
+  Réglages → Modèle, en plus de l'import libre par fichier ou URL. Détail
+  dans [`docs/MODELES_ET_AICORE.md`](docs/MODELES_ET_AICORE.md).
 - **Aucune clé, aucun compte** : ni pour discuter, ni pour importer un
   modèle ou un personnage. Le seul accès réseau optionnel est un
   téléchargement HTTP direct d'un fichier `.gguf` ou d'une fiche personnage
-  depuis une URL que *tu* fournis.
+  depuis une URL que *tu* fournis (y compris les préréglages ci-dessus).
+  Le backend Gemini Nano fait exception sur un point : il dépend du
+  service système AICore, lui-même lié à Google Play Services — voir
+  [`docs/MODELES_ET_AICORE.md`](docs/MODELES_ET_AICORE.md) pour le détail.
 - **Personnages créables ou importables**, au format ouvert
   [Character Card V2](https://github.com/malfoyslastname/character-card-spec-v2)
   (JSON, éventuellement embarqué dans un avatar PNG) — voir
@@ -116,7 +130,8 @@ document pour savoir quoi tester et comment lire les logs.
 ```
 app/src/main/cpp/            Pont JNI C++ vers llama.cpp (opencompanion_bridge.cpp)
 app/src/main/java/.../engine/        Moteur : LlamaBridge (JNI brut), InferenceEngine
-                                      (façade coroutines/Flow), ModelManager, décodage UTF-8
+                                      (façade coroutines/Flow), ModelManager, décodage UTF-8,
+                                      NanoBridge (Gemini Nano/AICore), RecommendedModels (préréglages)
 app/src/main/java/.../data/          Room (personnages, historique), DataStore (réglages)
 app/src/main/java/.../charactercard/ Import/export Character Card V2 (JSON + PNG)
 app/src/main/java/.../prompt/        Construction du prompt (patron de dialogue + historique)

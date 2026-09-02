@@ -12,6 +12,14 @@ import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "opencompanion_settings")
 
+/**
+ * Moteur d'inférence utilisé pour générer les réponses. [AUTO] essaie Gemini Nano (AICore)
+ * quand il est disponible sur l'appareil et retombe automatiquement sur llama.cpp sinon (voir
+ * ChatViewModel) ; [AICORE] et [LLAMA_CPP] forcent explicitement l'un ou l'autre — voir
+ * docs/MODELES_ET_AICORE.md pour le détail des compromis de chacun.
+ */
+enum class EngineBackend { AUTO, AICORE, LLAMA_CPP }
+
 data class EngineSettings(
     val selectedModelPath: String? = null,
     val useGpu: Boolean = true,
@@ -22,6 +30,7 @@ data class EngineSettings(
     val topP: Float = 0.95f,
     val repeatPenalty: Float = 1.1f,
     val threads: Int = 0, // 0 = laisser InferenceEngine choisir une valeur recommandée
+    val enginePreference: EngineBackend = EngineBackend.AUTO,
 )
 
 /**
@@ -43,6 +52,7 @@ class SettingsRepository(private val context: Context) {
         val TOP_P = floatPreferencesKey("top_p")
         val REPEAT_PENALTY = floatPreferencesKey("repeat_penalty")
         val THREADS = intPreferencesKey("threads")
+        val ENGINE_BACKEND = stringPreferencesKey("engine_backend")
     }
 
     val settings: Flow<EngineSettings> = context.dataStore.data.map { prefs ->
@@ -56,6 +66,9 @@ class SettingsRepository(private val context: Context) {
             topP = prefs[Keys.TOP_P] ?: 0.95f,
             repeatPenalty = prefs[Keys.REPEAT_PENALTY] ?: 1.1f,
             threads = prefs[Keys.THREADS] ?: 0,
+            enginePreference = prefs[Keys.ENGINE_BACKEND]?.let {
+                runCatching { EngineBackend.valueOf(it) }.getOrNull()
+            } ?: EngineBackend.AUTO,
         )
     }
 
@@ -82,4 +95,5 @@ class SettingsRepository(private val context: Context) {
     suspend fun setTopP(value: Float) = context.dataStore.edit { it[Keys.TOP_P] = value }
     suspend fun setRepeatPenalty(value: Float) = context.dataStore.edit { it[Keys.REPEAT_PENALTY] = value }
     suspend fun setThreads(value: Int) = context.dataStore.edit { it[Keys.THREADS] = value }
+    suspend fun setEnginePreference(value: EngineBackend) = context.dataStore.edit { it[Keys.ENGINE_BACKEND] = value.name }
 }
