@@ -42,13 +42,25 @@ object PromptBuilder {
             "une autre langue, tu réponds toujours en français. Ton style est celui d'une vraie " +
             "conversation orale entre deux personnes : phrases courtes et vivantes, vocabulaire " +
             "courant, quelques hésitations ou tournures naturelles si ça correspond au " +
-            "personnage. Jamais de tournure robotique, de traduction mot à mot depuis l'anglais, " +
-            "de liste à puces, ni de réponse démesurément longue pour un simple message de chat. " +
-            "Ne réfléchis jamais à voix haute et n'utilise jamais de balises comme <think> ou " +
-            "<thinking> : écris directement ta réplique, sans aucun raisonnement affiché avant. " +
-            "À chaque message, fais avancer la conversation avec une idée nouvelle : ne répète " +
-            "jamais, ni ne reformule, une réplique que tu as déjà dite plus tôt (y compris ta " +
-            "toute première réplique)."
+            "personnage. Jamais de tournure robotique ni de traduction mot à mot depuis " +
+            "l'anglais, jamais de liste à puces. Ne réfléchis jamais à voix haute et n'utilise " +
+            "jamais de balises comme <think> ou <thinking> : écris directement ta réplique, sans " +
+            "aucun raisonnement affiché avant. À chaque message, fais avancer la conversation " +
+            "avec une idée nouvelle : ne répète jamais, ni ne reformule, une réplique que tu as " +
+            "déjà dite plus tôt (y compris ta toute première réplique)."
+
+    /**
+     * Instruction de longueur, séparée de [LANGUAGE_AND_TONE_DIRECTIVE] pour rester facile à
+     * ajuster : un petit modèle quantifié a tendance à dériver vers de longs paragraphes
+     * explicatifs si rien ne le retient, ce qui casse l'illusion d'un vrai échange de messages
+     * (personne ne tape trois paragraphes pour répondre "ça va ?" dans une conversation réelle).
+     */
+    private const val CONCISENESS_DIRECTIVE =
+        "Réponds toujours de façon courte et réaliste, comme un vrai message de chat ou de SMS : " +
+            "en général une à trois phrases, rarement plus de deux courtes actions/pensées en " +
+            "plus du dialogue. N'explique pas tout d'un coup et n'écris jamais de pavé de texte : " +
+            "s'il y a beaucoup à raconter, donne l'essentiel maintenant et garde le reste pour la " +
+            "suite de la conversation, comme le ferait vraiment quelqu'un en train de discuter."
 
     /**
      * Enseigne la convention dialogue / action / pensée (courante dans les fictions et le jeu de
@@ -57,7 +69,9 @@ object PromptBuilder {
      * dites à voix haute entre (parenthèses), et le dialogue en clair pour le reste. Rendu côté
      * UI par ui/chat/MessageFormatting.kt (police italique + couleur dédiée par catégorie), donc
      * cette convention n'est pas qu'un effet de style dans le texte brut : elle pilote
-     * directement l'affichage des bulles de conversation.
+     * directement l'affichage des bulles de conversation — y compris pour les messages tapés par
+     * l'utilisateur lui-même (voir ChatScreen : les boutons "Action"/"Pensée" de la barre de
+     * saisie insèrent les mêmes marqueurs).
      */
     private const val ROLEPLAY_FORMAT_DIRECTIVE =
         "Structure chacune de tes réponses comme dans un roman ou un jeu de rôle textuel, en " +
@@ -94,6 +108,8 @@ object PromptBuilder {
 
     fun buildSystemPrompt(character: CharacterEntity, userProfile: UserProfile = UserProfile()): String = buildString {
         append(LANGUAGE_AND_TONE_DIRECTIVE)
+        append("\n\n")
+        append(CONCISENESS_DIRECTIVE)
         append("\n\n")
         append(ROLEPLAY_FORMAT_DIRECTIVE)
         userProfileDirective(userProfile).takeIf { it.isNotEmpty() }?.let {
