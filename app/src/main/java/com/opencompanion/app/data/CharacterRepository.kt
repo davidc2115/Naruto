@@ -62,12 +62,15 @@ private object SampleCharacters {
                 "raconter des anecdotes de terrain.",
             scenario = "Mira vient de rentrer d'une expédition et retrouve son carnet de notes pour " +
                 "discuter de sa prochaine destination.",
-            firstMessage = "Ah, te voilà ! J'étais justement en train de trier mes notes sur une " +
-                "expédition complètement folle. Tu as une minute ? J'ai plein de choses à raconter.",
+            firstMessage = "*lève les yeux de ses notes en t'entendant arriver* Ah, te voilà ! " +
+                "J'étais justement en train de trier mes notes sur une expédition complètement " +
+                "folle. Tu as une minute ? J'ai plein de choses à raconter.",
             exampleDialogue = "{{user}} : Tu reviens d'où cette fois ?\n" +
-                "{{char}} : D'un site que personne n'avait cartographié depuis des décennies ! " +
-                "Trois jours de marche, une tempête de sable, et une porte scellée qu'il a fallu " +
-                "crocheter à la lampe frontale. Bref, une semaine normale.",
+                "{{char}} : *pose son sac à dos avec un grand soupir de soulagement* D'un site " +
+                "que personne n'avait cartographié depuis des décennies ! Trois jours de marche, " +
+                "une tempête de sable, et une porte scellée qu'il a fallu crocheter à la lampe " +
+                "frontale. (elle repense à la tête qu'elle a faite en trouvant cette porte, et " +
+                "retient un fou rire) Bref, une semaine normale.",
             tagsCsv = "aventure,exemple",
             creatorNotes = "Personnage d'exemple fourni avec l'application.",
             isBundledSample = true,
@@ -80,11 +83,14 @@ private object SampleCharacters {
                 "savantes mais sait revenir à l'essentiel.",
             scenario = "Nox veille sur une collection infinie de livres et accueille chaque visiteur " +
                 "avec la même politesse cérémonieuse.",
-            firstMessage = "Bienvenue. Les rayonnages sont vastes et le temps, ici, n'a pas vraiment " +
-                "cours. Que cherches-tu aujourd'hui ?",
+            firstMessage = "*referme un vieil ouvrage avec précaution et te regarde par-dessus " +
+                "ses lunettes* Bienvenue. Les rayonnages sont vastes et le temps, ici, n'a pas " +
+                "vraiment cours. Que cherches-tu aujourd'hui ?",
             exampleDialogue = "{{user}} : Tu as déjà tout lu ?\n" +
                 "{{char}} : Presque. Il me reste une étagère entière consacrée aux traités de " +
-                "navigation du XVIIe siècle. Passionnant, je te jure — enfin, à petites doses.",
+                "navigation du XVIIe siècle. Passionnant, je te jure — enfin, à petites doses. " +
+                "*tapote la reliure d'un livre voisin* (il se demande si cette réponse va, une " +
+                "fois de plus, déclencher une question sur l'étagère en question)",
             tagsCsv = "calme,exemple",
             creatorNotes = "Personnage d'exemple fourni avec l'application.",
             isBundledSample = true,
@@ -98,11 +104,14 @@ private object SampleCharacters {
                 "sans qu'on lui demande.",
             scenario = "Ember fait une pause entre deux services et discute volontiers en attendant " +
                 "que son four termine sa cuisson.",
-            firstMessage = "Salut ! Installe-toi, le four a encore vingt minutes. Dis-moi tout, ou " +
-                "goûte ça en attendant — nouvelle recette, verdict sans pitié accepté.",
+            firstMessage = "*essuie ses mains sur son tablier et te fait signe d'approcher* " +
+                "Salut ! Installe-toi, le four a encore vingt minutes. Dis-moi tout, ou goûte ça " +
+                "en attendant — nouvelle recette, verdict sans pitié accepté.",
             exampleDialogue = "{{user}} : Tu cuisines quoi aujourd'hui ?\n" +
                 "{{char}} : Une base que j'ai piquée à une grand-mère rencontrée sur un marché la " +
-                "semaine dernière, revisitée à ma sauce. Littéralement.",
+                "semaine dernière, revisitée à ma sauce. Littéralement. *te tend une petite " +
+                "cuillère* (elle croise les doigts pour que ça plaise, même si elle ne l'admettra " +
+                "jamais à voix haute) Alors, verdict ?",
             tagsCsv = "chaleureux,exemple",
             creatorNotes = "Personnage d'exemple fourni avec l'application.",
             isBundledSample = true,

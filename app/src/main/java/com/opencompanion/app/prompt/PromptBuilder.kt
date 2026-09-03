@@ -3,6 +3,8 @@ package com.opencompanion.app.prompt
 import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
+import com.opencompanion.app.data.UserGender
+import com.opencompanion.app.data.UserProfile
 import com.opencompanion.app.data.resolveCharacterPlaceholders
 import com.opencompanion.app.engine.ChatTurn
 import com.opencompanion.app.engine.InferenceEngine
@@ -48,25 +50,74 @@ object PromptBuilder {
             "jamais, ni ne reformule, une réplique que tu as déjà dite plus tôt (y compris ta " +
             "toute première réplique)."
 
-    fun buildSystemPrompt(character: CharacterEntity): String = buildString {
+    /**
+     * Enseigne la convention dialogue / action / pensée (courante dans les fictions et le jeu de
+     * rôle textuel) pour des échanges bien plus immersifs qu'un simple mur de texte : les gestes
+     * et le langage corporel du personnage entre *astérisques*, ses pensées intérieures non
+     * dites à voix haute entre (parenthèses), et le dialogue en clair pour le reste. Rendu côté
+     * UI par ui/chat/MessageFormatting.kt (police italique + couleur dédiée par catégorie), donc
+     * cette convention n'est pas qu'un effet de style dans le texte brut : elle pilote
+     * directement l'affichage des bulles de conversation.
+     */
+    private const val ROLEPLAY_FORMAT_DIRECTIVE =
+        "Structure chacune de tes réponses comme dans un roman ou un jeu de rôle textuel, en " +
+            "mélangeant naturellement trois éléments : le dialogue s'écrit normalement, sans " +
+            "balise particulière ; les actions et le langage corporel du personnage (gestes, " +
+            "expressions, déplacements) s'écrivent entre *astérisques*, par exemple " +
+            "*s'approche et penche la tête* ; et les pensées intérieures du personnage, qu'il ne " +
+            "dit pas à voix haute, s'écrivent entre (parenthèses), par exemple (il se demande si " +
+            "c'est une bonne idée d'en parler maintenant). N'utilise pas forcément les trois à " +
+            "chaque message — seulement quand la scène s'y prête — mais évite les réponses qui ne " +
+            "sont qu'un mur de dialogue sans aucune action ni pensée."
+
+    /**
+     * Décrit la personne avec qui le personnage parle (voir [UserProfile]), pour des réponses
+     * adressées de façon réaliste plutôt qu'à un interlocuteur générique et sans visage. Chaîne
+     * vide si rien n'est renseigné : ne rajoute alors aucun bruit inutile au prompt.
+     */
+    private fun userProfileDirective(profile: UserProfile): String {
+        val facts = buildList {
+            if (profile.name.isNotBlank()) add("elle s'appelle ${profile.name}")
+            profile.age?.let { add("elle a $it ans") }
+            when (profile.gender) {
+                UserGender.FEMME -> add("c'est une femme")
+                UserGender.HOMME -> add("c'est un homme")
+                UserGender.AUTRE -> add("son genre est non-binaire ou autre — évite les formulations genrées forcées")
+                UserGender.NON_PRECISE -> Unit
+            }
+        }
+        if (facts.isEmpty()) return ""
+        return "Informations sur la personne avec qui tu parles, à utiliser naturellement pour " +
+            "plus de réalisme (sans les répéter mécaniquement à chaque message) : " +
+            facts.joinToString(", ") + "."
+    }
+
+    fun buildSystemPrompt(character: CharacterEntity, userProfile: UserProfile = UserProfile()): String = buildString {
         append(LANGUAGE_AND_TONE_DIRECTIVE)
         append("\n\n")
+        append(ROLEPLAY_FORMAT_DIRECTIVE)
+        userProfileDirective(userProfile).takeIf { it.isNotEmpty() }?.let {
+            append("\n\n")
+            append(it)
+        }
+        append("\n\n")
+        val userName = userProfile.displayName
         if (character.systemPromptOverride.isNotBlank()) {
-            append(resolveCharacterPlaceholders(character.systemPromptOverride, character))
+            append(resolveCharacterPlaceholders(character.systemPromptOverride, character, userName))
             return@buildString
         }
         append("Tu incarnes ${character.name}. Reste toujours dans ce rôle et réponds à la première personne.\n\n")
         if (character.description.isNotBlank()) {
-            append("Description : ${resolveCharacterPlaceholders(character.description, character)}\n")
+            append("Description : ${resolveCharacterPlaceholders(character.description, character, userName)}\n")
         }
         if (character.personality.isNotBlank()) {
-            append("Personnalité : ${resolveCharacterPlaceholders(character.personality, character)}\n")
+            append("Personnalité : ${resolveCharacterPlaceholders(character.personality, character, userName)}\n")
         }
         if (character.scenario.isNotBlank()) {
-            append("Contexte : ${resolveCharacterPlaceholders(character.scenario, character)}\n")
+            append("Contexte : ${resolveCharacterPlaceholders(character.scenario, character, userName)}\n")
         }
         if (character.exampleDialogue.isNotBlank()) {
-            append("\nExemples de style de réponse :\n${resolveCharacterPlaceholders(character.exampleDialogue, character)}\n")
+            append("\nExemples de style de réponse :\n${resolveCharacterPlaceholders(character.exampleDialogue, character, userName)}\n")
         }
     }.trim()
 
@@ -81,8 +132,9 @@ object PromptBuilder {
         engine: InferenceEngine,
         contextSize: Int,
         reservedForResponse: Int,
+        userProfile: UserProfile = UserProfile(),
     ): List<ChatTurn> {
-        val systemPrompt = buildSystemPrompt(character)
+        val systemPrompt = buildSystemPrompt(character, userProfile)
         val budget = (contextSize - reservedForResponse - SAFETY_MARGIN_TOKENS).coerceAtLeast(256)
 
         var used = engine.tokenCount(systemPrompt) + engine.tokenCount(newUserMessage)
@@ -116,8 +168,9 @@ object PromptBuilder {
         engine: InferenceEngine,
         contextSize: Int,
         reservedForResponse: Int,
+        userProfile: UserProfile = UserProfile(),
     ): String {
-        val turns = buildTurns(character, history, newUserMessage, engine, contextSize, reservedForResponse)
+        val turns = buildTurns(character, history, newUserMessage, engine, contextSize, reservedForResponse, userProfile)
         return engine.applyChatTemplate(turns, addAssistant = true) ?: fallbackFormat(turns)
     }
 
@@ -153,11 +206,13 @@ object PromptBuilder {
         history: List<ChatMessageEntity>,
         newUserMessage: String,
         maxOutputTokens: Int = 512,
+        userProfile: UserProfile = UserProfile(),
     ): String {
         // Marge de sécurité généreuse : ~4000 tokens au total pour AICore, on réserve la sortie
         // demandée plus une marge, et on garde le reste pour system + historique + message.
         val budget = (NANO_TOKEN_BUDGET - maxOutputTokens - SAFETY_MARGIN_TOKENS).coerceAtLeast(256)
-        val systemPrompt = buildSystemPrompt(character)
+        val systemPrompt = buildSystemPrompt(character, userProfile)
+        val userLabel = userProfile.displayName
 
         var used = estimateTokens(systemPrompt) + estimateTokens(newUserMessage)
         val kept = ArrayDeque<ChatTurn>()
@@ -178,12 +233,12 @@ object PromptBuilder {
             if (kept.isNotEmpty()) {
                 append("Historique récent de la conversation :\n")
                 for (turn in kept) {
-                    val speaker = if (turn.role == "user") "Utilisateur" else character.name
+                    val speaker = if (turn.role == "user") userLabel else character.name
                     append("$speaker : ${turn.content}\n")
                 }
                 append("\n")
             }
-            append("Utilisateur : $newUserMessage\n")
+            append("$userLabel : $newUserMessage\n")
             append("${character.name} :")
         }
     }

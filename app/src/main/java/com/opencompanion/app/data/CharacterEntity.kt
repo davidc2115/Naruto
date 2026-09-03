@@ -46,7 +46,11 @@ data class CharacterEntity(
  * littéralement dans ses réponses, ce qui casse immédiatement l'illusion d'une conversation
  * naturelle. Appliqué à la volée (plutôt qu'au moment de l'enregistrement) pour couvrir aussi
  * les fiches déjà en base avant cet ajout, sans migration.
+ *
+ * @param userName nom réel de l'utilisateur (voir [com.opencompanion.app.data.UserProfile]) si
+ * renseigné dans les réglages, sinon un générique neutre — pour plus de réalisme dès que la
+ * personne a pris deux secondes pour se présenter, sans rien casser sinon.
  */
-fun resolveCharacterPlaceholders(text: String, character: CharacterEntity): String =
-    text.replace("{{user}}", "Utilisateur", ignoreCase = true)
+fun resolveCharacterPlaceholders(text: String, character: CharacterEntity, userName: String = "Utilisateur"): String =
+    text.replace("{{user}}", userName, ignoreCase = true)
         .replace("{{char}}", character.name, ignoreCase = true)

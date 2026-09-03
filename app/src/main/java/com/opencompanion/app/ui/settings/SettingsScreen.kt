@@ -43,10 +43,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.EngineBackend
+import com.opencompanion.app.data.UserGender
 import com.opencompanion.app.engine.ModelManager
 import com.opencompanion.app.engine.NanoBridge
 import com.opencompanion.app.engine.RecommendedModels
@@ -81,6 +84,42 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             Modifier.padding(padding).padding(16.dp).fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            SectionTitle("Ton profil")
+            Text(
+                "Utilisé pour que les personnages s'adressent à toi de façon réaliste (par ton " +
+                    "prénom, en tenant compte de ton âge/genre si tu les renseignes). Entièrement " +
+                    "facultatif, jamais partagé — tout reste sur cet appareil.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            OutlinedTextField(
+                value = state.userProfile.name,
+                onValueChange = viewModel::setUserName,
+                label = { Text("Ton prénom") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = state.userProfile.age?.toString() ?: "",
+                onValueChange = { text -> viewModel.setUserAge(text.filter(Char::isDigit).take(3).toIntOrNull()) },
+                label = { Text("Ton âge (facultatif)") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Column {
+                Text("Ton genre (facultatif)", style = MaterialTheme.typography.bodyMedium)
+                UserGender.entries.forEach { gender ->
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = state.userProfile.gender == gender,
+                            onClick = { viewModel.setUserGender(gender) },
+                        )
+                        Text(userGenderLabel(gender))
+                    }
+                }
+            }
+
+            Divider()
             SectionTitle("Moteur d'IA")
             Text(
                 "« Auto » essaie d'abord Gemini Nano (rapide, intégré à Android) quand il est " +
@@ -275,6 +314,13 @@ private fun engineBackendLabel(backend: EngineBackend): String = when (backend) 
     EngineBackend.AUTO -> "Auto (recommandé)"
     EngineBackend.AICORE -> "Gemini Nano (AICore, appareil compatible uniquement)"
     EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp)"
+}
+
+private fun userGenderLabel(gender: UserGender): String = when (gender) {
+    UserGender.NON_PRECISE -> "Non précisé"
+    UserGender.FEMME -> "Femme"
+    UserGender.HOMME -> "Homme"
+    UserGender.AUTRE -> "Autre"
 }
 
 @Composable

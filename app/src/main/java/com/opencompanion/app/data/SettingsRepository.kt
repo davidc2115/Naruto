@@ -20,6 +20,27 @@ private val Context.dataStore by preferencesDataStore(name = "opencompanion_sett
  */
 enum class EngineBackend { AUTO, AICORE, LLAMA_CPP }
 
+/** Genre déclaré par l'utilisateur, injecté dans le prompt système (voir PromptBuilder) pour
+ *  que le personnage puisse s'adresser à lui de façon cohérente (accords, tournures...).
+ *  [NON_PRECISE] : aucune information n'est ajoutée au prompt, le modèle reste neutre. */
+enum class UserGender { NON_PRECISE, FEMME, HOMME, AUTRE }
+
+/**
+ * Profil de l'utilisateur (pas du personnage) : prénom, âge, genre — utilisés pour résoudre le
+ * jeton `{{user}}` des fiches personnage et pour informer le modèle de qui lui parle, afin que
+ * les réponses soient adressées de façon réaliste plutôt qu'à un "Utilisateur" générique et
+ * sans visage. Entièrement optionnel : un champ laissé vide/non précisé n'apparaît simplement
+ * pas dans le prompt (voir PromptBuilder.userProfileDirective).
+ */
+data class UserProfile(
+    val name: String = "",
+    val age: Int? = null,
+    val gender: UserGender = UserGender.NON_PRECISE,
+) {
+    /** Nom à afficher/injecter dans le prompt : jamais vide, retombe sur un générique neutre. */
+    val displayName: String get() = name.ifBlank { "Utilisateur" }
+}
+
 data class EngineSettings(
     val selectedModelPath: String? = null,
     val useGpu: Boolean = true,
@@ -57,6 +78,9 @@ class SettingsRepository(private val context: Context) {
         val REPEAT_PENALTY = floatPreferencesKey("repeat_penalty")
         val THREADS = intPreferencesKey("threads")
         val ENGINE_BACKEND = stringPreferencesKey("engine_backend")
+        val USER_NAME = stringPreferencesKey("user_profile_name")
+        val USER_AGE = intPreferencesKey("user_profile_age")
+        val USER_GENDER = stringPreferencesKey("user_profile_gender")
     }
 
     val settings: Flow<EngineSettings> = context.dataStore.data.map { prefs ->
@@ -100,4 +124,25 @@ class SettingsRepository(private val context: Context) {
     suspend fun setRepeatPenalty(value: Float) = context.dataStore.edit { it[Keys.REPEAT_PENALTY] = value }
     suspend fun setThreads(value: Int) = context.dataStore.edit { it[Keys.THREADS] = value }
     suspend fun setEnginePreference(value: EngineBackend) = context.dataStore.edit { it[Keys.ENGINE_BACKEND] = value.name }
+
+    val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
+        UserProfile(
+            name = prefs[Keys.USER_NAME] ?: "",
+            age = prefs[Keys.USER_AGE]?.takeIf { it > 0 },
+            gender = prefs[Keys.USER_GENDER]?.let {
+                runCatching { UserGender.valueOf(it) }.getOrNull()
+            } ?: UserGender.NON_PRECISE,
+        )
+    }
+
+    suspend fun setUserName(value: String) = context.dataStore.edit {
+        if (value.isBlank()) it.remove(Keys.USER_NAME) else it[Keys.USER_NAME] = value.trim()
+    }
+
+    /** [value] == null (ou <= 0) efface l'âge renseigné plutôt que de stocker une valeur invalide. */
+    suspend fun setUserAge(value: Int?) = context.dataStore.edit {
+        if (value == null || value <= 0) it.remove(Keys.USER_AGE) else it[Keys.USER_AGE] = value
+    }
+
+    suspend fun setUserGender(value: UserGender) = context.dataStore.edit { it[Keys.USER_GENDER] = value.name }
 }

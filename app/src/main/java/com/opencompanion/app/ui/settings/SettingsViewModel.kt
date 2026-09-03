@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.opencompanion.app.data.EngineBackend
 import com.opencompanion.app.data.EngineSettings
 import com.opencompanion.app.data.SettingsRepository
+import com.opencompanion.app.data.UserGender
+import com.opencompanion.app.data.UserProfile
 import com.opencompanion.app.engine.InferenceEngine
 import com.opencompanion.app.engine.ModelManager
 import com.opencompanion.app.engine.NanoBridge
@@ -19,6 +21,7 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiState(
     val settings: EngineSettings = EngineSettings(),
+    val userProfile: UserProfile = UserProfile(),
     val localModels: List<ModelManager.LocalModel> = emptyList(),
     val downloadProgress: Float? = null,
     val message: String? = null,
@@ -43,13 +46,16 @@ class SettingsViewModel(
         refreshNanoAvailability()
     }
 
-    val uiState: StateFlow<SettingsUiState> = settingsRepository.settings
-        .let { settingsFlow ->
+    val uiState: StateFlow<SettingsUiState> =
+        kotlinx.coroutines.flow.combine(settingsRepository.settings, settingsRepository.userProfile) { settings, profile ->
+            settings to profile
+        }.let { settingsAndProfileFlow ->
             kotlinx.coroutines.flow.combine(
-                settingsFlow, _localModels, _downloadProgress, _message, _nanoAvailability,
-            ) { settings, models, progress, message, nanoAvailability ->
+                settingsAndProfileFlow, _localModels, _downloadProgress, _message, _nanoAvailability,
+            ) { (settings, profile), models, progress, message, nanoAvailability ->
                 SettingsUiState(
                     settings = settings,
+                    userProfile = profile,
                     localModels = models,
                     downloadProgress = progress,
                     message = message,
@@ -177,6 +183,10 @@ class SettingsViewModel(
     fun setTopP(value: Float) = viewModelScope.launch { settingsRepository.setTopP(value) }
     fun setRepeatPenalty(value: Float) = viewModelScope.launch { settingsRepository.setRepeatPenalty(value) }
     fun setThreads(value: Int) = viewModelScope.launch { settingsRepository.setThreads(value) }
+
+    fun setUserName(value: String) = viewModelScope.launch { settingsRepository.setUserName(value) }
+    fun setUserAge(value: Int?) = viewModelScope.launch { settingsRepository.setUserAge(value) }
+    fun setUserGender(value: UserGender) = viewModelScope.launch { settingsRepository.setUserGender(value) }
 
     fun consumeMessage() {
         _message.value = null

@@ -44,6 +44,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
@@ -175,7 +180,10 @@ private fun MessageBubble(message: ChatMessageEntity) {
             color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
             shape = RoundedCornerShape(16.dp),
         ) {
-            Text(message.content, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp))
+            Text(
+                text = formatRoleplayText(message.content),
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            )
         }
     }
 }
@@ -189,7 +197,33 @@ private fun StreamingBubble(text: String, loadingModel: Boolean) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp))
                     Text("  Chargement du modèle…")
                 } else {
-                    Text(text.ifEmpty { "…" })
+                    Text(if (text.isEmpty()) AnnotatedString("…") else formatRoleplayText(text))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Convertit un message brut en texte stylé : dialogue en style normal, *actions* en italique
+ * discret, (pensées) en italique dans une couleur d'accent — voir MessageFormatting.kt pour la
+ * convention et le parseur. C'est ce qui rend la conversation "comme un vrai chatbot" plutôt
+ * qu'un mur de texte uniforme : la mise en forme du roleplay devient un vrai rendu visuel plutôt
+ * que de rester des astérisques et parenthèses bruts affichés tels quels.
+ */
+@Composable
+private fun formatRoleplayText(raw: String): AnnotatedString {
+    val actionColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val thoughtColor = MaterialTheme.colorScheme.tertiary
+    return buildAnnotatedString {
+        for (segment in parseMessageSegments(raw)) {
+            when (segment) {
+                is MessageSegment.Dialogue -> append(segment.text)
+                is MessageSegment.Action -> withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = actionColor)) {
+                    append(segment.text)
+                }
+                is MessageSegment.Thought -> withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = thoughtColor)) {
+                    append("‹${segment.text}›")
                 }
             }
         }

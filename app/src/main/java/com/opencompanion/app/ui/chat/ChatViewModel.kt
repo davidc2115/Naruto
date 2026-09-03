@@ -61,7 +61,8 @@ class ChatViewModel(
             if (character != null && character.firstMessage.isNotBlank() &&
                 repository.getMessages(characterId).isEmpty()
             ) {
-                val firstMessage = resolveCharacterPlaceholders(character.firstMessage, character)
+                val userName = settingsRepository.userProfile.first().displayName
+                val firstMessage = resolveCharacterPlaceholders(character.firstMessage, character, userName)
                 repository.appendMessage(characterId, MessageRole.ASSISTANT, firstMessage)
             }
         }
@@ -163,6 +164,7 @@ class ChatViewModel(
             history = fullHistory.dropLast(1),
             newUserMessage = lastUserMessage,
             maxOutputTokens = settings.maxResponseTokens,
+            userProfile = settingsRepository.userProfile.first(),
         )
 
         var nanoFailed = false
@@ -234,6 +236,7 @@ class ChatViewModel(
             engine = engine,
             contextSize = settings.contextSize,
             reservedForResponse = settings.maxResponseTokens,
+            userProfile = settingsRepository.userProfile.first(),
         )
 
         var gpuFailed = false
