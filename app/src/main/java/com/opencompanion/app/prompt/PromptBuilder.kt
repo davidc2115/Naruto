@@ -56,11 +56,39 @@ object PromptBuilder {
      * (personne ne tape trois paragraphes pour répondre "ça va ?" dans une conversation réelle).
      */
     private const val CONCISENESS_DIRECTIVE =
-        "Réponds toujours de façon courte et réaliste, comme un vrai message de chat ou de SMS : " +
-            "en général une à trois phrases, rarement plus de deux courtes actions/pensées en " +
-            "plus du dialogue. N'explique pas tout d'un coup et n'écris jamais de pavé de texte : " +
-            "s'il y a beaucoup à raconter, donne l'essentiel maintenant et garde le reste pour la " +
-            "suite de la conversation, comme le ferait vraiment quelqu'un en train de discuter."
+        "Réponds comme un vrai humain qui tape un message, pas comme un narrateur de roman : une " +
+            "seule courte phrase la plupart du temps, deux au grand maximum, avec au plus une " +
+            "courte action ou une courte pensée en plus du dialogue — jamais les deux à la fois " +
+            "sauf si la scène le justifie vraiment. Par exemple, au lieu de « *s'assoit lentement " +
+            "en face de toi, l'air pensif, pousse un long soupir et commence à raconter en détail " +
+            "toute sa journée en remontant depuis le matin* », écris plutôt quelque chose comme " +
+            "« *s'assoit en face de toi* Dure journée... je te raconte ? ». N'explique jamais tout " +
+            "d'un coup et n'écris jamais de pavé de texte : s'il y a beaucoup à raconter, donne " +
+            "l'essentiel maintenant et garde le reste pour la suite, comme le ferait vraiment " +
+            "quelqu'un en train de discuter. Si tu as plusieurs choses distinctes à dire à la " +
+            "suite — comme quelqu'un qui envoie plusieurs textos d'affilée au lieu d'un seul pavé " +
+            "— sépare-les par un saut de ligne (une idée par paragraphe) : chacune apparaîtra " +
+            "comme un message séparé, exactement comme une vraie conversation par messages. Ne " +
+            "dépasse jamais trois de ces messages courts d'affilée."
+
+    /**
+     * Complément à [CONCISENESS_DIRECTIVE] et à la consigne anti-répétition déjà présente dans
+     * [LANGUAGE_AND_TONE_DIRECTIVE] : un petit modèle quantifié a tendance à retomber sur les
+     * mêmes formulations d'ouverture, les mêmes actions et la même structure de réponse d'un tour
+     * à l'autre — ce qui donne une impression de conversation figée même quand le texte n'est pas
+     * mot pour mot identique. Le pénalité de répétition appliquée côté moteur (voir
+     * opencompanion_bridge.cpp) ne porte que sur les tokens généré pendant la réponse en cours,
+     * jamais sur l'historique déjà présent dans le prompt : c'est donc uniquement au modèle,
+     * via cette instruction, qu'il revient d'éviter de se répéter d'un message à l'autre.
+     */
+    private const val VARIETY_DIRECTIVE =
+        "Ne réponds jamais deux fois de la même façon : varie tes phrases d'ouverture, tes " +
+            "actions, tes réactions et ton vocabulaire à chaque message plutôt que de suivre un " +
+            "schéma identique (par exemple, n'ouvre pas systématiquement par la même action, et " +
+            "ne réagis pas systématiquement de la même manière à ce que dit ton interlocuteur). " +
+            "Apporte à chaque tour un détail, une réaction ou une idée réellement nouvelle, comme " +
+            "le ferait un humain qui improvise vraiment sa réponse — jamais une réponse générique " +
+            "qui irait aussi bien pour n'importe quel message précédent."
 
     /**
      * Enseigne la convention dialogue / action / pensée (courante dans les fictions et le jeu de
@@ -110,6 +138,8 @@ object PromptBuilder {
         append(LANGUAGE_AND_TONE_DIRECTIVE)
         append("\n\n")
         append(CONCISENESS_DIRECTIVE)
+        append("\n\n")
+        append(VARIETY_DIRECTIVE)
         append("\n\n")
         append(ROLEPLAY_FORMAT_DIRECTIVE)
         userProfileDirective(userProfile).takeIf { it.isNotEmpty() }?.let {

@@ -283,8 +283,15 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
 
         llama_sampler_chain_params sparams = llama_sampler_chain_default_params();
         sampler = llama_sampler_chain_init(sparams);
+        // Fréquence/présence non nulles (en plus de repeatPenalty) : sans elles, le modèle peut
+        // reproduire mot pour mot un tour de phrase déjà utilisé plus tôt dans la même réponse
+        // dès que la pénalité de répétition simple ne suffit pas à l'en dissuader — un facteur
+        // direct dans les réponses perçues comme figées/répétitives ou qui "reviennent toujours
+        // sur la phrase principale". Ces pénalités ne portent que sur les tokens générés pendant
+        // cet appel (voir llama_sampler_accept plus bas) : elles ne peuvent rien contre la
+        // répétition d'un tour à l'autre, gérée côté prompt par VARIETY_DIRECTIVE (PromptBuilder.kt).
         llama_sampler_chain_add(sampler, llama_sampler_init_penalties(
-                llama_vocab_n_tokens(session->vocab), 64, repeatPenalty, 0.0f, 0.0f));
+                llama_vocab_n_tokens(session->vocab), 64, repeatPenalty, 0.3f, 0.3f));
         if (topK > 0) {
             llama_sampler_chain_add(sampler, llama_sampler_init_top_k(topK));
         }

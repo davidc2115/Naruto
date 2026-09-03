@@ -50,7 +50,11 @@ data class EngineSettings(
     // ThinkBlockFilter) avant même de commencer sa vraie réponse — avec seulement 512, la
     // réponse visible pouvait être tronquée à quelques mots, voire totalement vide.
     val maxResponseTokens: Int = 768,
-    val temperature: Float = 0.8f,
+    // 0.9 plutôt que 0.8 : combiné aux pénalités freq/presence désormais actives côté natif
+    // (voir opencompanion_bridge.cpp), une température un peu plus haute réduit nettement la
+    // tendance des petits modèles quantifiés à retomber sur les mêmes formulations d'un tour à
+    // l'autre, sans basculer dans l'incohérence pour un modèle de cette taille.
+    val temperature: Float = 0.9f,
     val topK: Int = 40,
     val topP: Float = 0.95f,
     val repeatPenalty: Float = 1.1f,
@@ -89,7 +93,7 @@ class SettingsRepository(private val context: Context) {
             useGpu = (prefs[Keys.USE_GPU] ?: true) && !(prefs[Keys.GPU_DISABLED_AFTER_FAILURE] ?: false),
             contextSize = prefs[Keys.CONTEXT_SIZE] ?: 4096,
             maxResponseTokens = prefs[Keys.MAX_TOKENS] ?: 768,
-            temperature = prefs[Keys.TEMPERATURE] ?: 0.8f,
+            temperature = prefs[Keys.TEMPERATURE] ?: 0.9f,
             topK = prefs[Keys.TOP_K] ?: 40,
             topP = prefs[Keys.TOP_P] ?: 0.95f,
             repeatPenalty = prefs[Keys.REPEAT_PENALTY] ?: 1.1f,

@@ -28,6 +28,23 @@ import kotlinx.coroutines.launch
 
 enum class EngineStatus { IDLE, LOADING_MODEL, GENERATING, NO_MODEL_CONFIGURED, LOAD_ERROR }
 
+/**
+ * Découpe une réponse en plusieurs messages distincts sur les sauts de ligne vides, pour simuler
+ * une vraie rafale de textos plutôt qu'un unique pavé de texte (voir
+ * PromptBuilder.CONCISENESS_DIRECTIVE, qui enseigne cette convention au modèle). Plafonné pour
+ * éviter qu'une dérive du modèle ne fragmente une réponse en dizaines de bulles ; au-delà, on
+ * regroupe le surplus dans le dernier message plutôt que de le perdre.
+ */
+private const val MAX_SPLIT_MESSAGES = 4
+
+internal fun splitIntoBubbles(text: String): List<String> {
+    val parts = text.split(Regex("\n\\s*\n")).map { it.trim() }.filter { it.isNotEmpty() }
+    if (parts.size <= MAX_SPLIT_MESSAGES) return parts.ifEmpty { listOf(text.trim()) }
+    val head = parts.take(MAX_SPLIT_MESSAGES - 1)
+    val tail = parts.drop(MAX_SPLIT_MESSAGES - 1).joinToString("\n\n")
+    return head + tail
+}
+
 data class ChatUiState(
     val character: CharacterEntity? = null,
     val messages: List<ChatMessageEntity> = emptyList(),
@@ -176,7 +193,11 @@ class ChatViewModel(
                     val text = _streamingText.value
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
-                    if (text.isNotBlank()) repository.appendMessage(characterId, MessageRole.ASSISTANT, text)
+                    if (text.isNotBlank()) {
+                        splitIntoBubbles(text).forEach {
+                            repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
+                        }
+                    }
                 }
                 is GenerationEvent.Error -> {
                     nanoFailed = true
@@ -257,7 +278,9 @@ class ChatViewModel(
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
                     if (text.isNotBlank()) {
-                        repository.appendMessage(characterId, MessageRole.ASSISTANT, text)
+                        splitIntoBubbles(text).forEach {
+                            repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
+                        }
                     } else {
                         // Peut arriver si le modèle a épuisé tout son budget de tokens dans un
                         // bloc <think>...</think> (voir ThinkBlockFilter) sans jamais produire de

@@ -66,11 +66,13 @@ private object SampleCharacters {
                 "J'étais justement en train de trier mes notes sur une expédition complètement " +
                 "folle. Tu as une minute ? J'ai plein de choses à raconter.",
             exampleDialogue = "{{user}} : Tu reviens d'où cette fois ?\n" +
-                "{{char}} : *pose son sac à dos avec un grand soupir de soulagement* D'un site " +
-                "que personne n'avait cartographié depuis des décennies ! Trois jours de marche, " +
-                "une tempête de sable, et une porte scellée qu'il a fallu crocheter à la lampe " +
-                "frontale. (elle repense à la tête qu'elle a faite en trouvant cette porte, et " +
-                "retient un fou rire) Bref, une semaine normale.",
+                "{{char}} : *pose son sac à dos avec un soupir de soulagement* D'un site que " +
+                "personne n'avait cartographié depuis des décennies !\n" +
+                "{{user}} : Sérieux ? Raconte.\n" +
+                "{{char}} : Une porte scellée qu'il a fallu crocheter à la lampe frontale. (elle " +
+                "retient un fou rire en y repensant)\n" +
+                "\n" +
+                "Une porte, oui. Ne me demande pas ce qu'il y avait derrière, tu vas pas y croire.",
             tagsCsv = "aventure,exemple",
             creatorNotes = "Personnage d'exemple fourni avec l'application.",
             isBundledSample = true,
@@ -87,10 +89,11 @@ private object SampleCharacters {
                 "ses lunettes* Bienvenue. Les rayonnages sont vastes et le temps, ici, n'a pas " +
                 "vraiment cours. Que cherches-tu aujourd'hui ?",
             exampleDialogue = "{{user}} : Tu as déjà tout lu ?\n" +
-                "{{char}} : Presque. Il me reste une étagère entière consacrée aux traités de " +
-                "navigation du XVIIe siècle. Passionnant, je te jure — enfin, à petites doses. " +
-                "*tapote la reliure d'un livre voisin* (il se demande si cette réponse va, une " +
-                "fois de plus, déclencher une question sur l'étagère en question)",
+                "{{char}} : Presque. Il me reste une étagère entière, là-bas. *désigne un coin " +
+                "sombre du regard*\n" +
+                "{{user}} : Ça parle de quoi ?\n" +
+                "{{char}} : Navigation, XVIIe siècle. (il sent déjà la question suivante arriver) " +
+                "Passionnant, à petites doses.",
             tagsCsv = "calme,exemple",
             creatorNotes = "Personnage d'exemple fourni avec l'application.",
             isBundledSample = true,
@@ -108,10 +111,11 @@ private object SampleCharacters {
                 "Salut ! Installe-toi, le four a encore vingt minutes. Dis-moi tout, ou goûte ça " +
                 "en attendant — nouvelle recette, verdict sans pitié accepté.",
             exampleDialogue = "{{user}} : Tu cuisines quoi aujourd'hui ?\n" +
-                "{{char}} : Une base que j'ai piquée à une grand-mère rencontrée sur un marché la " +
-                "semaine dernière, revisitée à ma sauce. Littéralement. *te tend une petite " +
-                "cuillère* (elle croise les doigts pour que ça plaise, même si elle ne l'admettra " +
-                "jamais à voix haute) Alors, verdict ?",
+                "{{char}} : Une recette piquée à une grand-mère sur un marché. *te tend une " +
+                "petite cuillère* Goûte.\n" +
+                "{{user}} : C'est bon !\n" +
+                "{{char}} : (elle croise discrètement les doigts, sans l'admettre à voix haute) " +
+                "Ah, ça me rassure.",
             tagsCsv = "chaleureux,exemple",
             creatorNotes = "Personnage d'exemple fourni avec l'application.",
             isBundledSample = true,
