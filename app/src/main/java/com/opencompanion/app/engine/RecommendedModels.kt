@@ -13,7 +13,7 @@ package com.opencompanion.app.engine
  */
 object RecommendedModels {
 
-    enum class Tier { RAPIDE, QUALITE }
+    enum class Tier { RAPIDE, QUALITE, ENORME }
 
     data class Entry(
         val displayName: String,
@@ -86,6 +86,28 @@ object RecommendedModels {
             downloadUrl = "https://huggingface.co/unsloth/gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q4_K_M.gguf?download=true",
             fileName = "gemma-3-4b-it-Q4_K_M.gguf",
             note = "Meilleur choix qualité/multilingue de cette liste. Plus lent sans GPU stable.",
+        ),
+        // Bonsai 27B : 27 Md de paramètres compressés en quantification "ternaire" native
+        // (Q1_0, ~1,1 bit/poids au lieu des ~4 bits habituels), ce qui explique une taille de
+        // fichier comparable à un modèle 4 Md classique malgré un nombre de paramètres bien plus
+        // élevé. Vérifié : le sous-module llama.cpp embarqué (voir external/llama.cpp) reconnaît
+        // déjà l'architecture "qwen35" et le type de tenseur Q1_0 (CPU et Vulkan), donc ce modèle
+        // se charge avec le moteur existant, sans fork ni build spécial. Malgré ça, c'est un poids
+        // lourd pour un téléphone : à réserver aux appareils avec beaucoup de RAM, et à combiner
+        // avec le réglage « Couches déchargées sur le GPU » (Réglages → Matériel) en mode hybride
+        // plutôt que tout CPU ou tout GPU.
+        Entry(
+            displayName = "Bonsai 27B (Q1_0, ternaire)",
+            tier = Tier.ENORME,
+            approxSizeGb = 3.80,
+            paramCount = "27 Md de paramètres (quantifiés en ~1,1 bit/poids)",
+            license = "Apache 2.0",
+            downloadUrl = "https://huggingface.co/prism-ml/Bonsai-27B-gguf/resolve/main/Bonsai-27B-Q1_0.gguf?download=true",
+            fileName = "Bonsai-27B-Q1_0.gguf",
+            note = "Modèle expérimental bien plus gros que les autres de cette liste (27 Md de " +
+                "paramètres, compressés à 1 bit près) : demande beaucoup de RAM et de patience à " +
+                "charger. Si l'appli plante ou rame, réduis la taille du contexte et essaie le " +
+                "mode GPU hybride (Réglages → Matériel) avant d'abandonner.",
         ),
     )
 }

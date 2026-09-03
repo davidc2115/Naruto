@@ -230,6 +230,7 @@ class ChatViewModel(
             modelPath = settings.selectedModelPath!!,
             contextSize = settings.contextSize,
             useGpu = settings.useGpu,
+            gpuLayers = settings.gpuLayers,
             threads = threads,
         )
         return if (result.isSuccess) {

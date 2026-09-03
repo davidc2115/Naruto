@@ -44,6 +44,7 @@ class InferenceEngine(private val context: Context) {
     private var handle: Long = 0
     private var loadedModelPath: String? = null
     private var loadedWithGpu: Boolean = false
+    private var loadedGpuLayers: Int = 0
     private val lifecycleMutex = Mutex()
 
     /** true si CE build a été compilé avec le backend Vulkan (indépendant du GPU réel de l'appareil). */
@@ -63,25 +64,30 @@ class InferenceEngine(private val context: Context) {
 
     /**
      * Charge [modelPath] si nécessaire (ne recharge pas si déjà chargé avec les mêmes réglages).
-     * @param nGpuLayers -1 = décharger autant de couches que possible sur le GPU, 0 = CPU pur.
+     * @param gpuLayers nombre de couches à décharger sur le GPU quand [useGpu] est vrai : 0 = CPU
+     *   pur, une valeur inférieure au nombre réel de couches du modèle donne un mode hybride
+     *   CPU+GPU (llama.cpp répartit le réseau entre les deux), 999 (ou plus) décharge tout sur le
+     *   GPU — llama.cpp borne automatiquement au nombre réel de couches, c'est la convention
+     *   standard pour "autant que possible". Voir [com.opencompanion.app.data.SettingsRepository.gpuLayers].
      */
     suspend fun ensureModelLoaded(
         modelPath: String,
         contextSize: Int,
         useGpu: Boolean,
+        gpuLayers: Int = 999,
         threads: Int = recommendedThreadCount(),
     ): Result<Unit> = lifecycleMutex.withLock {
         val wantGpu = useGpu && vulkanCompiledIn
-        if (handle != 0L && loadedModelPath == modelPath && loadedWithGpu == wantGpu) {
+        val wantGpuLayers = if (wantGpu) gpuLayers.coerceAtLeast(0) else 0
+        if (handle != 0L && loadedModelPath == modelPath && loadedWithGpu == wantGpu &&
+            loadedGpuLayers == wantGpuLayers
+        ) {
             return@withLock Result.success(Unit)
         }
         unloadLocked()
 
-        // 999 : au-delà du nombre réel de couches du modèle, llama.cpp borne automatiquement —
-        // c'est la convention standard pour "décharger tout ce qui est possible sur le GPU".
-        val nGpuLayers = if (wantGpu) 999 else 0
         val newHandle = withContext(Dispatchers.IO) {
-            LlamaBridge.nativeLoadModel(modelPath, contextSize, nGpuLayers, threads)
+            LlamaBridge.nativeLoadModel(modelPath, contextSize, wantGpuLayers, threads)
         }
         if (newHandle == 0L) {
             return@withLock Result.failure(
@@ -91,6 +97,7 @@ class InferenceEngine(private val context: Context) {
         handle = newHandle
         loadedModelPath = modelPath
         loadedWithGpu = wantGpu
+        loadedGpuLayers = wantGpuLayers
         Result.success(Unit)
     }
 
@@ -103,6 +110,7 @@ class InferenceEngine(private val context: Context) {
         }
         loadedModelPath = null
         loadedWithGpu = false
+        loadedGpuLayers = 0
     }
 
     /** Nombre approximatif de tokens que consommerait [text] dans le contexte actuel. */

@@ -153,7 +153,11 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             )
             RecommendedModels.Tier.entries.forEach { tier ->
                 Text(
-                    if (tier == RecommendedModels.Tier.RAPIDE) "⚡ Rapide" else "★ Qualité",
+                    when (tier) {
+                        RecommendedModels.Tier.RAPIDE -> "⚡ Rapide"
+                        RecommendedModels.Tier.QUALITE -> "★ Qualité"
+                        RecommendedModels.Tier.ENORME -> "🐘 Modèle énorme (expérimental)"
+                    },
                     style = MaterialTheme.typography.labelLarge,
                 )
                 RecommendedModels.ALL.filter { it.tier == tier }.forEach { entry ->
@@ -213,6 +217,21 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                     checked = state.settings.useGpu,
                     onCheckedChange = viewModel::setUseGpu,
                     enabled = state.vulkanCompiledIn && state.deviceReportsVulkan,
+                )
+            }
+            if (state.settings.useGpu) {
+                StepperRow(
+                    label = "Couches déchargées sur le GPU",
+                    value = state.settings.gpuLayers,
+                    step = 4,
+                    range = 0..999,
+                    onChange = viewModel::setGpuLayers,
+                )
+                Text(
+                    "Une valeur inférieure au nombre de couches du modèle laisse le reste au " +
+                        "CPU : les deux travaillent ensemble (hybride) au lieu que tout passe " +
+                        "par le GPU. 999 = toutes les couches sur GPU, 0 = revient au CPU pur.",
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 

@@ -47,10 +47,10 @@ Réglages → « Moteur d'IA » :
 
 ## Modèles GGUF recommandés
 
-Six préréglages, en téléchargement direct HTTP (fichiers publics, aucune clé ni compte requis —
-même mécanisme que l'import par URL déjà existant), répartis en deux profils :
+Sept préréglages, en téléchargement direct HTTP (fichiers publics, aucune clé ni compte requis —
+même mécanisme que l'import par URL déjà existant), répartis en trois profils :
 
-| Modèle | Profil | Taille (Q4_K_M) | Paramètres | Licence |
+| Modèle | Profil | Taille | Paramètres | Licence |
 |---|---|---|---|---|
 | Qwen3 0.6B | ⚡ Rapide | ~0,40 Go | 0,6 Md | Apache 2.0 |
 | Gemma 3 1B | ⚡ Rapide | ~0,81 Go | 1 Md | Gemma (Google) |
@@ -58,13 +58,32 @@ même mécanisme que l'import par URL déjà existant), répartis en deux profil
 | Phi-4-mini | ★ Qualité | ~2,49 Go | 3,8 Md | MIT |
 | Qwen3 4B | ★ Qualité | ~2,50 Go | 4 Md | Apache 2.0 |
 | Gemma 3 4B | ★ Qualité | ~2,49 Go | 4 Md | Gemma (Google) |
+| Bonsai 27B (Q1_0) | 🐘 Énorme (expérimental) | ~3,80 Go | 27 Md (~1,1 bit/poids) | Apache 2.0 |
 
 Détail dans [`engine/RecommendedModels.kt`](../app/src/main/java/com/opencompanion/app/engine/RecommendedModels.kt).
 Le profil **Rapide** vise une réponse quasi instantanée même en CPU pur ; le profil **Qualité**
 donne de bien meilleures réponses mais reste nettement plus confortable avec le GPU Vulkan
 activé (voir `docs/VULKAN_NOTES.md`) qu'en CPU pur sur un téléphone d'entrée de gamme.
 
-Ces six modèles restent des suggestions : l'import libre par fichier ou URL directe
+### Bonsai 27B : un 27 Md de paramètres qui tient dans ~3,8 Go
+
+[`prism-ml/Bonsai-27B-gguf`](https://huggingface.co/prism-ml/Bonsai-27B-gguf) compresse un
+modèle de 27 milliards de paramètres (base Qwen3.6, architecture GGUF `qwen35`) en quantification
+"ternaire" native (type de tenseur `Q1_0`, ~1,1 bit par poids au lieu des ~4 bits habituels d'un
+GGUF classique type Q4_K_M) — d'où une taille de fichier comparable à un modèle 4 Md malgré un
+nombre de paramètres bien plus élevé. Point vérifié avant de l'ajouter : certains articles autour
+de ce modèle indiquent qu'un fork spécial de llama.cpp est nécessaire pour le faire tourner, mais
+le sous-module `external/llama.cpp` de ce dépôt (épinglé sur un commit de septembre 2026)
+reconnaît déjà nativement l'architecture `qwen35` et le type `GGML_TYPE_Q1_0` — CPU **et**
+Vulkan (`ggml/src/ggml-vulkan/vulkan-shaders/`) — donc aucun changement de moteur n'a été
+nécessaire pour l'ajouter à la liste. Le fichier proposé (`Bonsai-27B-Q1_0.gguf`, ~3,80 Go) est le
+modèle de texte seul ; les fichiers annexes du dépôt (`mmproj-*`, vision) et le "drafter"
+(`dspark-*`, décodage spéculatif) ne sont pas utilisés ici. Malgré sa taille de fichier modeste,
+c'est un modèle 27 Md : à réserver aux appareils avec beaucoup de RAM, idéalement combiné au
+réglage `Réglages → Matériel → Couches déchargées sur le GPU` en mode hybride plutôt que tout
+CPU. **Non testé sur un appareil physique** — même réserve que pour Gemini Nano/Vulkan ci-dessus.
+
+Ces sept modèles restent des suggestions : l'import libre par fichier ou URL directe
 (`ModelManager`) fonctionne toujours avec n'importe quel autre GGUF.
 
 ## Sources consultées
@@ -77,3 +96,9 @@ Ces six modèles restent des suggestions : l'import libre par fichier ou URL dir
 - [`com.google.mlkit.genai.common` (référence API)](https://developers.google.com/android/reference/com/google/mlkit/genai/common/package-summary)
 - Dépôts Hugging Face publics (`unsloth/...-GGUF`) pour les tailles exactes de fichiers Q4_K_M
   des modèles recommandés.
+- [`prism-ml/Bonsai-27B-gguf`](https://huggingface.co/prism-ml/Bonsai-27B-gguf) — fiche modèle,
+  taille exacte du fichier `Bonsai-27B-Q1_0.gguf` et architecture GGUF (`qwen35`).
+- Code source du sous-module `external/llama.cpp` embarqué (`src/llama-arch.cpp`,
+  `src/models/models.h`, `ggml/include/ggml.h`, `ggml/src/ggml-vulkan/`) — vérification directe
+  du support de l'architecture `qwen35` et du type `Q1_0` (CPU + Vulkan) avant d'ajouter Bonsai
+  27B à la liste, plutôt que de se fier uniquement aux articles tiers à son sujet.

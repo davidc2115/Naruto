@@ -96,7 +96,14 @@ d'appareils actifs est aujourd'hui marginale.
   l'API publique `llama.h` (`llama_model_load_from_file` avec
   `llama_model_params.n_gpu_layers`) gère elle-même le placement des couches
   sur les backends compilés, sans code de sélection de device à écrire côté
-  app.
+  app. **Historique** : la première version passait systématiquement 999
+  (toutes les couches sur GPU) dès que Vulkan était activé — un choix
+  tout-ou-rien qui laissait le CPU inactif pendant toute la génération et
+  pouvait dépasser la VRAM disponible sur certains appareils. Depuis, ce
+  nombre est configurable (`Réglages → Matériel → Couches déchargées sur le
+  GPU`, `SettingsRepository.gpuLayers`, défaut 20) : une valeur inférieure au
+  nombre réel de couches donne un vrai mode hybride, GPU et CPU travaillant
+  ensemble sur le même modèle plutôt que l'un ou l'autre en exclusivité.
 
 ## Ce qui est documenté comme fragile
 

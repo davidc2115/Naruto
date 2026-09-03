@@ -44,6 +44,16 @@ data class UserProfile(
 data class EngineSettings(
     val selectedModelPath: String? = null,
     val useGpu: Boolean = true,
+    // 20 plutôt que « toutes les couches » : décharger la totalité du modèle sur le GPU (l'ancien
+    // comportement fixe) laisse le CPU inactif pendant toute la génération, ce qui n'est pas un
+    // vrai mode hybride CPU+GPU et peut aussi dépasser la VRAM disponible sur certains appareils.
+    // Avec une valeur inférieure au nombre réel de couches du modèle, llama.cpp répartit
+    // automatiquement le travail : le début du réseau tourne sur le GPU (Vulkan), le reste sur le
+    // CPU — les deux processeurs contribuent à chaque token plutôt que l'un ou l'autre en
+    // exclusivité. 20 convient pour les petits modèles proposés par défaut (1 à 4 Md de
+    // paramètres, ~22 à 36 couches) ; voir setGpuLayers/StepperRow (Réglages → Matériel) pour
+    // ajuster — 999 revient à l'ancien comportement (tout sur GPU), 0 au CPU pur.
+    val gpuLayers: Int = 20,
     val contextSize: Int = 4096,
     // 768 plutôt que 512 : un modèle "raisonneur" (Qwen3, preset par défaut) consomme souvent
     // 150 à 250 tokens dans un bloc <think>...</think> retiré de l'affichage (voir
@@ -73,6 +83,7 @@ class SettingsRepository(private val context: Context) {
     private object Keys {
         val MODEL_PATH = stringPreferencesKey("selected_model_path")
         val USE_GPU = booleanPreferencesKey("use_gpu")
+        val GPU_LAYERS = intPreferencesKey("gpu_layers")
         val GPU_DISABLED_AFTER_FAILURE = booleanPreferencesKey("gpu_disabled_after_failure")
         val CONTEXT_SIZE = intPreferencesKey("context_size")
         val MAX_TOKENS = intPreferencesKey("max_response_tokens")
@@ -91,6 +102,7 @@ class SettingsRepository(private val context: Context) {
         EngineSettings(
             selectedModelPath = prefs[Keys.MODEL_PATH],
             useGpu = (prefs[Keys.USE_GPU] ?: true) && !(prefs[Keys.GPU_DISABLED_AFTER_FAILURE] ?: false),
+            gpuLayers = prefs[Keys.GPU_LAYERS] ?: 20,
             contextSize = prefs[Keys.CONTEXT_SIZE] ?: 4096,
             maxResponseTokens = prefs[Keys.MAX_TOKENS] ?: 768,
             temperature = prefs[Keys.TEMPERATURE] ?: 0.9f,
@@ -111,6 +123,12 @@ class SettingsRepository(private val context: Context) {
     suspend fun setUseGpu(enabled: Boolean) = context.dataStore.edit {
         it[Keys.USE_GPU] = enabled
         if (enabled) it[Keys.GPU_DISABLED_AFTER_FAILURE] = false
+    }
+
+    /** [value] est borné à [0, 999] : 0 = CPU pur, 999 = toutes les couches sur GPU (llama.cpp
+     *  borne de toute façon en interne au nombre réel de couches du modèle chargé). */
+    suspend fun setGpuLayers(value: Int) = context.dataStore.edit {
+        it[Keys.GPU_LAYERS] = value.coerceIn(0, 999)
     }
 
     /** Appelé après un échec de génération imputable au backend GPU : désactive le GPU sans

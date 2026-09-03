@@ -176,6 +176,7 @@ class SettingsViewModel(
     }
 
     fun setUseGpu(enabled: Boolean) = viewModelScope.launch { settingsRepository.setUseGpu(enabled) }
+    fun setGpuLayers(value: Int) = viewModelScope.launch { settingsRepository.setGpuLayers(value) }
     fun setContextSize(size: Int) = viewModelScope.launch { settingsRepository.setContextSize(size) }
     fun setMaxResponseTokens(tokens: Int) = viewModelScope.launch { settingsRepository.setMaxResponseTokens(tokens) }
     fun setTemperature(value: Float) = viewModelScope.launch { settingsRepository.setTemperature(value) }
