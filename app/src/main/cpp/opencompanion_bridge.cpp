@@ -51,6 +51,12 @@ struct ModelSession {
     // (llama_chat_apply_template retombe alors sur un format par défaut raisonnable).
     const char* chat_template = nullptr;
     std::atomic<bool> stop_requested{false};
+    // État du cache KV après le dernier appel réussi à nativeGenerate() : exactement les tokens
+    // (prompt effectivement décodé + réponse générée, dans cet ordre) réellement résidents dans
+    // le cache. Sert à réutiliser le cache d'un tour à l'autre plutôt que de tout redécoder à
+    // chaque message (voir nativeGenerate) — vide après le chargement du modèle, ou après tout
+    // appel dont l'issue rend l'état du cache incertain (erreur de décodage).
+    std::vector<llama_token> cached_tokens;
 };
 
 bool g_backend_initialized = false;
@@ -107,48 +113,71 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeLoadModel(
         JNIEnv* env, jobject, jstring jModelPath, jint nCtx, jint nGpuLayers, jint nThreads) {
     const std::string model_path = jstring_to_std_string(env, jModelPath);
 
-    llama_model_params model_params = llama_model_default_params();
-    model_params.n_gpu_layers = nGpuLayers;
+    // Le chargement (lecture du fichier GGUF, allocation des tenseurs, init du backend GPU) n'a
+    // longtemps eu aucun filet : une exception C++ levée ici (échec d'allocation mémoire type
+    // std::bad_alloc sur un modèle trop gros pour l'appareil, pilote Vulkan qui lève à
+    // l'initialisation du device...) traversait la frontière JNI et plantait tout le processus,
+    // contrairement à nativeGenerate() qui est protégé depuis le départ. Ce try/catch ne peut
+    // rien contre un GGML_ASSERT/abort() interne (ça termine le processus sans passer par une
+    // exception C++, aucun code ne peut l'intercepter), mais couvre les échecs qui, eux, sont de
+    // vraies exceptions — utile en particulier pour un modèle inhabituellement gros/exotique.
+    llama_model* model = nullptr;
+    llama_context* ctx = nullptr;
+    try {
+        llama_model_params model_params = llama_model_default_params();
+        model_params.n_gpu_layers = nGpuLayers;
 
-    llama_model* model = llama_model_load_from_file(model_path.c_str(), model_params);
-    if (model == nullptr) {
-        LOGE("Échec du chargement du modèle GGUF : %s", model_path.c_str());
+        model = llama_model_load_from_file(model_path.c_str(), model_params);
+        if (model == nullptr) {
+            LOGE("Échec du chargement du modèle GGUF : %s", model_path.c_str());
+            return 0;
+        }
+
+        llama_context_params ctx_params = llama_context_default_params();
+        ctx_params.n_ctx = static_cast<uint32_t>(nCtx > 0 ? nCtx : 4096);
+        // n_batch/n_ubatch bornent le nombre de tokens qu'un seul appel à llama_decode() peut
+        // traiter : un prompt (personnage + historique) qui dépasse cette valeur en une fois
+        // faisait planter l'appli (GGML_ASSERT non rattrapable dans llama.cpp), ce qui arrivait
+        // dès le 2e ou 3e message d'une conversation avec un personnage un peu détaillé, bien
+        // avant d'atteindre la limite réelle du contexte. On aligne désormais n_batch sur n_ctx
+        // (borné à 2048 : au-delà, le gain de débit du batching est marginal alors que le pic
+        // mémoire grimpe vite sur mobile) — et nativeGenerate() découpe de toute façon tout
+        // prompt plus long en plusieurs appels de llama_decode() respectant cette limite, donc
+        // cette valeur n'est plus un plafond dur, juste un compromis vitesse/mémoire pour le
+        // traitement du prompt.
+        ctx_params.n_batch = std::min<uint32_t>(ctx_params.n_ctx, 2048);
+        ctx_params.n_ubatch = ctx_params.n_batch;
+        const int32_t threads = nThreads > 0 ? nThreads : 4;
+        ctx_params.n_threads = threads;
+        ctx_params.n_threads_batch = threads;
+
+        ctx = llama_init_from_model(model, ctx_params);
+        if (ctx == nullptr) {
+            LOGE("Échec de création du contexte llama (mémoire/contexte trop grand pour l'appareil ?)");
+            llama_model_free(model);
+            return 0;
+        }
+
+        auto* session = new ModelSession();
+        session->model = model;
+        session->ctx = ctx;
+        session->vocab = llama_model_get_vocab(model);
+        session->chat_template = llama_model_chat_template(model, /* name */ nullptr);
+
+        LOGI("Modèle chargé : n_ctx=%d n_gpu_layers=%d threads=%d patron_dialogue=%s",
+             ctx_params.n_ctx, nGpuLayers, threads, session->chat_template != nullptr ? "oui" : "défaut");
+        return reinterpret_cast<jlong>(session);
+    } catch (const std::exception& e) {
+        LOGE("Exception pendant le chargement du modèle : %s", e.what());
+        if (ctx != nullptr) llama_free(ctx);
+        if (model != nullptr) llama_model_free(model);
+        return 0;
+    } catch (...) {
+        LOGE("Exception inconnue pendant le chargement du modèle");
+        if (ctx != nullptr) llama_free(ctx);
+        if (model != nullptr) llama_model_free(model);
         return 0;
     }
-
-    llama_context_params ctx_params = llama_context_default_params();
-    ctx_params.n_ctx = static_cast<uint32_t>(nCtx > 0 ? nCtx : 4096);
-    // n_batch/n_ubatch bornent le nombre de tokens qu'un seul appel à llama_decode() peut
-    // traiter : un prompt (personnage + historique) qui dépasse cette valeur en une fois faisait
-    // planter l'appli (GGML_ASSERT non rattrapable dans llama.cpp), ce qui arrivait dès le 2e ou
-    // 3e message d'une conversation avec un personnage un peu détaillé, bien avant d'atteindre la
-    // limite réelle du contexte. On aligne désormais n_batch sur n_ctx (borné à 2048 : au-delà,
-    // le gain de débit du batching est marginal alors que le pic mémoire grimpe vite sur mobile)
-    // — et nativeGenerate() découpe de toute façon tout prompt plus long en plusieurs appels de
-    // llama_decode() respectant cette limite, donc cette valeur n'est plus un plafond dur, juste
-    // un compromis vitesse/mémoire pour le traitement du prompt.
-    ctx_params.n_batch = std::min<uint32_t>(ctx_params.n_ctx, 2048);
-    ctx_params.n_ubatch = ctx_params.n_batch;
-    const int32_t threads = nThreads > 0 ? nThreads : 4;
-    ctx_params.n_threads = threads;
-    ctx_params.n_threads_batch = threads;
-
-    llama_context* ctx = llama_init_from_model(model, ctx_params);
-    if (ctx == nullptr) {
-        LOGE("Échec de création du contexte llama (mémoire/contexte trop grand pour l'appareil ?)");
-        llama_model_free(model);
-        return 0;
-    }
-
-    auto* session = new ModelSession();
-    session->model = model;
-    session->ctx = ctx;
-    session->vocab = llama_model_get_vocab(model);
-    session->chat_template = llama_model_chat_template(model, /* name */ nullptr);
-
-    LOGI("Modèle chargé : n_ctx=%d n_gpu_layers=%d threads=%d patron_dialogue=%s",
-         ctx_params.n_ctx, nGpuLayers, threads, session->chat_template != nullptr ? "oui" : "défaut");
-    return reinterpret_cast<jlong>(session);
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL
@@ -278,8 +307,35 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
             n_prompt_tokens = static_cast<int32_t>(prompt_tokens.size());
         }
 
-        // Contexte réinitialisé à chaque appel : voir note en tête de fichier.
-        llama_memory_clear(llama_get_memory(session->ctx), true);
+        // Réutilisation du cache KV entre tours : à l'origine, tout le contexte était effacé et
+        // reconstruit à neuf à chaque appel (le commentaire en tête de fichier documentait ce
+        // choix comme "plus simple et robuste... largement compensé par la vitesse de
+        // prompt-processing sur mobile") — en pratique, sur une conversation qui s'allonge, ça
+        // veut dire redécoder le system prompt et TOUT l'historique à chaque message, ce qui
+        // domine largement le temps de réponse bien avant que la génération token par token ne
+        // commence. On compare maintenant, token à token, le prompt de cet appel avec ce qui est
+        // réellement resté dans le cache depuis le tour précédent ([cached_tokens]) : tout préfixe
+        // identique (system prompt + tours plus anciens inchangés) reste en cache tel quel, seul
+        // ce qui diverge (nouveau message, réponse précédente reformulée par le filtrage
+        // <think>/découpage en bulles, historique tronqué ou personnage différent...) est retiré
+        // puis redécodé. Comparaison brute : ne peut jamais réutiliser à tort (elle s'arrête au
+        // premier token différent), donc au pire équivaut à l'ancien comportement (tout redécodé).
+        size_t common_prefix = 0;
+        {
+            const size_t max_common = std::min(session->cached_tokens.size(),
+                                                static_cast<size_t>(n_prompt_tokens));
+            while (common_prefix < max_common &&
+                   session->cached_tokens[common_prefix] == prompt_tokens[common_prefix]) {
+                common_prefix++;
+            }
+        }
+        if (!llama_memory_seq_rm(llama_get_memory(session->ctx), /* seq_id */ 0,
+                                  static_cast<llama_pos>(common_prefix), -1)) {
+            // Rare (dépend du backend) : la suppression partielle a échoué, on repart de zéro
+            // plutôt que de risquer un cache incohérent.
+            llama_memory_clear(llama_get_memory(session->ctx), true);
+            common_prefix = 0;
+        }
 
         llama_sampler_chain_params sparams = llama_sampler_chain_default_params();
         sampler = llama_sampler_chain_init(sparams);
@@ -320,7 +376,7 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
         // pas de position explicite), donc découper ainsi ne change rien au résultat, seulement à
         // la façon dont il est calculé.
         const int32_t n_batch = std::max<int32_t>(1, llama_n_batch(session->ctx));
-        int32_t n_fed = 0;
+        int32_t n_fed = static_cast<int32_t>(common_prefix);
         while (n_fed < n_prompt_tokens) {
             if (session->stop_requested.load()) { result_code = 1; aborted = true; break; }
             const int32_t chunk = std::min(n_batch, n_prompt_tokens - n_fed);
@@ -341,6 +397,10 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
         // avant d'échantillonner le suivant — comportement autoregressif inchangé par ailleurs.
         llama_token new_token = 0;
         bool first_iteration = true;
+        // Tokens effectivement générés (hors token de fin de séquence, jamais décodé — voir plus
+        // bas) : nécessaires pour reconstruire [cached_tokens] à la fin, la réponse du modèle
+        // restant elle aussi dans le cache KV pour le tour suivant.
+        std::vector<llama_token> generated_tokens;
 
         while (!aborted) {
             if (session->stop_requested.load()) { result_code = 1; break; }
@@ -361,6 +421,7 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
             if (llama_vocab_is_eog(session->vocab, new_token)) {
                 break;
             }
+            generated_tokens.push_back(new_token);
 
             int32_t piece_len = llama_token_to_piece(
                     session->vocab, new_token, piece_buf, sizeof(piece_buf), 0, true);
@@ -381,14 +442,29 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
             if (session->stop_requested.load()) { result_code = 1; break; }
         }
 
+        // n_fed reflète exactement le nombre de tokens du prompt réellement décodés (peut être
+        // < n_prompt_tokens si l'étape 1 a été interrompue) : c'est ça, pas prompt_tokens en
+        // entier, qui est vraiment resident dans le cache KV à ce stade. En cas d'erreur
+        // (result_code négatif), l'état du cache n'est plus garanti fiable — on vide plutôt que
+        // de risquer une réutilisation incorrecte au prochain appel.
+        if (result_code == 0 || result_code == 1) {
+            session->cached_tokens.assign(prompt_tokens.begin(), prompt_tokens.begin() + n_fed);
+            session->cached_tokens.insert(session->cached_tokens.end(),
+                                           generated_tokens.begin(), generated_tokens.end());
+        } else {
+            session->cached_tokens.clear();
+        }
+
         llama_sampler_free(sampler);
         return result_code;
     } catch (const std::exception& e) {
         LOGE("Exception pendant la génération (pilote GPU/Vulkan instable ?) : %s", e.what());
+        session->cached_tokens.clear(); // état du cache KV incertain après une exception
         if (sampler != nullptr) llama_sampler_free(sampler);
         return -6;
     } catch (...) {
         LOGE("Exception inconnue pendant la génération");
+        session->cached_tokens.clear();
         if (sampler != nullptr) llama_sampler_free(sampler);
         return -7;
     }

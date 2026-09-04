@@ -153,11 +153,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             )
             RecommendedModels.Tier.entries.forEach { tier ->
                 Text(
-                    when (tier) {
-                        RecommendedModels.Tier.RAPIDE -> "⚡ Rapide"
-                        RecommendedModels.Tier.QUALITE -> "★ Qualité"
-                        RecommendedModels.Tier.ENORME -> "🐘 Modèle énorme (expérimental)"
-                    },
+                    if (tier == RecommendedModels.Tier.RAPIDE) "⚡ Rapide" else "★ Qualité",
                     style = MaterialTheme.typography.labelLarge,
                 )
                 RecommendedModels.ALL.filter { it.tier == tier }.forEach { entry ->
@@ -241,8 +237,15 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 label = "Taille du contexte",
                 value = state.settings.contextSize,
                 step = 512,
-                range = 512..8192,
+                range = 512..16384,
                 onChange = viewModel::setContextSize,
+            )
+            Text(
+                "Combien de messages récents le personnage garde en mémoire avant d'oublier les " +
+                    "plus anciens. Une valeur plus haute retient une conversation plus longue " +
+                    "mais utilise plus de RAM et ralentit chaque réponse : à monter " +
+                    "progressivement plutôt que de sauter directement au maximum.",
+                style = MaterialTheme.typography.bodySmall,
             )
             StepperRow(
                 label = "Threads CPU (0 = auto)",

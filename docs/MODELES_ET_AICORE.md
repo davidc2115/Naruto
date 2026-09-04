@@ -47,8 +47,8 @@ Réglages → « Moteur d'IA » :
 
 ## Modèles GGUF recommandés
 
-Sept préréglages, en téléchargement direct HTTP (fichiers publics, aucune clé ni compte requis —
-même mécanisme que l'import par URL déjà existant), répartis en trois profils :
+Six préréglages, en téléchargement direct HTTP (fichiers publics, aucune clé ni compte requis —
+même mécanisme que l'import par URL déjà existant), répartis en deux profils :
 
 | Modèle | Profil | Taille | Paramètres | Licence |
 |---|---|---|---|---|
@@ -58,33 +58,51 @@ même mécanisme que l'import par URL déjà existant), répartis en trois profi
 | Phi-4-mini | ★ Qualité | ~2,49 Go | 3,8 Md | MIT |
 | Qwen3 4B | ★ Qualité | ~2,50 Go | 4 Md | Apache 2.0 |
 | Gemma 3 4B | ★ Qualité | ~2,49 Go | 4 Md | Gemma (Google) |
-| Bonsai 27B (Q1_0) | 🐘 Énorme (expérimental) | ~3,80 Go | 27 Md (~1,1 bit/poids) | Apache 2.0 |
 
 Détail dans [`engine/RecommendedModels.kt`](../app/src/main/java/com/opencompanion/app/engine/RecommendedModels.kt).
 Le profil **Rapide** vise une réponse quasi instantanée même en CPU pur ; le profil **Qualité**
 donne de bien meilleures réponses mais reste nettement plus confortable avec le GPU Vulkan
 activé (voir `docs/VULKAN_NOTES.md`) qu'en CPU pur sur un téléphone d'entrée de gamme.
 
-### Bonsai 27B : un 27 Md de paramètres qui tient dans ~3,8 Go
+### Retiré : Bonsai 27B — planté en usage réel, leçon retenue
 
-[`prism-ml/Bonsai-27B-gguf`](https://huggingface.co/prism-ml/Bonsai-27B-gguf) compresse un
-modèle de 27 milliards de paramètres (base Qwen3.6, architecture GGUF `qwen35`) en quantification
-"ternaire" native (type de tenseur `Q1_0`, ~1,1 bit par poids au lieu des ~4 bits habituels d'un
-GGUF classique type Q4_K_M) — d'où une taille de fichier comparable à un modèle 4 Md malgré un
-nombre de paramètres bien plus élevé. Point vérifié avant de l'ajouter : certains articles autour
-de ce modèle indiquent qu'un fork spécial de llama.cpp est nécessaire pour le faire tourner, mais
-le sous-module `external/llama.cpp` de ce dépôt (épinglé sur un commit de septembre 2026)
-reconnaît déjà nativement l'architecture `qwen35` et le type `GGML_TYPE_Q1_0` — CPU **et**
-Vulkan (`ggml/src/ggml-vulkan/vulkan-shaders/`) — donc aucun changement de moteur n'a été
-nécessaire pour l'ajouter à la liste. Le fichier proposé (`Bonsai-27B-Q1_0.gguf`, ~3,80 Go) est le
-modèle de texte seul ; les fichiers annexes du dépôt (`mmproj-*`, vision) et le "drafter"
-(`dspark-*`, décodage spéculatif) ne sont pas utilisés ici. Malgré sa taille de fichier modeste,
-c'est un modèle 27 Md : à réserver aux appareils avec beaucoup de RAM, idéalement combiné au
-réglage `Réglages → Matériel → Couches déchargées sur le GPU` en mode hybride plutôt que tout
-CPU. **Non testé sur un appareil physique** — même réserve que pour Gemini Nano/Vulkan ci-dessus.
+[`prism-ml/Bonsai-27B-gguf`](https://huggingface.co/prism-ml/Bonsai-27B-gguf) (27 Md de
+paramètres, base Qwen3.6/architecture GGUF `qwen35`, quantification "ternaire" native au format
+`Q1_0`, ~3,80 Go) a été ajouté un temps à cette liste, puis retiré après un signalement concret :
+il fait planter l'application sur un téléphone réel. Ce qui avait été vérifié avant l'ajout était
+réel mais **insuffisant** — leçon à retenir pour tout futur modèle "exotique" proposé ici :
 
-Ces sept modèles restent des suggestions : l'import libre par fichier ou URL directe
-(`ModelManager`) fonctionne toujours avec n'importe quel autre GGUF.
+- **Vérifié (et correct)** : le sous-module `external/llama.cpp` reconnaît nativement le type de
+  tenseur `GGML_TYPE_Q1_0` et l'architecture `qwen35`, CPU et Vulkan — donc pas besoin d'un fork
+  spécial de llama.cpp pour que le *format* du fichier soit reconnu, contrairement à ce que
+  laissent penser certains articles à propos de ce modèle.
+- **Pas vérifié (et probablement la vraie cause du plantage)** : reconnaître un type de donnée
+  (comment les poids sont stockés) ne garantit pas que tous les **opérateurs de calcul** requis
+  par le graphe d'inférence du modèle soient implémentés pour un backend donné. L'architecture de
+  Bonsai mélange environ 75 % de couches d'attention "linéaire" (façon state-space/gated, plus
+  proche d'un Mamba que d'un transformeur classique) et 25 % d'attention classique — un mélange
+  qui sollicite des opérateurs spécifiques (scan/état récurrent...) potentiellement absents ou
+  incomplets côté Vulkan sur la version de llama.cpp embarquée. Rien de tout ça n'a été contrôlé
+  avant l'ajout initial.
+- Le pic mémoire réel (poids + cache KV, avec un contexte non trivial) n'a pas non plus été
+  mesuré sur un appareil réel avant l'ajout — un simple dépassement mémoire (OOM) tue le
+  processus tout aussi brutalement qu'un opérateur manquant.
+- Dans les deux cas (opérateur non implémenté → `GGML_ASSERT`/`abort()`, ou OOM), le plantage
+  est **impossible à rattraper** côté JNI : ce sont des arrêts bas niveau du processus, pas des
+  exceptions C++ — voir `docs/VULKAN_NOTES.md` et le commentaire de `nativeGenerate` dans
+  `opencompanion_bridge.cpp`. `nativeLoadModel` a quand même été renforcé d'un `try/catch` (utile
+  contre un vrai échec d'allocation C++, `std::bad_alloc` par exemple) mais ça ne couvre pas ces
+  deux cas précis.
+
+**Règle retenue pour un futur ajout de modèle inhabituel** : vérifier le support du *format*
+(type de tenseur, architecture reconnue) ne suffit pas — il faut aussi soit trouver un rapport
+d'usage réel de ce modèle précis avec llama.cpp + Vulkan sur Android, soit accepter de ne
+l'ajouter qu'après un test sur un appareil physique, jamais uniquement sur la base d'une lecture
+de code.
+
+Ces six modèles restent des suggestions : l'import libre par fichier ou URL directe
+(`ModelManager`) fonctionne toujours avec n'importe quel autre GGUF — y compris Bonsai 27B, pour
+qui voudrait tenter sa chance en connaissance de cause.
 
 ## Sources consultées
 

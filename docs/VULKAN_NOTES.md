@@ -105,6 +105,66 @@ d'appareils actifs est aujourd'hui marginale.
   nombre réel de couches donne un vrai mode hybride, GPU et CPU travaillant
   ensemble sur le même modèle plutôt que l'un ou l'autre en exclusivité.
 
+## Vitesse : réutilisation du cache KV entre tours
+
+Jusqu'ici, `nativeGenerate()` effaçait tout le cache KV (`llama_memory_clear`) et redécodait
+l'intégralité du prompt — system prompt + tout l'historique gardé — à **chaque** message. Sur une
+conversation qui s'allonge, ce retraitement du prompt (pas la génération token par token) finit
+par dominer largement le temps de réponse, ce qui a été rapporté comme "les IA sont trop longues
+à répondre". Le commentaire d'origine en tête de fichier assumait que la vitesse de
+prompt-processing de llama.cpp sur mobile compenserait largement ce choix — en usage réel, non.
+
+Le cache est maintenant réutilisé d'un tour à l'autre : `ModelSession::cached_tokens` retient les
+tokens réellement résidents dans le cache après le dernier appel réussi (prompt effectivement
+décodé + réponse générée). À l'appel suivant, on compare token à token le nouveau prompt avec
+`cached_tokens` ; le plus long préfixe identique est conservé (`llama_memory_seq_rm(mem, 0,
+common_prefix, -1)` retire seulement ce qui diverge, pas tout), et seule la partie qui diverge est
+redécodée. Le placement automatique des positions de `llama_batch_get_one` (voir plus haut) se
+base sur l'occupation réelle du cache KV (`seq_pos_max + 1`), donc reprendre le décodage après un
+`seq_rm` partiel fonctionne sans code de positionnement explicite à écrire.
+
+Cette comparaison est **sûre par construction** : elle s'arrête au premier token différent, donc
+ne peut jamais réutiliser à tort un fragment de cache qui ne correspond plus au prompt actuel — au
+pire (personnage différent, historique tronqué/édité, ou reformulation par
+`ThinkBlockFilter`/le découpage en bulles côté Kotlin), elle ne trouve aucun préfixe commun et se
+comporte exactement comme avant (tout redécodé). Le gain dépend donc de la stabilité du texte
+reconstruit par `PromptBuilder.kt` d'un tour à l'autre : fort pour le system prompt et les tours
+anciens (qui ne changent jamais une fois écrits), plus limité sur le tour juste précédent si le
+modèle a pensé (`<think>`, filtré donc absent du texte re-rendu) ou si la réponse a été scindée en
+plusieurs bulles — un motif de plus pour la consigne "jamais de balises `<think>`" déjà présente
+dans `LANGUAGE_AND_TONE_DIRECTIVE`.
+
+L'état du cache est explicitement invalidé (`cached_tokens.clear()`) après toute issue où il n'est
+plus fiable : erreur de décodage, exception C++, ou échec partiel de `llama_memory_seq_rm` (auquel
+cas on retombe sur un `llama_memory_clear` complet). Un rechargement du modèle (changement de
+réglage GPU/contexte, repli CPU après plantage Vulkan...) crée de toute façon un nouveau
+`ModelSession`, donc un cache vide — pas de risque de réutiliser un cache d'un modèle différent.
+
+**Validé** (contrairement à la plupart de ce document — cette logique est indépendante du
+backend GPU, donc testable en CPU pur hors Android) : harness hôte reproduisant fidèlement cette
+logique (`nativeGenerate` sans le pont JNI), Qwen3-0.6B-Q4_K_M réel, 4 tours de conversation
+consécutifs avec patron de dialogue du modèle. Résultat : aucun plantage, taux de réutilisation du
+cache croissant comme attendu (0 % au 1er tour → 84 % → 91 % → 94 % au 4e), et texte généré
+cohérent à chaque tour (le modèle référence correctement les échanges précédents dans son
+raisonnement), signe qu'aucun décalage de position n'a corrompu le contexte. Reste à valider en
+conditions réelles : le gain de temps perçu (pas seulement le ratio de tokens réutilisés) sur
+appareil Android, et sur une conversation beaucoup plus longue que 4 tours.
+
+## Chargement du modèle : filet `try/catch` ajouté
+
+`nativeLoadModel()` n'avait, à l'origine, aucune protection contre une exception C++ (contrairement
+à `nativeGenerate()`, protégé depuis le départ — voir plus bas) : un échec d'allocation mémoire
+(`std::bad_alloc` sur un modèle trop gros pour l'appareil) ou une exception levée à
+l'initialisation du device Vulkan aurait traversé la frontière JNI et abattu tout le processus.
+Un `try/catch` a été ajouté autour du chargement, symétrique à celui de `nativeGenerate()`.
+**Limite importante** : ça ne protège pas contre un `GGML_ASSERT`/`abort()` interne à llama.cpp
+(un opérateur de calcul non implémenté pour l'architecture ou le backend chargé, par exemple) —
+ce sont des arrêts bas niveau du processus, pas des exceptions C++, donc rigoureusement rien côté
+JNI ne peut les rattraper. C'est précisément ce qui a motivé le retrait de Bonsai 27B de la liste
+de modèles recommandés (voir `docs/MODELES_ET_AICORE.md`) plutôt qu'une tentative de correctif :
+sans accès à un appareil réel pour obtenir les logs du plantage, impossible de savoir avec
+certitude s'il s'agit de ce cas précis ou d'un simple manque de mémoire.
+
 ## Ce qui est documenté comme fragile
 
 Plusieurs rapports (issues publiques `ggml-org/llama.cpp`) décrivent deux
@@ -150,6 +210,13 @@ un avec GPU Adreno, un avec GPU Mali) :
 - Chargement d'un petit modèle GGUF (< 2 Go) avec GPU activé, en observant
   le débit (tokens/s) affiché par les logs `adb logcat -s OpenCompanionNative`.
 - Comparaison CPU vs GPU sur le même modèle et le même prompt.
+- **Réutilisation du cache KV** (voir plus haut) : vérifier sur plusieurs tours
+  consécutifs d'une même conversation que la réponse générée reste cohérente
+  (pas de mots tronqués/incohérents en début de réponse, signe d'un
+  positionnement KV décalé) et que le débit perçu s'améliore réellement à
+  mesure que la conversation avance, en comparant les temps de première
+  réponse (`adb logcat -s OpenCompanionNative`) entre le 2e et le 10e message
+  d'une même conversation.
 - Comportement en cas de génération longue (contexte proche de la limite) :
   vérifier qu'aucun plantage n'apparaît et que le repli CPU se déclenche
   proprement si un problème survient.
