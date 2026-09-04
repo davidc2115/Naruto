@@ -92,10 +92,16 @@ object RecommendedModels {
         // fichier comparable à un modèle 4 Md classique malgré un nombre de paramètres bien plus
         // élevé. Vérifié : le sous-module llama.cpp embarqué (voir external/llama.cpp) reconnaît
         // déjà l'architecture "qwen35" et le type de tenseur Q1_0 (CPU et Vulkan), donc ce modèle
-        // se charge avec le moteur existant, sans fork ni build spécial. Malgré ça, c'est un poids
-        // lourd pour un téléphone : à réserver aux appareils avec beaucoup de RAM, et à combiner
-        // avec le réglage « Couches déchargées sur le GPU » (Réglages → Matériel) en mode hybride
-        // plutôt que tout CPU ou tout GPU.
+        // se charge avec le moteur existant, sans fork ni build spécial.
+        //
+        // ATTENTION vitesse : la quantification 1 bit réduit la taille du FICHIER, pas le nombre
+        // de calculs par token — à 27 Md de paramètres, chaque réponse reste bien plus lourde à
+        // calculer qu'avec les modèles 1-4 Md de cette liste, quelle que soit la quantification.
+        // Le réglage « Couches déchargées sur le GPU » (Réglages → Matériel) a un défaut de 20,
+        // pensé pour ces petits modèles (20-36 couches au total) : sur Bonsai 27B, qui a beaucoup
+        // plus de couches, 20 ne représente qu'une fraction du modèle et laisse l'essentiel sur
+        // CPU — remonter cette valeur (vers 999, ou par paliers si la VRAM ne suit pas) est le
+        // levier le plus direct pour accélérer ce modèle en particulier.
         Entry(
             displayName = "Bonsai 27B (Q1_0, ternaire)",
             tier = Tier.ENORME,
@@ -105,9 +111,11 @@ object RecommendedModels {
             downloadUrl = "https://huggingface.co/prism-ml/Bonsai-27B-gguf/resolve/main/Bonsai-27B-Q1_0.gguf?download=true",
             fileName = "Bonsai-27B-Q1_0.gguf",
             note = "Modèle expérimental bien plus gros que les autres de cette liste (27 Md de " +
-                "paramètres, compressés à 1 bit près) : demande beaucoup de RAM et de patience à " +
-                "charger. Si l'appli plante ou rame, réduis la taille du contexte et essaie le " +
-                "mode GPU hybride (Réglages → Matériel) avant d'abandonner.",
+                "paramètres) : la quantification 1 bit réduit la taille du fichier, pas le temps " +
+                "de calcul par réponse — reste bien plus lent que les modèles 1-4 Md ci-dessus, " +
+                "même avec le GPU. Pense à remonter « Couches déchargées sur le GPU » (Réglages " +
+                "→ Matériel, 20 par défaut) vers 999 pour ce modèle précisément, sinon la plupart " +
+                "de ses couches tournent sur CPU.",
         ),
     )
 }

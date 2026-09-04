@@ -284,8 +284,24 @@ object PromptBuilder {
                 }
                 append("\n")
             }
-            append("$userLabel : $newUserMessage\n")
-            append("${character.name} :")
+            append("$userLabel : $newUserMessage\n\n")
+            // Directive explicite plutôt qu'un simple "${character.name} :" en fin de prompt :
+            // ce dernier format (façon "complète cette réplique") convient à un modèle de base
+            // texte, mais Gemini Nano est un modèle *instruit*, pas un modèle de complétion — un
+            // simple nom suivi de ":" ne lui indique pas clairement qu'il doit répondre
+            // précisément au dernier message ci-dessus plutôt que de continuer la scène à sa
+            // façon (d'où des réponses qui semblent ignorer ce que vient de dire l'utilisateur,
+            // voire se répéter d'un tour à l'autre). En citant explicitement le dernier message,
+            // l'instruction ancre la génération dessus au lieu de laisser le modèle "deviner" la
+            // suite. Le backend llama.cpp n'a pas ce problème : il utilise le vrai patron de
+            // dialogue du modèle (voir buildPrompt/applyChatTemplate), pas un texte à compléter.
+            append(
+                "Réponds maintenant UNIQUEMENT en tant que ${character.name}, précisément à ce " +
+                    "dernier message de $userLabel : « $newUserMessage ». Ne recommence pas la " +
+                    "scène, ne pars pas sur une idée sans rapport : réagis à ce qui vient d'être " +
+                    "dit. N'écris que la réplique de ${character.name} elle-même, sans répéter " +
+                    "son nom ni ajouter de guillemets autour."
+            )
         }
     }
 
