@@ -55,6 +55,7 @@ data class ChatUiState(
     /** true si la réponse en cours (ou la dernière) a été générée par Gemini Nano (AICore)
      *  plutôt que par le moteur llama.cpp embarqué — voir [ChatViewModel.resolveActiveBackend]. */
     val usingNano: Boolean = false,
+    val selectedModelName: String? = null,
 )
 
 class ChatViewModel(
@@ -82,6 +83,17 @@ class ChatViewModel(
                 val firstMessage = resolveCharacterPlaceholders(character.firstMessage, character, userName)
                 repository.appendMessage(characterId, MessageRole.ASSISTANT, firstMessage)
             }
+
+            // Préchargement proactif du modèle local s'il est configuré pour que le nom et l'état
+            // s'affichent immédiatement à l'ouverture du chat.
+            val settings = settingsRepository.settings.first()
+            val backend = resolveActiveBackend(settings.enginePreference)
+            if (backend == EngineBackend.LLAMA_CPP && settings.selectedModelPath != null) {
+                _usingNano.value = false
+                loadModelIfNeeded(settings)
+            } else if (backend == EngineBackend.AICORE) {
+                _usingNano.value = true
+            }
         }
     }
 
@@ -91,7 +103,11 @@ class ChatViewModel(
         _streamingText,
         _status,
         _usingNano,
-    ) { character, messages, streaming, status, usingNano ->
+        settingsRepository.settings,
+    ) { character, messages, streaming, status, usingNano, settings ->
+        val modelName = settings.selectedModelPath?.let { path ->
+            java.io.File(path).name.removeSuffix(".gguf")
+        }
         ChatUiState(
             character = character,
             messages = messages,
@@ -100,6 +116,7 @@ class ChatViewModel(
             statusMessage = _statusMessage.value,
             usingGpu = engine.isUsingGpu,
             usingNano = usingNano,
+            selectedModelName = modelName,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChatUiState())
 

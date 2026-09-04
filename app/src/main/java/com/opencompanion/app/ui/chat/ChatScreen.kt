@@ -95,9 +95,17 @@ fun ChatScreen(
                         if (state.character != null) {
                             Text(
                                 when {
-                                    state.usingNano -> "⚡ Gemini Nano"
-                                    state.usingGpu -> "GPU (Vulkan)"
-                                    else -> "CPU"
+                                    state.status == EngineStatus.LOADING_MODEL -> {
+                                        val name = state.selectedModelName ?: "Modèle local"
+                                        "⏳ Chargement de $name…"
+                                    }
+                                    state.usingNano -> "⚡ Gemini Nano (AICore)"
+                                    state.selectedModelName != null -> {
+                                        val hw = if (state.usingGpu) "GPU Vulkan" else "CPU"
+                                        "🧠 ${state.selectedModelName} ($hw)"
+                                    }
+                                    state.usingGpu -> "🧠 Modèle local (GPU Vulkan)"
+                                    else -> "🧠 Modèle local (CPU)"
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                             )
