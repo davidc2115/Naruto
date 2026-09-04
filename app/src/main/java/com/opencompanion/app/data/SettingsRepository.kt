@@ -70,6 +70,7 @@ data class EngineSettings(
     val repeatPenalty: Float = 1.1f,
     val threads: Int = 0, // 0 = laisser InferenceEngine choisir une valeur recommandée
     val enginePreference: EngineBackend = EngineBackend.AUTO,
+    val allowNsfwMode: Boolean = true,
 )
 
 /**
@@ -93,6 +94,7 @@ class SettingsRepository(private val context: Context) {
         val REPEAT_PENALTY = floatPreferencesKey("repeat_penalty")
         val THREADS = intPreferencesKey("threads")
         val ENGINE_BACKEND = stringPreferencesKey("engine_backend")
+        val ALLOW_NSFW_MODE = booleanPreferencesKey("allow_nsfw_mode")
         val USER_NAME = stringPreferencesKey("user_profile_name")
         val USER_AGE = intPreferencesKey("user_profile_age")
         val USER_GENDER = stringPreferencesKey("user_profile_gender")
@@ -113,6 +115,7 @@ class SettingsRepository(private val context: Context) {
             enginePreference = prefs[Keys.ENGINE_BACKEND]?.let {
                 runCatching { EngineBackend.valueOf(it) }.getOrNull()
             } ?: EngineBackend.AUTO,
+            allowNsfwMode = prefs[Keys.ALLOW_NSFW_MODE] ?: true,
         )
     }
 
@@ -146,6 +149,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun setRepeatPenalty(value: Float) = context.dataStore.edit { it[Keys.REPEAT_PENALTY] = value }
     suspend fun setThreads(value: Int) = context.dataStore.edit { it[Keys.THREADS] = value }
     suspend fun setEnginePreference(value: EngineBackend) = context.dataStore.edit { it[Keys.ENGINE_BACKEND] = value.name }
+    suspend fun setAllowNsfwMode(enabled: Boolean) = context.dataStore.edit { it[Keys.ALLOW_NSFW_MODE] = enabled }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
         UserProfile(

@@ -136,16 +136,9 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeLoadModel(
         llama_context_params ctx_params = llama_context_default_params();
         ctx_params.n_ctx = static_cast<uint32_t>(nCtx > 0 ? nCtx : 4096);
         // n_batch/n_ubatch bornent le nombre de tokens qu'un seul appel à llama_decode() peut
-        // traiter : un prompt (personnage + historique) qui dépasse cette valeur en une fois
-        // faisait planter l'appli (GGML_ASSERT non rattrapable dans llama.cpp), ce qui arrivait
-        // dès le 2e ou 3e message d'une conversation avec un personnage un peu détaillé, bien
-        // avant d'atteindre la limite réelle du contexte. On aligne désormais n_batch sur n_ctx
-        // (borné à 2048 : au-delà, le gain de débit du batching est marginal alors que le pic
-        // mémoire grimpe vite sur mobile) — et nativeGenerate() découpe de toute façon tout
-        // prompt plus long en plusieurs appels de llama_decode() respectant cette limite, donc
-        // cette valeur n'est plus un plafond dur, juste un compromis vitesse/mémoire pour le
-        // traitement du prompt.
-        ctx_params.n_batch = std::min<uint32_t>(ctx_params.n_ctx, 2048);
+        // traiter. Borné à 512 pour éviter les pics d'allocation VRAM et la surchauffe sur GPU mobile Vulkan,
+        // garantissant un équilibre parfait entre vitesse de traitement du prompt et stabilité mémoire.
+        ctx_params.n_batch = std::min<uint32_t>(ctx_params.n_ctx, 512);
         ctx_params.n_ubatch = ctx_params.n_batch;
         const int32_t threads = nThreads > 0 ? nThreads : 4;
         ctx_params.n_threads = threads;

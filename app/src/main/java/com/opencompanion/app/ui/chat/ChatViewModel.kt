@@ -259,6 +259,7 @@ class ChatViewModel(
             contextSize = settings.contextSize,
             reservedForResponse = settings.maxResponseTokens,
             userProfile = settingsRepository.userProfile.first(),
+            allowNsfw = settings.allowNsfwMode,
         )
 
         var gpuFailed = false

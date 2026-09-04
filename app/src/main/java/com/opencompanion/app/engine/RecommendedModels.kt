@@ -87,6 +87,16 @@ object RecommendedModels {
             fileName = "gemma-3-4b-it-Q4_K_M.gguf",
             note = "Meilleur choix qualité/multilingue de cette liste. Plus lent sans GPU stable.",
         ),
+        Entry(
+            displayName = "Llama 3.2 3B Uncensored (Q4_K_M)",
+            tier = Tier.QUALITE,
+            approxSizeGb = 2.02,
+            paramCount = "3,2 Md de paramètres",
+            license = "Llama 3.2 Community License",
+            downloadUrl = "https://huggingface.co/cognitivecomputations/Dolphin-2.9.4-llama3.2-3b-GGUF/resolve/main/dolphin-2.9.4-llama3.2-3b-q4_k_m.gguf?download=true",
+            fileName = "dolphin-2.9.4-llama3.2-3b-q4_k_m.gguf",
+            note = "Modèle débridé sans filtre de sécurité, idéal pour le jeu de rôle adulte / NSFW libre et immersif.",
+        ),
         // Bonsai 27B (Q1_0, ternaire) a été essayé puis retiré : signalé en pratique par un
         // utilisateur comme faisant planter l'application sur son téléphone. La vérification
         // faite avant de l'ajouter (architecture "qwen35" et type de tenseur Q1_0 tous deux

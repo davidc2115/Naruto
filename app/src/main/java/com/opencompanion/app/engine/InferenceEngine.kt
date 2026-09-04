@@ -59,8 +59,15 @@ class InferenceEngine(private val context: Context) {
     val currentModelPath: String? get() = loadedModelPath
     val isUsingGpu: Boolean get() = loadedWithGpu
 
-    fun recommendedThreadCount(): Int =
-        (Runtime.getRuntime().availableProcessors() - 1).coerceIn(1, 8)
+    /**
+     * Nombre de threads CPU recommandés. Sur architecture mobile ARM (big.LITTLE), cibler 4 threads
+     * (les cœurs de performance) évite la contention avec les cœurs d'efficacité lents, réduit
+     * la surchauffe CPU et offre les meilleures performances en mode hybride Vulkan+CPU.
+     */
+    fun recommendedThreadCount(): Int {
+        val cores = Runtime.getRuntime().availableProcessors()
+        return if (cores <= 4) cores.coerceAtLeast(2) else (cores / 2).coerceIn(4, 6)
+    }
 
     /**
      * Charge [modelPath] si nécessaire (ne recharge pas si déjà chargé avec les mêmes réglages).
