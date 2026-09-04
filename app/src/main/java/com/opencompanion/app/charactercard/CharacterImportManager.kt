@@ -28,37 +28,31 @@ class CharacterImportManager(
         data class Failure(val reason: String) : ImportResult()
     }
 
-    suspend fun importFromUri(uri: Uri): ImportResult = withContext(Dispatchers.IO) {
+    suspend fun importFromUri(uri: Uri, autoTranslateFrench: Boolean = true): ImportResult = withContext(Dispatchers.IO) {
         try {
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 ?: return@withContext ImportResult.Failure("Impossible de lire le fichier sélectionné")
-            importFromBytesInternal(bytes)
+            importFromBytesInternal(bytes, autoTranslateFrench)
         } catch (e: Exception) {
             ImportResult.Failure(e.message ?: "Erreur d'import")
         }
     }
 
     /**
-     * Import direct depuis un texte brut — un JSON de fiche personnage collé ou partagé tel
-     * quel, sans passer par un fichier (certains sites communautaires proposent "copier/partager
-     * le JSON" plutôt qu'un téléchargement). Voir aussi MainActivity.handleIncomingShare : avant
-     * cet ajout, un partage de texte qui n'était pas reconnu comme une URL ne faisait
-     * strictement rien — aucun message, aucune erreur — ce qui donnait l'impression que l'import
-     * était cassé alors que rien n'avait simplement été tenté.
+     * Import direct depuis un texte brut — un JSON de fiche personnage collé ou partagé tel quel.
      */
-    suspend fun importFromText(text: String): ImportResult = withContext(Dispatchers.IO) {
-        importFromBytesInternal(text.toByteArray(Charsets.UTF_8))
+    suspend fun importFromText(text: String, autoTranslateFrench: Boolean = true): ImportResult = withContext(Dispatchers.IO) {
+        importFromBytesInternal(text.toByteArray(Charsets.UTF_8), autoTranslateFrench)
     }
 
     /**
      * Import direct depuis une URL (image PNG avec fiche embarquée, ou JSON brut).
-     * @param cookieHeader en-tête `Cookie` optionnel (session du site), utilisé quand ce lien de
-     * téléchargement provient du navigateur intégré ([com.opencompanion.app.ui.browse.CharacterBrowserScreen])
-     * et que le site exige d'être connecté pour servir le fichier — une requête HTTP "à froid"
-     * sans les cookies de la page recevrait sinon une erreur 401/403 alors que le fichier est
-     * bien accessible depuis la page elle-même.
      */
-    suspend fun importFromUrl(url: String, cookieHeader: String? = null): ImportResult = withContext(Dispatchers.IO) {
+    suspend fun importFromUrl(
+        url: String,
+        cookieHeader: String? = null,
+        autoTranslateFrench: Boolean = true,
+    ): ImportResult = withContext(Dispatchers.IO) {
         var connection: HttpURLConnection? = null
         try {
             connection = (URL(url).openConnection() as HttpURLConnection).apply {
@@ -73,7 +67,7 @@ class CharacterImportManager(
                 return@withContext ImportResult.Failure("Le serveur a répondu ${connection.responseCode}")
             }
             val bytes = connection.inputStream.use { it.readBytes() }
-            importFromBytesInternal(bytes)
+            importFromBytesInternal(bytes, autoTranslateFrench)
         } catch (e: Exception) {
             ImportResult.Failure(e.message ?: "Erreur réseau")
         } finally {

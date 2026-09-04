@@ -65,9 +65,9 @@ class CharacterBrowserViewModel(
         viewModelScope.launch {
             val trimmed = pageText?.trim()
             val result = if (!trimmed.isNullOrEmpty() && trimmed.first() == '{') {
-                importManager.importFromText(trimmed)
+                importManager.importFromText(trimmed, autoTranslateFrench)
             } else {
-                importManager.importFromUrl(url, cookieHeader)
+                importManager.importFromUrl(url, cookieHeader, autoTranslateFrench)
             }
             report(result, autoTranslateFrench)
         }
