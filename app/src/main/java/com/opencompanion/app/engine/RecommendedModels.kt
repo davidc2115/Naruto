@@ -93,8 +93,8 @@ object RecommendedModels {
             approxSizeGb = 2.02,
             paramCount = "3,2 Md de paramètres",
             license = "Llama 3.2 Community License",
-            downloadUrl = "https://huggingface.co/cognitivecomputations/Dolphin-2.9.4-llama3.2-3b-GGUF/resolve/main/dolphin-2.9.4-llama3.2-3b-q4_k_m.gguf?download=true",
-            fileName = "dolphin-2.9.4-llama3.2-3b-q4_k_m.gguf",
+            downloadUrl = "https://huggingface.co/mradermacher/Llama-3.2-3B-Instruct-uncensored-GGUF/resolve/main/Llama-3.2-3B-Instruct-uncensored.Q4_K_M.gguf?download=true",
+            fileName = "Llama-3.2-3B-Instruct-uncensored.Q4_K_M.gguf",
             note = "Modèle débridé sans filtre de sécurité, idéal pour le jeu de rôle adulte / NSFW libre et immersif.",
         ),
         // Bonsai 27B (Q1_0, ternaire) a été essayé puis retiré : signalé en pratique par un
