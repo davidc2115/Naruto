@@ -28,44 +28,39 @@ class CharacterBrowserViewModel(
     /** Téléchargement classique (http/https) intercepté dans la WebView — fiche PNG ou JSON
      *  servie comme un vrai fichier téléchargeable. [cookieHeader] permet de rester authentifié
      *  auprès du site si le lien de téléchargement nécessite la session ouverte dans la page. */
-    fun importFromDownloadUrl(url: String, cookieHeader: String?) {
+    fun importFromDownloadUrl(url: String, cookieHeader: String?, autoTranslateFrench: Boolean = true) {
         setImporting()
         viewModelScope.launch {
-            report(importManager.importFromUrl(url, cookieHeader))
+            report(importManager.importFromUrl(url, cookieHeader), autoTranslateFrench)
         }
     }
 
     /**
      * Téléchargement "blob:" (contenu généré en mémoire par la page, très courant pour un bouton
-     * "Télécharger" en JavaScript) : le contenu ne peut être récupéré que par la page elle-même,
-     * relu et renvoyé ici en Data URI base64 par le script injecté dans [CharacterBrowserScreen].
+     * "Télécharger" en JavaScript).
      */
-    fun importFromDataUri(dataUri: String) {
+    fun importFromDataUri(dataUri: String, autoTranslateFrench: Boolean = true) {
         setImporting()
         viewModelScope.launch {
             val base64 = dataUri.substringAfter(",", missingDelimiterValue = "")
             if (base64.isEmpty()) {
-                report(CharacterImportManager.ImportResult.Failure("Contenu téléchargé illisible"))
+                report(CharacterImportManager.ImportResult.Failure("Contenu téléchargé illisible"), autoTranslateFrench)
                 return@launch
             }
             val bytes = try {
                 Base64.decode(base64, Base64.DEFAULT)
             } catch (e: IllegalArgumentException) {
-                report(CharacterImportManager.ImportResult.Failure("Contenu téléchargé illisible"))
+                report(CharacterImportManager.ImportResult.Failure("Contenu téléchargé illisible"), autoTranslateFrench)
                 return@launch
             }
-            report(importManager.importFromBytes(bytes))
+            report(importManager.importFromBytes(bytes, autoTranslateFrench), autoTranslateFrench)
         }
     }
 
     /**
-     * Bouton "Importer cette page" : filet de rattrapage pour les sites qui affichent le JSON
-     * de la fiche directement comme texte de page plutôt que de proposer un téléchargement.
-     * Si la page ne ressemble pas à du JSON, on retente comme si l'URL actuelle était elle-même
-     * le fichier (image PNG avec fiche embarquée servie directement, sans détour par un clic
-     * "télécharger" que la WebView aurait pu intercepter).
+     * Bouton "Importer cette page" : filet de rattrapage pour les sites qui affichent le JSON.
      */
-    fun importCurrentPage(url: String, pageText: String?, cookieHeader: String?) {
+    fun importCurrentPage(url: String, pageText: String?, cookieHeader: String?, autoTranslateFrench: Boolean = true) {
         setImporting()
         viewModelScope.launch {
             val trimmed = pageText?.trim()
@@ -74,7 +69,7 @@ class CharacterBrowserViewModel(
             } else {
                 importManager.importFromUrl(url, cookieHeader)
             }
-            report(result)
+            report(result, autoTranslateFrench)
         }
     }
 
@@ -82,10 +77,13 @@ class CharacterBrowserViewModel(
         _isImporting.value = true
     }
 
-    private fun report(result: CharacterImportManager.ImportResult) {
+    private fun report(result: CharacterImportManager.ImportResult, translated: Boolean = false) {
         _isImporting.value = false
         _importMessage.value = when (result) {
-            is CharacterImportManager.ImportResult.Success -> "« ${result.name} » importé."
+            is CharacterImportManager.ImportResult.Success -> {
+                val suffix = if (translated) " (traduit en FR 🇫🇷)" else ""
+                "« ${result.name} » importé$suffix."
+            }
             is CharacterImportManager.ImportResult.Failure -> "Import impossible : ${result.reason}"
         }
     }

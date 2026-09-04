@@ -110,14 +110,6 @@ object PromptBuilder {
             "dit pas à voix haute, s'écrivent entre (parenthèses), par exemple (il se demande si " +
             "c'est une bonne idée d'en parler maintenant). N'utilise pas forcément les trois à " +
             "chaque message — seulement quand la scène s'y prête — mais évite les réponses qui ne " +
-            "Structure chacune de tes réponses comme dans un roman ou un jeu de rôle textuel, en " +
-            "mélangeant naturellement trois éléments : le dialogue s'écrit normalement, sans " +
-            "balise particulière ; les actions et le langage corporel du personnage (gestes, " +
-            "expressions, déplacements) s'écrivent entre *astérisques*, par exemple " +
-            "*s'approche et penche la tête* ; et les pensées intérieures du personnage, qu'il ne " +
-            "dit pas à voix haute, s'écrivent entre (parenthèses), par exemple (il se demande si " +
-            "c'est une bonne idée d'en parler maintenant). N'utilise pas forcément les trois à " +
-            "chaque message — seulement quand la scène s'y prête — mais évite les réponses qui ne " +
             "sont qu'un mur de dialogue sans aucune action ni pensée."
 
     /**

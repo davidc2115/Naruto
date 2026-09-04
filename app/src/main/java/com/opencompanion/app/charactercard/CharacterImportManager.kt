@@ -83,16 +83,13 @@ class CharacterImportManager(
 
     /**
      * Point d'entrée public pour un import déjà réduit à des octets bruts — utilisé par
-     * [importFromUri]/[importFromText]/[importFromUrl] ci-dessus, et directement par le
-     * navigateur intégré pour les téléchargements servis en `blob:` (le contenu n'existe que
-     * dans la mémoire de la page ; il est relu et renvoyé en base64 par du JavaScript injecté,
-     * voir CharacterBrowserScreen, puisqu'aucune requête réseau "classique" ne peut y accéder).
+     * [importFromUri]/[importFromText]/[importFromUrl] ci-dessus.
      */
-    suspend fun importFromBytes(bytes: ByteArray): ImportResult = withContext(Dispatchers.IO) {
-        importFromBytesInternal(bytes)
+    suspend fun importFromBytes(bytes: ByteArray, autoTranslateFrench: Boolean = true): ImportResult = withContext(Dispatchers.IO) {
+        importFromBytesInternal(bytes, autoTranslateFrench)
     }
 
-    private suspend fun importFromBytesInternal(bytes: ByteArray): ImportResult {
+    private suspend fun importFromBytesInternal(bytes: ByteArray, autoTranslateFrench: Boolean = true): ImportResult {
         val jsonText: String
         var avatarBytes: ByteArray? = null
 
@@ -104,9 +101,7 @@ class CharacterImportManager(
             avatarBytes = bytes
         } else {
             // .removePrefix(UTF8_BOM) : un fichier JSON téléchargé depuis un navigateur (Windows
-            // en particulier) commence très souvent par un BOM UTF-8 invisible. Sans ce
-            // nettoyage, jsonText.first() n'est jamais '{' et un fichier par ailleurs
-            // parfaitement valide est rejeté ici avant même d'atteindre CharacterCardCodec.
+            // en particulier) commence très souvent par un BOM UTF-8 invisible.
             jsonText = bytes.toString(Charsets.UTF_8).removePrefix(CharacterCardCodec.UTF8_BOM).trim()
             if (jsonText.isEmpty() || jsonText.first() != '{') {
                 return ImportResult.Failure("Format non reconnu : ni PNG avec fiche embarquée, ni JSON")
@@ -120,6 +115,9 @@ class CharacterImportManager(
         }
 
         var entity = cardData.toEntity()
+        if (autoTranslateFrench) {
+            entity = CharacterTranslator.translateEntityToFrench(entity)
+        }
         if (avatarBytes != null) {
             entity = entity.copy(avatarPath = saveAvatar(avatarBytes, entity.name))
         }

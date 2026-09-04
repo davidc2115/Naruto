@@ -43,22 +43,26 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+
+data class PopularSitePreset(val name: String, val url: String, val icon: String = "🌐")
+
+val POPULAR_SITES = listOf(
+    PopularSitePreset("Chub.ai", "https://chub.ai/"),
+    PopularSitePreset("JanitorAI", "https://janitorai.com/"),
+    PopularSitePreset("CharacterHub", "https://characterhub.org/"),
+    PopularSitePreset("SpicyChat", "https://spicychat.ai/"),
+    PopularSitePreset("Character.ai", "https://character.ai/"),
+    PopularSitePreset("Pygmalion", "https://pygmalion.chat/"),
+)
+
 /**
  * Navigateur intégré pour importer une fiche personnage directement depuis un site
  * communautaire, sans quitter l'appli ni passer par le sélecteur de fichiers du système.
- *
- * Fonctionnement :
- *  - L'utilisateur navigue librement (barre d'adresse + WebView classique) vers le site de son
- *    choix — volontairement pas de liste de sites imposée ici : le choix des sites communautaires
- *    à utiliser reste entièrement à l'utilisateur.
- *  - Un clic sur un lien de téléchargement PNG/JSON classique (requête http(s) normale) est
- *    intercepté par [android.webkit.WebView.setDownloadListener] et importé automatiquement,
- *    avec les cookies de la page pour rester authentifié si le site l'exige.
- *  - Beaucoup de sites modernes déclenchent plutôt un téléchargement "blob:" généré en JavaScript
- *    (le fichier n'existe qu'en mémoire dans la page) : dans ce cas, un petit script est injecté
- *    pour relire ce blob et le renvoyer ici en base64 via [BlobImportBridge].
- *  - Si un site affiche simplement le JSON de la fiche comme texte de page (au lieu d'un vrai
- *    téléchargement), le bouton "Importer cette page" ci-dessous sert de filet de rattrapage.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SetJavaScriptEnabled")
@@ -76,13 +80,12 @@ fun CharacterBrowserScreen(
     var currentUrl by remember { mutableStateOf("") }
     var loadProgress by remember { mutableStateOf(0) }
     var canGoBack by remember { mutableStateOf(false) }
+    var autoTranslateFr by remember { mutableStateOf(true) }
 
     val webView = remember {
         WebView(context).apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
-            // Cookies nécessaires pour que la session du site (connexion, préférences d'âge/
-            // contenu propres au site) suive jusqu'au lien de téléchargement intercepté.
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
         }
@@ -120,7 +123,7 @@ fun CharacterBrowserScreen(
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
                     verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                 ) {
                     OutlinedTextField(
@@ -134,6 +137,28 @@ fun CharacterBrowserScreen(
                         Icon(Icons.Filled.PlayArrow, contentDescription = "Aller")
                     }
                 }
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    item {
+                        FilterChip(
+                            selected = autoTranslateFr,
+                            onClick = { autoTranslateFr = !autoTranslateFr },
+                            label = { Text("🌐 Traduire en FR à l'import") },
+                        )
+                    }
+                    items(POPULAR_SITES) { site ->
+                        AssistChip(
+                            onClick = {
+                                addressText = site.url
+                                webView.loadUrl(site.url)
+                            },
+                            label = { Text("${site.icon} ${site.name}") },
+                        )
+                    }
+                }
             }
         },
         floatingActionButton = {
@@ -145,7 +170,7 @@ fun CharacterBrowserScreen(
                     webView.evaluateJavascript(
                         "(function(){return document.body ? document.body.innerText : '';})();",
                     ) { rawResult ->
-                        viewModel.importCurrentPage(currentUrl, unescapeJsString(rawResult), cookies)
+                        viewModel.importCurrentPage(currentUrl, unescapeJsString(rawResult), cookies, autoTranslateFr)
                     }
                 },
             )
@@ -175,20 +200,16 @@ fun CharacterBrowserScreen(
                         }
                         addJavascriptInterface(
                             BlobImportBridge(
-                                onReady = { dataUri -> viewModel.importFromDataUri(dataUri) },
+                                onReady = { dataUri -> viewModel.importFromDataUri(dataUri, autoTranslateFr) },
                             ),
                             "AndroidCardImporter",
                         )
                         setDownloadListener { url, _, _, _, _ ->
                             if (url.startsWith("blob:")) {
-                                // Un blob: n'existe qu'en mémoire côté page : on demande à la page
-                                // elle-même de le relire et de nous le renvoyer en base64, plutôt
-                                // que de tenter un GET classique dessus (impossible, pas une vraie
-                                // ressource réseau).
                                 evaluateJavascript(BLOB_CAPTURE_JS.replace("__BLOB_URL__", url), null)
                             } else {
                                 val cookies = CookieManager.getInstance().getCookie(url)
-                                viewModel.importFromDownloadUrl(url, cookies)
+                                viewModel.importFromDownloadUrl(url, cookies, autoTranslateFr)
                             }
                         }
                     }
