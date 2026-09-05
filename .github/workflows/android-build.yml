@@ -34,12 +34,14 @@ jobs:
         # YAML, signature d'API) n'ont jamais réglé le vrai problème : il n'y avait pas d'erreur de
         # code à corriger. Un fichier swap donne au compilateur la marge dont il a besoin plutôt
         # que d'échouer brutalement (plus lent dans le pire cas, mais fiable).
-        run: |
-          sudo fallocate -l 8G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
-          free -h
+        #
+        # Premier essai (fallocate manuel sur /swapfile) échoué : "fallocate failed: Text file
+        # busy" — l'image Ubuntu des runners GitHub a déjà un fichier swap actif à ce chemin
+        # précis. On utilise donc une action dédiée et maintenue, qui gère elle-même le
+        # dimensionnement/l'emplacement du fichier plutôt que de refaire ce calcul à la main.
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 8
 
       - name: JDK 17
         uses: actions/setup-java@v4

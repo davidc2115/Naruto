@@ -51,10 +51,16 @@ tue le processus (`Killed`, message de l'OOM killer du cgroup — **pas** un mes
 compilateur). C'est pour ça que les tentatives de correction précédentes ne marchaient jamais :
 il n'y avait pas de bug de code à corriger, juste pas assez de mémoire pendant la compilation.
 
-**Correctif appliqué** (`.github/workflows/android-build.yml`) : un fichier swap de 8 Go est créé
-juste après le clonage du dépôt, avant toute étape lourde. C'est la mitigation standard pour ce
-problème connu de `ggml-vulkan` sur des machines à mémoire limitée — plus lent dans le pire cas
-(swap), mais ça ne plante plus.
+**Correctif appliqué** (`.github/workflows/android-build.yml`) : 8 Go de swap ajoutés juste après
+le clonage du dépôt, avant toute étape lourde. C'est la mitigation standard pour ce problème connu
+de `ggml-vulkan` sur des machines à mémoire limitée — plus lent dans le pire cas (swap), mais ça ne
+plante plus.
+
+Premier essai (script `fallocate -l 8G /swapfile` à la main) : a lui-même échoué en CI —
+`fallocate: fallocate failed: Text file busy` — parce que l'image Ubuntu des runners GitHub
+Actions a déjà un fichier swap actif à ce chemin précis (`/swapfile`), donc l'écrire par-dessus
+échoue. Corrigé en passant par l'action dédiée `pierotofy/set-swap-space`, qui gère elle-même le
+dimensionnement et l'emplacement plutôt que de refaire ce calcul à la main.
 
 **Validé** : recompilé `opencompanion_bridge.cpp.o` seul (a réussi du premier coup, avant même le
 crash — la correction de code du bot était donc un faux positif) ; `mul_mm.comp.cpp` recompilé
