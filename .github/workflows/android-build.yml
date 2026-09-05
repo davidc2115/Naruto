@@ -58,7 +58,7 @@ jobs:
         # shaders GLSL en SPIR-V au moment du build et a besoin des en-têtes SPIR-V/Vulkan
         # pour se configurer. Sans eux, CMake échoue avec "Could NOT find Vulkan (missing:
         # glslc)" puis "Could not find a package configuration file... SPIRV-Headers".
-        run: sudo apt-get update -qq && sudo apt-get install -y glslc spirv-headers libvulkan-dev
+        run: sudo apt-get update -qq && sudo apt-get install -y shaderc spirv-headers libvulkan-dev
 
       - name: Rendre gradlew exécutable
         run: chmod +x ./gradlew
