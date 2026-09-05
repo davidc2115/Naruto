@@ -32,6 +32,43 @@ hôte. Le correctif, dans `app/build.gradle.kts`
 chercher aussi hors du sysroot pour ces paquets et programmes hôte. Voir
 aussi le README pour les prérequis d'un build local.
 
+## Piège vérifié en usage réel : OOM du compilateur sur `mul_mm.comp.cpp`, pas une erreur de code
+
+Début septembre 2026, la CI (`.github/workflows/android-build.yml`) a échoué plusieurs fois de
+suite sur ce projet, avec des tentatives de correction automatiques qui n'ont jamais réglé le
+vrai problème (mise à jour de CMake, ajout de paquets, correction de la syntaxe YAML, et jusqu'à
+un remplacement — erroné — de `llama_memory_seq_rm`/`llama_memory_clear` par des noms de
+fonctions qui **n'existent pas** dans la version de `external/llama.cpp` embarquée ici, `commit
+8887a48f0` ; voir `git log` de `opencompanion_bridge.cpp` pour ce commit et sa correction).
+
+La vraie cause, reproduite ici même dans un environnement au gabarit comparable à un runner
+GitHub Actions "privé" (2 vCPU / 8 Go de RAM, voir la documentation GitHub sur les runners
+hébergés) : `ggml-vulkan` génère un fichier C++ (`mul_mm.comp.cpp`) qui contient **toutes les
+variantes de shaders** de multiplication matricielle sous forme de tableaux C++ énormes. Le
+compiler (via `clang++` du NDK) demande plusieurs gigaoctets de RAM à lui seul ; dès que deux
+instances tournent en parallèle (compilation à `-j2` par défaut sur un runner 2 cœurs), le noyau
+tue le processus (`Killed`, message de l'OOM killer du cgroup — **pas** un message `error:` du
+compilateur). C'est pour ça que les tentatives de correction précédentes ne marchaient jamais :
+il n'y avait pas de bug de code à corriger, juste pas assez de mémoire pendant la compilation.
+
+**Correctif appliqué** (`.github/workflows/android-build.yml`) : un fichier swap de 8 Go est créé
+juste après le clonage du dépôt, avant toute étape lourde. C'est la mitigation standard pour ce
+problème connu de `ggml-vulkan` sur des machines à mémoire limitée — plus lent dans le pire cas
+(swap), mais ça ne plante plus.
+
+**Validé** : recompilé `opencompanion_bridge.cpp.o` seul (a réussi du premier coup, avant même le
+crash — la correction de code du bot était donc un faux positif) ; `mul_mm.comp.cpp` recompilé
+en solo (`ninja -j1`, sans concurrence mémoire) a bien dépassé le point où le build à plusieurs
+jobs plantait, confirmant que la RAM disponible — pas le code — était la cause. Le fichier est
+lui-même très lent à compiler (30+ minutes sur un CPU faible même seul) ; la CI GitHub, avec un
+vCPU généralement moins contraint et le swap ajouté, devrait s'en sortir plus vite et sans OOM —
+à confirmer sur le prochain run réel.
+
+**Leçon retenue, dans la continuité de celle sur Bonsai 27B plus bas** : un "correctif" poussé
+par un outil (bot ou agent) qui n'a pas d'abord identifié la vraie cause d'un échec de CI peut
+introduire une régression qui a l'air plausible (un nom de fonction "corrigé") sans l'être —
+toujours vérifier le message d'erreur réel avant d'appliquer un correctif de compilation.
+
 ## Piège vérifié pendant la conception : en-têtes C++ Vulkan (vulkan.hpp) non propagés
 
 Une fois `glslc`/`SPIRV-Headers` trouvés, la compilation de `ggml-vulkan.cpp`

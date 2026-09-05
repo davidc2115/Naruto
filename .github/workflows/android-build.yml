@@ -24,6 +24,23 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Ajouter du swap (évite un OOM kill pendant la compilation Vulkan)
+        # La vraie cause des échecs de build récents n'était PAS une erreur de compilation :
+        # un des fichiers générés par ggml-vulkan (mul_mm.comp.cpp, qui contient toutes les
+        # variantes de shaders de multiplication matricielle) a besoin de plus de RAM que ce que
+        # ce runner en offre par défaut. Le compilateur (clang++) se fait tuer par l'OOM killer du
+        # noyau en plein milieu ("Killed", sans aucun message "error:") — ce qui explique pourquoi
+        # les tentatives de correction précédentes (version de CMake, paquets manquants, syntaxe
+        # YAML, signature d'API) n'ont jamais réglé le vrai problème : il n'y avait pas d'erreur de
+        # code à corriger. Un fichier swap donne au compilateur la marge dont il a besoin plutôt
+        # que d'échouer brutalement (plus lent dans le pire cas, mais fiable).
+        run: |
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
       - name: JDK 17
         uses: actions/setup-java@v4
         with:

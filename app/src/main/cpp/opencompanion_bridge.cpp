@@ -322,11 +322,11 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
                 common_prefix++;
             }
         }
-        if (!llama_kv_cache_seq_rm(session->ctx, /* seq_id */ 0,
+        if (!llama_memory_seq_rm(llama_get_memory(session->ctx), /* seq_id */ 0,
                                   static_cast<llama_pos>(common_prefix), -1)) {
             // Rare (dépend du backend) : la suppression partielle a échoué, on repart de zéro
             // plutôt que de risquer un cache incohérent.
-            llama_kv_cache_clear(session->ctx);
+            llama_memory_clear(llama_get_memory(session->ctx), true);
             common_prefix = 0;
         }
 
