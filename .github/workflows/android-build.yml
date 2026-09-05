@@ -68,7 +68,12 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build APK debug (arm64-v8a, avec Vulkan)
-        run: ./gradlew :app:assembleDebug --stacktrace -PabiFilters=arm64-v8a || (echo "=== NATIVE BUILD LOGS DUMP ===" && find app/.cxx app/build -name "*.log" -exec echo "--- LOG: {} ---" \; -exec cat {} \; && exit 1)
+        run: |
+          ./gradlew :app:assembleDebug --stacktrace -PabiFilters=arm64-v8a || {
+            echo "=== NATIVE BUILD LOGS DUMP ==="
+            find app/.cxx app/build -name "*.log" -exec cat {} +
+            exit 1
+          }
 
       - name: Uploader l'APK
         uses: actions/upload-artifact@v4
