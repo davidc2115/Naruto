@@ -58,7 +58,11 @@ jobs:
         # shaders GLSL en SPIR-V au moment du build et a besoin des en-têtes SPIR-V/Vulkan
         # pour se configurer. Sans eux, CMake échoue avec "Could NOT find Vulkan (missing:
         # glslc)" puis "Could not find a package configuration file... SPIRV-Headers".
-        run: sudo apt-get update -qq && sudo apt-get install -y shaderc spirv-headers libvulkan-dev
+        run: |
+          wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+          sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-jammy.list https://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list
+          sudo apt-get update -qq
+          sudo apt-get install -y vulkan-sdk
 
       - name: Rendre gradlew exécutable
         run: chmod +x ./gradlew
