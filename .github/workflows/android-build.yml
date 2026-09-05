@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Cloner le dépôt (avec le sous-module llama.cpp)
         uses: actions/checkout@v4
@@ -49,6 +49,7 @@ jobs:
       - name: Installer la plateforme et le NDK Android requis
         run: |
           ANDROID_SDK_ROOT="$ANDROID_HOME"
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses || true
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" \
             "platforms;android-36" "build-tools;36.0.0" "ndk;28.0.13004108" "cmake;3.31.5" > /dev/null
 

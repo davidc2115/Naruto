@@ -97,14 +97,16 @@ class ChatViewModel(
         }
     }
 
+    private val _engineState = combine(_streamingText, _status, _usingNano) { streaming, status, usingNano ->
+        Triple(streaming, status, usingNano)
+    }
+
     val uiState: StateFlow<ChatUiState> = combine(
         repository.observeCharacter(characterId),
         repository.observeMessages(characterId),
-        _streamingText,
-        _status,
-        _usingNano,
+        _engineState,
         settingsRepository.settings,
-    ) { character, messages, streaming, status, usingNano, settings ->
+    ) { character, messages, (streaming, status, usingNano), settings ->
         val modelName = settings.selectedModelPath?.let { path ->
             java.io.File(path).name.removeSuffix(".gguf")
         }
