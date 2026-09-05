@@ -43,49 +43,7 @@ set(GGML_CCACHE OFF CACHE BOOL "" FORCE)
 
 if(OPENCOMPANION_ENABLE_VULKAN)
     set(GGML_VULKAN ON CACHE BOOL "" FORCE)
-else()
-    set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
-endif()
 
-add_subdirectory(${LLAMA_DIR} llama_cpp_build)
-
-if(OPENCOMPANION_ENABLE_VULKAN AND TARGET ggml-vulkan)
-    # find_package(Vulkan) (appelé dans llama.cpp/ggml/src/ggml-vulkan/CMakeLists.txt)
-    # détecte correctement Vulkan_INCLUDE_DIR (passé depuis app/build.gradle.kts, voir
-    # -DVulkan_INCLUDE_DIR) : la variable est bien renseignée et Vulkan_FOUND=TRUE. Mais
-    # lors de la cross-compilation vers Android, ce répertoire ne se retrouve jamais comme
-    # flag -I effectif au moment de compiler ggml-vulkan.cpp (qui inclut directement
-    # <vulkan/vulkan.hpp>) : la cible échoue avec "vulkan/vulkan.hpp file not found".
-    #
-    # Root cause identifiée en inspectant CMakeCache.txt, le fichier build.ninja généré ET
-    # la sortie `clang++ -E -v` du compilateur NDK : la liste de recherche *implicite* du
-    # compilateur pour ce triplet cible se termine par ".../sysroot/usr/include" (dernier
-    # composant : "usr/include"). CMake calcule CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES pour
-    # ce compilateur et l'utilise pour filtrer, comme redondants, les répertoires ajoutés
-    # via target_include_directories() — et il le fait avec une comparaison qui traite
-    # notre /usr/include (chemin HÔTE) comme un doublon du usr/include du SYSROOT cible,
-    # alors que ce sont deux répertoires différents sur le disque (confirmé : aucun n'est
-    # un lien symbolique vers l'autre). Résultat : target_include_directories(ggml-vulkan
-    # PRIVATE /usr/include) modifie bien la propriété INCLUDE_DIRECTORIES de la cible
-    # (vérifié via get_target_property), mais CMake supprime silencieusement ce répertoire
-    # de la ligne de commande -I générée dans build.ninja.
-    #
-    # Contournement, étape 1 : passer le répertoire comme flag de compilation BRUT
-    # (target_compile_options avec -isystem) plutôt que comme propriété d'includes — les
-    # flags de compilation ne passent pas par cette déduplication et se retrouvent tels
-    # quels sur la ligne de commande.
-    #
-    # Contournement, étape 2 : sur Linux, "$ENV{VULKAN_SDK}/include" est absent et le seul
-    # répertoire trouvé est /usr/include lui-même (racine des en-têtes système Debian/Ubuntu,
-    # pas un répertoire dédié à Vulkan) : y ajouter -isystem expose TOUS les en-têtes glibc de
-    # la machine hôte au compilateur cross (NDK/bionic), ce qui casse la compilation
-    # différemment ("bits/wordsize.h file not found", des en-têtes glibc multiarch
-    # introuvables hors de leur propre arborescence). Les en-têtes Vulkan-Hpp
-    # (vulkan.hpp, vulkan_*.hpp) sont eux-mêmes autonomes (aucune dépendance glibc, seulement
-    # la STL C++ déjà fournie par le NDK) : on copie donc uniquement le sous-répertoire
-    # vulkan/ dans un dossier isolé du build, pour n'exposer que ces en-têtes-là et non le
-    # reste de /usr/include. Voir docs/VULKAN_NOTES.md pour le détail complet de cette
-    # investigation.
     find_path(OPENCOMPANION_VULKAN_HPP_DIR
         NAMES vulkan/vulkan.hpp
         PATHS
@@ -98,10 +56,6 @@ if(OPENCOMPANION_ENABLE_VULKAN AND TARGET ggml-vulkan)
         set(OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR "${CMAKE_BINARY_DIR}/opencompanion_vulkan_headers")
         file(COPY "${OPENCOMPANION_VULKAN_HPP_DIR}/vulkan" DESTINATION "${OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR}")
 
-        # ggml-vulkan.cpp inclut aussi <spirv/unified1/spirv.hpp> (paquet spirv-headers,
-        # même problème : uniquement présent sous la racine hôte /usr/include). Même
-        # traitement — copie isolée du seul sous-répertoire spirv/, self-contained lui
-        # aussi (pas de dépendance glibc).
         find_path(OPENCOMPANION_SPIRV_HPP_DIR
             NAMES spirv/unified1/spirv.hpp
             PATHS
@@ -113,22 +67,15 @@ if(OPENCOMPANION_ENABLE_VULKAN AND TARGET ggml-vulkan)
         )
         if(OPENCOMPANION_SPIRV_HPP_DIR)
             file(COPY "${OPENCOMPANION_SPIRV_HPP_DIR}/spirv" DESTINATION "${OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR}")
-        else()
-            message(WARNING
-                "spirv/unified1/spirv.hpp introuvable : la compilation du backend Vulkan va "
-                "probablement échouer. Installez le paquet spirv-headers (Debian/Ubuntu) ou "
-                "le Vulkan SDK LunarG. Voir docs/VULKAN_NOTES.md.")
         endif()
 
-        target_compile_options(ggml-vulkan PRIVATE "-isystem${OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR}")
-    else()
-        message(WARNING
-            "vulkan/vulkan.hpp introuvable (ni $ENV{VULKAN_SDK}/include ni /usr/include) : "
-            "la compilation du backend Vulkan va probablement échouer. Installez le "
-            "paquet fournissant les en-têtes C++ de Vulkan (ex. libvulkan-dev sur "
-            "Debian/Ubuntu) ou le Vulkan SDK LunarG. Voir docs/VULKAN_NOTES.md.")
+        add_compile_options("-isystem${OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR}")
     endif()
+else()
+    set(GGML_VULKAN OFF CACHE BOOL "" FORCE)
 endif()
+
+add_subdirectory(${LLAMA_DIR} llama_cpp_build)
 
 # --- Pont JNI ----------------------------------------------------------------
 add_library(opencompanion_bridge SHARED
