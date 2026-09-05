@@ -91,6 +91,7 @@ if(OPENCOMPANION_ENABLE_VULKAN AND TARGET ggml-vulkan)
         PATHS
             "$ENV{VULKAN_SDK}/include"
             /usr/include
+            /usr/local/include
         NO_CMAKE_FIND_ROOT_PATH
     )
     if(OPENCOMPANION_VULKAN_HPP_DIR)
@@ -106,6 +107,8 @@ if(OPENCOMPANION_ENABLE_VULKAN AND TARGET ggml-vulkan)
             PATHS
                 "$ENV{VULKAN_SDK}/include"
                 /usr/include
+                /usr/local/include
+                /usr/include/spirv-headers
             NO_CMAKE_FIND_ROOT_PATH
         )
         if(OPENCOMPANION_SPIRV_HPP_DIR)
