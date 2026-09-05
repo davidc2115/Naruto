@@ -56,6 +56,21 @@ if(OPENCOMPANION_ENABLE_VULKAN)
         set(OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR "${CMAKE_BINARY_DIR}/opencompanion_vulkan_headers")
         file(COPY "${OPENCOMPANION_VULKAN_HPP_DIR}/vulkan" DESTINATION "${OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR}")
 
+        # vulkan_core.h inclut aussi <vk_video/vulkan_video_codec_*.h> (extensions vidéo, un
+        # sous-répertoire séparé du même paquet Vulkan-Headers que vulkan/) — sans lui, la
+        # compilation échoue avec "vk_video/vulkan_video_codec_av1std.h file not found" dès que
+        # vulkan_core.h est inclus indirectement (ce qui arrive toujours via vulkan.hpp). Même
+        # traitement que vulkan/ et spirv/ ci-dessous : copie isolée, pas d'exposition du reste
+        # de /usr/include.
+        if(EXISTS "${OPENCOMPANION_VULKAN_HPP_DIR}/vk_video")
+            file(COPY "${OPENCOMPANION_VULKAN_HPP_DIR}/vk_video" DESTINATION "${OPENCOMPANION_VULKAN_HPP_ISOLATED_DIR}")
+        else()
+            message(WARNING
+                "vk_video/ introuvable à côté de vulkan/ (${OPENCOMPANION_VULKAN_HPP_DIR}) : la "
+                "compilation du backend Vulkan va probablement échouer sur "
+                "'vk_video/vulkan_video_codec_av1std.h file not found'. Voir docs/VULKAN_NOTES.md.")
+        endif()
+
         find_path(OPENCOMPANION_SPIRV_HPP_DIR
             NAMES spirv/unified1/spirv.hpp
             PATHS

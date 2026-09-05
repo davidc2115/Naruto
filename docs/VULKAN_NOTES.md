@@ -32,6 +32,24 @@ hôte. Le correctif, dans `app/build.gradle.kts`
 chercher aussi hors du sysroot pour ces paquets et programmes hôte. Voir
 aussi le README pour les prérequis d'un build local.
 
+## Piège vérifié en usage réel : `vk_video/` manquant dans les en-têtes Vulkan isolés
+
+Une fois l'OOM CI réglé (section suivante), la compilation a échoué une marche plus loin,
+toujours sur `ggml-vulkan.cpp` :
+`vulkan_core.h:12325:10: fatal error: 'vk_video/vulkan_video_codec_av1std.h' file not found`.
+
+Rappel du contexte (voir la section "en-têtes C++ Vulkan" plus bas) : pour contourner un bug de
+déduplication de CMake, seul le sous-répertoire `vulkan/` (et `spirv/` pour SPIR-V) de
+`/usr/include` est copié dans un dossier isolé exposé au compilateur — pas tout `/usr/include`,
+pour ne pas lui exposer les en-têtes glibc de la machine hôte. Ce qui n'avait pas été anticipé :
+`vulkan_core.h` inclut aussi `<vk_video/vulkan_video_codec_*.h>` (extensions vidéo, ajoutées au
+paquet Vulkan-Headers depuis 2023) — un **troisième** sous-répertoire du même paquet, absent de
+la copie isolée. Corrigé dans `app/src/main/cpp/CMakeLists.txt` : `vk_video/` est copié au même
+titre que `vulkan/` et `spirv/`, avec le même avertissement CMake s'il venait à manquer.
+
+**Validé** : reconfiguré CMake et recompilé `ggml-vulkan.cpp.o` seul après le correctif — le
+dossier isolé contient bien `vk_video/` et la compilation aboutit sans erreur.
+
 ## Piège vérifié en usage réel : OOM du compilateur sur `mul_mm.comp.cpp`, pas une erreur de code
 
 Début septembre 2026, la CI (`.github/workflows/android-build.yml`) a échoué plusieurs fois de
