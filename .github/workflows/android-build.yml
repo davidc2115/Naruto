@@ -51,7 +51,7 @@ jobs:
           ANDROID_SDK_ROOT="$ANDROID_HOME"
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses || true
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" \
-            "platforms;android-36" "build-tools;36.0.0" "ndk;28.0.13004108" "cmake;3.31.5" > /dev/null
+            "platforms;android-36" "build-tools;36.0.0" "ndk;28.0.13004108" "cmake;3.22.1" > /dev/null
 
       - name: Installer les outils hôte requis par le backend Vulkan de ggml
         # Outils HÔTE (rien de tout ça n'est embarqué dans l'APK) : ggml-vulkan compile ses
