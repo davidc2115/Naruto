@@ -95,62 +95,95 @@ class ModelManager(private val context: Context) {
         val destName = sanitizeFileName(suggestedName.ifBlank { url.substringAfterLast('/') })
             .ifBlank { "modele-${System.currentTimeMillis()}.gguf" }
         val dest = uniqueDestination(destName)
-        var connection: HttpURLConnection? = null
-        try {
-            var currentUrl = url
-            var redirectCount = 0
-            while (redirectCount < 10) {
-                val conn = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
-                    requestMethod = "GET"
-                    connectTimeout = 30_000
-                    readTimeout = 30_000
-                    instanceFollowRedirects = true
-                    setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile) OpenCompanion/1.0")
-                }
-                conn.connect()
-                val code = conn.responseCode
-                if (code in 300..399) {
-                    val location = conn.getHeaderField("Location")
-                    conn.disconnect()
-                    if (!location.isNullOrBlank()) {
-                        currentUrl = URL(URL(currentUrl), location).toString()
-                        redirectCount++
-                        continue
-                    }
-                }
-                connection = conn
-                break
-            }
+        val buffer = ByteArray(1 shl 16)
+        var attempts = 0
+        var completed = false
 
-            val finalConn = connection ?: error("Impossible de se connecter à l'URL")
-            if (finalConn.responseCode !in 200..299) {
-                trySend(ImportProgress.Failed("Le serveur a répondu ${finalConn.responseCode}"))
-                close()
-                return@callbackFlow
-            }
-            val total = finalConn.contentLengthLong
-            var read = 0L
-            finalConn.inputStream.use { input ->
-                dest.outputStream().use { output ->
-                    val buffer = ByteArray(1 shl 16)
-                    while (true) {
-                        val n = input.read(buffer)
-                        if (n <= 0) break
-                        output.write(buffer, 0, n)
-                        read += n
-                        trySend(ImportProgress.Downloading(read, total))
+        while (attempts < 5 && !completed) {
+            val existingLength = if (dest.exists()) dest.length() else 0L
+            var connection: HttpURLConnection? = null
+            try {
+                var currentUrl = url
+                var redirectCount = 0
+                while (redirectCount < 10) {
+                    val conn = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
+                        requestMethod = "GET"
+                        connectTimeout = 30_000
+                        readTimeout = 120_000
+                        instanceFollowRedirects = true
+                        setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile) OpenCompanion/1.0")
+                        if (existingLength > 0) {
+                            setRequestProperty("Range", "bytes=$existingLength-")
+                        }
+                    }
+                    conn.connect()
+                    val code = conn.responseCode
+                    if (code in 300..399) {
+                        val location = conn.getHeaderField("Location")
+                        conn.disconnect()
+                        if (!location.isNullOrBlank()) {
+                            currentUrl = URL(URL(currentUrl), location).toString()
+                            redirectCount++
+                            continue
+                        }
+                    }
+                    connection = conn
+                    break
+                }
+
+                val finalConn = connection ?: error("Impossible de se connecter à l'URL")
+                val responseCode = finalConn.responseCode
+
+                val isRangeResponse = (responseCode == 206)
+                val isFullResponse = (responseCode in 200..299)
+
+                if (!isRangeResponse && !isFullResponse) {
+                    dest.delete()
+                    trySend(ImportProgress.Failed("Le serveur a répondu $responseCode"))
+                    close()
+                    return@callbackFlow
+                }
+
+                val append = isRangeResponse && existingLength > 0
+                var bytesRead = if (append) existingLength else 0L
+
+                val serverContentLength = finalConn.contentLengthLong
+                val total = if (isRangeResponse && serverContentLength > 0) {
+                    existingLength + serverContentLength
+                } else if (serverContentLength > 0) {
+                    serverContentLength
+                } else {
+                    -1L
+                }
+
+                val fileOutputStream = java.io.FileOutputStream(dest, append)
+                finalConn.inputStream.use { input ->
+                    fileOutputStream.use { output ->
+                        while (true) {
+                            val n = input.read(buffer)
+                            if (n <= 0) break
+                            output.write(buffer, 0, n)
+                            bytesRead += n
+                            trySend(ImportProgress.Downloading(bytesRead, total))
+                        }
                     }
                 }
+                completed = true
+                trySend(ImportProgress.Done(toLocalModel(dest)))
+            } catch (e: Exception) {
+                attempts++
+                if (attempts >= 5) {
+                    dest.delete()
+                    trySend(ImportProgress.Failed(e.message ?: e.toString()))
+                } else {
+                    kotlinx.coroutines.delay(2000)
+                }
+            } finally {
+                connection?.disconnect()
             }
-            trySend(ImportProgress.Done(toLocalModel(dest)))
-        } catch (e: Exception) {
-            dest.delete()
-            trySend(ImportProgress.Failed(e.message ?: e.toString()))
-        } finally {
-            connection?.disconnect()
-            close()
         }
-        awaitClose { connection?.disconnect() }
+        close()
+        awaitClose { }
     }.flowOn(Dispatchers.IO)
 
     private fun uniqueDestination(name: String): File {
