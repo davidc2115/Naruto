@@ -101,6 +101,12 @@ class InferenceEngine(private val context: Context) {
         ) {
             return@withLock Result.success(Unit)
         }
+        val file = java.io.File(modelPath)
+        if (!file.exists() || !file.isFile) {
+            return@withLock Result.failure(
+                IllegalArgumentException("Fichier de modèle introuvable : ${file.name}")
+            )
+        }
         unloadLocked()
 
         // nativeLoadModel() est un appel JNI bloquant, pas une fonction suspend : une fois entré

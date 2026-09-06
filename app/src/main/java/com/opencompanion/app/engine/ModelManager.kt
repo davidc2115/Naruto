@@ -97,21 +97,40 @@ class ModelManager(private val context: Context) {
         val dest = uniqueDestination(destName)
         var connection: HttpURLConnection? = null
         try {
-            connection = (URL(url).openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                connectTimeout = 15_000
-                readTimeout = 15_000
-                instanceFollowRedirects = true
+            var currentUrl = url
+            var redirectCount = 0
+            while (redirectCount < 10) {
+                val conn = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 30_000
+                    readTimeout = 30_000
+                    instanceFollowRedirects = true
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile) OpenCompanion/1.0")
+                }
+                conn.connect()
+                val code = conn.responseCode
+                if (code in 300..399) {
+                    val location = conn.getHeaderField("Location")
+                    conn.disconnect()
+                    if (!location.isNullOrBlank()) {
+                        currentUrl = URL(URL(currentUrl), location).toString()
+                        redirectCount++
+                        continue
+                    }
+                }
+                connection = conn
+                break
             }
-            connection.connect()
-            if (connection.responseCode !in 200..299) {
-                trySend(ImportProgress.Failed("Le serveur a répondu ${connection.responseCode}"))
+
+            val finalConn = connection ?: error("Impossible de se connecter à l'URL")
+            if (finalConn.responseCode !in 200..299) {
+                trySend(ImportProgress.Failed("Le serveur a répondu ${finalConn.responseCode}"))
                 close()
                 return@callbackFlow
             }
-            val total = connection.contentLengthLong
+            val total = finalConn.contentLengthLong
             var read = 0L
-            connection.inputStream.use { input ->
+            finalConn.inputStream.use { input ->
                 dest.outputStream().use { output ->
                     val buffer = ByteArray(1 shl 16)
                     while (true) {

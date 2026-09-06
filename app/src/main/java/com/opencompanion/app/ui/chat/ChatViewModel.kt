@@ -243,16 +243,32 @@ class ChatViewModel(
     }
 
     private suspend fun loadModelIfNeeded(settings: EngineSettings): Boolean {
+        val path = settings.selectedModelPath
+        if (path.isNullOrBlank()) {
+            _status.value = EngineStatus.NO_MODEL_CONFIGURED
+            _statusMessage.value = "Choisis un modèle dans les réglages avant de discuter."
+            return false
+        }
+        val file = java.io.File(path)
+        if (!file.exists() || !file.isFile) {
+            _status.value = EngineStatus.NO_MODEL_CONFIGURED
+            _statusMessage.value = "Le fichier du modèle sélectionné est introuvable sur l'appareil."
+            return false
+        }
+
         _status.value = EngineStatus.LOADING_MODEL
         val threads = if (settings.threads > 0) settings.threads else engine.recommendedThreadCount()
         val result = engine.ensureModelLoaded(
-            modelPath = settings.selectedModelPath!!,
+            modelPath = path,
             contextSize = settings.contextSize,
             useGpu = settings.useGpu,
             gpuLayers = settings.gpuLayers,
             threads = threads,
         )
-        if (result.isSuccess) return true
+        if (result.isSuccess) {
+            _status.value = EngineStatus.IDLE
+            return true
+        }
 
         // Même repli automatique CPU que pour un échec de GÉNÉRATION en GPU (voir runGeneration) :
         // sur certains appareils, le pilote Vulkan peut faire échouer — ou carrément bloquer,
