@@ -29,18 +29,62 @@ object CharacterCardCodec {
     }
 
     fun decode(jsonText: String): CharacterCardData {
-        // Un BOM UTF-8 en tête (très courant sur des fichiers exportés/enregistrés depuis un
-        // navigateur ou un éditeur Windows) fait échouer le parseur JSON, qui ne l'accepte pas
-        // avant le premier '{' — voir aussi CharacterImportManager.importFromBytes qui applique
-        // le même nettoyage avant même d'arriver ici ; on le refait ici en garde-fou, au cas où
-        // decode() est appelé directement avec un texte qui n'est jamais passé par ce filtre.
-        val root = json.parseToJsonElement(jsonText.removePrefix(UTF8_BOM)).jsonObject
-        val dataObject: JsonObject = if (root["spec"]?.jsonPrimitive?.contentOrNull?.startsWith("chara_card") == true) {
-            root["data"]?.jsonObject ?: root
-        } else {
-            root
+        val cleanJson = jsonText.removePrefix(UTF8_BOM).trim()
+        val root = json.parseToJsonElement(cleanJson).jsonObject
+
+        val dataObject: JsonObject = when {
+            root["spec"]?.jsonPrimitive?.contentOrNull?.startsWith("chara_card") == true -> {
+                root["data"]?.jsonObject ?: root
+            }
+            root.containsKey("data") && root["data"] is JsonObject -> {
+                root["data"]!!.jsonObject
+            }
+            root.containsKey("character") && root["character"] is JsonObject -> {
+                root["character"]!!.jsonObject
+            }
+            root.containsKey("chara") && root["chara"] is JsonObject -> {
+                root["chara"]!!.jsonObject
+            }
+            root.containsKey("card") && root["card"] is JsonObject -> {
+                root["card"]!!.jsonObject
+            }
+            else -> root
         }
-        return json.decodeFromJsonElement<CharacterCardData>(dataObject)
+
+        val decoded = try {
+            json.decodeFromJsonElement<CharacterCardData>(dataObject)
+        } catch (_: Exception) {
+            CharacterCardData()
+        }
+
+        fun getStringField(obj: JsonObject, vararg keys: String): String {
+            for (key in keys) {
+                val element = obj[key] ?: continue
+                val str = try { element.jsonPrimitive.contentOrNull } catch (_: Exception) { null }
+                if (!str.isNullOrBlank()) return str
+            }
+            return ""
+        }
+
+        val finalName = decoded.name.ifBlank { getStringField(dataObject, "name", "char_name", "title") }
+        val finalDescription = decoded.description.ifBlank { getStringField(dataObject, "description", "char_persona", "summary", "persona", "definition") }
+        val finalPersonality = decoded.personality.ifBlank { getStringField(dataObject, "personality", "char_personality", "traits") }
+        val finalScenario = decoded.scenario.ifBlank { getStringField(dataObject, "scenario", "world_scenario", "situation") }
+        val finalFirstMes = decoded.firstMes.ifBlank { getStringField(dataObject, "first_mes", "greeting", "first_message", "intro") }
+        val finalMesExample = decoded.mesExample.ifBlank { getStringField(dataObject, "mes_example", "example_dialogue", "dialogue_examples", "mes_examples", "examples") }
+        val finalCreatorNotes = decoded.creatorNotes.ifBlank { getStringField(dataObject, "creator_notes", "comment", "notes") }
+        val finalSystemPrompt = decoded.systemPrompt.ifBlank { getStringField(dataObject, "system_prompt", "custom_text", "system_prompt_override") }
+
+        return decoded.copy(
+            name = finalName,
+            description = finalDescription,
+            personality = finalPersonality,
+            scenario = finalScenario,
+            firstMes = finalFirstMes,
+            mesExample = finalMesExample,
+            creatorNotes = finalCreatorNotes,
+            systemPrompt = finalSystemPrompt,
+        )
     }
 
     fun encode(entity: CharacterEntity): String {

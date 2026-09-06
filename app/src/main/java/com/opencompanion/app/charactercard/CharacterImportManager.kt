@@ -46,32 +46,68 @@ class CharacterImportManager(
     }
 
     /**
-     * Import direct depuis une URL (image PNG avec fiche embarquée, ou JSON brut).
+     * Import direct depuis une URL (image PNG avec fiche embarquée, JSON brut, ou page HTML).
      */
     suspend fun importFromUrl(
         url: String,
         cookieHeader: String? = null,
         autoTranslateFrench: Boolean = true,
     ): ImportResult = withContext(Dispatchers.IO) {
-        var connection: HttpURLConnection? = null
+        var currentUrl = url
+        var redirects = 0
+        val maxRedirects = 10
+        var bytes: ByteArray? = null
+        var lastResponseCode = -1
+
         try {
-            connection = (URL(url).openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                connectTimeout = 15_000
-                readTimeout = 15_000
-                instanceFollowRedirects = true
-                if (!cookieHeader.isNullOrBlank()) setRequestProperty("Cookie", cookieHeader)
+            while (redirects < maxRedirects) {
+                val connection = (URL(currentUrl).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 30_000
+                    readTimeout = 30_000
+                    instanceFollowRedirects = false
+                    setRequestProperty(
+                        "User-Agent",
+                        "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 OpenCompanion/1.0"
+                    )
+                    setRequestProperty(
+                        "Accept",
+                        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,application/json,*/*;q=0.8"
+                    )
+                    if (!cookieHeader.isNullOrBlank()) setRequestProperty("Cookie", cookieHeader)
+                }
+
+                try {
+                    lastResponseCode = connection.responseCode
+                    if (lastResponseCode in 300..399) {
+                        val location = connection.getHeaderField("Location")
+                        if (location.isNullOrBlank()) {
+                            return@withContext ImportResult.Failure("Redirection sans en-tête Location ($lastResponseCode)")
+                        }
+                        currentUrl = if (location.startsWith("http://") || location.startsWith("https://")) {
+                            location
+                        } else {
+                            URL(URL(currentUrl), location).toString()
+                        }
+                        redirects++
+                    } else if (lastResponseCode in 200..299) {
+                        bytes = connection.inputStream.use { it.readBytes() }
+                        break
+                    } else {
+                        return@withContext ImportResult.Failure("Le serveur a répondu $lastResponseCode")
+                    }
+                } finally {
+                    connection.disconnect()
+                }
             }
-            connection.connect()
-            if (connection.responseCode !in 200..299) {
-                return@withContext ImportResult.Failure("Le serveur a répondu ${connection.responseCode}")
+
+            if (bytes == null) {
+                return@withContext ImportResult.Failure("Trop de redirections HTTP (limite: $maxRedirects)")
             }
-            val bytes = connection.inputStream.use { it.readBytes() }
+
             importFromBytesInternal(bytes, autoTranslateFrench)
         } catch (e: Exception) {
             ImportResult.Failure(e.message ?: "Erreur réseau")
-        } finally {
-            connection?.disconnect()
         }
     }
 
@@ -94,10 +130,17 @@ class CharacterImportManager(
                 )
             avatarBytes = bytes
         } else {
-            // .removePrefix(UTF8_BOM) : un fichier JSON téléchargé depuis un navigateur (Windows
-            // en particulier) commence très souvent par un BOM UTF-8 invisible.
-            jsonText = bytes.toString(Charsets.UTF_8).removePrefix(CharacterCardCodec.UTF8_BOM).trim()
-            if (jsonText.isEmpty() || jsonText.first() != '{') {
+            val text = bytes.toString(Charsets.UTF_8).removePrefix(CharacterCardCodec.UTF8_BOM).trim()
+            if (text.startsWith("<!DOCTYPE", ignoreCase = true) || text.startsWith("<html", ignoreCase = true)) {
+                val extractedJson = tryExtractJsonFromHtml(text)
+                if (extractedJson != null) {
+                    jsonText = extractedJson
+                } else {
+                    return ImportResult.Failure("La page HTML ne contient pas de données de personnage reconnues")
+                }
+            } else if (text.isNotEmpty() && text.first() == '{') {
+                jsonText = text
+            } else {
                 return ImportResult.Failure("Format non reconnu : ni PNG avec fiche embarquée, ni JSON")
             }
         }
@@ -106,6 +149,10 @@ class CharacterImportManager(
             CharacterCardCodec.decode(jsonText)
         } catch (e: Exception) {
             return ImportResult.Failure("JSON de fiche personnage invalide : ${e.message}")
+        }
+
+        if (cardData.name.isBlank() && cardData.description.isBlank() && cardData.firstMes.isBlank()) {
+            return ImportResult.Failure("Aucune donnée de personnage n'a pu être extraite")
         }
 
         var entity = cardData.toEntity()
@@ -118,6 +165,26 @@ class CharacterImportManager(
 
         val id = repository.saveCharacter(entity)
         return ImportResult.Success(id, entity.name)
+    }
+
+    private fun tryExtractJsonFromHtml(html: String): String? {
+        val nextDataMatch = Regex("""<script\s+id="__NEXT_DATA__"\s+type="application/json">([^<]+)</script>""").find(html)
+        if (nextDataMatch != null) {
+            val jsonContent = nextDataMatch.groupValues[1]
+            if (jsonContent.contains("\"character\"") || jsonContent.contains("\"chara\"") || jsonContent.contains("\"card\"") || jsonContent.contains("\"name\"")) {
+                return jsonContent
+            }
+        }
+
+        val genericMatch = Regex("""<script[^>]*type="application/json"[^>]*>([^<]+)</script>""").findAll(html)
+        for (match in genericMatch) {
+            val content = match.groupValues[1].trim()
+            if (content.startsWith("{") && (content.contains("\"name\"") || content.contains("\"first_mes\"") || content.contains("\"description\""))) {
+                return content
+            }
+        }
+
+        return null
     }
 
     private fun saveAvatar(bytes: ByteArray, name: String): String {
