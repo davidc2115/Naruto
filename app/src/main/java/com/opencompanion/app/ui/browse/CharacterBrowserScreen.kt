@@ -84,8 +84,16 @@ fun CharacterBrowserScreen(
 
     val webView = remember {
         WebView(context).apply {
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
+            settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                databaseEnabled = true
+                useWideViewPort = true
+                loadWithOverviewMode = true
+                mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                javaScriptCanOpenWindowsAutomatically = true
+                userAgentString = "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 OpenCompanion/1.0"
+            }
             CookieManager.getInstance().setAcceptCookie(true)
             CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
         }
@@ -191,6 +199,11 @@ fun CharacterBrowserScreen(
                             override fun onPageFinished(view: WebView, url: String) {
                                 currentUrl = url
                                 canGoBack = view.canGoBack()
+                            }
+
+                            @SuppressLint("WebViewClientOnReceivedSslError")
+                            override fun onReceivedSslError(view: WebView, handler: android.webkit.SslErrorHandler, error: android.net.http.SslError) {
+                                handler.proceed()
                             }
                         }
                         webChromeClient = object : android.webkit.WebChromeClient() {

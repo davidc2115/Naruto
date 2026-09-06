@@ -111,7 +111,14 @@ class ModelManager(private val context: Context) {
                         connectTimeout = 30_000
                         readTimeout = 120_000
                         instanceFollowRedirects = true
-                        setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile) OpenCompanion/1.0")
+                        setRequestProperty(
+                            "User-Agent",
+                            "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 OpenCompanion/1.0"
+                        )
+                        setRequestProperty(
+                            "Accept",
+                            "*/*"
+                        )
                         if (existingLength > 0) {
                             setRequestProperty("Range", "bytes=$existingLength-")
                         }
@@ -138,10 +145,18 @@ class ModelManager(private val context: Context) {
                 val isFullResponse = (responseCode in 200..299)
 
                 if (!isRangeResponse && !isFullResponse) {
-                    dest.delete()
-                    trySend(ImportProgress.Failed("Le serveur a répondu $responseCode"))
-                    close()
-                    return@callbackFlow
+                    finalConn.disconnect()
+                    connection = null
+                    attempts++
+                    if (attempts >= 5) {
+                        dest.delete()
+                        trySend(ImportProgress.Failed("Le serveur a répondu $responseCode (échec après $attempts tentatives)"))
+                        close()
+                        return@callbackFlow
+                    } else {
+                        kotlinx.coroutines.delay(2000)
+                        continue
+                    }
                 }
 
                 val append = isRangeResponse && existingLength > 0
@@ -163,6 +178,7 @@ class ModelManager(private val context: Context) {
                             val n = input.read(buffer)
                             if (n <= 0) break
                             output.write(buffer, 0, n)
+                            output.flush()
                             bytesRead += n
                             trySend(ImportProgress.Downloading(bytesRead, total))
                         }
