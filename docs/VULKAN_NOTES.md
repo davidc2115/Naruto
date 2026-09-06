@@ -260,6 +260,40 @@ familles de problèmes sur Android :
   pause après un plantage, pour ne pas cacher un vrai bug matériel/pilote
   derrière un simple oubli de réactivation.
 
+## Piège vérifié en usage réel : chargement du modèle bloqué indéfiniment
+
+Premier vrai test sur un appareil physique (après les correctifs CI ci-dessus, qui avaient
+laissé le backend Vulkan jamais réellement testé hors du cloud) : l'app restait bloquée sur
+l'écran "chargement du modèle" sans jamais aboutir ni afficher d'erreur.
+
+Cause probable : `nativeLoadModel()` (JNI) est un appel **bloquant**, pas une fonction suspend.
+Avant ce correctif, `ensureModelLoaded()` l'appelait via un simple `withContext(Dispatchers.IO)`
+sans aucun délai — si l'appel natif se bloque réellement (le cas documenté plus haut : le pilote
+Vulkan d'un appareil qui bloque plutôt que d'échouer à l'initialisation), rien côté Kotlin ne
+pouvait s'en apercevoir ni reprendre la main : l'utilisateur restait bloqué sans recours, aucun
+message d'erreur, aucun moyen de continuer sans forcer la fermeture de l'app.
+
+**Correctif** (`InferenceEngine.ensureModelLoaded`) : l'appel natif est lancé sur son propre thread
+(`engineScope.async`) et attendu avec un délai de 45s (`withTimeoutOrNull`). Point important : un
+`withTimeoutOrNull` placé directement autour d'un appel bloquant ne sert à rien (il attend quand
+même la fin réelle de l'appel avant de constater le dépassement) — c'est `await()` sur le
+`Deferred` séparé qui est un vrai point de suspension annulable. Limite assumée : l'appel natif
+bloqué continue de tourner en arrière-plan (aucune API Kotlin ne peut interrompre un appel JNI
+bloquant en cours) ; s'il aboutit après coup, la session orpheline est libérée aussitôt pour ne
+pas fuir la mémoire native (un modèle peut peser plusieurs Go).
+
+Au niveau `ChatViewModel.loadModelIfNeeded` : même repli automatique CPU qu'un échec de
+génération GPU (voir plus haut) — un dépassement de délai avec GPU activé désactive le GPU pour
+la session et relance le chargement en CPU pur, une seule fois, avant d'afficher une vraie erreur
+si ça échoue aussi. Avant ce correctif, ce repli n'existait que pour les échecs de GÉNÉRATION,
+pas de CHARGEMENT — un point mort pour tout appareil dont le pilote Vulkan bloque dès l'init.
+
+**Non vérifié** : le vrai comportement du pilote Vulkan de l'appareil concerné (bloqué vs juste
+très lent), faute de logcat récupéré au moment du blocage — le délai de 45s est un choix
+raisonnable mais pas calibré sur mesure réelle. À ajuster si de vrais logs `adb logcat -s
+OpenCompanionNative` montrent un chargement légitimement plus long (gros modèle sur stockage lent
++ contexte proche de 16384) déclenchant ce filet à tort.
+
 ## Ce qui reste à valider sur de vrais appareils
 
 Ce projet a été conçu dans un environnement cloud sans GPU ni Vulkan : tout

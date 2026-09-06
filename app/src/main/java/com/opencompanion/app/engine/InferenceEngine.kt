@@ -2,13 +2,19 @@ package com.opencompanion.app.engine
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** Un tour de dialogue générique, indépendant du format texte final (voir applyChatTemplate). */
 data class ChatTurn(val role: String, val content: String)
@@ -46,6 +52,10 @@ class InferenceEngine(private val context: Context) {
     private var loadedWithGpu: Boolean = false
     private var loadedGpuLayers: Int = 0
     private val lifecycleMutex = Mutex()
+
+    // Scope de vie du moteur (survit à l'annulation d'un chargement en timeout, voir plus bas) :
+    // une seule instance d'InferenceEngine vit pour toute l'app, jamais fermée explicitement.
+    private val engineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /** true si CE build a été compilé avec le backend Vulkan (indépendant du GPU réel de l'appareil). */
     val vulkanCompiledIn: Boolean by lazy { LlamaBridge.nativeHasVulkanSupport() }
@@ -93,8 +103,43 @@ class InferenceEngine(private val context: Context) {
         }
         unloadLocked()
 
-        val newHandle = withContext(Dispatchers.IO) {
+        // nativeLoadModel() est un appel JNI bloquant, pas une fonction suspend : une fois entré
+        // dans le code C++ (lecture du fichier GGUF, et surtout initialisation du backend Vulkan —
+        // sur certains appareils, le pilote GPU peut bloquer indéfiniment à ce moment plutôt que
+        // d'échouer proprement, voir docs/VULKAN_NOTES.md), rien côté Kotlin ne peut l'interrompre :
+        // un withTimeoutOrNull() qui l'entourerait directement attendrait quand même la fin réelle
+        // de l'appel avant de constater le dépassement. On le lance donc sur son propre thread
+        // (engineScope, indépendant du withTimeoutOrNull qui suit) : ATTENDRE son résultat (await())
+        // est un vrai point de suspension, donc annulable — ça permet à l'appelant de reprendre la
+        // main après le délai plutôt que de rester bloqué sur "chargement du modèle" pour toujours,
+        // même si l'appel natif continue, lui, de tourner en arrière-plan sur son thread.
+        val loadDeferred = engineScope.async {
             LlamaBridge.nativeLoadModel(modelPath, contextSize, wantGpuLayers, threads)
+        }
+        val newHandle = withTimeoutOrNull(MODEL_LOAD_TIMEOUT_MS) { loadDeferred.await() }
+        if (newHandle == null) {
+            // Délai dépassé : on ne peut pas tuer l'appel natif en cours, seulement cesser de
+            // l'attendre. S'il finit par aboutir après coup, on libère aussitôt la session
+            // orpheline (elle ne sera jamais assignée à `handle`) pour ne pas fuir la mémoire
+            // native — sans ce nettoyage, une timeout suivie d'un chargement qui réussit quand
+            // même en arrière-plan laisserait un modèle entier (potentiellement plusieurs Go)
+            // chargé en mémoire sans jamais être libéré.
+            engineScope.launch {
+                val orphan = runCatching { loadDeferred.await() }.getOrNull()
+                if (orphan != null && orphan != 0L) {
+                    Log.w(
+                        "OpenCompanion",
+                        "Chargement natif abouti après le délai : libération de la session orpheline",
+                    )
+                    LlamaBridge.nativeFreeModel(orphan)
+                }
+            }
+            return@withLock Result.failure(
+                IllegalStateException(
+                    "Le chargement du modèle n'a pas répondu en ${MODEL_LOAD_TIMEOUT_MS / 1000}s " +
+                        "(souvent un pilote GPU Vulkan qui bloque à l'initialisation sur cet appareil)"
+                )
+            )
         }
         if (newHandle == 0L) {
             return@withLock Result.failure(
@@ -106,6 +151,12 @@ class InferenceEngine(private val context: Context) {
         loadedWithGpu = wantGpu
         loadedGpuLayers = wantGpuLayers
         Result.success(Unit)
+    }
+
+    private companion object {
+        /** Généreux : un gros modèle sur stockage lent + compilation des pipelines Vulkan peut
+         *  légitimement prendre du temps. Au-delà, on considère l'appareil bloqué plutôt que lent. */
+        const val MODEL_LOAD_TIMEOUT_MS = 45_000L
     }
 
     suspend fun unload() = lifecycleMutex.withLock { unloadLocked() }

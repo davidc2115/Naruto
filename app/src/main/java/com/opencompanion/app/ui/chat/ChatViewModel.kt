@@ -252,13 +252,23 @@ class ChatViewModel(
             gpuLayers = settings.gpuLayers,
             threads = threads,
         )
-        return if (result.isSuccess) {
-            true
-        } else {
-            _status.value = EngineStatus.LOAD_ERROR
-            _statusMessage.value = result.exceptionOrNull()?.message ?: "Échec du chargement du modèle"
-            false
+        if (result.isSuccess) return true
+
+        // Même repli automatique CPU que pour un échec de GÉNÉRATION en GPU (voir runGeneration) :
+        // sur certains appareils, le pilote Vulkan peut faire échouer — ou carrément bloquer,
+        // voir InferenceEngine.ensureModelLoaded et docs/VULKAN_NOTES.md — le CHARGEMENT du
+        // modèle, pas seulement la génération. Sans ce repli, un appareil au pilote GPU capricieux
+        // restait bloqué sur "chargement du modèle" (ou en échec) sans aucun recours.
+        if (settings.useGpu && !gpuRetryUsed) {
+            gpuRetryUsed = true
+            settingsRepository.markGpuUnstable()
+            _statusMessage.value = "Le GPU (Vulkan) n'a pas répondu pendant le chargement : nouvelle tentative en mode CPU."
+            return loadModelIfNeeded(settingsRepository.settings.first())
         }
+
+        _status.value = EngineStatus.LOAD_ERROR
+        _statusMessage.value = result.exceptionOrNull()?.message ?: "Échec du chargement du modèle"
+        return false
     }
 
     private suspend fun runGeneration(character: CharacterEntity, settings: EngineSettings, allowGpuRetry: Boolean) {
