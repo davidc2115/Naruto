@@ -44,16 +44,10 @@ data class UserProfile(
 data class EngineSettings(
     val selectedModelPath: String? = null,
     val useGpu: Boolean = true,
-    // 20 plutôt que « toutes les couches » : décharger la totalité du modèle sur le GPU (l'ancien
-    // comportement fixe) laisse le CPU inactif pendant toute la génération, ce qui n'est pas un
-    // vrai mode hybride CPU+GPU et peut aussi dépasser la VRAM disponible sur certains appareils.
-    // Avec une valeur inférieure au nombre réel de couches du modèle, llama.cpp répartit
-    // automatiquement le travail : le début du réseau tourne sur le GPU (Vulkan), le reste sur le
-    // CPU — les deux processeurs contribuent à chaque token plutôt que l'un ou l'autre en
-    // exclusivité. 20 convient pour les petits modèles proposés par défaut (1 à 4 Md de
-    // paramètres, ~22 à 36 couches) ; voir setGpuLayers/StepperRow (Réglages → Matériel) pour
-    // ajuster — 999 revient à l'ancien comportement (tout sur GPU), 0 au CPU pur.
-    val gpuLayers: Int = 20,
+    // 999 décharge la totalité des couches du réseau sur le GPU Vulkan quand le GPU est activé.
+    // Décharger partiellement (ex. 20 couches) imposait un va-et-vient synchrone entre CPU et GPU
+    // à chaque token sur mobile, ce qui ralentissait l'inférence de façon extrême.
+    val gpuLayers: Int = 999,
     val contextSize: Int = 4096,
     // 768 plutôt que 512 : un modèle "raisonneur" (Qwen3, preset par défaut) consomme souvent
     // 150 à 250 tokens dans un bloc <think>...</think> retiré de l'affichage (voir

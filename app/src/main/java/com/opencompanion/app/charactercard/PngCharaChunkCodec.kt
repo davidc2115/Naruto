@@ -29,52 +29,76 @@ object PngCharaChunkCodec {
     fun isPng(bytes: ByteArray): Boolean =
         bytes.size >= 8 && (0 until 8).all { bytes[it] == PNG_SIGNATURE[it] }
 
+    private val RECOGNIZED_KEYWORDS = setOf(
+        "chara", "ccv3", "chara_card_v2", "character", "character_card", "tavern", "data", "card", "Card"
+    )
+
     /** Extrait et décode le JSON de la fiche personnage embarquée, ou null si absente/invalide. */
     fun extractCharacterJson(bytes: ByteArray): String? {
         if (!isPng(bytes)) return null
 
         var offset = 8
-        var charaBase64: String? = null
-        var ccv3Base64: String? = null
+        var extractedRawText: String? = null
 
         while (offset + 8 <= bytes.size) {
             val length = readIntBE(bytes, offset)
-            if (length < 0) break // chunk > 2 Go : ne devrait jamais arriver pour une fiche texte
+            if (length < 0) break // chunk > 2 Go
             val type = String(bytes, offset + 4, 4, Charsets.US_ASCII)
             val dataStart = offset + 8
             if (dataStart + length + 4 > bytes.size) break
 
-            if (type == "tEXt") {
-                val chunk = bytes.copyOfRange(dataStart, dataStart + length)
-                val nullIndex = chunk.indexOf(0.toByte())
-                if (nullIndex > 0) {
-                    val keyword = String(chunk, 0, nullIndex, Charsets.ISO_8859_1)
-                    val text = String(chunk, nullIndex + 1, chunk.size - nullIndex - 1, Charsets.ISO_8859_1)
-                    when (keyword) {
-                        "chara" -> charaBase64 = text
-                        "ccv3" -> ccv3Base64 = text
+            val chunk = bytes.copyOfRange(dataStart, dataStart + length)
+            when (type) {
+                "tEXt" -> {
+                    val nullIndex = chunk.indexOf(0.toByte())
+                    if (nullIndex > 0) {
+                        val keyword = String(chunk, 0, nullIndex, Charsets.ISO_8859_1)
+                        if (keyword in RECOGNIZED_KEYWORDS && extractedRawText == null) {
+                            extractedRawText = String(chunk, nullIndex + 1, chunk.size - nullIndex - 1, Charsets.ISO_8859_1)
+                        }
                     }
                 }
-            } else if (type == "iTXt") {
-                val chunk = bytes.copyOfRange(dataStart, dataStart + length)
-                readItxtChunk(chunk)?.let { (keyword, text) ->
-                    when (keyword) {
-                        "chara" -> if (charaBase64 == null) charaBase64 = text
-                        "ccv3" -> if (ccv3Base64 == null) ccv3Base64 = text
+                "iTXt" -> {
+                    readItxtChunk(chunk)?.let { (keyword, text) ->
+                        if (keyword in RECOGNIZED_KEYWORDS && extractedRawText == null) {
+                            extractedRawText = text
+                        }
+                    }
+                }
+                "zTXt" -> {
+                    readZtxtChunk(chunk)?.let { (keyword, text) ->
+                        if (keyword in RECOGNIZED_KEYWORDS && extractedRawText == null) {
+                            extractedRawText = text
+                        }
                     }
                 }
             }
 
             offset = dataStart + length + 4 // + CRC
-            if (type == "IEND") break
+            if (type == "IEND" || extractedRawText != null) break
         }
 
-        val base64 = charaBase64 ?: ccv3Base64 ?: return null
+        val text = extractedRawText?.trim() ?: return null
+        if (text.startsWith("{")) {
+            return text
+        }
         return try {
-            String(Base64.decode(base64, Base64.DEFAULT), Charsets.UTF_8)
-        } catch (e: IllegalArgumentException) {
+            String(Base64.decode(text, Base64.DEFAULT), Charsets.UTF_8)
+        } catch (_: IllegalArgumentException) {
             null
         }
+    }
+
+    private fun readZtxtChunk(chunk: ByteArray): Pair<String, String>? {
+        val keywordEnd = chunk.indexOf(0.toByte())
+        if (keywordEnd <= 0 || keywordEnd + 2 >= chunk.size) return null
+        val keyword = String(chunk, 0, keywordEnd, Charsets.ISO_8859_1)
+        val compressionMethod = chunk[keywordEnd + 1].toInt()
+        if (compressionMethod != 0) return null
+
+        val compressedData = chunk.copyOfRange(keywordEnd + 2, chunk.size)
+        val decompressed = inflateZlib(compressedData) ?: return null
+        return keyword to String(decompressed, Charsets.UTF_8)
     }
 
     /**

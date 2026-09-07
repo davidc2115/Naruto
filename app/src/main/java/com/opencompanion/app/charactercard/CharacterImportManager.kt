@@ -176,12 +176,43 @@ class CharacterImportManager(
             }
         }
 
-        val genericMatch = Regex("""<script[^>]*type="application/json"[^>]*>([^<]+)</script>""").findAll(html)
+        val nuxtDataMatch = Regex("""<script\s+id="__NUXT_DATA__"[^>]*>([^<]+)</script>""").find(html)
+        if (nuxtDataMatch != null) {
+            val jsonContent = nuxtDataMatch.groupValues[1]
+            if (jsonContent.startsWith("[") || jsonContent.startsWith("{")) {
+                return jsonContent
+            }
+        }
+
+        val windowDataMatch = Regex("""window\.(?:__INITIAL_STATE__|__CARD__|__CHARACTER__|CHARACTER_DATA)\s*=\s*(\{[\s\S]+?\});""").find(html)
+        if (windowDataMatch != null) {
+            return windowDataMatch.groupValues[1]
+        }
+
+        val genericMatch = Regex("""<script[^>]*type="application/(?:ld\+)?json"[^>]*>([^<]+)</script>""").findAll(html)
         for (match in genericMatch) {
             val content = match.groupValues[1].trim()
-            if (content.startsWith("{") && (content.contains("\"name\"") || content.contains("\"first_mes\"") || content.contains("\"description\""))) {
+            if (content.startsWith("{") && (content.contains("\"name\"") || content.contains("\"first_mes\"") || content.contains("\"description\"") || content.contains("\"char_name\""))) {
                 return content
             }
+        }
+
+        // OpenGraph / Meta tag fallback for generic web pages
+        val ogTitle = Regex("""<meta\s+(?:property|name)="og:title"\s+content="([^"]+)"i""").find(html)?.groupValues?.get(1)
+            ?: Regex("""<title>([^<]+)</title>""").find(html)?.groupValues?.get(1)
+        val ogDesc = Regex("""<meta\s+(?:property|name)="(?:og:description|description)"\s+content="([^"]+)"i""").find(html)?.groupValues?.get(1)
+
+        if (!ogTitle.isNullOrBlank() && !ogDesc.isNullOrBlank()) {
+            val cleanTitle = ogTitle.substringBefore(" - ").substringBefore(" | ").trim()
+            return """
+                {
+                    "name": "$cleanTitle",
+                    "description": "$ogDesc",
+                    "personality": "",
+                    "scenario": "",
+                    "first_mes": "*se présente à vous* Bonjour ! Je suis $cleanTitle."
+                }
+            """.trimIndent()
         }
 
         return null
