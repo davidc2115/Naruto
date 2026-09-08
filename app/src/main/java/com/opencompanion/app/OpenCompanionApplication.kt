@@ -5,6 +5,7 @@ import com.opencompanion.app.charactercard.CharacterImportManager
 import com.opencompanion.app.data.AppDatabase
 import com.opencompanion.app.data.CharacterRepository
 import com.opencompanion.app.data.SettingsRepository
+import com.opencompanion.app.engine.CloudEngineBridge
 import com.opencompanion.app.engine.InferenceEngine
 import com.opencompanion.app.engine.ModelManager
 import com.opencompanion.app.engine.NanoBridge

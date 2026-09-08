@@ -48,29 +48,24 @@ android {
                 // GGML_VULKAN active le backend Vulkan (GPU) dans llama.cpp ; le
                 // backend CPU reste toujours compilé en secours (voir cpp/CMakeLists.txt
                 // et engine/InferenceEngine.kt pour le repli automatique à l'exécution).
-                //
-                // En CI GitHub Actions, -POPENCOMPANION_ENABLE_VULKAN=OFF désactive Vulkan
-                // pour éviter un OOM kill sur ggml-vulkan.cpp (ses shaders SPIR-V générés
-                // consomment plus de RAM que le runner n'en offre). Le CPU est le fallback
-                // automatique à l'exécution. En local, Vulkan est actif par défaut.
-                val enableVulkan = (project.findProperty("OPENCOMPANION_ENABLE_VULKAN") as String? ?: "ON").uppercase() != "OFF"
-                val vulkanFlag = if (enableVulkan) "ON" else "OFF"
-                val cmakeArgs = mutableListOf(
-                    "-DOPENCOMPANION_ENABLE_VULKAN=$vulkanFlag",
+                arguments += listOf(
+                    "-DOPENCOMPANION_ENABLE_VULKAN=ON",
                     "-DANDROID_STL=c++_shared",
-                    "-DCMAKE_BUILD_PARALLEL_LEVEL=4",
-                )
-                if (enableVulkan) {
-                    // Ces flags ne sont nécessaires que quand Vulkan est actif :
                     // find_package(SPIRV-Headers) et Vulkan (glslc) cherchent des paquets
-                    // installés sur la machine HÔTE (pas dans le sysroot NDK).
-                    cmakeArgs += listOf(
-                        "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH",
-                        "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=BOTH",
-                        "-DVulkan_INCLUDE_DIR=" + (System.getenv("VULKAN_SDK")?.let { "$it/include" } ?: "/usr/include"),
-                    )
-                }
-                arguments += cmakeArgs
+                    // installés sur la machine HÔTE qui compile (pas dans le sysroot NDK) :
+                    // sans ce réglage, le toolchain Android restreint find_package() au
+                    // seul sysroot NDK et échoue à les trouver même s'ils sont installés
+                    // (voir docs/VULKAN_NOTES.md pour le détail de l'erreur rencontrée).
+                    "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH",
+                    "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=BOTH",
+                    // find_package(Vulkan) détecte bien la version (via vulkan.pc / le pilote),
+                    // mais ggml-vulkan.cpp inclut directement <vulkan/vulkan.hpp> sans que le
+                    // répertoire d'en-têtes trouvé soit propagé aux flags -I de cette cible
+                    // précise. On le passe explicitement : $VULKAN_SDK/include si le Vulkan SDK
+                    // LunarG est utilisé (Windows/macOS/CI dédiée), sinon /usr/include qui est
+                    // l'emplacement standard de libvulkan-dev sur Debian/Ubuntu.
+                    "-DVulkan_INCLUDE_DIR=" + (System.getenv("VULKAN_SDK")?.let { "$it/include" } ?: "/usr/include"),
+                )
                 cppFlags += listOf("-std=c++17")
             }
         }

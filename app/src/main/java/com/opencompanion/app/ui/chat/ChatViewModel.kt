@@ -10,6 +10,7 @@ import com.opencompanion.app.data.EngineSettings
 import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.SettingsRepository
 import com.opencompanion.app.data.resolveCharacterPlaceholders
+import com.opencompanion.app.engine.CloudEngineBridge
 import com.opencompanion.app.engine.GenerationEvent
 import com.opencompanion.app.engine.GenerationParams
 import com.opencompanion.app.engine.InferenceEngine
