@@ -65,6 +65,7 @@ android {
                     // LunarG est utilisé (Windows/macOS/CI dédiée), sinon /usr/include qui est
                     // l'emplacement standard de libvulkan-dev sur Debian/Ubuntu.
                     "-DVulkan_INCLUDE_DIR=" + (System.getenv("VULKAN_SDK")?.let { "$it/include" } ?: "/usr/include"),
+                    "-DCMAKE_BUILD_PARALLEL_LEVEL=4",
                 )
                 cppFlags += listOf("-std=c++17")
             }
