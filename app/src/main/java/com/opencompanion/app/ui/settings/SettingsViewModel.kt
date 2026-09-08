@@ -189,6 +189,10 @@ class SettingsViewModel(
     fun setUserAge(value: Int?) = viewModelScope.launch { settingsRepository.setUserAge(value) }
     fun setUserGender(value: UserGender) = viewModelScope.launch { settingsRepository.setUserGender(value) }
 
+    fun setCloudApiKey(key: String) = viewModelScope.launch { settingsRepository.setCloudApiKey(key) }
+    fun setCloudModelName(model: String) = viewModelScope.launch { settingsRepository.setCloudModelName(model) }
+    fun setCloudEndpointUrl(url: String) = viewModelScope.launch { settingsRepository.setCloudEndpointUrl(url) }
+
     fun consumeMessage() {
         _message.value = null
     }

@@ -81,6 +81,7 @@ fun AppNav(app: OpenCompanionApplication) {
                         app.characterRepository,
                         app.inferenceEngine,
                         app.nanoBridge,
+                        app.cloudEngineBridge,
                         app.settingsRepository,
                     )
                 },

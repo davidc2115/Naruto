@@ -28,6 +28,7 @@ class OpenCompanionApplication : Application() {
     val modelManager by lazy { ModelManager(this) }
     val inferenceEngine by lazy { InferenceEngine(this) }
     val nanoBridge by lazy { NanoBridge(this) }
+    val cloudEngineBridge by lazy { CloudEngineBridge() }
     val characterImportManager by lazy { CharacterImportManager(this, characterRepository) }
 
     override fun onCreate() {

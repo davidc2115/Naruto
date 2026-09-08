@@ -139,6 +139,86 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                     Text(engineBackendLabel(backend))
                 }
             }
+
+            if (state.settings.enginePreference in listOf(EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI)) {
+                Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Configuration Cloud IA", style = MaterialTheme.typography.titleSmall)
+                        if (state.settings.enginePreference == EngineBackend.CLOUD_OPENROUTER) {
+                            Text(
+                                "OpenRouter offre des modèles ultra-rapides et entièrement débridés (NSFW/JDR). " +
+                                "Obtiens une clé gratuite en 1 clic sur openrouter.ai/keys si besoin.",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            OutlinedTextField(
+                                value = state.settings.cloudModelName,
+                                onValueChange = viewModel::setCloudModelName,
+                                label = { Text("Modèle Cloud") },
+                                placeholder = { Text("nousresearch/hermes-3-llama-3.1-8b:free") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                TextButton(onClick = { viewModel.setCloudModelName("nousresearch/hermes-3-llama-3.1-8b:free") }) {
+                                    Text("Hermes 3 (NSFW)")
+                                }
+                                TextButton(onClick = { viewModel.setCloudModelName("meta-llama/llama-3.3-70b-instruct:free") }) {
+                                    Text("Llama 3.3 70B")
+                                }
+                                TextButton(onClick = { viewModel.setCloudModelName("qwen/qwen-2.5-72b-instruct:free") }) {
+                                    Text("Qwen 72B")
+                                }
+                            }
+                            OutlinedTextField(
+                                value = state.settings.cloudApiKey,
+                                onValueChange = viewModel::setCloudApiKey,
+                                label = { Text("Clé API OpenRouter (optionnelle / gratuite)") },
+                                placeholder = { Text("sk-or-v1-...") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_KOBOLD_HORDE) {
+                            Text(
+                                "KoboldAI Horde est un réseau d'IA communautaire 100% gratuit, illimité et sans restriction NSFW. " +
+                                "Aucune clé requise.",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            OutlinedTextField(
+                                value = state.settings.cloudModelName,
+                                onValueChange = viewModel::setCloudModelName,
+                                label = { Text("Modèle Horde") },
+                                placeholder = { Text("Hermes-3-Llama-3.1-8B") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_CUSTOM_OPENAI) {
+                            OutlinedTextField(
+                                value = state.settings.cloudEndpointUrl,
+                                onValueChange = viewModel::setCloudEndpointUrl,
+                                label = { Text("URL de l'API (/v1/chat/completions)") },
+                                placeholder = { Text("https://api.groq.com/openai/v1/chat/completions") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            OutlinedTextField(
+                                value = state.settings.cloudModelName,
+                                onValueChange = viewModel::setCloudModelName,
+                                label = { Text("Nom du modèle") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            OutlinedTextField(
+                                value = state.settings.cloudApiKey,
+                                onValueChange = viewModel::setCloudApiKey,
+                                label = { Text("Clé API (si nécessaire)") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+                }
+            }
+
             NanoAvailabilityRow(
                 availability = state.nanoAvailability,
                 onDownload = viewModel::downloadNano,
@@ -333,9 +413,12 @@ private fun ModelRow(
 }
 
 private fun engineBackendLabel(backend: EngineBackend): String = when (backend) {
-    EngineBackend.AUTO -> "Auto (recommandé)"
+    EngineBackend.AUTO -> "Auto (Local AICore / llama.cpp)"
     EngineBackend.AICORE -> "Gemini Nano (AICore, appareil compatible uniquement)"
-    EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp)"
+    EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp sur l'appareil)"
+    EngineBackend.CLOUD_OPENROUTER -> "☁️ Cloud IA - OpenRouter (Gratuit, ultra-rapide, Hermes 3 / Llama 3.3, NSFW)"
+    EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 Cloud IA - KoboldAI Horde (Gratuit & illimité & 100% NSFW, sans clé)"
+    EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ Cloud IA - API Compatible OpenAI (Groq, LM Studio, Together, DeepInfra...)"
 }
 
 private fun userGenderLabel(gender: UserGender): String = when (gender) {

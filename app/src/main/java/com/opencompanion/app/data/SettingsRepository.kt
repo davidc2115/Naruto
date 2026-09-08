@@ -18,7 +18,14 @@ private val Context.dataStore by preferencesDataStore(name = "opencompanion_sett
  * ChatViewModel) ; [AICORE] et [LLAMA_CPP] forcent explicitement l'un ou l'autre — voir
  * docs/MODELES_ET_AICORE.md pour le détail des compromis de chacun.
  */
-enum class EngineBackend { AUTO, AICORE, LLAMA_CPP }
+enum class EngineBackend {
+    AUTO,
+    AICORE,
+    LLAMA_CPP,
+    CLOUD_OPENROUTER,
+    CLOUD_KOBOLD_HORDE,
+    CLOUD_CUSTOM_OPENAI
+}
 
 /** Genre déclaré par l'utilisateur, injecté dans le prompt système (voir PromptBuilder) pour
  *  que le personnage puisse s'adresser à lui de façon cohérente (accords, tournures...).
@@ -65,6 +72,9 @@ data class EngineSettings(
     val threads: Int = 0, // 0 = laisser InferenceEngine choisir une valeur recommandée
     val enginePreference: EngineBackend = EngineBackend.AUTO,
     val allowNsfwMode: Boolean = true,
+    val cloudApiKey: String = "",
+    val cloudModelName: String = "nousresearch/hermes-3-llama-3.1-8b:free",
+    val cloudEndpointUrl: String = "https://openrouter.ai/api/v1/chat/completions",
 )
 
 /**
@@ -92,13 +102,16 @@ class SettingsRepository(private val context: Context) {
         val USER_NAME = stringPreferencesKey("user_profile_name")
         val USER_AGE = intPreferencesKey("user_profile_age")
         val USER_GENDER = stringPreferencesKey("user_profile_gender")
+        val CLOUD_API_KEY = stringPreferencesKey("cloud_api_key")
+        val CLOUD_MODEL_NAME = stringPreferencesKey("cloud_model_name")
+        val CLOUD_ENDPOINT_URL = stringPreferencesKey("cloud_endpoint_url")
     }
 
     val settings: Flow<EngineSettings> = context.dataStore.data.map { prefs ->
         EngineSettings(
             selectedModelPath = prefs[Keys.MODEL_PATH],
             useGpu = (prefs[Keys.USE_GPU] ?: true) && !(prefs[Keys.GPU_DISABLED_AFTER_FAILURE] ?: false),
-            gpuLayers = prefs[Keys.GPU_LAYERS] ?: 20,
+            gpuLayers = prefs[Keys.GPU_LAYERS] ?: 999,
             contextSize = prefs[Keys.CONTEXT_SIZE] ?: 4096,
             maxResponseTokens = prefs[Keys.MAX_TOKENS] ?: 768,
             temperature = prefs[Keys.TEMPERATURE] ?: 0.9f,
@@ -110,6 +123,9 @@ class SettingsRepository(private val context: Context) {
                 runCatching { EngineBackend.valueOf(it) }.getOrNull()
             } ?: EngineBackend.AUTO,
             allowNsfwMode = prefs[Keys.ALLOW_NSFW_MODE] ?: true,
+            cloudApiKey = prefs[Keys.CLOUD_API_KEY] ?: "",
+            cloudModelName = prefs[Keys.CLOUD_MODEL_NAME] ?: "nousresearch/hermes-3-llama-3.1-8b:free",
+            cloudEndpointUrl = prefs[Keys.CLOUD_ENDPOINT_URL] ?: "https://openrouter.ai/api/v1/chat/completions",
         )
     }
 
@@ -144,6 +160,16 @@ class SettingsRepository(private val context: Context) {
     suspend fun setThreads(value: Int) = context.dataStore.edit { it[Keys.THREADS] = value }
     suspend fun setEnginePreference(value: EngineBackend) = context.dataStore.edit { it[Keys.ENGINE_BACKEND] = value.name }
     suspend fun setAllowNsfwMode(enabled: Boolean) = context.dataStore.edit { it[Keys.ALLOW_NSFW_MODE] = enabled }
+
+    suspend fun setCloudApiKey(key: String) = context.dataStore.edit {
+        if (key.isBlank()) it.remove(Keys.CLOUD_API_KEY) else it[Keys.CLOUD_API_KEY] = key.trim()
+    }
+    suspend fun setCloudModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.CLOUD_MODEL_NAME) else it[Keys.CLOUD_MODEL_NAME] = model.trim()
+    }
+    suspend fun setCloudEndpointUrl(url: String) = context.dataStore.edit {
+        if (url.isBlank()) it.remove(Keys.CLOUD_ENDPOINT_URL) else it[Keys.CLOUD_ENDPOINT_URL] = url.trim()
+    }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
         UserProfile(

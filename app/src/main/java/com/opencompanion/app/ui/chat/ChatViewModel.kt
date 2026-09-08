@@ -63,6 +63,7 @@ class ChatViewModel(
     private val repository: CharacterRepository,
     private val engine: InferenceEngine,
     private val nanoBridge: NanoBridge,
+    private val cloudBridge: CloudEngineBridge,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
@@ -107,8 +108,13 @@ class ChatViewModel(
         _engineState,
         settingsRepository.settings,
     ) { character, messages, (streaming, status, usingNano), settings ->
-        val modelName = settings.selectedModelPath?.let { path ->
-            java.io.File(path).name.removeSuffix(".gguf")
+        val modelName = when (settings.enginePreference) {
+            EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
+                "Cloud : ${settings.cloudModelName.substringAfterLast('/')}"
+            }
+            else -> settings.selectedModelPath?.let { path ->
+                java.io.File(path).name.removeSuffix(".gguf")
+            }
         }
         ChatUiState(
             character = character,
@@ -134,29 +140,33 @@ class ChatViewModel(
             val settings = settingsRepository.settings.first()
             val backend = resolveActiveBackend(settings.enginePreference)
 
-            if (backend == EngineBackend.AICORE) {
-                // Gemini Nano ne nécessite aucun fichier .gguf : contrairement au backend
-                // llama.cpp ci-dessous, rien à charger, le service système fait le travail.
-                _usingNano.value = true
-                runNanoGeneration(
-                    character = character,
-                    settings = settings,
-                    allowFallbackToLlama = settings.enginePreference == EngineBackend.AUTO,
-                )
-                return@launch
+            when (backend) {
+                EngineBackend.AICORE -> {
+                    _usingNano.value = true
+                    runNanoGeneration(
+                        character = character,
+                        settings = settings,
+                        allowFallbackToLlama = settings.enginePreference == EngineBackend.AUTO,
+                    )
+                    return@launch
+                }
+                EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
+                    _usingNano.value = false
+                    runCloudGeneration(character, settings, backend)
+                    return@launch
+                }
+                else -> {
+                    _usingNano.value = false
+                    if (settings.selectedModelPath == null) {
+                        _status.value = EngineStatus.NO_MODEL_CONFIGURED
+                        _statusMessage.value = "Choisis un modèle dans les réglages avant de discuter."
+                        return@launch
+                    }
+                    val loaded = loadModelIfNeeded(settings)
+                    if (!loaded) return@launch
+                    runGeneration(character, settings, allowGpuRetry = true)
+                }
             }
-
-            _usingNano.value = false
-            if (settings.selectedModelPath == null) {
-                _status.value = EngineStatus.NO_MODEL_CONFIGURED
-                _statusMessage.value = "Choisis un modèle dans les réglages avant de discuter."
-                return@launch
-            }
-
-            val loaded = loadModelIfNeeded(settings)
-            if (!loaded) return@launch
-
-            runGeneration(character, settings, allowGpuRetry = true)
         }
     }
 
@@ -169,11 +179,79 @@ class ChatViewModel(
     private suspend fun resolveActiveBackend(preference: EngineBackend): EngineBackend = when (preference) {
         EngineBackend.LLAMA_CPP -> EngineBackend.LLAMA_CPP
         EngineBackend.AICORE -> EngineBackend.AICORE
+        EngineBackend.CLOUD_OPENROUTER -> EngineBackend.CLOUD_OPENROUTER
+        EngineBackend.CLOUD_KOBOLD_HORDE -> EngineBackend.CLOUD_KOBOLD_HORDE
+        EngineBackend.CLOUD_CUSTOM_OPENAI -> EngineBackend.CLOUD_CUSTOM_OPENAI
         EngineBackend.AUTO -> {
             if (nanoBridge.checkAvailability() == NanoBridge.NanoAvailability.AVAILABLE) {
                 EngineBackend.AICORE
             } else {
                 EngineBackend.LLAMA_CPP
+            }
+        }
+    }
+
+    private suspend fun runCloudGeneration(
+        character: CharacterEntity,
+        settings: EngineSettings,
+        backend: EngineBackend,
+    ) {
+        _status.value = EngineStatus.GENERATING
+        _streamingText.value = ""
+
+        val fullHistory = repository.getMessages(characterId)
+        val lastUserMessage = fullHistory.lastOrNull { it.role == MessageRole.USER }?.content.orEmpty()
+        val turns = PromptBuilder.buildTurns(
+            character = character,
+            history = fullHistory.dropLast(1),
+            newUserMessage = lastUserMessage,
+            engine = engine,
+            contextSize = settings.contextSize,
+            reservedForResponse = settings.maxResponseTokens,
+            userProfile = settingsRepository.userProfile.first(),
+            allowNsfw = settings.allowNsfwMode,
+        )
+
+        val flow = if (backend == EngineBackend.CLOUD_KOBOLD_HORDE) {
+            cloudBridge.generateKoboldHorde(
+                apiKey = settings.cloudApiKey,
+                modelName = settings.cloudModelName,
+                turns = turns,
+                maxTokens = settings.maxResponseTokens,
+                temperature = settings.temperature,
+            )
+        } else {
+            cloudBridge.generateOpenAiCompatible(
+                endpointUrl = settings.cloudEndpointUrl,
+                apiKey = settings.cloudApiKey,
+                modelName = settings.cloudModelName,
+                turns = turns,
+                maxTokens = settings.maxResponseTokens,
+                temperature = settings.temperature,
+            )
+        }
+
+        flow.collectLatest { event ->
+            when (event) {
+                is GenerationEvent.Token -> _streamingText.value += event.text
+                is GenerationEvent.Done -> {
+                    val text = _streamingText.value
+                    _streamingText.value = ""
+                    _status.value = EngineStatus.IDLE
+                    if (text.isNotBlank()) {
+                        splitIntoBubbles(text).forEach {
+                            repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
+                        }
+                    } else {
+                        _statusMessage.value = "Réponse vide reçue du serveur Cloud."
+                    }
+                }
+                is GenerationEvent.Error -> {
+                    _status.value = EngineStatus.LOAD_ERROR
+                    _statusMessage.value = event.message
+                    _streamingText.value = ""
+                }
+                is GenerationEvent.GpuFailure -> Unit
             }
         }
     }
