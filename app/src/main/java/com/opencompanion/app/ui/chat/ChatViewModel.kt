@@ -150,7 +150,7 @@ class ChatViewModel(
                     )
                     return@launch
                 }
-                EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
+                EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
                     _usingNano.value = false
                     runCloudGeneration(character, settings, backend)
                     return@launch
@@ -179,6 +179,7 @@ class ChatViewModel(
     private suspend fun resolveActiveBackend(preference: EngineBackend): EngineBackend = when (preference) {
         EngineBackend.LLAMA_CPP -> EngineBackend.LLAMA_CPP
         EngineBackend.AICORE -> EngineBackend.AICORE
+        EngineBackend.CLOUD_FREE_NO_KEY -> EngineBackend.CLOUD_FREE_NO_KEY
         EngineBackend.CLOUD_OPENROUTER -> EngineBackend.CLOUD_OPENROUTER
         EngineBackend.CLOUD_KOBOLD_HORDE -> EngineBackend.CLOUD_KOBOLD_HORDE
         EngineBackend.CLOUD_CUSTOM_OPENAI -> EngineBackend.CLOUD_CUSTOM_OPENAI
@@ -212,7 +213,13 @@ class ChatViewModel(
             allowNsfw = settings.allowNsfwMode,
         )
 
-        val flow = if (backend == EngineBackend.CLOUD_KOBOLD_HORDE) {
+        val flow = if (backend == EngineBackend.CLOUD_FREE_NO_KEY) {
+            cloudBridge.generateFreeNoKeyCloud(
+                turns = turns,
+                maxTokens = settings.maxResponseTokens,
+                temperature = settings.temperature,
+            )
+        } else if (backend == EngineBackend.CLOUD_KOBOLD_HORDE) {
             cloudBridge.generateKoboldHorde(
                 apiKey = settings.cloudApiKey,
                 modelName = settings.cloudModelName,

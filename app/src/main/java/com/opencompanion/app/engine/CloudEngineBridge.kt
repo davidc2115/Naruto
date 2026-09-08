@@ -15,11 +15,93 @@ import java.net.URL
 
 /**
  * Moteur d'inférence Cloud : effectue les requêtes en streaming ou en polling vers des providers
- * d'IA Cloud gratuits, illimités et sans censure (OpenRouter, KoboldAI Horde, ou serveur compatible OpenAI).
+ * d'IA Cloud gratuits, illimités et sans censure (OpenRouter, KoboldAI Horde, Pollinations, ou serveur compatible OpenAI).
  */
 class CloudEngineBridge {
 
     private val jsonParser = Json { ignoreUnknownKeys = true; isLenient = true }
+
+    /**
+     * Mode Cloud 100% Gratuit & Illimité SANS AUCUNE CLÉ API REQUISE.
+     * N'exige aucun compte ni clé : utilise les services publics anonymes débridés (Pollinations ➔ KoboldHorde anonyme).
+     */
+    fun generateFreeNoKeyCloud(
+        turns: List<ChatTurn>,
+        maxTokens: Int = 768,
+        temperature: Float = 0.8f,
+    ): Flow<GenerationEvent> = channelFlow {
+        var success = false
+
+        // 1. Tentative via Pollinations AI (Accès anonyme public sans clé)
+        try {
+            val url = URL("https://text.pollinations.ai/openai")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                connectTimeout = 15_000
+                readTimeout = 30_000
+                doOutput = true
+                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                setRequestProperty(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 OpenCompanion/1.0"
+                )
+            }
+
+            val messagesList = turns.map { turn -> mapOf("role" to turn.role, "content" to turn.content) }
+            val payload = mapOf(
+                "model" to "openai",
+                "messages" to messagesList,
+                "temperature" to temperature,
+                "max_tokens" to maxTokens
+            )
+
+            val jsonBody = buildJsonString(payload)
+            conn.outputStream.use { os ->
+                os.write(jsonBody.toByteArray(Charsets.UTF_8))
+                os.flush()
+            }
+
+            if (conn.responseCode in 200..299) {
+                val respText = conn.inputStream.bufferedReader().use { it.readText() }
+                val extractedText = parseJsonTextOrChoice(respText)
+                if (extractedText.isNotBlank()) {
+                    send(GenerationEvent.Token(extractedText))
+                    send(GenerationEvent.Done)
+                    success = true
+                }
+            }
+            conn.disconnect()
+        } catch (_: Exception) {}
+
+        if (success) return@channelFlow
+
+        // 2. Repli automatique sur KoboldAI Horde (Clé publique anonyme 0000000000 - 100% Sans Clé / Sans Inscription)
+        generateKoboldHorde(
+            apiKey = "0000000000",
+            modelName = "Hermes-3-Llama-3.1-8B",
+            turns = turns,
+            maxTokens = maxTokens,
+            temperature = temperature,
+        ).collect { event ->
+            send(event)
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private fun parseJsonTextOrChoice(respText: String): String {
+        return try {
+            val root = jsonParser.parseToJsonElement(respText).jsonObject
+            val choices = root["choices"]?.jsonArray
+            if (choices != null && choices.isNotEmpty()) {
+                val first = choices[0].jsonObject
+                val message = first["message"]?.jsonObject
+                message?.get("content")?.jsonPrimitive?.content ?: first["text"]?.jsonPrimitive?.content ?: ""
+            } else {
+                root["text"]?.jsonPrimitive?.content ?: respText
+            }
+        } catch (_: Exception) {
+            respText
+        }
+    }
 
     /**
      * Inférence via API compatible OpenAI (OpenRouter, Groq, Together AI, LM Studio distant, etc.)

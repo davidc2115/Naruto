@@ -19,6 +19,7 @@ private val Context.dataStore by preferencesDataStore(name = "opencompanion_sett
  * docs/MODELES_ET_AICORE.md pour le détail des compromis de chacun.
  */
 enum class EngineBackend {
+    CLOUD_FREE_NO_KEY,
     AUTO,
     AICORE,
     LLAMA_CPP,
@@ -70,10 +71,10 @@ data class EngineSettings(
     val topP: Float = 0.95f,
     val repeatPenalty: Float = 1.1f,
     val threads: Int = 0, // 0 = laisser InferenceEngine choisir une valeur recommandée
-    val enginePreference: EngineBackend = EngineBackend.AUTO,
+    val enginePreference: EngineBackend = EngineBackend.CLOUD_FREE_NO_KEY,
     val allowNsfwMode: Boolean = true,
     val cloudApiKey: String = "",
-    val cloudModelName: String = "nousresearch/hermes-3-llama-3.1-8b:free",
+    val cloudModelName: String = "Hermes-3-Llama-3.1-8B",
     val cloudEndpointUrl: String = "https://openrouter.ai/api/v1/chat/completions",
 )
 

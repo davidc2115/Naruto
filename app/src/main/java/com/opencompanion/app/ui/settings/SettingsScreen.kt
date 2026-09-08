@@ -413,12 +413,13 @@ private fun ModelRow(
 }
 
 private fun engineBackendLabel(backend: EngineBackend): String = when (backend) {
+    EngineBackend.CLOUD_FREE_NO_KEY -> "⚡ Cloud IA Gratuit (SANS CLÉ API, Illimité & NSFW - Recommandé)"
     EngineBackend.AUTO -> "Auto (Local AICore / llama.cpp)"
     EngineBackend.AICORE -> "Gemini Nano (AICore, appareil compatible uniquement)"
     EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp sur l'appareil)"
-    EngineBackend.CLOUD_OPENROUTER -> "☁️ Cloud IA - OpenRouter (Gratuit, ultra-rapide, Hermes 3 / Llama 3.3, NSFW)"
-    EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 Cloud IA - KoboldAI Horde (Gratuit & illimité & 100% NSFW, sans clé)"
-    EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ Cloud IA - API Compatible OpenAI (Groq, LM Studio, Together, DeepInfra...)"
+    EngineBackend.CLOUD_OPENROUTER -> "☁️ OpenRouter Cloud (Avec votre clé API)"
+    EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 KoboldAI Horde (Réseau décentralisé sans clé)"
+    EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ API Cloud Perso / Compatible OpenAI (Groq, LM Studio, Together...)"
 }
 
 private fun userGenderLabel(gender: UserGender): String = when (gender) {
