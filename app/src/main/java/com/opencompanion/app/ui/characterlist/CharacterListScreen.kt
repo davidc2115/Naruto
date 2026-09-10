@@ -94,6 +94,11 @@ fun CharacterListScreen(
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { viewModel.importFromUri(it) }
     }
+    // Sélection multiple : permet d'importer d'un coup toute une collection de fiches
+    // personnage déjà téléchargées (.png / .json), sans repasser par le sélecteur pour chacune.
+    val multiFilePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isNotEmpty()) viewModel.importFromUris(uris)
+    }
 
     LaunchedEffect(importMessage) {
         importMessage?.let {
@@ -156,6 +161,21 @@ fun CharacterListScreen(
                             // dans le sélecteur. Le contenu réel est de toute façon revérifié dans
                             // CharacterImportManager (signature PNG / premier caractère '{').
                             filePicker.launch(
+                                arrayOf(
+                                    "image/png",
+                                    "application/json",
+                                    "text/plain",
+                                    "application/octet-stream",
+                                ),
+                            )
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Importer plusieurs fiches (.png / .json)") },
+                        leadingIcon = { Icon(Icons.Filled.FileUpload, contentDescription = null) },
+                        onClick = {
+                            menuExpanded = false
+                            multiFilePicker.launch(
                                 arrayOf(
                                     "image/png",
                                     "application/json",

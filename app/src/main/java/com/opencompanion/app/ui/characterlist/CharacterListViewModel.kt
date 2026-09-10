@@ -35,6 +35,38 @@ class CharacterListViewModel(
         }
     }
 
+    /**
+     * Import en lot : le sélecteur de fichiers ("Importer plusieurs fiches") peut renvoyer
+     * plusieurs fichiers d'un coup — on les importe l'un après l'autre (chacun reste indépendant :
+     * un fichier invalide n'interrompt pas les suivants) puis on résume le résultat en un seul
+     * message plutôt que d'empiler une snackbar par fichier.
+     */
+    fun importFromUris(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        viewModelScope.launch {
+            var successCount = 0
+            val failures = mutableListOf<String>()
+            for (uri in uris) {
+                when (val result = importManager.importFromUri(uri)) {
+                    is CharacterImportManager.ImportResult.Success -> successCount++
+                    is CharacterImportManager.ImportResult.Failure -> failures += result.reason
+                }
+            }
+            _importMessage.value = buildString {
+                append(
+                    when (successCount) {
+                        0 -> "Aucun personnage importé."
+                        1 -> "1 personnage importé."
+                        else -> "$successCount personnages importés."
+                    },
+                )
+                if (failures.isNotEmpty()) {
+                    append(" ${failures.size} échec(s).")
+                }
+            }
+        }
+    }
+
     fun importFromUrl(url: String) {
         viewModelScope.launch {
             when (val result = importManager.importFromUrl(url)) {
