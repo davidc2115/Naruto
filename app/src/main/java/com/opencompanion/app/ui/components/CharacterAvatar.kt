@@ -1,5 +1,6 @@
 package com.opencompanion.app.ui.components
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.ui.theme.AccentPink
@@ -27,12 +29,10 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Vignette d'avatar de personnage : décode [avatarPath] (fichier local, extrait de la fiche
- * Character Card à l'import — voir CharacterImportManager.saveAvatar) en arrière-plan, sous-
- * échantillonné à la taille d'affichage réelle pour éviter de charger une image potentiellement
- * volumineuse en pleine résolution juste pour une vignette. Sans [avatarPath] (personnage créé
- * à la main, sans fiche importée) ou en cas d'échec de décodage, retombe sur un avatar généré :
- * dégradé de marque + initiale du nom, plutôt que de laisser un espace vide façon "image cassée".
+ * Vignette d'avatar de personnage : décode [avatarPath] (fichier local ou asset embarqué)
+ * en arrière-plan, sous-échantillonné à la taille d'affichage réelle. En cas d'absence
+ * de fichier local, tente de charger l'avatar embarqué dans assets/avatars/ correspondant
+ * au personnage, puis retombe sur un avatar généré avec initiale.
  */
 @Composable
 fun CharacterAvatar(
@@ -42,31 +42,28 @@ fun CharacterAvatar(
     shape: androidx.compose.ui.graphics.Shape = CircleShape,
 ) {
     Box(modifier = modifier.clip(shape)) {
-        if (avatarPath.isNullOrBlank()) {
-            InitialAvatarFallback(name)
+        val context = LocalContext.current
+        val density = LocalDensity.current
+        val targetPx = with(density) { 200.dp.toPx() }.toInt().coerceAtLeast(64)
+        val bitmapState = produceState<Bitmap?>(initialValue = null, avatarPath, name) {
+            value = withContext(Dispatchers.IO) {
+                if (!avatarPath.isNullOrBlank() && !avatarPath.startsWith("asset://")) {
+                    decodeSampledBitmap(avatarPath, targetPx)
+                } else null
+            } ?: withContext(Dispatchers.IO) {
+                loadAssetAvatar(context, avatarPath, name, targetPx)
+            }
+        }
+        val bitmap = bitmapState.value
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
         } else {
-            val density = LocalDensity.current
-            // On ne connaît la taille réelle en px qu'une fois la contrainte de layout posée par
-            // le modifier de l'appelant ; en pratique les avatars sont affichés entre 40dp et
-            // ~160dp selon l'écran, donc un sous-échantillonnage ciblant ~200px suffit largement
-            // pour une vignette nette sans jamais décoder l'image source en pleine résolution.
-            val targetPx = with(density) { 200.dp.toPx() }.toInt().coerceAtLeast(64)
-            val bitmapState = produceState<Bitmap?>(initialValue = null, avatarPath) {
-                value = withContext(Dispatchers.IO) {
-                    runCatching { decodeSampledBitmap(avatarPath, targetPx) }.getOrNull()
-                }
-            }
-            val bitmap = bitmapState.value
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                )
-            } else {
-                InitialAvatarFallback(name)
-            }
+            InitialAvatarFallback(name)
         }
     }
 }
@@ -109,3 +106,56 @@ private fun decodeSampledBitmap(path: String, targetPx: Int): Bitmap? {
     val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
     return BitmapFactory.decodeFile(path, decodeOptions)
 }
+
+/** Tente de charger un avatar embarqué dans les assets de l'application (assets/avatars/...)
+ *  par chemin ou par nom de personnage si aucun fichier local n'existe. */
+private fun loadAssetAvatar(context: Context, avatarPath: String?, name: String, targetPx: Int): Bitmap? {
+    val cleanPath = avatarPath?.removePrefix("asset:///")?.removePrefix("assets/")
+    val candidates = mutableListOf<String>()
+    if (!cleanPath.isNullOrBlank()) {
+        candidates.add(cleanPath)
+        if (!cleanPath.startsWith("avatars/")) {
+            candidates.add("avatars/$cleanPath")
+        }
+    }
+    val normalized = java.text.Normalizer.normalize(name, java.text.Normalizer.Form.NFD)
+        .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
+    val sanitized = normalized.lowercase()
+        .replace(".", "")
+        .replace(Regex("[^a-z0-9_]+"), "_")
+        .trim('_')
+    candidates.add("avatars/$sanitized.jpg")
+    candidates.add("avatars/$sanitized.png")
+    candidates.add("avatars/$sanitized.webp")
+
+    for (assetName in candidates) {
+        try {
+            val sampleSize = context.assets.open(assetName).use { stream ->
+                val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeStream(stream, null, boundsOptions)
+                val (rawWidth, rawHeight) = boundsOptions.outWidth to boundsOptions.outHeight
+                if (rawWidth > 0 && rawHeight > 0) {
+                    var s = 1
+                    val largest = maxOf(rawWidth, rawHeight)
+                    while (largest / (s * 2) >= targetPx) {
+                        s *= 2
+                    }
+                    s
+                } else {
+                    -1
+                }
+            }
+            if (sampleSize > 0) {
+                context.assets.open(assetName).use { stream ->
+                    val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+                    val bmp = BitmapFactory.decodeStream(stream, null, decodeOptions)
+                    if (bmp != null) return bmp
+                }
+            }
+        } catch (_: Exception) {
+            // Ignorer et essayer le candidat suivant
+        }
+    }
+    return null
+}
+

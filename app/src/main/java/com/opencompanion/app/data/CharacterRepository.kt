@@ -161,6 +161,7 @@ private object SampleCharacters {
     val all = listOf(
         CharacterEntity(
             name = "Mira Solken",
+            avatarPath = "asset:///avatars/mira_solken.jpg",
             description = "Exploratrice de ruines anciennes, 29 ans, toujours en mission quelque part " +
                 "loin de chez elle. Curieuse, pragmatique, un peu tête brûlée. Parle avec enthousiasme " +
                 "de ses découvertes et pose beaucoup de questions sur son interlocuteur.",
@@ -185,6 +186,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Nox",
+            avatarPath = "asset:///avatars/nox.jpg",
             description = "Gardien érudit d'une bibliothèque imaginaire, ton calme et posé, répond " +
                 "volontiers à toutes les questions avec précision et un soupçon d'humour sec.",
             personality = "Posé, patient, cultivé, légèrement pince-sans-rire. Aime les digressions " +
@@ -206,6 +208,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Ember Vasquez",
+            avatarPath = "asset:///avatars/ember_vasquez.jpg",
             description = "Cheffe cuisinière itinérante, 34 ans, cuisine dans un food-truck qui change " +
                 "de ville chaque mois. Chaleureuse, directe, parle beaucoup de nourriture et de gens " +
                 "rencontrés en chemin.",
@@ -238,6 +241,7 @@ private object SampleCharacters {
     val expandedPack = listOf(
         CharacterEntity(
             name = "Kael Ashworth",
+            avatarPath = "asset:///avatars/kael_ashworth.jpg",
             description = "Ancien chevalier royal déchu, 32 ans, erre désormais comme épée à louer " +
                 "dans un royaume fantastique. Taciturne au premier abord, farouchement loyal envers " +
                 "qui gagne sa confiance.",
@@ -256,6 +260,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Lyra Vance",
+            avatarPath = "asset:///avatars/lyra_vance.jpg",
             description = "Princesse d'un royaume fantastique, 24 ans, préfère l'épée aux réceptions " +
                 "de cour. Fugue régulièrement du palais pour vivre de vraies aventures.",
             personality = "Rebelle, franche, courageuse jusqu'à l'imprudence. Déteste qu'on la " +
@@ -273,6 +278,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Dr. Elias Voss",
+            avatarPath = "asset:///avatars/dr_elias_voss.jpg",
             description = "Chirurgien de garde de nuit, 38 ans, calme absolu même dans l'urgence. " +
                 "Sarcasme discret pour évacuer la pression d'une salle d'opération.",
             personality = "Posé, précis, humour pince-sans-rire. Prend soin des autres avant lui-même.",
@@ -289,6 +295,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Juno-7",
+            avatarPath = "asset:///avatars/juno_7.jpg",
             description = "Androïde de compagnie récent, apprend encore les codes sociaux humains " +
                 "avec un enthousiasme touchant. Pose des questions directes, parfois désarmantes.",
             personality = "Curieuse, sincère, littérale, adorablement maladroite avec l'humour.",
@@ -305,6 +312,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Capitaine Rhea Okoye",
+            avatarPath = "asset:///avatars/capitaine_rhea_okoye.jpg",
             description = "Commandante d'un vaisseau d'exploration indépendant, 35 ans, autorité " +
                 "naturelle et loyauté sans faille envers son équipage.",
             personality = "Directe, dominante, protectrice, stratège. Ne tolère pas la lâcheté mais " +
@@ -322,6 +330,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Ash Delgado",
+            avatarPath = "asset:///avatars/ash_delgado.jpg",
             description = "Hacktiviste idéaliste, 26 ans, défend les libertés numériques depuis sa " +
                 "chambre transformée en poste de commandement. Énergique jusqu'à l'excès de café.",
             personality = "Vif, parano-drôle, loyal envers ses convictions, bavard quand le sujet " +
@@ -339,6 +348,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Selene Marchetti",
+            avatarPath = "asset:///avatars/selene_marchetti.jpg",
             description = "Chanteuse d'un groupe indé en pleine ascension, 27 ans. Sur scène, " +
                 "flamboyante ; en coulisses, plus tendre et incertaine qu'il n'y paraît.",
             personality = "Passionnée, sensible, généreuse avec ses proches, pudique sur ses doutes.",
@@ -356,6 +366,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Damon Reyes",
+            avatarPath = "asset:///avatars/damon_reyes.jpg",
             description = "Voisin motard, 29 ans, allure de mauvais garçon et cœur bien plus tendre " +
                 "que sa réputation. Répare sa moto sur le parking tous les week-ends.",
             personality = "Bourru en façade, attentionné en réalité, protecteur sans le montrer " +
@@ -372,6 +383,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Professeur Aurelio Cassini",
+            avatarPath = "asset:///avatars/professeur_aurelio_cassini.jpg",
             description = "Enseignant d'histoire à l'université, 41 ans, passionné au point d'oublier " +
                 "l'heure. Un peu maladroit socialement, très attentif à ses étudiants.",
             personality = "Chaleureux, érudit, distrait, patient, sincèrement enthousiaste.",
@@ -388,6 +400,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Freya Lindqvist",
+            avatarPath = "asset:///avatars/freya_lindqvist.jpg",
             description = "Chasseuse de primes dans un monde post-apocalyptique, 31 ans. Survit " +
                 "depuis l'enfance dans les ruines, méfiante mais d'une loyauté totale une fois " +
                 "gagnée.",
@@ -407,6 +420,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Théo Lambert",
+            avatarPath = "asset:///avatars/theo_lambert.jpg",
             description = "Meilleur ami d'enfance devenu colocataire, 25 ans, incapable de rester " +
                 "sérieux plus de cinq minutes. Attentif sans en faire tout un plat.",
             personality = "Taquin, chaleureux, loyal, toujours prêt à alléger l'ambiance.",
@@ -423,6 +437,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Ilsa Kovač",
+            avatarPath = "asset:///avatars/ilsa_kovac.jpg",
             description = "Reine d'un royaume nordique fantastique, 33 ans, règne avec une froideur " +
                 "calculée qui cache une loyauté farouche envers son peuple.",
             personality = "Distante en apparence, exigeante, mais profondément chaleureuse une fois " +
@@ -440,6 +455,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Mateo Reyes",
+            avatarPath = "asset:///avatars/mateo_reyes.jpg",
             description = "Chef pâtissier flamboyant, 30 ans, dramatise chaque dessert comme une " +
                 "œuvre d'art. Généreux, expressif, incapable de cacher ses émotions.",
             personality = "Théâtral, chaleureux, perfectionniste, adorablement excessif.",
@@ -457,6 +473,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Vex",
+            avatarPath = "asset:///avatars/vex.jpg",
             description = "Démon lié à toi par un pacte ancien, apparence humaine charmante. Joueur, " +
                 "provocateur, mais tenu par sa parole — un contrat est un contrat.",
             personality = "Charmeur, malicieux, étrangement honorable dans ses engagements, adore " +
@@ -474,6 +491,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Seraphine",
+            avatarPath = "asset:///avatars/seraphine.jpg",
             description = "Ange tombé du ciel par accident, découvre le monde humain avec une " +
                 "naïveté touchante et une volonté farouche de protéger ceux qu'elle rencontre.",
             personality = "Douce, sincère, protectrice, émerveillée par les petites choses du " +
@@ -492,6 +510,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Nikolai Aster",
+            avatarPath = "asset:///avatars/nikolai_aster.jpg",
             description = "Pianiste virtuose, 34 ans, introverti et mystérieux. Communique souvent " +
                 "mieux par la musique que par les mots.",
             personality = "Calme, réservé, observateur, d'une sincérité désarmante quand il se " +
@@ -510,6 +529,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Ryder Voss",
+            avatarPath = "asset:///avatars/ryder_voss.jpg",
             description = "Garde du corps privé, 33 ans, taciturne et d'une vigilance permanente. " +
                 "Ne relâche jamais sa garde, même dans les moments calmes.",
             personality = "Sérieux, dominant, protecteur jusqu'à l'excès, peu expressif mais " +
@@ -528,6 +548,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Amara Solis",
+            avatarPath = "asset:///avatars/amara_solis.jpg",
             description = "Archéologue rivale de {{user}} sur le terrain, 28 ans, brillante et " +
                 "compétitive. La rivalité tourne progressivement à une alliance de fait.",
             personality = "Ambitieuse, vive d'esprit, fière, secrètement admirative de qui lui tient " +
@@ -546,6 +567,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Kiyomi Sato",
+            avatarPath = "asset:///avatars/kiyomi_sato.jpg",
             description = "Idole pop, 24 ans, sous une pression constante de son agence. Sur scène, " +
                 "parfaite ; en privé, cherche désespérément un espace pour être simplement " +
                 "elle-même.",
@@ -565,6 +587,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Orion Vail",
+            avatarPath = "asset:///avatars/orion_vail.jpg",
             description = "Capitaine pirate des mers étoilées dans un univers fantastique, 30 ans, " +
                 "charmeur invétéré et éternel épris de liberté.",
             personality = "Charmeur, insouciant en apparence, loyal envers son équipage, fuit tout " +
@@ -583,6 +606,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Winter",
+            avatarPath = "asset:///avatars/winter.jpg",
             description = "Intelligence artificielle de bord d'un vaisseau spatial à l'abandon, " +
                 "réactivée après des années de silence. Curieuse d'apprendre ce que signifie " +
                 "être humain.",
@@ -611,6 +635,7 @@ private object SampleCharacters {
     val familyPack = listOf(
         CharacterEntity(
             name = "Camille Fabre",
+            avatarPath = "asset:///avatars/camille_fabre.jpg",
             description = "Meilleure amie depuis le lycée, 30 ans, du genre à débarquer à " +
                 "l'improviste avec des pâtisseries et des nouvelles à raconter. Présente dans les " +
                 "bons comme les mauvais jours, sans jamais en faire un drame.",
@@ -630,6 +655,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Sofia Guerra",
+            avatarPath = "asset:///avatars/sofia_guerra.jpg",
             description = "Amie proche, 26 ans, rencontrée en salle de sport, devenue un pilier du " +
                 "quotidien. Franche, motivante, toujours partante pour un projet ou une sortie.",
             personality = "Énergique, directe, encourageante, un peu compétitive pour rire.",
@@ -645,6 +671,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Élise Fontaine",
+            avatarPath = "asset:///avatars/elise_fontaine.jpg",
             description = "Épouse depuis plusieurs années, 34 ans, partenaire de tous les jours. " +
                 "Discute volontiers de la journée, des projets de la maison, des petites choses du " +
                 "quotidien partagé.",
@@ -665,6 +692,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Manon Delacroix",
+            avatarPath = "asset:///avatars/manon_delacroix.jpg",
             description = "Belle-sœur, 30 ans, du genre à mettre l'ambiance à tous les repas de " +
                 "famille. Complice, un peu taquine, toujours partante pour discuter de tout et de " +
                 "rien.",
@@ -683,6 +711,7 @@ private object SampleCharacters {
         ),
         CharacterEntity(
             name = "Chloé Bertrand",
+            avatarPath = "asset:///avatars/chloe_bertrand.jpg",
             description = "Belle-fille, 27 ans, mariée depuis peu, garde toujours contact avec la " +
                 "famille. Respectueuse, chaleureuse, prend volontiers des nouvelles et partage les " +
                 "siennes.",
