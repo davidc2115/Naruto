@@ -16,6 +16,8 @@ import com.opencompanion.app.ui.charactereditor.CharacterEditorScreen
 import com.opencompanion.app.ui.charactereditor.CharacterEditorViewModel
 import com.opencompanion.app.ui.characterlist.CharacterListScreen
 import com.opencompanion.app.ui.characterlist.CharacterListViewModel
+import com.opencompanion.app.ui.persona.PersonaManagerScreen
+import com.opencompanion.app.ui.persona.PersonaManagerViewModel
 import com.opencompanion.app.ui.settings.SettingsScreen
 import com.opencompanion.app.ui.settings.SettingsViewModel
 
@@ -25,6 +27,7 @@ private object Routes {
     const val CHAT = "chat/{characterId}"
     const val SETTINGS = "settings"
     const val BROWSE_IMPORT = "browse_import"
+    const val PERSONAS = "personas"
 
     fun editor(characterId: Long? = null) = "editor?characterId=${characterId ?: -1}"
     fun chat(characterId: Long) = "chat/$characterId"
@@ -48,7 +51,15 @@ fun AppNav(app: OpenCompanionApplication) {
                 onEditCharacter = { id -> navController.navigate(Routes.editor(id)) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onBrowseImport = { navController.navigate(Routes.BROWSE_IMPORT) },
+                onOpenPersonas = { navController.navigate(Routes.PERSONAS) },
             )
+        }
+
+        composable(Routes.PERSONAS) {
+            val vm: PersonaManagerViewModel = viewModel(
+                factory = AppViewModelFactory { PersonaManagerViewModel(app.characterRepository) },
+            )
+            PersonaManagerScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }
 
         composable(Routes.BROWSE_IMPORT) {
@@ -90,6 +101,7 @@ fun AppNav(app: OpenCompanionApplication) {
                 viewModel = vm,
                 onBack = { navController.popBackStack() },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onOpenPersonas = { navController.navigate(Routes.PERSONAS) },
             )
         }
 

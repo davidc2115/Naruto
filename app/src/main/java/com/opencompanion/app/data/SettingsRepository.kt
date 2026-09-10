@@ -49,6 +49,9 @@ data class UserProfile(
     val name: String = "",
     val age: Int? = null,
     val gender: UserGender = UserGender.NON_PRECISE,
+    /** Bio/description du persona actif (voir [UserPersonaEntity]), injectée dans le prompt
+     *  système pour donner corps à l'identité endossée par l'utilisateur, au-delà du simple nom. */
+    val description: String = "",
 ) {
     /** Nom à afficher/injecter dans le prompt : jamais vide, retombe sur un générique neutre. */
     val displayName: String get() = name.ifBlank { "Utilisateur" }

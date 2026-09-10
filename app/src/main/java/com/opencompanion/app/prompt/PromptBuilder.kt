@@ -137,6 +137,7 @@ object PromptBuilder {
                 UserGender.AUTRE -> add("son genre est non-binaire ou autre — évite les formulations genrées forcées")
                 UserGender.NON_PRECISE -> Unit
             }
+            if (profile.description.isNotBlank()) add(profile.description.trim())
         }
         if (facts.isEmpty()) return ""
         return "Informations sur la personne avec qui tu parles, à utiliser naturellement pour " +

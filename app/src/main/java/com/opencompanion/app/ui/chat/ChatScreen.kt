@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -34,12 +35,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,6 +63,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
+import com.opencompanion.app.data.UserPersonaEntity
 import com.opencompanion.app.ui.components.CharacterAvatar
 import com.opencompanion.app.ui.theme.BrandGradient
 
@@ -69,10 +73,13 @@ fun ChatScreen(
     viewModel: ChatViewModel,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenPersonas: () -> Unit,
 ) {
     val state by viewModel.uiState.collectAsState()
+    val personas by viewModel.personas.collectAsState()
     var input by remember { mutableStateOf(TextFieldValue("")) }
     var menuExpanded by remember { mutableStateOf(false) }
+    var showPersonaPicker by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -138,6 +145,10 @@ fun ChatScreen(
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(
+                            text = { Text("Changer de persona") },
+                            onClick = { menuExpanded = false; showPersonaPicker = true },
+                        )
+                        DropdownMenuItem(
                             text = { Text("Effacer l'historique") },
                             onClick = { menuExpanded = false; viewModel.clearHistory() },
                         )
@@ -184,6 +195,64 @@ fun ChatScreen(
             }
         }
     }
+
+    if (showPersonaPicker) {
+        PersonaPickerDialog(
+            personas = personas,
+            activePersonaId = state.character?.activePersonaId,
+            onDismiss = { showPersonaPicker = false },
+            onSelect = { personaId -> showPersonaPicker = false; viewModel.setActivePersona(personaId) },
+            onManagePersonas = { showPersonaPicker = false; onOpenPersonas() },
+        )
+    }
+}
+
+/**
+ * Choix du persona utilisateur pour CETTE conversation uniquement (voir
+ * ChatViewModel.setActivePersona) — "Persona par défaut" revient explicitement au persona marqué
+ * par défaut dans le gestionnaire plutôt que de figer un choix qui deviendrait incohérent si ce
+ * défaut change plus tard.
+ */
+@Composable
+private fun PersonaPickerDialog(
+    personas: List<UserPersonaEntity>,
+    activePersonaId: Long?,
+    onDismiss: () -> Unit,
+    onSelect: (Long?) -> Unit,
+    onManagePersonas: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Changer de persona") },
+        text = {
+            Column {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = activePersonaId == null, onClick = { onSelect(null) })
+                    Text("Persona par défaut")
+                }
+                personas.forEach { persona ->
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = activePersonaId == persona.id,
+                            onClick = { onSelect(persona.id) },
+                        )
+                        Text(persona.name)
+                    }
+                }
+                if (personas.isEmpty()) {
+                    Text(
+                        "Aucun persona créé pour l'instant.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onManagePersonas) { Text("Gérer mes personas") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Fermer") } },
+    )
 }
 
 @Composable

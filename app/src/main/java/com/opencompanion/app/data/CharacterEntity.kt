@@ -32,6 +32,11 @@ data class CharacterEntity(
     val isBundledSample: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
+    /** Persona utilisateur (voir [UserPersonaEntity]) à utiliser dans les conversations avec ce
+     *  personnage. null = utiliser le persona marqué par défaut (voir
+     *  CharacterRepository.resolveActivePersona) — permet à chaque personnage/histoire d'avoir
+     *  sa propre identité pour l'utilisateur sans devoir la choisir à chaque fois. */
+    val activePersonaId: Long? = null,
 ) {
     val tags: List<String>
         get() = tagsCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }

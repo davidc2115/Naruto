@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -81,6 +82,7 @@ fun CharacterListScreen(
     onEditCharacter: (Long) -> Unit,
     onOpenSettings: () -> Unit,
     onBrowseImport: () -> Unit,
+    onOpenPersonas: () -> Unit,
 ) {
     val characters by viewModel.characters.collectAsState()
     val importMessage by viewModel.importMessage.collectAsState()
@@ -113,6 +115,9 @@ fun CharacterListScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onOpenPersonas) {
+                        Icon(Icons.Filled.Person, contentDescription = "Mes personas")
+                    }
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = "Réglages")
                     }

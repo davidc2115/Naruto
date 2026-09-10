@@ -9,6 +9,9 @@ import com.opencompanion.app.data.EngineBackend
 import com.opencompanion.app.data.EngineSettings
 import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.SettingsRepository
+import com.opencompanion.app.data.UserGender
+import com.opencompanion.app.data.UserPersonaEntity
+import com.opencompanion.app.data.UserProfile
 import com.opencompanion.app.data.resolveCharacterPlaceholders
 import com.opencompanion.app.engine.CloudEngineBridge
 import com.opencompanion.app.engine.GenerationEvent
@@ -81,7 +84,7 @@ class ChatViewModel(
             if (character != null && character.firstMessage.isNotBlank() &&
                 repository.getMessages(characterId).isEmpty()
             ) {
-                val userName = settingsRepository.userProfile.first().displayName
+                val userName = resolveUserProfile(character).displayName
                 val firstMessage = resolveCharacterPlaceholders(character.firstMessage, character, userName)
                 repository.appendMessage(characterId, MessageRole.ASSISTANT, firstMessage)
             }
@@ -130,6 +133,17 @@ class ChatViewModel(
             selectedModelName = modelName,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChatUiState())
+
+    /** Personas disponibles pour le sélecteur de la barre de chat (voir ChatScreen). */
+    val personas: StateFlow<List<UserPersonaEntity>> = repository.observePersonas()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Change le persona utilisateur actif pour CE personnage uniquement (voir
+     *  CharacterRepository.setActivePersonaForCharacter) — [personaId] à null revient au
+     *  persona par défaut plutôt qu'à un choix figé. */
+    fun setActivePersona(personaId: Long?) {
+        viewModelScope.launch { repository.setActivePersonaForCharacter(characterId, personaId) }
+    }
 
     fun sendMessage(text: String) {
         val trimmed = text.trim()
@@ -198,6 +212,27 @@ class ChatViewModel(
         }
     }
 
+    /**
+     * Résout le persona utilisateur actif pour [character] (voir
+     * [CharacterRepository.resolveActivePersona] — choix explicite du personnage, sinon persona
+     * par défaut) et le convertit au format [UserProfile] attendu par [PromptBuilder]. Retombe
+     * sur l'ancien profil unique des réglages si aucun persona n'existe encore (ne devrait
+     * normalement pas arriver, [characterRepository.ensureDefaultPersonaSeeded] en crée un au
+     * premier lancement — filet de sécurité plutôt qu'un chemin attendu).
+     */
+    private suspend fun resolveUserProfile(character: CharacterEntity): UserProfile {
+        val persona = repository.resolveActivePersona(character)
+        if (persona != null) {
+            return UserProfile(
+                name = persona.name,
+                age = persona.age,
+                gender = runCatching { UserGender.valueOf(persona.gender) }.getOrDefault(UserGender.NON_PRECISE),
+                description = persona.description,
+            )
+        }
+        return settingsRepository.userProfile.first()
+    }
+
     private suspend fun runCloudGeneration(
         character: CharacterEntity,
         settings: EngineSettings,
@@ -215,7 +250,7 @@ class ChatViewModel(
             engine = engine,
             contextSize = settings.contextSize,
             reservedForResponse = settings.maxResponseTokens,
-            userProfile = settingsRepository.userProfile.first(),
+            userProfile = resolveUserProfile(character),
             allowNsfw = settings.allowNsfwMode,
         )
 
@@ -310,7 +345,7 @@ class ChatViewModel(
             history = fullHistory.dropLast(1),
             newUserMessage = lastUserMessage,
             maxOutputTokens = settings.maxResponseTokens,
-            userProfile = settingsRepository.userProfile.first(),
+            userProfile = resolveUserProfile(character),
         )
 
         var nanoFailed = false
@@ -413,7 +448,7 @@ class ChatViewModel(
             engine = engine,
             contextSize = settings.contextSize,
             reservedForResponse = settings.maxResponseTokens,
-            userProfile = settingsRepository.userProfile.first(),
+            userProfile = resolveUserProfile(character),
             allowNsfw = settings.allowNsfwMode,
         )
 

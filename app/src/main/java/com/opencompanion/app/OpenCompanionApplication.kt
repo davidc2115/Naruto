@@ -12,6 +12,7 @@ import com.opencompanion.app.engine.NanoBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -24,7 +25,9 @@ class OpenCompanionApplication : Application() {
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     val database by lazy { AppDatabase.getInstance(this) }
-    val characterRepository by lazy { CharacterRepository(database.characterDao(), database.chatDao()) }
+    val characterRepository by lazy {
+        CharacterRepository(database.characterDao(), database.chatDao(), database.userPersonaDao())
+    }
     val settingsRepository by lazy { SettingsRepository(this) }
     val modelManager by lazy { ModelManager(this) }
     val inferenceEngine by lazy { InferenceEngine(this) }
@@ -36,6 +39,7 @@ class OpenCompanionApplication : Application() {
         super.onCreate()
         applicationScope.launch {
             characterRepository.seedSampleCharactersIfEmpty()
+            characterRepository.ensureDefaultPersonaSeeded(settingsRepository.userProfile.first())
         }
     }
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 class CharacterRepository(
     private val characterDao: CharacterDao,
     private val chatDao: ChatDao,
+    private val personaDao: UserPersonaDao,
 ) {
     fun observeCharacters(): Flow<List<CharacterEntity>> = characterDao.observeAll()
 
@@ -42,6 +43,66 @@ class CharacterRepository(
     suspend fun seedSampleCharactersIfEmpty() {
         if (characterDao.count() > 0) return
         SampleCharacters.all.forEach { characterDao.upsert(it) }
+    }
+
+    // --- Personas utilisateur (voir UserPersonaEntity) --------------------------------------
+
+    fun observePersonas(): Flow<List<UserPersonaEntity>> = personaDao.observeAll()
+
+    suspend fun getPersona(id: Long): UserPersonaEntity? = personaDao.getById(id)
+
+    suspend fun savePersona(persona: UserPersonaEntity): Long {
+        val id = personaDao.upsert(persona)
+        // Le tout premier persona créé devient automatiquement le persona par défaut : sans ça,
+        // un utilisateur qui crée un unique persona devrait encore explicitement le marquer par
+        // défaut pour qu'il serve à quoi que ce soit.
+        if (persona.isDefault || personaDao.count() == 1) {
+            setDefaultPersona(if (id > 0) id else persona.id)
+        }
+        return id
+    }
+
+    suspend fun deletePersona(persona: UserPersonaEntity) = personaDao.delete(persona)
+
+    /** Garantit qu'un seul persona est marqué par défaut à la fois. */
+    suspend fun setDefaultPersona(id: Long) {
+        val persona = personaDao.getById(id) ?: return
+        personaDao.update(persona.copy(isDefault = true))
+        personaDao.clearDefaultExcept(id)
+    }
+
+    /**
+     * Résout le persona utilisateur actif pour [character] : son choix explicite
+     * ([CharacterEntity.activePersonaId]) s'il existe encore, sinon le persona par défaut, sinon
+     * null si aucun persona n'a encore été créé (l'appelant retombe alors sur un profil
+     * générique — voir ChatViewModel).
+     */
+    suspend fun resolveActivePersona(character: CharacterEntity): UserPersonaEntity? {
+        character.activePersonaId?.let { id -> personaDao.getById(id)?.let { return it } }
+        return personaDao.getDefault() ?: personaDao.getAll().firstOrNull()
+    }
+
+    suspend fun setActivePersonaForCharacter(characterId: Long, personaId: Long?) {
+        val character = characterDao.getById(characterId) ?: return
+        characterDao.update(character.copy(activePersonaId = personaId, updatedAt = System.currentTimeMillis()))
+    }
+
+    /**
+     * Amorce un premier persona à partir de l'ancien profil unique stocké dans les réglages
+     * ([SettingsRepository.UserProfile]), la toute première fois qu'un persona est nécessaire
+     * mais qu'aucun n'existe encore — pour qu'un nom déjà renseigné avant l'arrivée des personas
+     * multiples ne soit pas perdu silencieusement.
+     */
+    suspend fun ensureDefaultPersonaSeeded(legacyProfile: UserProfile) {
+        if (personaDao.count() > 0) return
+        savePersona(
+            UserPersonaEntity(
+                name = legacyProfile.name.ifBlank { "Moi" },
+                age = legacyProfile.age,
+                gender = legacyProfile.gender.name,
+                isDefault = true,
+            ),
+        )
     }
 }
 
