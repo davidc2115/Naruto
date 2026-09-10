@@ -130,6 +130,22 @@ class SettingsRepository(private val context: Context) {
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
         val GEMINI_MODEL_NAME = stringPreferencesKey("gemini_model_name")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
+        val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
+    }
+
+    /**
+     * Même mécanisme que [expandedCatalogSeeded] mais pour le lot "famille/entourage" (voir
+     * SampleCharacters.familyPack) — des personnages pensés pour de la discussion simple et
+     * chaleureuse (pas romantique) autour de liens familiers (amie, épouse, belle-sœur,
+     * belle-fille…). Un drapeau dédié plutôt que de rallonger [expandedCatalogSeeded] : ça garde
+     * chaque vague de contenu indépendante et rejouable séparément si besoin plus tard.
+     */
+    val familyPackSeeded: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.FAMILY_PACK_SEEDED] ?: false
+    }
+
+    suspend fun setFamilyPackSeeded(value: Boolean) = context.dataStore.edit {
+        it[Keys.FAMILY_PACK_SEEDED] = value
     }
 
     /**

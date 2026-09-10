@@ -48,6 +48,10 @@ class OpenCompanionApplication : Application() {
                 characterRepository.seedExpandedCatalog()
                 settingsRepository.setExpandedCatalogSeeded(true)
             }
+            if (!settingsRepository.familyPackSeeded.first()) {
+                characterRepository.seedFamilyPack()
+                settingsRepository.setFamilyPackSeeded(true)
+            }
         }
     }
 }
