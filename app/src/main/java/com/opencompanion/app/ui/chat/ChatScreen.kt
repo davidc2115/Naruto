@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteSweep
@@ -57,6 +60,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
+import com.opencompanion.app.ui.components.CharacterAvatar
+import com.opencompanion.app.ui.theme.BrandGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,12 +91,20 @@ fun ChatScreen(
     val isGenerating = state.status == EngineStatus.GENERATING || state.status == EngineStatus.LOADING_MODEL
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(state.character?.name ?: "…")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CharacterAvatar(
+                            avatarPath = state.character?.avatarPath,
+                            name = state.character?.name.orEmpty(),
+                            modifier = Modifier.size(36.dp),
+                        )
+                        Spacer(Modifier.size(10.dp))
+                        Column {
+                        Text(state.character?.name ?: "…", style = MaterialTheme.typography.titleMedium)
                         if (state.character != null) {
                             Text(
                                 when {
@@ -109,6 +122,7 @@ fun ChatScreen(
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                             )
+                        }
                         }
                     }
                 },
@@ -129,6 +143,9 @@ fun ChatScreen(
                         )
                     }
                 },
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
             )
         },
         bottomBar = {
@@ -185,13 +202,28 @@ private fun ModelMissingBanner(onOpenSettings: () -> Unit) {
     }
 }
 
+/**
+ * Bulles asymétriques façon SpicyChat/RosyTalk : dégradé de marque plein pour l'utilisateur
+ * (coin bas-droit "pointu"), surface neutre sombre pour le personnage (coin bas-gauche
+ * "pointu") — la forme de la bulle suffit à distinguer les deux sans dépendre uniquement de
+ * l'alignement gauche/droite, utile notamment pour les lecteurs peu habitués au motif.
+ */
+private val UserBubbleShape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bottomStart = 18.dp, bottomEnd = 4.dp)
+private val CharBubbleShape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bottomStart = 4.dp, bottomEnd = 18.dp)
+
 @Composable
 private fun MessageBubble(message: ChatMessageEntity) {
     val isUser = message.role == MessageRole.USER
     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start) {
-        Surface(
-            color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-            shape = RoundedCornerShape(16.dp),
+        Box(
+            modifier = Modifier
+                .clip(if (isUser) UserBubbleShape else CharBubbleShape)
+                .background(
+                    if (isUser) BrandGradient else Brush.linearGradient(
+                        listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surfaceVariant),
+                    ),
+                )
+                .widthIn(max = 300.dp),
         ) {
             Text(
                 text = formatRoleplayText(message.content, isUser),
@@ -204,10 +236,15 @@ private fun MessageBubble(message: ChatMessageEntity) {
 @Composable
 private fun StreamingBubble(text: String, loadingModel: Boolean) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-        Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(16.dp)) {
+        Box(
+            modifier = Modifier
+                .clip(CharBubbleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .widthIn(max = 300.dp),
+        ) {
             Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (loadingModel) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp))
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = MaterialTheme.colorScheme.secondary)
                     Text("  Chargement du modèle…")
                 } else {
                     Text(if (text.isEmpty()) AnnotatedString("…") else formatRoleplayText(text, isUser = false))
@@ -229,9 +266,12 @@ private fun StreamingBubble(text: String, loadingModel: Boolean) {
  */
 @Composable
 private fun formatRoleplayText(raw: String, isUser: Boolean): AnnotatedString {
-    val dialogueColor = if (isUser) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-    val actionColor = MaterialTheme.colorScheme.secondary
-    val thoughtColor = MaterialTheme.colorScheme.tertiary
+    // Bulle utilisateur = dégradé de marque plein (rose→violet) : le texte y est toujours blanc,
+    // avec des variantes légèrement teintées pour action/pensée plutôt que les couleurs d'accent
+    // secondary/tertiary du thème, qui se distingueraient mal sur un fond déjà rose/violet.
+    val dialogueColor = if (isUser) androidx.compose.ui.graphics.Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+    val actionColor = if (isUser) androidx.compose.ui.graphics.Color(0xFFFFE1EC) else MaterialTheme.colorScheme.secondary
+    val thoughtColor = if (isUser) androidx.compose.ui.graphics.Color(0xFFF3E8FF) else MaterialTheme.colorScheme.tertiary
     return buildAnnotatedString {
         for (segment in parseMessageSegments(raw)) {
             when (segment) {
@@ -258,7 +298,7 @@ private fun ChatInputBar(
     onSend: () -> Unit,
     onStop: () -> Unit,
 ) {
-    Surface(tonalElevation = 3.dp) {
+    Surface(color = MaterialTheme.colorScheme.surface, tonalElevation = 3.dp) {
         Column(Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
             // Boutons "Action"/"Pensée" : insèrent les mêmes marqueurs (*…*, (…)) que ceux
             // enseignés au modèle (voir PromptBuilder.ROLEPLAY_FORMAT_DIRECTIVE), pour que
@@ -290,10 +330,28 @@ private fun ChatInputBar(
                     enabled = !isGenerating,
                     maxLines = 5,
                 )
-                if (isGenerating) {
-                    IconButton(onClick = onStop) { Icon(Icons.Filled.Stop, contentDescription = "Arrêter") }
+                val sendButtonBrush = if (isGenerating) {
+                    val c = MaterialTheme.colorScheme.surfaceVariant
+                    Brush.linearGradient(listOf(c, c))
                 } else {
-                    IconButton(onClick = onSend) { Icon(Icons.Filled.Send, contentDescription = "Envoyer") }
+                    BrandGradient
+                }
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(sendButtonBrush),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (isGenerating) {
+                        IconButton(onClick = onStop) {
+                            Icon(Icons.Filled.Stop, contentDescription = "Arrêter", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    } else {
+                        IconButton(onClick = onSend) {
+                            Icon(Icons.Filled.Send, contentDescription = "Envoyer", tint = androidx.compose.ui.graphics.Color.White)
+                        }
+                    }
                 }
             }
         }
