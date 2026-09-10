@@ -18,6 +18,7 @@ import com.opencompanion.app.engine.GenerationEvent
 import com.opencompanion.app.engine.GenerationParams
 import com.opencompanion.app.engine.InferenceEngine
 import com.opencompanion.app.engine.NanoBridge
+import com.opencompanion.app.engine.parseApiKeys
 import com.opencompanion.app.prompt.PromptBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -279,32 +280,40 @@ class ChatViewModel(
             )
         } else if (backend == EngineBackend.CLOUD_GROQ) {
             // Groq expose une API compatible OpenAI : on réutilise le client générique plutôt
-            // qu'une fonction dédiée, seule l'URL d'endpoint change.
-            cloudBridge.generateOpenAiCompatible(
-                endpointUrl = "https://api.groq.com/openai/v1/chat/completions",
-                apiKey = settings.groqApiKey,
-                modelName = settings.groqModelName,
-                turns = turns,
-                maxTokens = settings.maxResponseTokens,
-                temperature = settings.temperature,
-            )
+            // qu'une fonction dédiée, seule l'URL d'endpoint change. Plusieurs clés (une par
+            // ligne dans les réglages) tournent automatiquement en cas de clé invalide/quota
+            // atteint — voir CloudEngineBridge.generateWithKeyRotation.
+            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.groqApiKey)) { key ->
+                cloudBridge.generateOpenAiCompatible(
+                    endpointUrl = "https://api.groq.com/openai/v1/chat/completions",
+                    apiKey = key,
+                    modelName = settings.groqModelName,
+                    turns = turns,
+                    maxTokens = settings.maxResponseTokens,
+                    temperature = settings.temperature,
+                )
+            }
         } else if (backend == EngineBackend.CLOUD_GEMINI) {
-            cloudBridge.generateGemini(
-                apiKey = settings.geminiApiKey,
-                modelName = settings.geminiModelName,
-                turns = turns,
-                maxTokens = settings.maxResponseTokens,
-                temperature = settings.temperature,
-            )
+            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.geminiApiKey)) { key ->
+                cloudBridge.generateGemini(
+                    apiKey = key,
+                    modelName = settings.geminiModelName,
+                    turns = turns,
+                    maxTokens = settings.maxResponseTokens,
+                    temperature = settings.temperature,
+                )
+            }
         } else {
-            cloudBridge.generateOpenAiCompatible(
-                endpointUrl = settings.cloudEndpointUrl,
-                apiKey = settings.cloudApiKey,
-                modelName = settings.cloudModelName,
-                turns = turns,
-                maxTokens = settings.maxResponseTokens,
-                temperature = settings.temperature,
-            )
+            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.cloudApiKey)) { key ->
+                cloudBridge.generateOpenAiCompatible(
+                    endpointUrl = settings.cloudEndpointUrl,
+                    apiKey = key,
+                    modelName = settings.cloudModelName,
+                    turns = turns,
+                    maxTokens = settings.maxResponseTokens,
+                    temperature = settings.temperature,
+                )
+            }
         }
 
         flow.collectLatest { event ->

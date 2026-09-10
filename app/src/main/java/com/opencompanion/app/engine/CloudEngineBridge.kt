@@ -13,6 +13,25 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+/** Découpe une chaîne de clés API en liste utilisable : une clé par ligne (ou séparées par des
+ *  virgules), lignes vides ignorées — permet de renseigner plusieurs clés (plusieurs comptes
+ *  gratuits) pour un même provider et de tourner automatiquement dessus en cas de quota atteint
+ *  (voir [CloudEngineBridge.generateWithKeyRotation]). */
+fun parseApiKeys(raw: String): List<String> =
+    raw.split('\n', ',').map { it.trim() }.filter { it.isNotBlank() }
+
+private val HTTP_STATUS_IN_MESSAGE = Regex("\\((\\d{3})\\)")
+
+/** true si [message] (formaté par les fonctions generate* de [CloudEngineBridge], ex.
+ *  "Gemini (429) : ...") correspond à une erreur d'authentification ou de quota — les seuls cas
+ *  où réessayer avec une AUTRE clé API a une chance de résoudre le problème (401/403 = clé
+ *  invalide/refusée, 429 = quota épuisé). Une 404 (mauvais nom de modèle/URL) ou une erreur
+ *  réseau échouerait de la même façon avec n'importe quelle clé : inutile de toutes les essayer. */
+private fun isKeyRotationCandidate(message: String): Boolean {
+    val code = HTTP_STATUS_IN_MESSAGE.find(message)?.groupValues?.get(1)?.toIntOrNull() ?: return false
+    return code == 401 || code == 403 || code == 429
+}
+
 /**
  * Moteur d'inférence Cloud : effectue les requêtes en streaming ou en polling vers des providers
  * d'IA Cloud gratuits, illimités et sans censure (OpenRouter, KoboldAI Horde, Pollinations, ou serveur compatible OpenAI).
@@ -20,6 +39,47 @@ import java.net.URL
 class CloudEngineBridge {
 
     private val jsonParser = Json { ignoreUnknownKeys = true; isLenient = true }
+
+    /**
+     * Essaie [attempt] successivement avec chaque clé de [apiKeys] tant que l'échec est une
+     * erreur d'authentification/quota (voir [isKeyRotationCandidate]) et qu'AUCUN token n'a
+     * encore été reçu — pour que plusieurs clés API gratuites du même provider servent de
+     * réserve les unes des autres, sans surveillance manuelle à chaque quota atteint. Une fois
+     * qu'un token a été émis, on ne bascule plus : rejouer la génération sur une autre clé
+     * dupliquerait/mélangerait une réponse déjà commencée plutôt que de vraiment la réparer.
+     * [apiKeys] vide = une seule tentative avec une clé vide (comportement identique à avant
+     * l'introduction du multi-clés, pour les backends qui tolèrent une clé absente).
+     */
+    fun generateWithKeyRotation(
+        apiKeys: List<String>,
+        attempt: (String) -> Flow<GenerationEvent>,
+    ): Flow<GenerationEvent> = channelFlow {
+        val keys = apiKeys.ifEmpty { listOf("") }
+        var lastErrorMessage: String? = null
+        for ((index, key) in keys.withIndex()) {
+            var tokenEmitted = false
+            var shouldTryNextKey = false
+            attempt(key).collect { event ->
+                when (event) {
+                    is GenerationEvent.Token -> {
+                        tokenEmitted = true
+                        send(event)
+                    }
+                    is GenerationEvent.Error -> {
+                        lastErrorMessage = event.message
+                        if (!tokenEmitted && index < keys.lastIndex && isKeyRotationCandidate(event.message)) {
+                            shouldTryNextKey = true
+                        } else {
+                            send(event)
+                        }
+                    }
+                    else -> send(event)
+                }
+            }
+            if (!shouldTryNextKey) return@channelFlow
+        }
+        send(GenerationEvent.Error(lastErrorMessage ?: "Toutes les clés API configurées ont échoué."))
+    }.flowOn(Dispatchers.IO)
 
     /**
      * Mode Cloud 100% Gratuit & Illimité SANS AUCUNE CLÉ API REQUISE.
@@ -310,7 +370,10 @@ class CloudEngineBridge {
                 send(GenerationEvent.Error("Aucune clé API Gemini configurée (Réglages → Moteur d'IA)."))
                 return@channelFlow
             }
-            val model = modelName.ifBlank { "gemini-2.0-flash" }
+            // "gemini-2.0-flash" (l'ancien défaut) a été mis hors service par Google en 2026 —
+            // voir la doc officielle des modèles Gemini pour la liste à jour si celui-ci
+            // devient à son tour obsolète (erreur 404 "is not found for API version").
+            val model = modelName.ifBlank { "gemini-3.5-flash" }
             val url = URL(
                 "https://generativelanguage.googleapis.com/v1beta/models/$model:streamGenerateContent" +
                     "?alt=sse&key=${apiKey.trim()}"

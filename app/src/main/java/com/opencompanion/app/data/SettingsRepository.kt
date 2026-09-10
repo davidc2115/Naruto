@@ -92,9 +92,9 @@ data class EngineSettings(
     val cloudModelName: String = "Hermes-3-Llama-3.1-8B",
     val cloudEndpointUrl: String = "https://openrouter.ai/api/v1/chat/completions",
     val groqApiKey: String = "",
-    val groqModelName: String = "llama-3.3-70b-versatile",
+    val groqModelName: String = "openai/gpt-oss-120b",
     val geminiApiKey: String = "",
-    val geminiModelName: String = "gemini-2.0-flash",
+    val geminiModelName: String = "gemini-3.5-flash",
 )
 
 /**
@@ -151,9 +151,18 @@ class SettingsRepository(private val context: Context) {
             cloudModelName = prefs[Keys.CLOUD_MODEL_NAME] ?: "nousresearch/hermes-3-llama-3.1-8b:free",
             cloudEndpointUrl = prefs[Keys.CLOUD_ENDPOINT_URL] ?: "https://openrouter.ai/api/v1/chat/completions",
             groqApiKey = prefs[Keys.GROQ_API_KEY] ?: "",
-            groqModelName = prefs[Keys.GROQ_MODEL_NAME] ?: "llama-3.3-70b-versatile",
+            // Corrige automatiquement l'ancien défaut "llama-3.3-70b-versatile" (coupé pour les
+            // comptes gratuits/développeur par Groq le 16/08/2026) s'il a été enregistré tel
+            // quel — sans ça, quelqu'un qui n'a jamais touché ce champ resterait bloqué sur un
+            // modèle mort après une mise à jour de l'app plutôt que de bénéficier du nouveau défaut.
+            groqModelName = prefs[Keys.GROQ_MODEL_NAME]?.takeUnless { it == "llama-3.3-70b-versatile" }
+                ?: "openai/gpt-oss-120b",
             geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
-            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME] ?: "gemini-2.0-flash",
+            // Même correction pour "gemini-2.0-flash", mis hors service par Google en 2026 — voir
+            // CloudEngineBridge.generateGemini pour la référence à la doc à jour en cas de
+            // nouvelle obsolescence.
+            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.takeUnless { it == "gemini-2.0-flash" }
+                ?: "gemini-3.5-flash",
         )
     }
 
