@@ -2,7 +2,10 @@ package com.opencompanion.app.ui.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,16 +13,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,6 +56,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,6 +67,7 @@ import com.opencompanion.app.data.UserGender
 import com.opencompanion.app.engine.ModelManager
 import com.opencompanion.app.engine.NanoBridge
 import com.opencompanion.app.engine.RecommendedModels
+import com.opencompanion.app.ui.theme.BrandGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,148 +137,130 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             Divider()
             SectionTitle("Moteur d'IA")
             Text(
-                "« Auto » essaie d'abord Gemini Nano (rapide, intégré à Android) quand il est " +
-                    "disponible sur cet appareil, et bascule automatiquement sur le modèle GGUF " +
-                    "local sinon.",
+                "Où tourne l'IA qui anime tes personnages ?",
                 style = MaterialTheme.typography.bodySmall,
             )
-            EngineBackend.entries.forEach { backend ->
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                ) {
-                    RadioButton(
-                        selected = state.settings.enginePreference == backend,
-                        onClick = { viewModel.setEnginePreference(backend) },
-                    )
-                    Text(engineBackendLabel(backend))
-                }
+
+            val currentCategory = engineCategoryOf(state.settings.enginePreference)
+            EngineCategory.entries.forEach { category ->
+                EngineCategoryCard(
+                    category = category,
+                    selected = category == currentCategory,
+                    onClick = { viewModel.setEnginePreference(category.defaultBackend) },
+                )
             }
 
-            if (state.settings.enginePreference in listOf(
-                    EngineBackend.CLOUD_OPENROUTER,
-                    EngineBackend.CLOUD_KOBOLD_HORDE,
-                    EngineBackend.CLOUD_CUSTOM_OPENAI,
-                    EngineBackend.CLOUD_GROQ,
-                    EngineBackend.CLOUD_GEMINI,
-                )
-            ) {
-                Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
-                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Configuration Cloud IA", style = MaterialTheme.typography.titleSmall)
-                        if (state.settings.enginePreference == EngineBackend.CLOUD_OPENROUTER) {
-                            Text(
-                                "OpenRouter offre des modèles ultra-rapides et entièrement débridés (NSFW/JDR). " +
-                                "Obtiens une clé gratuite en 1 clic sur openrouter.ai/keys si besoin.",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                            OutlinedTextField(
-                                value = state.settings.cloudModelName,
-                                onValueChange = viewModel::setCloudModelName,
-                                label = { Text("Modèle Cloud") },
-                                placeholder = { Text("nousresearch/hermes-3-llama-3.1-8b:free") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                TextButton(onClick = { viewModel.setCloudModelName("nousresearch/hermes-3-llama-3.1-8b:free") }) {
-                                    Text("Hermes 3 (NSFW)")
-                                }
-                                TextButton(onClick = { viewModel.setCloudModelName("meta-llama/llama-3.3-70b-instruct:free") }) {
-                                    Text("Llama 3.3 70B")
-                                }
-                                TextButton(onClick = { viewModel.setCloudModelName("qwen/qwen-2.5-72b-instruct:free") }) {
-                                    Text("Qwen 72B")
-                                }
+            when (currentCategory) {
+                EngineCategory.LOCAL -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp)) {
+                        listOf(EngineBackend.AUTO, EngineBackend.AICORE, EngineBackend.LLAMA_CPP).forEach { backend ->
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = state.settings.enginePreference == backend,
+                                    onClick = { viewModel.setEnginePreference(backend) },
+                                )
+                                Text(engineBackendLabel(backend))
                             }
-                            OutlinedTextField(
-                                value = state.settings.cloudApiKey,
-                                onValueChange = viewModel::setCloudApiKey,
-                                label = { Text("Clé API OpenRouter (optionnelle / gratuite)") },
-                                placeholder = { Text("sk-or-v1-...") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_KOBOLD_HORDE) {
-                            Text(
-                                "KoboldAI Horde est un réseau d'IA communautaire 100% gratuit, illimité et sans restriction NSFW. " +
-                                "Aucune clé requise.",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                            OutlinedTextField(
-                                value = state.settings.cloudModelName,
-                                onValueChange = viewModel::setCloudModelName,
-                                label = { Text("Modèle Horde") },
-                                placeholder = { Text("Hermes-3-Llama-3.1-8B") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_CUSTOM_OPENAI) {
-                            OutlinedTextField(
-                                value = state.settings.cloudEndpointUrl,
-                                onValueChange = viewModel::setCloudEndpointUrl,
-                                label = { Text("URL de l'API (/v1/chat/completions)") },
-                                placeholder = { Text("https://api.groq.com/openai/v1/chat/completions") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            OutlinedTextField(
-                                value = state.settings.cloudModelName,
-                                onValueChange = viewModel::setCloudModelName,
-                                label = { Text("Nom du modèle") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            OutlinedTextField(
-                                value = state.settings.cloudApiKey,
-                                onValueChange = viewModel::setCloudApiKey,
-                                label = { Text("Clé API (si nécessaire)") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_GROQ) {
-                            Text(
-                                "Groq propose une inférence cloud très rapide. Crée une clé API " +
-                                    "gratuite sur console.groq.com/keys.",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                            OutlinedTextField(
-                                value = state.settings.groqApiKey,
-                                onValueChange = viewModel::setGroqApiKey,
-                                label = { Text("Clé API Groq") },
-                                placeholder = { Text("gsk_...") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            OutlinedTextField(
-                                value = state.settings.groqModelName,
-                                onValueChange = viewModel::setGroqModelName,
-                                label = { Text("Modèle Groq") },
-                                placeholder = { Text("llama-3.3-70b-versatile") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_GEMINI) {
-                            Text(
-                                "Gemini (Google). Crée une clé API gratuite sur aistudio.google.com/apikey.",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                            OutlinedTextField(
-                                value = state.settings.geminiApiKey,
-                                onValueChange = viewModel::setGeminiApiKey,
-                                label = { Text("Clé API Gemini") },
-                                placeholder = { Text("AIza...") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            OutlinedTextField(
-                                value = state.settings.geminiModelName,
-                                onValueChange = viewModel::setGeminiModelName,
-                                label = { Text("Modèle Gemini") },
-                                placeholder = { Text("gemini-2.0-flash") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
+                        }
+                        Text(
+                            "« Auto » essaie d'abord Gemini Nano (rapide, intégré à Android) quand il " +
+                                "est disponible sur cet appareil, et bascule automatiquement sur le " +
+                                "modèle GGUF local sinon — c'est le choix le plus simple.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+                EngineCategory.GROQ -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "Crée une clé API gratuite sur console.groq.com/keys.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        ApiKeysField(
+                            value = state.settings.groqApiKey,
+                            onValueChange = viewModel::setGroqApiKey,
+                            label = "Clé(s) API Groq",
+                            placeholder = "gsk_...",
+                        )
+                        OutlinedTextField(
+                            value = state.settings.groqModelName,
+                            onValueChange = viewModel::setGroqModelName,
+                            label = { Text("Modèle") },
+                            placeholder = { Text("openai/gpt-oss-120b") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                EngineCategory.GEMINI -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "Crée une clé API gratuite sur aistudio.google.com/apikey.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        ApiKeysField(
+                            value = state.settings.geminiApiKey,
+                            onValueChange = viewModel::setGeminiApiKey,
+                            label = "Clé(s) API Gemini",
+                            placeholder = "AIza...",
+                        )
+                        OutlinedTextField(
+                            value = state.settings.geminiModelName,
+                            onValueChange = viewModel::setGeminiModelName,
+                            label = { Text("Modèle") },
+                            placeholder = { Text("gemini-3.5-flash") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                EngineCategory.CUSTOM_CLOUD -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "Pour OpenRouter, laisse l'URL par défaut. Sinon, mets l'URL de n'importe " +
+                                "quel serveur compatible OpenAI (LM Studio, Together AI…).",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        OutlinedTextField(
+                            value = state.settings.cloudEndpointUrl,
+                            onValueChange = viewModel::setCloudEndpointUrl,
+                            label = { Text("URL de l'API (/v1/chat/completions)") },
+                            placeholder = { Text("https://openrouter.ai/api/v1/chat/completions") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        OutlinedTextField(
+                            value = state.settings.cloudModelName,
+                            onValueChange = viewModel::setCloudModelName,
+                            label = { Text("Modèle") },
+                            placeholder = { Text("nousresearch/hermes-3-llama-3.1-8b:free") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        ApiKeysField(
+                            value = state.settings.cloudApiKey,
+                            onValueChange = viewModel::setCloudApiKey,
+                            label = "Clé(s) API",
+                            placeholder = "sk-or-v1-...",
+                        )
+                    }
+                }
+                EngineCategory.ANONYMOUS -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            "⚠️ Passe par des serveurs publics tiers non vérifiés (Pollinations, " +
+                                "KoboldAI Horde) : disponibilité et qualité variables. Préfère Groq ou " +
+                                "Gemini avec ta propre clé si tu peux.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        listOf(EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_KOBOLD_HORDE).forEach { backend ->
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = state.settings.enginePreference == backend,
+                                    onClick = { viewModel.setEnginePreference(backend) },
+                                )
+                                Text(if (backend == EngineBackend.CLOUD_FREE_NO_KEY) "Auto (recommandé)" else "KoboldAI Horde uniquement")
+                            }
                         }
                     }
                 }
@@ -475,6 +472,115 @@ private fun engineBackendLabel(backend: EngineBackend): String = when (backend) 
     EngineBackend.CLOUD_OPENROUTER -> "☁️ OpenRouter Cloud (avec ta clé API)"
     EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 KoboldAI Horde (réseau communautaire tiers, sans clé)"
     EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ API Cloud personnalisée / compatible OpenAI"
+}
+
+/**
+ * Regroupe les 9 [EngineBackend] techniques en 5 familles compréhensibles pour l'utilisateur, afin
+ * de remplacer l'ancienne liste plate de 9 boutons radio par 5 grandes cartes (voir
+ * [EngineCategoryCard]). Chaque famille garde son propre bloc de réglages détaillés en dessous
+ * (choix précis + clé API le cas échéant).
+ */
+private enum class EngineCategory(
+    val title: String,
+    val subtitle: String,
+    val icon: ImageVector,
+    val defaultBackend: EngineBackend,
+) {
+    LOCAL(
+        title = "Sur l'appareil",
+        subtitle = "Gratuit, privé, fonctionne sans connexion",
+        icon = Icons.Filled.PhoneAndroid,
+        defaultBackend = EngineBackend.AUTO,
+    ),
+    GROQ(
+        title = "Groq",
+        subtitle = "Cloud très rapide, clé API gratuite",
+        icon = Icons.Filled.Bolt,
+        defaultBackend = EngineBackend.CLOUD_GROQ,
+    ),
+    GEMINI(
+        title = "Gemini",
+        subtitle = "Cloud Google, clé API gratuite",
+        icon = Icons.Filled.AutoAwesome,
+        defaultBackend = EngineBackend.CLOUD_GEMINI,
+    ),
+    CUSTOM_CLOUD(
+        title = "Cloud personnalisé",
+        subtitle = "OpenRouter ou tout serveur compatible OpenAI",
+        icon = Icons.Filled.Cloud,
+        defaultBackend = EngineBackend.CLOUD_OPENROUTER,
+    ),
+    ANONYMOUS(
+        title = "Anonyme (sans clé)",
+        subtitle = "Serveurs publics tiers, qualité variable",
+        icon = Icons.Filled.Public,
+        defaultBackend = EngineBackend.CLOUD_FREE_NO_KEY,
+    ),
+}
+
+private fun engineCategoryOf(backend: EngineBackend): EngineCategory = when (backend) {
+    EngineBackend.AUTO, EngineBackend.AICORE, EngineBackend.LLAMA_CPP -> EngineCategory.LOCAL
+    EngineBackend.CLOUD_GROQ -> EngineCategory.GROQ
+    EngineBackend.CLOUD_GEMINI -> EngineCategory.GEMINI
+    EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_CUSTOM_OPENAI -> EngineCategory.CUSTOM_CLOUD
+    EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_KOBOLD_HORDE -> EngineCategory.ANONYMOUS
+}
+
+/** Grande carte cliquable représentant une famille de moteur d'IA (remplace un simple bouton radio
+ *  pour rendre le choix plus visuel et plus simple à comprendre d'un coup d'œil). */
+@Composable
+private fun EngineCategoryCard(category: EngineCategory, selected: Boolean, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(if (selected) BrandGradient else Brush.linearGradient(listOf(Color.Gray, Color.Gray)), shape = CircleShape),
+                contentAlignment = androidx.compose.ui.Alignment.Center,
+            ) {
+                Icon(category.icon, contentDescription = null, tint = Color.White)
+            }
+            Column(Modifier.weight(1f)) {
+                Text(category.title, style = MaterialTheme.typography.titleMedium)
+                Text(category.subtitle, style = MaterialTheme.typography.bodySmall)
+            }
+            RadioButton(selected = selected, onClick = onClick)
+        }
+    }
+}
+
+/** Champ multi-lignes pour saisir une ou plusieurs clés API (une par ligne), pour permettre la
+ *  rotation automatique quand le quota d'une clé est atteint (voir `generateWithKeyRotation`). */
+@Composable
+private fun ApiKeysField(value: String, onValueChange: (String) -> Unit, label: String, placeholder: String) {
+    Column {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            placeholder = { Text(placeholder) },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            "Plusieurs clés ? Une par ligne (ou séparées par une virgule) — la suivante est " +
+                "utilisée automatiquement si le quota d'une clé est atteint.",
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
 }
 
 private fun userGenderLabel(gender: UserGender): String = when (gender) {
