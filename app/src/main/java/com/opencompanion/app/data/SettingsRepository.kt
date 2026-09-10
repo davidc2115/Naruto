@@ -25,7 +25,12 @@ enum class EngineBackend {
     LLAMA_CPP,
     CLOUD_OPENROUTER,
     CLOUD_KOBOLD_HORDE,
-    CLOUD_CUSTOM_OPENAI
+    CLOUD_CUSTOM_OPENAI,
+    // Backends demandés explicitement par l'utilisateur : nécessitent chacun sa propre clé API
+    // (compte Groq / compte Google AI Studio), donc pas de bascule automatique de l'un vers
+    // l'autre — seulement une sélection manuelle dans les réglages (voir ChatViewModel).
+    CLOUD_GROQ,
+    CLOUD_GEMINI
 }
 
 /** Genre déclaré par l'utilisateur, injecté dans le prompt système (voir PromptBuilder) pour
@@ -71,11 +76,22 @@ data class EngineSettings(
     val topP: Float = 0.95f,
     val repeatPenalty: Float = 1.1f,
     val threads: Int = 0, // 0 = laisser InferenceEngine choisir une valeur recommandée
-    val enginePreference: EngineBackend = EngineBackend.CLOUD_FREE_NO_KEY,
-    val allowNsfwMode: Boolean = true,
+    // AUTO (Gemini Nano si dispo, sinon llama.cpp local) plutôt que CLOUD_FREE_NO_KEY par défaut :
+    // ce dernier envoie silencieusement les messages à des services anonymes tiers (Pollinations,
+    // KoboldAI Horde) sans que l'utilisateur ait rien configuré ni choisi. Les backends cloud
+    // (Groq, Gemini, ou un provider personnalisé) restent disponibles mais doivent être activés
+    // explicitement dans les réglages, avec la clé API de l'utilisateur.
+    val enginePreference: EngineBackend = EngineBackend.AUTO,
+    // false par défaut : le mode NSFW doit être un choix explicite de l'utilisateur (opt-in),
+    // jamais activé silencieusement de base.
+    val allowNsfwMode: Boolean = false,
     val cloudApiKey: String = "",
     val cloudModelName: String = "Hermes-3-Llama-3.1-8B",
     val cloudEndpointUrl: String = "https://openrouter.ai/api/v1/chat/completions",
+    val groqApiKey: String = "",
+    val groqModelName: String = "llama-3.3-70b-versatile",
+    val geminiApiKey: String = "",
+    val geminiModelName: String = "gemini-2.0-flash",
 )
 
 /**
@@ -106,6 +122,10 @@ class SettingsRepository(private val context: Context) {
         val CLOUD_API_KEY = stringPreferencesKey("cloud_api_key")
         val CLOUD_MODEL_NAME = stringPreferencesKey("cloud_model_name")
         val CLOUD_ENDPOINT_URL = stringPreferencesKey("cloud_endpoint_url")
+        val GROQ_API_KEY = stringPreferencesKey("groq_api_key")
+        val GROQ_MODEL_NAME = stringPreferencesKey("groq_model_name")
+        val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
+        val GEMINI_MODEL_NAME = stringPreferencesKey("gemini_model_name")
     }
 
     val settings: Flow<EngineSettings> = context.dataStore.data.map { prefs ->
@@ -123,10 +143,14 @@ class SettingsRepository(private val context: Context) {
             enginePreference = prefs[Keys.ENGINE_BACKEND]?.let {
                 runCatching { EngineBackend.valueOf(it) }.getOrNull()
             } ?: EngineBackend.AUTO,
-            allowNsfwMode = prefs[Keys.ALLOW_NSFW_MODE] ?: true,
+            allowNsfwMode = prefs[Keys.ALLOW_NSFW_MODE] ?: false,
             cloudApiKey = prefs[Keys.CLOUD_API_KEY] ?: "",
             cloudModelName = prefs[Keys.CLOUD_MODEL_NAME] ?: "nousresearch/hermes-3-llama-3.1-8b:free",
             cloudEndpointUrl = prefs[Keys.CLOUD_ENDPOINT_URL] ?: "https://openrouter.ai/api/v1/chat/completions",
+            groqApiKey = prefs[Keys.GROQ_API_KEY] ?: "",
+            groqModelName = prefs[Keys.GROQ_MODEL_NAME] ?: "llama-3.3-70b-versatile",
+            geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
+            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME] ?: "gemini-2.0-flash",
         )
     }
 
@@ -170,6 +194,19 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setCloudEndpointUrl(url: String) = context.dataStore.edit {
         if (url.isBlank()) it.remove(Keys.CLOUD_ENDPOINT_URL) else it[Keys.CLOUD_ENDPOINT_URL] = url.trim()
+    }
+
+    suspend fun setGroqApiKey(key: String) = context.dataStore.edit {
+        if (key.isBlank()) it.remove(Keys.GROQ_API_KEY) else it[Keys.GROQ_API_KEY] = key.trim()
+    }
+    suspend fun setGroqModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.GROQ_MODEL_NAME) else it[Keys.GROQ_MODEL_NAME] = model.trim()
+    }
+    suspend fun setGeminiApiKey(key: String) = context.dataStore.edit {
+        if (key.isBlank()) it.remove(Keys.GEMINI_API_KEY) else it[Keys.GEMINI_API_KEY] = key.trim()
+    }
+    suspend fun setGeminiModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.GEMINI_MODEL_NAME) else it[Keys.GEMINI_MODEL_NAME] = model.trim()
     }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->

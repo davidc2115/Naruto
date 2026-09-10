@@ -140,7 +140,14 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 }
             }
 
-            if (state.settings.enginePreference in listOf(EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI)) {
+            if (state.settings.enginePreference in listOf(
+                    EngineBackend.CLOUD_OPENROUTER,
+                    EngineBackend.CLOUD_KOBOLD_HORDE,
+                    EngineBackend.CLOUD_CUSTOM_OPENAI,
+                    EngineBackend.CLOUD_GROQ,
+                    EngineBackend.CLOUD_GEMINI,
+                )
+            ) {
                 Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("Configuration Cloud IA", style = MaterialTheme.typography.titleSmall)
@@ -211,6 +218,49 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                 value = state.settings.cloudApiKey,
                                 onValueChange = viewModel::setCloudApiKey,
                                 label = { Text("Clé API (si nécessaire)") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_GROQ) {
+                            Text(
+                                "Groq propose une inférence cloud très rapide. Crée une clé API " +
+                                    "gratuite sur console.groq.com/keys.",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            OutlinedTextField(
+                                value = state.settings.groqApiKey,
+                                onValueChange = viewModel::setGroqApiKey,
+                                label = { Text("Clé API Groq") },
+                                placeholder = { Text("gsk_...") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            OutlinedTextField(
+                                value = state.settings.groqModelName,
+                                onValueChange = viewModel::setGroqModelName,
+                                label = { Text("Modèle Groq") },
+                                placeholder = { Text("llama-3.3-70b-versatile") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        } else if (state.settings.enginePreference == EngineBackend.CLOUD_GEMINI) {
+                            Text(
+                                "Gemini (Google). Crée une clé API gratuite sur aistudio.google.com/apikey.",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            OutlinedTextField(
+                                value = state.settings.geminiApiKey,
+                                onValueChange = viewModel::setGeminiApiKey,
+                                label = { Text("Clé API Gemini") },
+                                placeholder = { Text("AIza...") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            OutlinedTextField(
+                                value = state.settings.geminiModelName,
+                                onValueChange = viewModel::setGeminiModelName,
+                                label = { Text("Modèle Gemini") },
+                                placeholder = { Text("gemini-2.0-flash") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                             )
@@ -413,13 +463,18 @@ private fun ModelRow(
 }
 
 private fun engineBackendLabel(backend: EngineBackend): String = when (backend) {
-    EngineBackend.CLOUD_FREE_NO_KEY -> "⚡ Cloud IA Gratuit (SANS CLÉ API, Illimité & NSFW - Recommandé)"
+    // Repose sur des serveurs anonymes tiers (Pollinations AI, KoboldAI Horde) non affiliés à
+    // Anthropic ni configurés par toi : tes messages transitent par leurs services. Ni "gratuit"
+    // ni "illimité" ne sont garantis dans le temps. Préférer Groq/Gemini avec ta propre clé API.
+    EngineBackend.CLOUD_FREE_NO_KEY -> "⚠️ Cloud anonyme sans clé (service tiers non vérifié)"
     EngineBackend.AUTO -> "Auto (Local AICore / llama.cpp)"
     EngineBackend.AICORE -> "Gemini Nano (AICore, appareil compatible uniquement)"
     EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp sur l'appareil)"
-    EngineBackend.CLOUD_OPENROUTER -> "☁️ OpenRouter Cloud (Avec votre clé API)"
-    EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 KoboldAI Horde (Réseau décentralisé sans clé)"
-    EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ API Cloud Perso / Compatible OpenAI (Groq, LM Studio, Together...)"
+    EngineBackend.CLOUD_GROQ -> "☁️ Groq (avec ta clé API)"
+    EngineBackend.CLOUD_GEMINI -> "☁️ Gemini (avec ta clé API)"
+    EngineBackend.CLOUD_OPENROUTER -> "☁️ OpenRouter Cloud (avec ta clé API)"
+    EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 KoboldAI Horde (réseau communautaire tiers, sans clé)"
+    EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ API Cloud personnalisée / compatible OpenAI"
 }
 
 private fun userGenderLabel(gender: UserGender): String = when (gender) {

@@ -193,6 +193,11 @@ class SettingsViewModel(
     fun setCloudModelName(model: String) = viewModelScope.launch { settingsRepository.setCloudModelName(model) }
     fun setCloudEndpointUrl(url: String) = viewModelScope.launch { settingsRepository.setCloudEndpointUrl(url) }
 
+    fun setGroqApiKey(key: String) = viewModelScope.launch { settingsRepository.setGroqApiKey(key) }
+    fun setGroqModelName(model: String) = viewModelScope.launch { settingsRepository.setGroqModelName(model) }
+    fun setGeminiApiKey(key: String) = viewModelScope.launch { settingsRepository.setGeminiApiKey(key) }
+    fun setGeminiModelName(model: String) = viewModelScope.launch { settingsRepository.setGeminiModelName(model) }
+
     fun consumeMessage() {
         _message.value = null
     }

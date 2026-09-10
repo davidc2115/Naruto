@@ -290,6 +290,103 @@ class CloudEngineBridge {
         }
     }.flowOn(Dispatchers.IO)
 
+    /**
+     * Inférence via l'API Gemini de Google (generativelanguage.googleapis.com), en streaming SSE.
+     * Format différent de l'API compatible OpenAI ci-dessus : rôles "user"/"model" (pas
+     * "assistant"), et le message système passe par un champ `systemInstruction` séparé plutôt
+     * que par un tour de rôle "system" dans la liste — d'où une fonction dédiée plutôt qu'une
+     * réutilisation de [generateOpenAiCompatible].
+     */
+    fun generateGemini(
+        apiKey: String,
+        modelName: String,
+        turns: List<ChatTurn>,
+        maxTokens: Int = 768,
+        temperature: Float = 0.8f,
+    ): Flow<GenerationEvent> = channelFlow {
+        var connection: HttpURLConnection? = null
+        try {
+            if (apiKey.isBlank()) {
+                send(GenerationEvent.Error("Aucune clé API Gemini configurée (Réglages → Moteur d'IA)."))
+                return@channelFlow
+            }
+            val model = modelName.ifBlank { "gemini-2.0-flash" }
+            val url = URL(
+                "https://generativelanguage.googleapis.com/v1beta/models/$model:streamGenerateContent" +
+                    "?alt=sse&key=${apiKey.trim()}"
+            )
+            connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                connectTimeout = 20_000
+                readTimeout = 60_000
+                doOutput = true
+                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+            }
+
+            val systemText = turns.firstOrNull { it.role == "system" }?.content
+            val contents = turns.filter { it.role != "system" }.map { turn ->
+                mapOf(
+                    "role" to if (turn.role == "assistant") "model" else "user",
+                    "parts" to listOf(mapOf("text" to turn.content)),
+                )
+            }
+            val payloadMap = mutableMapOf<String, Any>(
+                "contents" to contents,
+                "generationConfig" to mapOf(
+                    "temperature" to temperature,
+                    "maxOutputTokens" to maxTokens,
+                ),
+            )
+            if (!systemText.isNullOrBlank()) {
+                payloadMap["systemInstruction"] = mapOf("parts" to listOf(mapOf("text" to systemText)))
+            }
+
+            val jsonBody = buildJsonString(payloadMap)
+            connection.outputStream.use { os ->
+                os.write(jsonBody.toByteArray(Charsets.UTF_8))
+                os.flush()
+            }
+
+            val responseCode = connection.responseCode
+            if (responseCode !in 200..299) {
+                val errorText = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                send(GenerationEvent.Error("Gemini ($responseCode) : ${parseErrorMessage(errorText, responseCode)}"))
+                return@channelFlow
+            }
+
+            BufferedReader(InputStreamReader(connection.inputStream, Charsets.UTF_8)).use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    val currentLine = line?.trim() ?: continue
+                    if (currentLine.startsWith("data:")) {
+                        val dataStr = currentLine.removePrefix("data:").trim()
+                        if (dataStr.isEmpty()) continue
+                        try {
+                            val token = extractTokenFromGemini(dataStr)
+                            if (!token.isNullOrEmpty()) {
+                                send(GenerationEvent.Token(token))
+                            }
+                        } catch (_: Exception) {}
+                    }
+                }
+            }
+            send(GenerationEvent.Done)
+        } catch (e: Exception) {
+            send(GenerationEvent.Error(e.message ?: "Erreur réseau lors de la connexion à Gemini"))
+        } finally {
+            connection?.disconnect()
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private fun extractTokenFromGemini(jsonStr: String): String? {
+        val root = jsonParser.parseToJsonElement(jsonStr).jsonObject
+        val candidates = root["candidates"]?.jsonArray ?: return null
+        if (candidates.isEmpty()) return null
+        val content = candidates[0].jsonObject["content"]?.jsonObject ?: return null
+        val parts = content["parts"]?.jsonArray ?: return null
+        return parts.joinToString("") { it.jsonObject["text"]?.jsonPrimitive?.content.orEmpty() }
+    }
+
     private fun extractTokenFromSse(jsonStr: String): String? {
         val root = jsonParser.parseToJsonElement(jsonStr).jsonObject
         val choices = root["choices"]?.jsonArray ?: return null

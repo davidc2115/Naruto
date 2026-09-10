@@ -113,6 +113,8 @@ class ChatViewModel(
             EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
                 "Cloud : ${settings.cloudModelName.substringAfterLast('/')}"
             }
+            EngineBackend.CLOUD_GROQ -> "Groq : ${settings.groqModelName}"
+            EngineBackend.CLOUD_GEMINI -> "Gemini : ${settings.geminiModelName}"
             else -> settings.selectedModelPath?.let { path ->
                 java.io.File(path).name.removeSuffix(".gguf")
             }
@@ -151,7 +153,8 @@ class ChatViewModel(
                     )
                     return@launch
                 }
-                EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
+                EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE,
+                EngineBackend.CLOUD_CUSTOM_OPENAI, EngineBackend.CLOUD_GROQ, EngineBackend.CLOUD_GEMINI -> {
                     _usingNano.value = false
                     runCloudGeneration(character, settings, backend)
                     return@launch
@@ -184,6 +187,8 @@ class ChatViewModel(
         EngineBackend.CLOUD_OPENROUTER -> EngineBackend.CLOUD_OPENROUTER
         EngineBackend.CLOUD_KOBOLD_HORDE -> EngineBackend.CLOUD_KOBOLD_HORDE
         EngineBackend.CLOUD_CUSTOM_OPENAI -> EngineBackend.CLOUD_CUSTOM_OPENAI
+        EngineBackend.CLOUD_GROQ -> EngineBackend.CLOUD_GROQ
+        EngineBackend.CLOUD_GEMINI -> EngineBackend.CLOUD_GEMINI
         EngineBackend.AUTO -> {
             if (nanoBridge.checkAvailability() == NanoBridge.NanoAvailability.AVAILABLE) {
                 EngineBackend.AICORE
@@ -224,6 +229,25 @@ class ChatViewModel(
             cloudBridge.generateKoboldHorde(
                 apiKey = settings.cloudApiKey,
                 modelName = settings.cloudModelName,
+                turns = turns,
+                maxTokens = settings.maxResponseTokens,
+                temperature = settings.temperature,
+            )
+        } else if (backend == EngineBackend.CLOUD_GROQ) {
+            // Groq expose une API compatible OpenAI : on réutilise le client générique plutôt
+            // qu'une fonction dédiée, seule l'URL d'endpoint change.
+            cloudBridge.generateOpenAiCompatible(
+                endpointUrl = "https://api.groq.com/openai/v1/chat/completions",
+                apiKey = settings.groqApiKey,
+                modelName = settings.groqModelName,
+                turns = turns,
+                maxTokens = settings.maxResponseTokens,
+                temperature = settings.temperature,
+            )
+        } else if (backend == EngineBackend.CLOUD_GEMINI) {
+            cloudBridge.generateGemini(
+                apiKey = settings.geminiApiKey,
+                modelName = settings.geminiModelName,
                 turns = turns,
                 maxTokens = settings.maxResponseTokens,
                 temperature = settings.temperature,
