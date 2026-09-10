@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
@@ -61,6 +62,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.UserPersonaEntity
@@ -80,6 +82,7 @@ fun ChatScreen(
     var input by remember { mutableStateOf(TextFieldValue("")) }
     var menuExpanded by remember { mutableStateOf(false) }
     var showPersonaPicker by remember { mutableStateOf(false) }
+    var showRelationshipDialog by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -137,6 +140,15 @@ fun ChatScreen(
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
                 },
                 actions = {
+                    if (state.character != null) {
+                        IconButton(onClick = { showRelationshipDialog = true }) {
+                            Icon(
+                                Icons.Filled.Favorite,
+                                contentDescription = "Relation & mémoire (${state.character?.affectionLevel ?: 0}/100)",
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = "Réglages")
                     }
@@ -205,6 +217,73 @@ fun ChatScreen(
             onManagePersonas = { showPersonaPicker = false; onOpenPersonas() },
         )
     }
+
+    if (showRelationshipDialog) {
+        state.character?.let { character ->
+            RelationshipDialog(
+                character = character,
+                onDismiss = { showRelationshipDialog = false },
+                onAffectionChange = viewModel::setAffectionLevel,
+                onMemoryNotesChange = viewModel::updateMemoryNotes,
+            )
+        }
+    }
+}
+
+/**
+ * Édition du niveau de relation ("évolution avec chaque personnage" demandée) et des notes de
+ * mémoire persistantes — voir CharacterEntity.affectionLevel/memoryNotes et
+ * PromptBuilder.relationshipDirective pour comment c'est réinjecté dans le prompt. Le niveau
+ * progresse tout seul avec les échanges (voir ChatViewModel.sendMessage) mais reste ajustable
+ * ici manuellement, par exemple pour corriger une évolution qui ne correspond pas à la scène.
+ */
+@Composable
+private fun RelationshipDialog(
+    character: CharacterEntity,
+    onDismiss: () -> Unit,
+    onAffectionChange: (Int) -> Unit,
+    onMemoryNotesChange: (String) -> Unit,
+) {
+    var affection by remember(character.id) { mutableStateOf(character.affectionLevel.toFloat()) }
+    var notes by remember(character.id) { mutableStateOf(character.memoryNotes) }
+
+    AlertDialog(
+        onDismissRequest = { onAffectionChange(affection.toInt()); onMemoryNotesChange(notes); onDismiss() },
+        title = { Text("Relation & mémoire — ${character.name}") },
+        text = {
+            Column {
+                Text(
+                    "Niveau de relation : ${affection.toInt()}/100 (${character.relationshipStage})",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                androidx.compose.material3.Slider(
+                    value = affection,
+                    onValueChange = { affection = it },
+                    valueRange = 0f..100f,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Progresse automatiquement au fil des messages ; ajustable ici manuellement.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
+                Text("Mémoire (notes libres)", style = MaterialTheme.typography.bodyMedium)
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    placeholder = { Text("Faits importants à retenir pour cette histoire…") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onAffectionChange(affection.toInt()); onMemoryNotesChange(notes); onDismiss() }) {
+                Text("Fermer")
+            }
+        },
+    )
 }
 
 /**

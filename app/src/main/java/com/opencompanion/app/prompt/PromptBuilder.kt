@@ -145,6 +145,30 @@ object PromptBuilder {
             facts.joinToString(", ") + "."
     }
 
+    /**
+     * Injecte le niveau de relation actuel ([CharacterEntity.affectionLevel]/[CharacterEntity.relationshipStage])
+     * et les notes de mémoire éditables ([CharacterEntity.memoryNotes]) dans le prompt système —
+     * la "mémoire quasi illimitée" et l'"évolution avec chaque personnage" demandées : les notes
+     * survivent même quand l'historique brut est tronqué (voir buildTurns), et le niveau de
+     * relation donne au modèle un repère de ton explicite plutôt que de devoir le redéduire du
+     * seul historique récent à chaque fois.
+     */
+    private fun relationshipDirective(character: CharacterEntity): String = buildString {
+        if (character.affectionLevel > 0) {
+            append(
+                "Niveau de relation actuel avec ${character.name} : ${character.affectionLevel}/100 " +
+                    "(\"${character.relationshipStage}\"). Adapte progressivement la chaleur, la " +
+                    "familiarité et la complicité de tes réponses à ce niveau, sans l'annoncer " +
+                    "explicitement ni le mentionner comme un chiffre.",
+            )
+        }
+        if (character.memoryNotes.isNotBlank()) {
+            if (isNotEmpty()) append("\n")
+            append("Notes importantes à retenir sur cette histoire (renseignées par l'utilisateur, à " +
+                "prendre en compte sans les répéter mécaniquement) : ${character.memoryNotes.trim()}")
+        }
+    }
+
     fun buildSystemPrompt(
         character: CharacterEntity,
         userProfile: UserProfile = UserProfile(),
@@ -162,6 +186,10 @@ object PromptBuilder {
             append(UNFILTERED_ROLEPLAY_DIRECTIVE)
         }
         userProfileDirective(userProfile).takeIf { it.isNotEmpty() }?.let {
+            append("\n\n")
+            append(it)
+        }
+        relationshipDirective(character).takeIf { it.isNotEmpty() }?.let {
             append("\n\n")
             append(it)
         }

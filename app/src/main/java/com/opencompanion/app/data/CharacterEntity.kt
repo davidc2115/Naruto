@@ -37,9 +37,31 @@ data class CharacterEntity(
      *  CharacterRepository.resolveActivePersona) — permet à chaque personnage/histoire d'avoir
      *  sa propre identité pour l'utilisateur sans devoir la choisir à chaque fois. */
     val activePersonaId: Long? = null,
+    /** Notes libres, éditables par l'utilisateur DEPUIS le chat (pas la fiche personnage) —
+     *  mémoire persistante de faits importants ("mémoire quasi illimitée pour des conversations
+     *  évolutives") qui survit même quand l'historique brut est tronqué faute de place dans le
+     *  contexte du modèle (voir PromptBuilder.buildTurns). */
+    val memoryNotes: String = "",
+    /** Niveau de relation avec ce personnage, 0-100. Progresse automatiquement d'un petit
+     *  incrément à chaque message envoyé (voir CharacterRepository.incrementAffection) — un
+     *  indicateur simple et honnête plutôt qu'une prétendue analyse de sentiment — et reste
+     *  ajustable manuellement par l'utilisateur (voir ChatScreen, dialogue "Relation & Mémoire"). */
+    val affectionLevel: Int = 0,
 ) {
     val tags: List<String>
         get() = tagsCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+    /** Étiquette qualitative dérivée de [affectionLevel], pour l'affichage et pour le prompt
+     *  système — des seuils simples plutôt qu'une échelle continue, plus lisibles d'un coup
+     *  d'œil pour l'utilisateur comme pour orienter le ton du modèle. */
+    val relationshipStage: String
+        get() = when {
+            affectionLevel >= 80 -> "Intime"
+            affectionLevel >= 60 -> "Proche"
+            affectionLevel >= 40 -> "Ami·e"
+            affectionLevel >= 20 -> "Connaissance"
+            else -> "Inconnu·e"
+        }
 }
 
 /**

@@ -145,6 +145,14 @@ class ChatViewModel(
         viewModelScope.launch { repository.setActivePersonaForCharacter(characterId, personaId) }
     }
 
+    fun updateMemoryNotes(notes: String) {
+        viewModelScope.launch { repository.updateMemoryNotes(characterId, notes) }
+    }
+
+    fun setAffectionLevel(level: Int) {
+        viewModelScope.launch { repository.setAffectionLevel(characterId, level) }
+    }
+
     fun sendMessage(text: String) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return
@@ -153,6 +161,7 @@ class ChatViewModel(
         generationJob = viewModelScope.launch {
             val character = repository.getCharacter(characterId) ?: return@launch
             repository.appendMessage(characterId, MessageRole.USER, trimmed)
+            repository.incrementAffection(characterId)
 
             val settings = settingsRepository.settings.first()
             val backend = resolveActiveBackend(settings.enginePreference)

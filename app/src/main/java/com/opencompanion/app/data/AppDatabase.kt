@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [CharacterEntity::class, ChatMessageEntity::class, UserPersonaEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -47,13 +47,22 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Ajoute la mémoire éditable et le niveau de relation par personnage (voir
+         *  [CharacterEntity.memoryNotes]/[CharacterEntity.affectionLevel]). */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `characters` ADD COLUMN `memoryNotes` TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE `characters` ADD COLUMN `affectionLevel` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "opencompanion.db",
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }

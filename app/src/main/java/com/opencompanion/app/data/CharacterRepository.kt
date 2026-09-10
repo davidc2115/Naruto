@@ -87,6 +87,29 @@ class CharacterRepository(
         characterDao.update(character.copy(activePersonaId = personaId, updatedAt = System.currentTimeMillis()))
     }
 
+    // --- Mémoire éditable et niveau de relation par personnage -----------------------------
+
+    suspend fun updateMemoryNotes(characterId: Long, notes: String) {
+        val character = characterDao.getById(characterId) ?: return
+        // N'écrase pas updatedAt sur un simple ajustement de notes/relation : ça ferait
+        // remonter artificiellement le personnage en tête de la liste d'accueil (triée par
+        // updatedAt) sans qu'aucune conversation n'ait réellement eu lieu.
+        characterDao.update(character.copy(memoryNotes = notes))
+    }
+
+    suspend fun setAffectionLevel(characterId: Long, level: Int) {
+        val character = characterDao.getById(characterId) ?: return
+        characterDao.update(character.copy(affectionLevel = level.coerceIn(0, 100)))
+    }
+
+    /** Fait progresser d'un petit incrément le niveau de relation à chaque message envoyé par
+     *  l'utilisateur (voir ChatViewModel.sendMessage) — un signal d'évolution simple et honnête
+     *  plutôt qu'une prétendue analyse de sentiment du contenu échangé. */
+    suspend fun incrementAffection(characterId: Long, amount: Int = 2) {
+        val character = characterDao.getById(characterId) ?: return
+        characterDao.update(character.copy(affectionLevel = (character.affectionLevel + amount).coerceIn(0, 100)))
+    }
+
     /**
      * Amorce un premier persona à partir de l'ancien profil unique stocké dans les réglages
      * ([SettingsRepository.UserProfile]), la toute première fois qu'un persona est nécessaire
