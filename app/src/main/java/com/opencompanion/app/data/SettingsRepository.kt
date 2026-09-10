@@ -129,6 +129,24 @@ class SettingsRepository(private val context: Context) {
         val GROQ_MODEL_NAME = stringPreferencesKey("groq_model_name")
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
         val GEMINI_MODEL_NAME = stringPreferencesKey("gemini_model_name")
+        val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
+    }
+
+    /**
+     * Vrai une fois que le catalogue élargi de personnages fournis avec l'app (voir
+     * CharacterRepository.seedExpandedCatalogIfNeeded) a déjà été inséré une bonne fois pour
+     * toutes — sur un appareil déjà installé comme sur une première installation. Un drapeau
+     * séparé de [SettingsRepository]/`seedSampleCharactersIfEmpty` est nécessaire : sans lui, un
+     * agrandissement du catalogue lors d'une mise à jour ne toucherait jamais les comptes déjà
+     * créés (la base n'est plus vide) ; et sans le mémoriser durablement, les personnages
+     * réapparaîtraient à chaque lancement même après que l'utilisateur les ait supprimés.
+     */
+    val expandedCatalogSeeded: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.EXPANDED_CATALOG_SEEDED] ?: false
+    }
+
+    suspend fun setExpandedCatalogSeeded(value: Boolean) = context.dataStore.edit {
+        it[Keys.EXPANDED_CATALOG_SEEDED] = value
     }
 
     val settings: Flow<EngineSettings> = context.dataStore.data.map { prefs ->

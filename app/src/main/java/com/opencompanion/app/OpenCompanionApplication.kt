@@ -40,6 +40,14 @@ class OpenCompanionApplication : Application() {
         applicationScope.launch {
             characterRepository.seedSampleCharactersIfEmpty()
             characterRepository.ensureDefaultPersonaSeeded(settingsRepository.userProfile.first())
+            // Catalogue élargi (voir CharacterRepository.seedExpandedCatalog) : drapeau à part de
+            // seedSampleCharactersIfEmpty pour atteindre aussi les comptes déjà créés, une seule
+            // fois, sans jamais faire réapparaître des personnages que l'utilisateur aurait
+            // supprimés depuis.
+            if (!settingsRepository.expandedCatalogSeeded.first()) {
+                characterRepository.seedExpandedCatalog()
+                settingsRepository.setExpandedCatalogSeeded(true)
+            }
         }
     }
 }
