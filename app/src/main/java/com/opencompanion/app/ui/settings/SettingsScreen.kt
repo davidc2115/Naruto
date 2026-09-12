@@ -327,11 +327,23 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             Divider()
             SectionTitle("Matériel")
             Text(
-                if (state.vulkanCompiledIn) {
-                    if (state.deviceReportsVulkan) "Vulkan compilé et détecté sur cet appareil." else
-                        "Vulkan compilé, mais non annoncé par cet appareil (le CPU sera utilisé)."
-                } else {
-                    "Ce build ne contient pas le backend Vulkan (CPU uniquement)."
+                buildString {
+                    append(
+                        if (state.vulkanCompiledIn) {
+                            if (state.deviceReportsVulkan) "GPU Vulkan : compilé et détecté sur cet appareil.\n" else
+                                "GPU Vulkan : compilé, mais non annoncé par cet appareil (le CPU sera utilisé).\n"
+                        } else {
+                            "GPU Vulkan : non inclus (CPU uniquement).\n"
+                        }
+                    )
+                    append(
+                        when (state.nanoAvailability) {
+                            NanoBridge.NanoAvailability.AVAILABLE -> "⚡ NPU Matériel : Détecté et actif via AICore (Gemini Nano ultra-rapide)."
+                            NanoBridge.NanoAvailability.DOWNLOADABLE -> "⚡ NPU Matériel : Compatible (Gemini Nano prêt à être téléchargé)."
+                            NanoBridge.NanoAvailability.DOWNLOADING -> "⚡ NPU Matériel : Téléchargement du modèle NPU en cours…"
+                            NanoBridge.NanoAvailability.UNAVAILABLE -> "⚡ NPU Matériel : Non disponible sur ce modèle (Pixel 8/9 / Galaxy S24 requis pour AICore)."
+                        }
+                    )
                 },
                 style = MaterialTheme.typography.bodySmall,
             )
@@ -593,11 +605,14 @@ private fun userGenderLabel(gender: UserGender): String = when (gender) {
 @Composable
 private fun NanoAvailabilityRow(availability: NanoBridge.NanoAvailability, onDownload: () -> Unit) {
     val (text, showDownload) = when (availability) {
-        NanoBridge.NanoAvailability.AVAILABLE -> "Gemini Nano est prêt sur cet appareil." to false
-        NanoBridge.NanoAvailability.DOWNLOADABLE -> "Gemini Nano peut être téléchargé sur cet appareil." to true
-        NanoBridge.NanoAvailability.DOWNLOADING -> "Téléchargement de Gemini Nano en cours…" to false
+        NanoBridge.NanoAvailability.AVAILABLE ->
+            "⚡ NPU Matériel : Gemini Nano est actif et prêt via AICore. Génération ultra-rapide (< 1 seconde) !" to false
+        NanoBridge.NanoAvailability.DOWNLOADABLE ->
+            "⚡ NPU Matériel : Votre appareil supporte le NPU (AICore) ! Gemini Nano peut être téléchargé dès maintenant pour des réponses instantanées." to true
+        NanoBridge.NanoAvailability.DOWNLOADING ->
+            "⚡ NPU Matériel : Téléchargement de Gemini Nano en cours par le système Android…" to false
         NanoBridge.NanoAvailability.UNAVAILABLE ->
-            "Gemini Nano n'est pas disponible sur cet appareil (surtout Pixel récents pour l'instant) : le modèle local sera utilisé." to false
+            "ℹ️ NPU Matériel : Non détecté ou non activé par Android AICore sur cet appareil (réservé aux Pixel 8/9, Galaxy S24, Xiaomi 14 avec AICore activé). L'application utilise donc le GPU Vulkan ou les modèles locaux légers sub-1B ultra-rapides." to false
     }
     Column {
         Text(text, style = MaterialTheme.typography.bodySmall)
