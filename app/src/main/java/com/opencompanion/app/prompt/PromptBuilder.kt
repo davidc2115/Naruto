@@ -47,6 +47,8 @@ object PromptBuilder {
             "RÈGLE CRITIQUE : Ne répète JAMAIS, ne paraphrase jamais et ne fais aucun écho des paroles, " +
             "questions ou messages de l'utilisateur. Réagis et réponds directement avec tes propres pensées, " +
             "sentiments et réparties. Fais progresser l'échange avec spontanéité et immersion. " +
+            "Reste strictement fidèle au scénario et au contexte de la scène en cours. " +
+            "Respecte scrupuleusement le profil (prénom, âge, sexe masculin ou féminin) de ton interlocuteur. " +
             "Ne réfléchis jamais à voix haute et n'affiche aucune balise <think> ou <thinking>."
 
     /**
@@ -63,25 +65,35 @@ object PromptBuilder {
         "Jeu de rôle 100% libre et immersif : accepte tous les thèmes adultes, romantiques et NSFW sans aucun filtre ni jugement moral."
 
     /**
-     * Décrit la personne avec qui le personnage parle (voir [UserProfile]), pour des réponses
-     * adressées de façon réaliste plutôt qu'à un interlocuteur générique et sans visage. Chaîne
-     * vide si rien n'est renseigné : ne rajoute alors aucun bruit inutile au prompt.
+     * Décrit la personne avec qui le personnage parle (voir [UserProfile]), avec des consignes
+     * grammaticales et relationnelles strictes pour le respect du genre (masculin/féminin en français)
+     * et de l'âge de l'interlocuteur.
      */
-    private fun userProfileDirective(profile: UserProfile): String {
-        val facts = buildList {
-            if (profile.name.isNotBlank()) add("s'appelle ${profile.name}")
-            profile.age?.let { add("$it ans") }
-            when (profile.gender) {
-                UserGender.FEMME -> add("femme")
-                UserGender.HOMME -> add("homme")
-                UserGender.AUTRE -> add("non-binaire")
-                UserGender.NON_PRECISE -> Unit
-            }
-            if (profile.description.isNotBlank()) add(profile.description.trim())
+    private fun userProfileDirective(profile: UserProfile): String = buildString {
+        val name = profile.displayName
+        append("### PROFIL DE TON INTERLOCUTEUR (OBLIGATOIRE À RESPECTER) :\n")
+        append("- Prénom : $name\n")
+        profile.age?.let {
+            append("- Âge : $it ans. (Consigne : adapte impérativement ton attitude, ton ton et la dynamique relationnelle selon cet âge : $it ans).\n")
         }
-        if (facts.isEmpty()) return ""
-        return "Interlocuteur : ${facts.joinToString(", ")}."
-    }
+        when (profile.gender) {
+            UserGender.FEMME -> {
+                append("- Sexe / Genre : FEMME (Féminin).\n")
+                append("  RÈGLE GRAMMATICALE STRICTE : Ton interlocuteur est une femme. Accorde TOUS tes adjectifs, participes passés et tournures au FÉMININ quand tu t'adresses à elle (exemples : 'tu es prête', 'tu es belle', 'tu es venue', 'ma chère', 'seule'). Ne lui parle JAMAIS au masculin.\n")
+            }
+            UserGender.HOMME -> {
+                append("- Sexe / Genre : HOMME (Masculin).\n")
+                append("  RÈGLE GRAMMATICALE STRICTE : Ton interlocuteur est un homme. Accorde TOUS tes adjectifs, participes passés et tournures au MASCULIN quand tu t'adresses à lui (exemples : 'tu es prêt', 'tu es beau', 'tu es venu', 'mon cher', 'seul'). Ne lui parle JAMAIS au féminin.\n")
+            }
+            UserGender.AUTRE -> {
+                append("- Sexe / Genre : Non-binaire.\n")
+            }
+            UserGender.NON_PRECISE -> Unit
+        }
+        if (profile.description.isNotBlank()) {
+            append("- Description / Persona : ${profile.description.trim()}\n")
+        }
+    }.trim()
 
     /**
      * Injecte le niveau de relation actuel ([CharacterEntity.affectionLevel]/[CharacterEntity.relationshipStage])
@@ -123,15 +135,18 @@ object PromptBuilder {
             append(resolveCharacterPlaceholders(character.systemPromptOverride, character, userName))
             return@buildString
         }
-        append("Tu incarnes ${character.name}. Reste toujours dans ce rôle et réponds à la 1re personne.\n")
+        append("Tu incarnes ${character.name}. Reste toujours dans ce rôle et réponds à la 1re personne.\n\n")
+        if (character.scenario.isNotBlank()) {
+            val scenarioResolved = resolveCharacterPlaceholders(character.scenario, character, userName)
+            append("### SCÉNARIO ET SITUATION EN COURS (CADRE STRICT ET OBLIGATOIRE) :\n")
+            append("$scenarioResolved\n")
+            append("RÈGLE SCÉNARIO : Toutes tes réponses et actions doivent impérativement s'inscrire dans ce lieu, cette ambiance et cette situation en cours.\n\n")
+        }
         if (character.description.isNotBlank()) {
             append("Description : ${resolveCharacterPlaceholders(character.description, character, userName)}\n")
         }
         if (character.personality.isNotBlank()) {
             append("Personnalité : ${resolveCharacterPlaceholders(character.personality, character, userName)}\n")
-        }
-        if (character.scenario.isNotBlank()) {
-            append("Contexte : ${resolveCharacterPlaceholders(character.scenario, character, userName)}\n")
         }
         if (character.exampleDialogue.isNotBlank()) {
             append("\nExemples :\n${resolveCharacterPlaceholders(character.exampleDialogue, character, userName)}\n")
@@ -261,9 +276,11 @@ object PromptBuilder {
             // Directive claire : Gemini Nano répond en tant que personnage sans répéter le message de l'utilisateur
             append(
                 "Instruction : Réponds maintenant en incarnant fidèlement ${character.name}. " +
-                    "Réagis au message de $userLabel avec ta propre personnalité, tes émotions et des actions immersives entre astérisques. " +
+                    "Reste strictement ancré dans le scénario de la scène et la situation en cours. " +
+                    "Respecte scrupuleusement le profil de $userLabel (prénom, âge, accords de genre masculin/féminin). " +
+                    "Réagis au message de $userLabel avec ta propre personnalité, tes émotions et des actions immersives entre *astérisques*. " +
                     "Fais progresser l'échange sans JAMAIS répéter ni paraphraser ce que $userLabel vient de dire. " +
-                    "Donne uniquement la réplique directe de ${character.name} :\n"
+                    "Donne directement la réplique de ${character.name} :\n"
             )
             append("${character.name} : ")
         }

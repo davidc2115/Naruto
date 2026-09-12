@@ -309,24 +309,26 @@ class ChatViewModel(
     }
 
     /**
-     * Résout le persona utilisateur actif pour [character] (voir
-     * [CharacterRepository.resolveActivePersona] — choix explicite du personnage, sinon persona
-     * par défaut) et le convertit au format [UserProfile] attendu par [PromptBuilder]. Retombe
-     * sur l'ancien profil unique des réglages si aucun persona n'existe encore (ne devrait
-     * normalement pas arriver, [characterRepository.ensureDefaultPersonaSeeded] en crée un au
-     * premier lancement — filet de sécurité plutôt qu'un chemin attendu).
+     * Résout le persona utilisateur actif pour [character] en le combinant avec le profil
+     * global de l'utilisateur ([SettingsRepository.userProfile]).
+     *
+     * Si un persona par défaut existe mais n'a pas précisé d'âge ou de genre (ou a le nom par
+     * défaut "Moi"), les valeurs renseignées par l'utilisateur dans les Réglages (nom, âge, sexe)
+     * sont prioritaires afin de ne JAMAIS écraser ou ignorer son âge et son genre réels.
      */
     private suspend fun resolveUserProfile(character: CharacterEntity): UserProfile {
+        val globalProfile = settingsRepository.userProfile.first()
         val persona = repository.resolveActivePersona(character)
         if (persona != null) {
+            val gender = runCatching { UserGender.valueOf(persona.gender) }.getOrDefault(UserGender.NON_PRECISE)
             return UserProfile(
-                name = persona.name,
-                age = persona.age,
-                gender = runCatching { UserGender.valueOf(persona.gender) }.getOrDefault(UserGender.NON_PRECISE),
-                description = persona.description,
+                name = persona.name.takeIf { it.isNotBlank() && it != "Moi" } ?: globalProfile.name.ifBlank { "Utilisateur" },
+                age = persona.age ?: globalProfile.age,
+                gender = if (gender != UserGender.NON_PRECISE) gender else globalProfile.gender,
+                description = persona.description.ifBlank { globalProfile.description },
             )
         }
-        return settingsRepository.userProfile.first()
+        return globalProfile
     }
 
     private suspend fun runCloudGeneration(
