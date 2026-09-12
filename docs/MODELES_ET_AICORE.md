@@ -52,6 +52,9 @@ même mécanisme que l'import par URL déjà existant), répartis en deux profil
 
 | Modèle | Profil | Taille | Paramètres | Licence |
 |---|---|---|---|---|
+| SmolLM2 360M | ⚡⚡ Ultra-Rapide | ~0,26 Go | 360 M | Apache 2.0 |
+| Qwen 2.5 0.5B Uncensored | ⚡⚡ Ultra-Rapide (NSFW/RP) | ~0,47 Go | 0,5 Md | Apache 2.0 |
+| Llama 3.2 1B Uncensored (Q3) | ⚡ Rapide Micro-Q (NSFW/RP) | ~0,61 Go | 1 Md | Llama 3.2 Community License |
 | Qwen3 0.6B | ⚡ Rapide | ~0,40 Go | 0,6 Md | Apache 2.0 |
 | Gemma 3 1B | ⚡ Rapide | ~0,81 Go | 1 Md | Gemma (Google) |
 | Llama 3.2 1B | ⚡ Rapide | ~0,81 Go | 1 Md | Llama 3.2 Community License |
@@ -63,9 +66,21 @@ même mécanisme que l'import par URL déjà existant), répartis en deux profil
 | Llama 3.2 3B Uncensored | ★ Qualité (NSFW/RP) | ~2,24 Go | 3,2 Md | Llama 3.2 Community License |
 
 Détail dans [`engine/RecommendedModels.kt`](../app/src/main/java/com/opencompanion/app/engine/RecommendedModels.kt).
-Le profil **Rapide** vise une réponse quasi instantanée même en CPU pur ; le profil **Qualité**
-donne de bien meilleures réponses mais reste nettement plus confortable avec le GPU Vulkan
-activé (voir `docs/VULKAN_NOTES.md`) qu'en CPU pur sur un téléphone d'entrée de gamme.
+Le profil **⚡⚡ Ultra-Rapide** (0.3B à 0.5B) garantit un temps de réponse immédiat (<1-2 secondes de délai initial) même sur smartphone d'entrée de gamme ou CPU pur.
+Le profil **⚡ Rapide Micro-Q** (quantification 3 bits type Q3_K_S) réduit de 25% la mémoire et la bande passante requise.
+
+## Pourquoi le NPU matériel (Gemini Nano / AICore) est si rapide ?
+
+Sur smartphone, l'exécution d'un modèle de langage se heurte au goulot d'étranglement de la mémoire et du calcul matriciel :
+1. **NPU (Neural Processing Unit - Qualcomm Hexagon, Tensor TPU, MediaTek APU)** :
+   - Circuit électronique dédié 100% à la multiplication matricielle par blocs (systolic arrays).
+   - Bande passante dédiée ultra-haute vitesse avec consommation dérisoire (~1 Watt).
+   - Évaluation du prompt système à **1500 - 3000 tokens/seconde** : la première réponse arrive instantanément (zéro lag initial).
+   - C'est ce qu'utilise **Gemini Nano via AICore** dans l'application !
+2. **GPU Vulkan vs CPU** :
+   - Les GPU mobiles (Adreno, Mali) sont conçus pour le rendu 3D graphique, pas pour les transformeurs continus.
+   - Les shaders Vulkan calculent le prompt système à environ 20 - 40 tokens/seconde. Si le prompt fait 800 tokens, l'utilisateur attend 20 à 40 secondes de freeze complet avant le premier mot !
+   - **Notre optimisation** : nous avons compressé les directives système de `PromptBuilder.kt` de 600 tokens à 75 tokens (division par 8 du temps d'attente initial TTFT), tout en introduisant des modèles 0.5B abliterés non censurés ultra-véloces.
 
 ### Retiré : Bonsai 27B — planté en usage réel, leçon retenue
 

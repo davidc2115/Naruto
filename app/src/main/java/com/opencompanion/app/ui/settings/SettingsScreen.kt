@@ -163,9 +163,9 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             }
                         }
                         Text(
-                            "« Auto » essaie d'abord Gemini Nano (rapide, intégré à Android) quand il " +
-                                "est disponible sur cet appareil, et bascule automatiquement sur le " +
-                                "modèle GGUF local sinon — c'est le choix le plus simple.",
+                            "« Auto » utilise en priorité le NPU matériel (Gemini Nano) pour des réponses " +
+                                "instantanées s'il est actif sur l'appareil, ou bascule sur votre modèle " +
+                                "local GGUF sinon.",
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
@@ -464,8 +464,8 @@ private fun engineBackendLabel(backend: EngineBackend): String = when (backend) 
     // Anthropic ni configurés par toi : tes messages transitent par leurs services. Ni "gratuit"
     // ni "illimité" ne sont garantis dans le temps. Préférer Groq/Gemini avec ta propre clé API.
     EngineBackend.CLOUD_FREE_NO_KEY -> "⚠️ Cloud anonyme sans clé (service tiers non vérifié)"
-    EngineBackend.AUTO -> "Auto (Local AICore / llama.cpp)"
-    EngineBackend.AICORE -> "Gemini Nano (AICore, appareil compatible uniquement)"
+    EngineBackend.AUTO -> "Auto (⚡ NPU matériel si dispo, sinon llama.cpp)"
+    EngineBackend.AICORE -> "⚡ NPU Matériel : Gemini Nano (AICore, ultra-rapide)"
     EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp sur l'appareil)"
     EngineBackend.CLOUD_GROQ -> "☁️ Groq (avec ta clé API)"
     EngineBackend.CLOUD_GEMINI -> "☁️ Gemini (avec ta clé API)"

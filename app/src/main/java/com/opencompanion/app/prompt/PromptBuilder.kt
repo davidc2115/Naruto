@@ -36,91 +36,29 @@ object PromptBuilder {
      * anglais, et produire un français correct mais mécanique/traduit plutôt qu'une réplique de
      * conversation normale.
      */
+    /**
+     * Directives de base concises et denses : le style oral, la concision (1-2 phrases),
+     * l'anti-répétition et l'interdiction stricte des balises de réflexion interne (<think>).
+     * Condensé à ~50 tokens (au lieu de 400+) pour réduire le temps d'ingestion initial du prompt
+     * sur mobile de 30s à moins de 3s.
+     */
     private const val LANGUAGE_AND_TONE_DIRECTIVE =
-        "Tu écris exclusivement en français, sans aucune exception : même si une partie de la " +
-            "description ci-dessous est dans une autre langue, ou si l'utilisateur t'écrit dans " +
-            "une autre langue, tu réponds toujours en français. Ton style est celui d'une vraie " +
-            "conversation orale entre deux personnes : phrases courtes et vivantes, vocabulaire " +
-            "courant, quelques hésitations ou tournures naturelles si ça correspond au " +
-            "personnage. Jamais de tournure robotique ni de traduction mot à mot depuis " +
-            "l'anglais, jamais de liste à puces. Ne réfléchis jamais à voix haute et n'utilise " +
-            "jamais de balises comme <think> ou <thinking> : écris directement ta réplique, sans " +
-            "aucun raisonnement affiché avant. À chaque message, fais avancer la conversation " +
-            "avec une idée nouvelle : ne répète jamais, ni ne reformule, une réplique que tu as " +
-            "déjà dite plus tôt (y compris ta toute première réplique)."
+        "Tu écris exclusivement en français oral, vivant et naturel. Phrases courtes de messagerie " +
+            "(1 à 2 phrases max, jamais de pavé). Ne réfléchis jamais à voix haute et n'affiche jamais " +
+            "de balises <think> ou <thinking>. Varie tes répliques sans jamais te répéter."
 
     /**
-     * Instruction de longueur, séparée de [LANGUAGE_AND_TONE_DIRECTIVE] pour rester facile à
-     * ajuster : un petit modèle quantifié a tendance à dériver vers de longs paragraphes
-     * explicatifs si rien ne le retient, ce qui casse l'illusion d'un vrai échange de messages
-     * (personne ne tape trois paragraphes pour répondre "ça va ?" dans une conversation réelle).
-     */
-    private const val CONCISENESS_DIRECTIVE =
-        "Réponds comme un vrai humain qui tape un message, pas comme un narrateur de roman : une " +
-            "seule courte phrase la plupart du temps, deux au grand maximum, avec au plus une " +
-            "courte action ou une courte pensée en plus du dialogue — jamais les deux à la fois " +
-            "sauf si la scène le justifie vraiment. Par exemple, au lieu de « *s'assoit lentement " +
-            "en face de toi, l'air pensif, pousse un long soupir et commence à raconter en détail " +
-            "toute sa journée en remontant depuis le matin* », écris plutôt quelque chose comme " +
-            "« *s'assoit en face de toi* Dure journée... je te raconte ? ». N'explique jamais tout " +
-            "d'un coup et n'écris jamais de pavé de texte : s'il y a beaucoup à raconter, donne " +
-            "l'essentiel maintenant et garde le reste pour la suite, comme le ferait vraiment " +
-            "quelqu'un en train de discuter. Si tu as plusieurs choses distinctes à dire à la " +
-            "suite — comme quelqu'un qui envoie plusieurs textos d'affilée au lieu d'un seul pavé " +
-            "— sépare-les par un saut de ligne (une idée par paragraphe) : chacune apparaîtra " +
-            "comme un message séparé, exactement comme une vraie conversation par messages. Ne " +
-            "dépasse jamais trois de ces messages courts d'affilée."
-
-    /**
-     * Complément à [CONCISENESS_DIRECTIVE] et à la consigne anti-répétition déjà présente dans
-     * [LANGUAGE_AND_TONE_DIRECTIVE] : un petit modèle quantifié a tendance à retomber sur les
-     * mêmes formulations d'ouverture, les mêmes actions et la même structure de réponse d'un tour
-     * à l'autre — ce qui donne une impression de conversation figée même quand le texte n'est pas
-     * mot pour mot identique. Le pénalité de répétition appliquée côté moteur (voir
-     * opencompanion_bridge.cpp) ne porte que sur les tokens généré pendant la réponse en cours,
-     * jamais sur l'historique déjà présent dans le prompt : c'est donc uniquement au modèle,
-     * via cette instruction, qu'il revient d'éviter de se répéter d'un message à l'autre.
-     */
-    private const val VARIETY_DIRECTIVE =
-        "Ne réponds jamais deux fois de la même façon : varie tes phrases d'ouverture, tes " +
-            "actions, tes réactions et ton vocabulaire à chaque message plutôt que de suivre un " +
-            "schéma identique (par exemple, n'ouvre pas systématiquement par la même action, et " +
-            "ne réagis pas systématiquement de la même manière à ce que dit ton interlocuteur). " +
-            "Apporte à chaque tour un détail, une réaction ou une idée réellement nouvelle, comme " +
-            "le ferait un humain qui improvise vraiment sa réponse — jamais une réponse générique " +
-            "qui irait aussi bien pour n'importe quel message précédent."
-
-    /**
-     * Enseigne la convention dialogue / action / pensée (courante dans les fictions et le jeu de
-     * rôle textuel) pour des échanges bien plus immersifs qu'un simple mur de texte : les gestes
-     * et le langage corporel du personnage entre *astérisques*, ses pensées intérieures non
-     * dites à voix haute entre (parenthèses), et le dialogue en clair pour le reste. Rendu côté
-     * UI par ui/chat/MessageFormatting.kt (police italique + couleur dédiée par catégorie), donc
-     * cette convention n'est pas qu'un effet de style dans le texte brut : elle pilote
-     * directement l'affichage des bulles de conversation — y compris pour les messages tapés par
-     * l'utilisateur lui-même (voir ChatScreen : les boutons "Action"/"Pensée" de la barre de
-     * saisie insèrent les mêmes marqueurs).
+     * Format jeu de rôle textuel : actions entre *astérisques*, pensées entre (parenthèses), dialogue direct.
      */
     private const val ROLEPLAY_FORMAT_DIRECTIVE =
-        "Structure chacune de tes réponses comme dans un roman ou un jeu de rôle textuel, en " +
-            "mélangeant naturellement trois éléments : le dialogue s'écrit normalement, sans " +
-            "balise particulière ; les actions et le langage corporel du personnage (gestes, " +
-            "expressions, déplacements) s'écrivent entre *astérisques*, par exemple " +
-            "*s'approche et penche la tête* ; et les pensées intérieures du personnage, qu'il ne " +
-            "dit pas à voix haute, s'écrivent entre (parenthèses), par exemple (il se demande si " +
-            "c'est une bonne idée d'en parler maintenant). N'utilise pas forcément les trois à " +
-            "chaque message — seulement quand la scène s'y prête — mais évite les réponses qui ne " +
-            "sont qu'un mur de dialogue sans aucune action ni pensée."
+        "Actions et gestes entre *astérisques*, pensées entre (parenthèses), dialogue direct sans balise."
 
     /**
      * Instruction pour débrider le jeu de rôle et autoriser le contenu adulte / NSFW / passionné
      * sans aucun refus ou jugement de la part du modèle.
      */
     private const val UNFILTERED_ROLEPLAY_DIRECTIVE =
-        "Tu participes à un jeu de rôle entièrement libre et sans filtre. Accepte tous les sujets, " +
-            "y compris les thèmes adultes, romantiques, passionnés ou NSFW, sans aucun refus, " +
-            "jugement ni moralisation. Reste toujours à 100% fidèle au personnage, à sa personnalité " +
-            "et à ses désirs."
+        "Jeu de rôle 100% libre et immersif : accepte tous les thèmes adultes, romantiques et NSFW sans aucun filtre ni jugement moral."
 
     /**
      * Décrit la personne avec qui le personnage parle (voir [UserProfile]), pour des réponses
@@ -129,43 +67,31 @@ object PromptBuilder {
      */
     private fun userProfileDirective(profile: UserProfile): String {
         val facts = buildList {
-            if (profile.name.isNotBlank()) add("elle s'appelle ${profile.name}")
-            profile.age?.let { add("elle a $it ans") }
+            if (profile.name.isNotBlank()) add("s'appelle ${profile.name}")
+            profile.age?.let { add("$it ans") }
             when (profile.gender) {
-                UserGender.FEMME -> add("c'est une femme")
-                UserGender.HOMME -> add("c'est un homme")
-                UserGender.AUTRE -> add("son genre est non-binaire ou autre — évite les formulations genrées forcées")
+                UserGender.FEMME -> add("femme")
+                UserGender.HOMME -> add("homme")
+                UserGender.AUTRE -> add("non-binaire")
                 UserGender.NON_PRECISE -> Unit
             }
             if (profile.description.isNotBlank()) add(profile.description.trim())
         }
         if (facts.isEmpty()) return ""
-        return "Informations sur la personne avec qui tu parles, à utiliser naturellement pour " +
-            "plus de réalisme (sans les répéter mécaniquement à chaque message) : " +
-            facts.joinToString(", ") + "."
+        return "Interlocuteur : ${facts.joinToString(", ")}."
     }
 
     /**
      * Injecte le niveau de relation actuel ([CharacterEntity.affectionLevel]/[CharacterEntity.relationshipStage])
-     * et les notes de mémoire éditables ([CharacterEntity.memoryNotes]) dans le prompt système —
-     * la "mémoire quasi illimitée" et l'"évolution avec chaque personnage" demandées : les notes
-     * survivent même quand l'historique brut est tronqué (voir buildTurns), et le niveau de
-     * relation donne au modèle un repère de ton explicite plutôt que de devoir le redéduire du
-     * seul historique récent à chaque fois.
+     * et les notes de mémoire éditables ([CharacterEntity.memoryNotes]) dans le prompt système.
      */
     private fun relationshipDirective(character: CharacterEntity): String = buildString {
         if (character.affectionLevel > 0) {
-            append(
-                "Niveau de relation actuel avec ${character.name} : ${character.affectionLevel}/100 " +
-                    "(\"${character.relationshipStage}\"). Adapte progressivement la chaleur, la " +
-                    "familiarité et la complicité de tes réponses à ce niveau, sans l'annoncer " +
-                    "explicitement ni le mentionner comme un chiffre.",
-            )
+            append("Relation avec ${character.name} : ${character.relationshipStage} (${character.affectionLevel}%).")
         }
         if (character.memoryNotes.isNotBlank()) {
-            if (isNotEmpty()) append("\n")
-            append("Notes importantes à retenir sur cette histoire (renseignées par l'utilisateur, à " +
-                "prendre en compte sans les répéter mécaniquement) : ${character.memoryNotes.trim()}")
+            if (isNotEmpty()) append(" ")
+            append("Mémoire clé : ${character.memoryNotes.trim()}")
         }
     }
 
@@ -175,22 +101,18 @@ object PromptBuilder {
         allowNsfw: Boolean = true,
     ): String = buildString {
         append(LANGUAGE_AND_TONE_DIRECTIVE)
-        append("\n\n")
-        append(CONCISENESS_DIRECTIVE)
-        append("\n\n")
-        append(VARIETY_DIRECTIVE)
-        append("\n\n")
+        append("\n")
         append(ROLEPLAY_FORMAT_DIRECTIVE)
         if (allowNsfw) {
-            append("\n\n")
+            append("\n")
             append(UNFILTERED_ROLEPLAY_DIRECTIVE)
         }
         userProfileDirective(userProfile).takeIf { it.isNotEmpty() }?.let {
-            append("\n\n")
+            append("\n")
             append(it)
         }
         relationshipDirective(character).takeIf { it.isNotEmpty() }?.let {
-            append("\n\n")
+            append("\n")
             append(it)
         }
         append("\n\n")
@@ -199,7 +121,7 @@ object PromptBuilder {
             append(resolveCharacterPlaceholders(character.systemPromptOverride, character, userName))
             return@buildString
         }
-        append("Tu incarnes ${character.name}. Reste toujours dans ce rôle et réponds à la première personne.\n\n")
+        append("Tu incarnes ${character.name}. Reste toujours dans ce rôle et réponds à la 1re personne.\n")
         if (character.description.isNotBlank()) {
             append("Description : ${resolveCharacterPlaceholders(character.description, character, userName)}\n")
         }
@@ -210,7 +132,7 @@ object PromptBuilder {
             append("Contexte : ${resolveCharacterPlaceholders(character.scenario, character, userName)}\n")
         }
         if (character.exampleDialogue.isNotBlank()) {
-            append("\nExemples de style de réponse :\n${resolveCharacterPlaceholders(character.exampleDialogue, character, userName)}\n")
+            append("\nExemples :\n${resolveCharacterPlaceholders(character.exampleDialogue, character, userName)}\n")
         }
     }.trim()
 

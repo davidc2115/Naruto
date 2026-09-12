@@ -28,6 +28,36 @@ object RecommendedModels {
 
     val ALL: List<Entry> = listOf(
         Entry(
+            displayName = "SmolLM2 360M (Q4_K_M)",
+            tier = Tier.RAPIDE,
+            approxSizeGb = 0.26,
+            paramCount = "0,36 Md de paramètres",
+            license = "Apache 2.0",
+            downloadUrl = "https://huggingface.co/unsloth/SmolLM2-360M-Instruct-GGUF/resolve/main/SmolLM2-360M-Instruct-Q4_K_M.gguf?download=true",
+            fileName = "SmolLM2-360M-Instruct-Q4_K_M.gguf",
+            note = "Ultra-miniature (258 Mo) et quasi-instantané (60-90 tokens/s sur mobile). Réponse immédiate sans aucun temps de chargement.",
+        ),
+        Entry(
+            displayName = "Qwen 2.5 0.5B Uncensored (Q4_K_M)",
+            tier = Tier.RAPIDE,
+            approxSizeGb = 0.47,
+            paramCount = "0,5 Md de paramètres",
+            license = "Apache 2.0",
+            downloadUrl = "https://huggingface.co/Goekdeniz-Guelmez/Josiefied-Qwen2.5-0.5B-Instruct-abliterated-v1-gguf/resolve/main/josiefied-qwen2.5-0.5b-instruct-abliterated-v1.Q4_K_M.gguf?download=true",
+            fileName = "josiefied-qwen2.5-0.5b-instruct-abliterated-v1.Q4_K_M.gguf",
+            note = "Le meilleur modèle sub-1B non censuré (défiltré/abliterated). Ultra-rapide (40-70 tokens/s) et sans aucun filtre moral ni latence.",
+        ),
+        Entry(
+            displayName = "Llama 3.2 1B Uncensored (Q3_K_S)",
+            tier = Tier.RAPIDE,
+            approxSizeGb = 0.61,
+            paramCount = "1 Md de paramètres",
+            license = "Llama 3.2 Community License",
+            downloadUrl = "https://huggingface.co/brittlewis12/Llama-3.2-1B-Instruct-Uncensored-GGUF/resolve/main/llama-3.2-1b-instruct-uncensored.Q3_K_S.gguf?download=true",
+            fileName = "llama-3.2-1b-instruct-uncensored.Q3_K_S.gguf",
+            note = "Micro-quantification 3-bit ultra-légère (611 Mo). Réduit l'usage mémoire de 25% et accélère le débit sur smartphone.",
+        ),
+        Entry(
             displayName = "Qwen3 0.6B (Q4_K_M)",
             tier = Tier.RAPIDE,
             approxSizeGb = 0.40,

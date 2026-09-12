@@ -122,7 +122,7 @@ fun ChatScreen(
                                         val name = state.selectedModelName ?: "Modèle local"
                                         "⏳ Chargement de $name…"
                                     }
-                                    state.usingNano -> "⚡ Gemini Nano (AICore)"
+                                    state.usingNano -> "⚡ NPU Matériel (Gemini Nano)"
                                     state.selectedModelName != null -> {
                                         val hw = if (state.usingGpu) "GPU Vulkan" else "CPU"
                                         "🧠 ${state.selectedModelName} ($hw)"
