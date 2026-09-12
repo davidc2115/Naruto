@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -32,6 +34,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -39,6 +42,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -75,6 +79,13 @@ import com.opencompanion.app.ui.theme.BrandGradient
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
     val state by viewModel.uiState.collectAsState()
+    val groqModels by viewModel.groqModels.collectAsState()
+    val geminiModels by viewModel.geminiModels.collectAsState()
+    val openAiModels by viewModel.openAiModels.collectAsState()
+    val openRouterModels by viewModel.openRouterModels.collectAsState()
+    val isFetchingModels by viewModel.isFetchingModels.collectAsState()
+    var pickerTarget by remember { mutableStateOf<PickerTarget?>(null) }
+
     var showUrlDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -192,6 +203,33 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            Button(
+                                onClick = viewModel::refreshGroqModels,
+                                enabled = !isFetchingModels,
+                                modifier = Modifier.weight(1.1f),
+                            ) {
+                                if (isFetchingModels) {
+                                    CircularProgressIndicator(
+                                        Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 2.dp,
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                                Text("🔄 Recharger")
+                            }
+                            OutlinedButton(
+                                onClick = { pickerTarget = PickerTarget.GROQ },
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text("📋 Choisir (${groqModels.size})")
+                            }
+                        }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             FilterChip(
                                 selected = state.settings.groqModelName == "llama-3.3-70b-versatile",
@@ -226,6 +264,33 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            Button(
+                                onClick = viewModel::refreshGeminiModels,
+                                enabled = !isFetchingModels,
+                                modifier = Modifier.weight(1.1f),
+                            ) {
+                                if (isFetchingModels) {
+                                    CircularProgressIndicator(
+                                        Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 2.dp,
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                                Text("🔄 Recharger")
+                            }
+                            OutlinedButton(
+                                onClick = { pickerTarget = PickerTarget.GEMINI },
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text("📋 Choisir (${geminiModels.size})")
+                            }
+                        }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             FilterChip(
                                 selected = state.settings.geminiModelName == "gemini-2.0-flash",
@@ -260,6 +325,33 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            Button(
+                                onClick = viewModel::refreshOpenAiModels,
+                                enabled = !isFetchingModels,
+                                modifier = Modifier.weight(1.1f),
+                            ) {
+                                if (isFetchingModels) {
+                                    CircularProgressIndicator(
+                                        Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 2.dp,
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                                Text("🔄 Recharger")
+                            }
+                            OutlinedButton(
+                                onClick = { pickerTarget = PickerTarget.OPENAI },
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text("📋 Choisir (${openAiModels.size})")
+                            }
+                        }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             FilterChip(
                                 selected = state.settings.openAiModelName == "gpt-4o-mini",
@@ -297,6 +389,33 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        ) {
+                            Button(
+                                onClick = viewModel::refreshOpenRouterModels,
+                                enabled = !isFetchingModels,
+                                modifier = Modifier.weight(1.1f),
+                            ) {
+                                if (isFetchingModels) {
+                                    CircularProgressIndicator(
+                                        Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 2.dp,
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                                Text("🔄 Modèles OpenRouter")
+                            }
+                            OutlinedButton(
+                                onClick = { pickerTarget = PickerTarget.OPENROUTER },
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Text("📋 Choisir (${openRouterModels.size})")
+                            }
+                        }
                         ApiKeysField(
                             value = state.settings.cloudApiKey,
                             onValueChange = viewModel::setCloudApiKey,
@@ -323,6 +442,31 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             }
                         }
                     }
+                }
+            }
+
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                ),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            ) {
+                Row(
+                    Modifier.padding(12.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                        Text("🔓 Mode adulte & débridé (NSFW)", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "Autorise les scènes intimes, romantiques et passionnées sans censure ni refus moral des IA (Groq, Gemini, OpenAI, IA locales).",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Switch(
+                        checked = state.settings.allowNsfwMode,
+                        onCheckedChange = viewModel::setAllowNsfwMode,
+                    )
                 }
             }
 
@@ -495,6 +639,41 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
         UrlImportDialog(
             onDismiss = { showUrlDialog = false },
             onConfirm = { url -> showUrlDialog = false; viewModel.importFromUrl(url) },
+        )
+    }
+
+    pickerTarget?.let { target ->
+        val title = when (target) {
+            PickerTarget.GROQ -> "Choisir un modèle Groq"
+            PickerTarget.GEMINI -> "Choisir un modèle Gemini"
+            PickerTarget.OPENAI -> "Choisir un modèle OpenAI"
+            PickerTarget.OPENROUTER -> "Choisir un modèle OpenRouter"
+        }
+        val models = when (target) {
+            PickerTarget.GROQ -> groqModels
+            PickerTarget.GEMINI -> geminiModels
+            PickerTarget.OPENAI -> openAiModels
+            PickerTarget.OPENROUTER -> openRouterModels
+        }
+        val currentModel = when (target) {
+            PickerTarget.GROQ -> state.settings.groqModelName
+            PickerTarget.GEMINI -> state.settings.geminiModelName
+            PickerTarget.OPENAI -> state.settings.openAiModelName
+            PickerTarget.OPENROUTER -> state.settings.cloudModelName
+        }
+        val onSelect: (String) -> Unit = when (target) {
+            PickerTarget.GROQ -> viewModel::setGroqModelName
+            PickerTarget.GEMINI -> viewModel::setGeminiModelName
+            PickerTarget.OPENAI -> viewModel::setOpenAiModelName
+            PickerTarget.OPENROUTER -> viewModel::setCloudModelName
+        }
+
+        ModelPickerDialog(
+            title = title,
+            models = models,
+            selectedModel = currentModel,
+            onSelect = onSelect,
+            onDismiss = { pickerTarget = null },
         )
     }
 }
@@ -772,3 +951,88 @@ private fun UrlImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) 
         dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } },
     )
 }
+
+enum class PickerTarget { GROQ, GEMINI, OPENAI, OPENROUTER }
+
+@Composable
+private fun ModelPickerDialog(
+    title: String,
+    models: List<String>,
+    selectedModel: String,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredModels = remember(models, searchQuery) {
+        if (searchQuery.isBlank()) models
+        else models.filter { it.contains(searchQuery, ignoreCase = true) }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Rechercher un modèle...") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    "${filteredModels.size} modèle(s) disponible(s)",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    filteredModels.forEach { modelName ->
+                        val isSelected = modelName == selectedModel
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onSelect(modelName)
+                                    onDismiss()
+                                },
+                        ) {
+                            Row(
+                                Modifier.padding(12.dp),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    text = modelName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                if (isSelected) {
+                                    Text("✓", color = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Fermer")
+            }
+        },
+    )
+}
+

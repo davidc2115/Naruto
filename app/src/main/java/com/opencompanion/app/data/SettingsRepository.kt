@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.opencompanion.app.engine.DECOMMISSIONED_GROQ_MODELS
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -190,13 +191,13 @@ class SettingsRepository(private val context: Context) {
             cloudModelName = prefs[Keys.CLOUD_MODEL_NAME] ?: "nousresearch/hermes-3-llama-3.1-8b:free",
             cloudEndpointUrl = prefs[Keys.CLOUD_ENDPOINT_URL] ?: "https://openrouter.ai/api/v1/chat/completions",
             groqApiKey = prefs[Keys.GROQ_API_KEY] ?: "",
-            groqModelName = prefs[Keys.GROQ_MODEL_NAME]?.takeUnless { it == "openai/gpt-oss-120b" }
+            groqModelName = prefs[Keys.GROQ_MODEL_NAME]?.takeUnless { it in DECOMMISSIONED_GROQ_MODELS || it.isBlank() }
                 ?: "llama-3.3-70b-versatile",
             geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
-            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.takeUnless { it == "gemini-3.5-flash" }
+            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.takeUnless { it == "gemini-3.5-flash" || it.isBlank() }
                 ?: "gemini-2.0-flash",
             openAiApiKey = prefs[Keys.OPENAI_API_KEY] ?: "",
-            openAiModelName = prefs[Keys.OPENAI_MODEL_NAME] ?: "gpt-4o-mini",
+            openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
         )
     }
 
@@ -246,7 +247,8 @@ class SettingsRepository(private val context: Context) {
         if (key.isBlank()) it.remove(Keys.GROQ_API_KEY) else it[Keys.GROQ_API_KEY] = key.trim()
     }
     suspend fun setGroqModelName(model: String) = context.dataStore.edit {
-        if (model.isBlank()) it.remove(Keys.GROQ_MODEL_NAME) else it[Keys.GROQ_MODEL_NAME] = model.trim()
+        val sanitized = if (model.trim() in DECOMMISSIONED_GROQ_MODELS || model.isBlank()) "llama-3.3-70b-versatile" else model.trim()
+        it[Keys.GROQ_MODEL_NAME] = sanitized
     }
     suspend fun setGeminiApiKey(key: String) = context.dataStore.edit {
         if (key.isBlank()) it.remove(Keys.GEMINI_API_KEY) else it[Keys.GEMINI_API_KEY] = key.trim()

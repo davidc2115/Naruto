@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -19,6 +20,20 @@ import java.net.URL
  *  (voir [CloudEngineBridge.generateWithKeyRotation]). */
 fun parseApiKeys(raw: String): List<String> =
     raw.split('\n', ',').map { it.trim() }.filter { it.isNotBlank() }
+
+val DECOMMISSIONED_GROQ_MODELS = setOf(
+    "openai/gpt-oss-120b",
+    "llama-3.1-70b-versatile",
+    "llama3-70b-8192",
+    "llama3-8b-8192",
+    "llama-3.2-11b-vision-preview",
+    "llama-3.2-90b-vision-preview",
+    "llama-3.2-3b-preview",
+    "llama-3.2-1b-preview",
+    "mixtral-8x7b-32768",
+    "gemma-7b-it",
+    "gemma2-9b-it",
+)
 
 private val HTTP_STATUS_IN_MESSAGE = Regex("\\((\\d{3})\\)")
 
@@ -200,8 +215,14 @@ class CloudEngineBridge {
                 mapOf("role" to turn.role, "content" to turn.content)
             }
 
+            val effectiveModel = if (targetUrl.contains("groq.com") && (modelName in DECOMMISSIONED_GROQ_MODELS || modelName.isBlank())) {
+                "llama-3.3-70b-versatile"
+            } else {
+                modelName.ifBlank { "nousresearch/hermes-3-llama-3.1-8b:free" }
+            }
+
             val payloadMap = mutableMapOf<String, Any>(
-                "model" to modelName.ifBlank { "nousresearch/hermes-3-llama-3.1-8b:free" },
+                "model" to effectiveModel,
                 "messages" to messagesList,
                 "temperature" to temperature,
                 "max_tokens" to maxTokens,
@@ -390,12 +411,21 @@ class CloudEngineBridge {
                     "parts" to listOf(mapOf("text" to turn.content)),
                 )
             }
+            val safetySettings = listOf(
+                mapOf("category" to "HARM_CATEGORY_HARASSMENT", "threshold" to "BLOCK_NONE"),
+                mapOf("category" to "HARM_CATEGORY_HATE_SPEECH", "threshold" to "BLOCK_NONE"),
+                mapOf("category" to "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold" to "BLOCK_NONE"),
+                mapOf("category" to "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold" to "BLOCK_NONE"),
+                mapOf("category" to "HARM_CATEGORY_CIVIC_INTEGRITY", "threshold" to "BLOCK_NONE"),
+            )
+
             val payloadMap = mutableMapOf<String, Any>(
                 "contents" to contents,
                 "generationConfig" to mapOf(
                     "temperature" to temperature,
                     "maxOutputTokens" to maxTokens,
                 ),
+                "safetySettings" to safetySettings,
             )
             if (!systemText.isNullOrBlank()) {
                 payloadMap["systemInstruction"] = mapOf("parts" to listOf(mapOf("text" to systemText)))
@@ -460,11 +490,25 @@ class CloudEngineBridge {
 
     private fun extractTokenFromGemini(jsonStr: String): String? {
         val root = jsonParser.parseToJsonElement(jsonStr).jsonObject
-        val candidates = root["candidates"]?.jsonArray ?: return null
-        if (candidates.isEmpty()) return null
-        val content = candidates[0].jsonObject["content"]?.jsonObject ?: return null
-        val parts = content["parts"]?.jsonArray ?: return null
-        return parts.joinToString("") { it.jsonObject["text"]?.jsonPrimitive?.content.orEmpty() }
+        val candidates = root["candidates"]?.jsonArray
+        if (candidates.isNullOrEmpty()) {
+            val promptFeedback = root["promptFeedback"]?.jsonObject
+            val blockReason = promptFeedback?.get("blockReason")?.jsonPrimitive?.content
+            if (!blockReason.isNullOrBlank()) {
+                return "[Message filtré par Gemini : $blockReason]"
+            }
+            return null
+        }
+        val firstCand = candidates[0].jsonObject
+        val finishReason = firstCand["finishReason"]?.jsonPrimitive?.content
+        val content = firstCand["content"]?.jsonObject
+        val parts = content?.get("parts")?.jsonArray
+        val text = parts?.joinToString("") { it.jsonObject["text"]?.jsonPrimitive?.content.orEmpty() }
+        if (!text.isNullOrEmpty()) return text
+        if (finishReason == "SAFETY") {
+            return "[Réponse modérée par les filtres de sécurité Gemini (SAFETY)]"
+        }
+        return null
     }
 
     private fun extractTokenFromSse(jsonStr: String): String? {
@@ -502,5 +546,163 @@ class CloudEngineBridge {
             .replace("\n", "\\n")
             .replace("\r", "\\r")
             .replace("\t", "\\t")
+    }
+
+    suspend fun fetchGroqModels(apiKey: String): Result<List<String>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val key = parseApiKeys(apiKey).firstOrNull() ?: error("Clé API Groq requise")
+            val url = URL("https://api.groq.com/openai/v1/models")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 10_000
+                readTimeout = 10_000
+                setRequestProperty("Authorization", "Bearer $key")
+                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+            }
+            val code = conn.responseCode
+            if (code !in 200..299) {
+                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                error(parseErrorMessage(err, code))
+            }
+            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+            conn.disconnect()
+            val root = jsonParser.parseToJsonElement(resp).jsonObject
+            val data = root["data"]?.jsonArray ?: emptyList()
+            val models = data.mapNotNull {
+                val obj = it.jsonObject
+                val id = obj["id"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                val active = obj["active"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: true
+                if (active && id !in DECOMMISSIONED_GROQ_MODELS && !id.contains("whisper")) id else null
+            }.sortedWith(Comparator { a, b ->
+                fun rank(s: String) = when {
+                    s.startsWith("llama-3.3-70b") -> 0
+                    s.startsWith("llama-3.1-8b") -> 1
+                    s.startsWith("llama-3.1-70b") -> 2
+                    s.contains("qwen") -> 3
+                    s.contains("deepseek") -> 4
+                    else -> 5
+                }
+                val rA = rank(a)
+                val rB = rank(b)
+                if (rA != rB) rA.compareTo(rB) else a.compareTo(b)
+            })
+            if (models.isEmpty()) listOf("llama-3.3-70b-versatile", "llama-3.1-8b-instant") else models
+        }
+    }
+
+    suspend fun fetchGeminiModels(apiKey: String): Result<List<String>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val key = parseApiKeys(apiKey).firstOrNull() ?: error("Clé API Gemini requise")
+            val url = URL("https://generativelanguage.googleapis.com/v1beta/models?key=$key")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 10_000
+                readTimeout = 10_000
+                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+            }
+            val code = conn.responseCode
+            if (code !in 200..299) {
+                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                error(parseErrorMessage(err, code))
+            }
+            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+            conn.disconnect()
+            val root = jsonParser.parseToJsonElement(resp).jsonObject
+            val modelsArray = root["models"]?.jsonArray ?: emptyList()
+            val models = modelsArray.mapNotNull {
+                val obj = it.jsonObject
+                val name = obj["name"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                val methods = obj["supportedGenerationMethods"]?.jsonArray?.map { m -> m.jsonPrimitive.content } ?: emptyList()
+                val id = name.removePrefix("models/")
+                if (methods.contains("generateContent") && !id.contains("embedding") && !id.contains("aqa")) {
+                    id
+                } else null
+            }.sortedWith(Comparator { a, b ->
+                fun rank(s: String) = when {
+                    s == "gemini-2.0-flash" -> 0
+                    s == "gemini-2.0-flash-lite-preview-02-05" -> 1
+                    s == "gemini-1.5-flash" -> 2
+                    s == "gemini-1.5-pro" -> 3
+                    s.startsWith("gemini-2.0") -> 4
+                    s.startsWith("gemini-1.5") -> 5
+                    else -> 6
+                }
+                val rA = rank(a)
+                val rB = rank(b)
+                if (rA != rB) rA.compareTo(rB) else a.compareTo(b)
+            })
+            if (models.isEmpty()) listOf("gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro") else models
+        }
+    }
+
+    suspend fun fetchOpenAiModels(apiKey: String): Result<List<String>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val key = parseApiKeys(apiKey).firstOrNull() ?: error("Clé API OpenAI requise")
+            val url = URL("https://api.openai.com/v1/models")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 10_000
+                readTimeout = 10_000
+                setRequestProperty("Authorization", "Bearer $key")
+                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+            }
+            val code = conn.responseCode
+            if (code !in 200..299) {
+                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                error(parseErrorMessage(err, code))
+            }
+            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+            conn.disconnect()
+            val root = jsonParser.parseToJsonElement(resp).jsonObject
+            val data = root["data"]?.jsonArray ?: emptyList()
+            val chatPrefixes = listOf("gpt-4", "gpt-3.5", "o1", "o3", "chatgpt")
+            val models = data.mapNotNull {
+                val id = it.jsonObject["id"]?.jsonPrimitive?.content ?: return@mapNotNull null
+                if (chatPrefixes.any { p -> id.startsWith(p) } && !id.contains("realtime") && !id.contains("audio") && !id.contains("transcription") && !id.contains("tts")) {
+                    id
+                } else null
+            }.sortedWith(Comparator { a, b ->
+                fun rank(s: String) = when {
+                    s == "gpt-4o-mini" -> 0
+                    s == "gpt-4o" -> 1
+                    s.startsWith("o3-mini") -> 2
+                    s.startsWith("o1") -> 3
+                    s.startsWith("gpt-4-turbo") -> 4
+                    else -> 5
+                }
+                val rA = rank(a)
+                val rB = rank(b)
+                if (rA != rB) rA.compareTo(rB) else a.compareTo(b)
+            })
+            if (models.isEmpty()) listOf("gpt-4o-mini", "gpt-4o", "o3-mini") else models
+        }
+    }
+
+    suspend fun fetchOpenRouterModels(): Result<List<String>> = withContext(Dispatchers.IO) {
+        runCatching {
+            val url = URL("https://openrouter.ai/api/v1/models")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 10_000
+                readTimeout = 10_000
+                setRequestProperty("User-Agent", "Mozilla/5.0 OpenCompanion/1.0")
+            }
+            val code = conn.responseCode
+            if (code !in 200..299) {
+                error("HTTP $code")
+            }
+            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+            conn.disconnect()
+            val root = jsonParser.parseToJsonElement(resp).jsonObject
+            val data = root["data"]?.jsonArray ?: emptyList()
+            val models = data.mapNotNull {
+                it.jsonObject["id"]?.jsonPrimitive?.content
+            }.sortedWith(Comparator { a, b ->
+                val aFree = a.endsWith(":free")
+                val bFree = b.endsWith(":free")
+                if (aFree != bFree) (if (aFree) -1 else 1) else a.compareTo(b)
+            })
+            if (models.isEmpty()) listOf("nousresearch/hermes-3-llama-3.1-8b:free", "meta-llama/llama-3.3-70b-instruct:free") else models
+        }
     }
 }

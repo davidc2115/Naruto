@@ -12,6 +12,7 @@ import com.opencompanion.app.engine.InferenceEngine
 import com.opencompanion.app.engine.ModelManager
 import com.opencompanion.app.engine.NanoBridge
 import com.opencompanion.app.engine.RecommendedModels
+import com.opencompanion.app.engine.CloudEngineBridge
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,12 +36,56 @@ class SettingsViewModel(
     private val modelManager: ModelManager,
     private val engine: InferenceEngine,
     private val nanoBridge: NanoBridge,
+    private val cloudEngineBridge: CloudEngineBridge,
 ) : ViewModel() {
 
     private val _localModels = MutableStateFlow(modelManager.listLocalModels())
     private val _downloadProgress = MutableStateFlow<Float?>(null)
     private val _message = MutableStateFlow<String?>(null)
     private val _nanoAvailability = MutableStateFlow(NanoBridge.NanoAvailability.UNAVAILABLE)
+
+    private val _groqModels = MutableStateFlow<List<String>>(
+        listOf(
+            "llama-3.3-70b-versatile",
+            "llama-3.1-8b-instant",
+            "deepseek-r1-distill-llama-70b",
+            "qwen-2.5-32b",
+            "qwen-qwq-32b",
+        )
+    )
+    val groqModels: StateFlow<List<String>> = _groqModels.asStateFlow()
+
+    private val _geminiModels = MutableStateFlow<List<String>>(
+        listOf(
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite-preview-02-05",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+        )
+    )
+    val geminiModels: StateFlow<List<String>> = _geminiModels.asStateFlow()
+
+    private val _openAiModels = MutableStateFlow<List<String>>(
+        listOf(
+            "gpt-4o-mini",
+            "gpt-4o",
+            "o3-mini",
+            "gpt-4-turbo",
+        )
+    )
+    val openAiModels: StateFlow<List<String>> = _openAiModels.asStateFlow()
+
+    private val _openRouterModels = MutableStateFlow<List<String>>(
+        listOf(
+            "nousresearch/hermes-3-llama-3.1-8b:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "deepseek/deepseek-r1:free",
+        )
+    )
+    val openRouterModels: StateFlow<List<String>> = _openRouterModels.asStateFlow()
+
+    private val _isFetchingModels = MutableStateFlow(false)
+    val isFetchingModels: StateFlow<Boolean> = _isFetchingModels.asStateFlow()
 
     init {
         refreshNanoAvailability()
@@ -199,6 +244,86 @@ class SettingsViewModel(
     fun setGeminiModelName(model: String) = viewModelScope.launch { settingsRepository.setGeminiModelName(model) }
     fun setOpenAiApiKey(key: String) = viewModelScope.launch { settingsRepository.setOpenAiApiKey(key) }
     fun setOpenAiModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiModelName(model) }
+    fun setAllowNsfwMode(enabled: Boolean) = viewModelScope.launch { settingsRepository.setAllowNsfwMode(enabled) }
+
+    fun refreshGroqModels() {
+        viewModelScope.launch {
+            val key = uiState.value.settings.groqApiKey
+            if (key.isBlank()) {
+                _message.value = "Entre ta clé API Groq d'abord pour lister les modèles."
+                return@launch
+            }
+            _isFetchingModels.value = true
+            cloudEngineBridge.fetchGroqModels(key).fold(
+                onSuccess = { list ->
+                    _groqModels.value = list
+                    _message.value = "${list.size} modèles Groq actifs récupérés."
+                },
+                onFailure = { err ->
+                    _message.value = "Erreur chargement modèles Groq : ${err.message}"
+                }
+            )
+            _isFetchingModels.value = false
+        }
+    }
+
+    fun refreshGeminiModels() {
+        viewModelScope.launch {
+            val key = uiState.value.settings.geminiApiKey
+            if (key.isBlank()) {
+                _message.value = "Entre ta clé API Gemini d'abord pour lister les modèles."
+                return@launch
+            }
+            _isFetchingModels.value = true
+            cloudEngineBridge.fetchGeminiModels(key).fold(
+                onSuccess = { list ->
+                    _geminiModels.value = list
+                    _message.value = "${list.size} modèles Gemini récupérés."
+                },
+                onFailure = { err ->
+                    _message.value = "Erreur chargement modèles Gemini : ${err.message}"
+                }
+            )
+            _isFetchingModels.value = false
+        }
+    }
+
+    fun refreshOpenAiModels() {
+        viewModelScope.launch {
+            val key = uiState.value.settings.openAiApiKey
+            if (key.isBlank()) {
+                _message.value = "Entre ta clé API OpenAI d'abord pour lister les modèles."
+                return@launch
+            }
+            _isFetchingModels.value = true
+            cloudEngineBridge.fetchOpenAiModels(key).fold(
+                onSuccess = { list ->
+                    _openAiModels.value = list
+                    _message.value = "${list.size} modèles OpenAI récupérés."
+                },
+                onFailure = { err ->
+                    _message.value = "Erreur chargement modèles OpenAI : ${err.message}"
+                }
+            )
+            _isFetchingModels.value = false
+        }
+    }
+
+    fun refreshOpenRouterModels() {
+        viewModelScope.launch {
+            _isFetchingModels.value = true
+            cloudEngineBridge.fetchOpenRouterModels().fold(
+                onSuccess = { list ->
+                    _openRouterModels.value = list
+                    _message.value = "${list.size} modèles OpenRouter récupérés."
+                },
+                onFailure = { err ->
+                    _message.value = "Erreur chargement modèles OpenRouter : ${err.message}"
+                }
+            )
+            _isFetchingModels.value = false
+        }
+    }
 
     fun consumeMessage() {
         _message.value = null

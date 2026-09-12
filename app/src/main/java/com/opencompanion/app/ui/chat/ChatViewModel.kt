@@ -307,6 +307,7 @@ class ChatViewModel(
                 DialogueMode.FORCE_NSFW -> {
                     if (hasLocalModel) EngineBackend.LLAMA_CPP
                     else if (settings.groqApiKey.isNotBlank()) EngineBackend.CLOUD_GROQ
+                    else if (settings.geminiApiKey.isNotBlank()) EngineBackend.CLOUD_GEMINI
                     else if (settings.openAiApiKey.isNotBlank()) EngineBackend.CLOUD_OPENAI
                     else if (nanoAvailable) EngineBackend.AICORE
                     else EngineBackend.LLAMA_CPP
@@ -376,7 +377,7 @@ class ChatViewModel(
             contextSize = settings.contextSize,
             reservedForResponse = settings.maxResponseTokens,
             userProfile = resolveUserProfile(character),
-            allowNsfw = settings.allowNsfwMode,
+            allowNsfw = settings.allowNsfwMode || _dialogueMode.value != DialogueMode.FORCE_SFW,
         )
 
         val flow = if (backend == EngineBackend.CLOUD_FREE_NO_KEY) {

@@ -131,7 +131,13 @@ fun AppNav(app: OpenCompanionApplication) {
         composable(Routes.SETTINGS) {
             val vm: SettingsViewModel = viewModel(
                 factory = AppViewModelFactory {
-                    SettingsViewModel(app.settingsRepository, app.modelManager, app.inferenceEngine, app.nanoBridge)
+                    SettingsViewModel(
+                        app.settingsRepository,
+                        app.modelManager,
+                        app.inferenceEngine,
+                        app.nanoBridge,
+                        app.cloudEngineBridge,
+                    )
                 },
             )
             SettingsScreen(viewModel = vm, onBack = { navController.popBackStack() })
