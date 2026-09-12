@@ -21,7 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
@@ -191,7 +191,7 @@ fun CharacterDetailScreen(
                         shape = RoundedCornerShape(16.dp),
                     ) {
                         Icon(
-                            if (state.hasConversation) Icons.AutoMirrored.Filled.Chat else Icons.Filled.PlayArrow,
+                            if (state.hasConversation) Icons.AutoMirrored.Filled.Message else Icons.Filled.PlayArrow,
                             contentDescription = null,
                             tint = Color.White,
                         )
@@ -346,7 +346,7 @@ fun CharacterDetailScreen(
                 Column(Modifier.padding(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            Icons.AutoMirrored.Filled.Chat,
+                            Icons.AutoMirrored.Filled.Message,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp),

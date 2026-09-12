@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
@@ -363,7 +364,7 @@ private fun CharacterCard(
                     )
                     DropdownMenuItem(
                         text = { Text("Discuter directement") },
-                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.Message, contentDescription = null) },
                         onClick = { menuExpanded = false; onQuickChat() },
                     )
                     DropdownMenuItem(
