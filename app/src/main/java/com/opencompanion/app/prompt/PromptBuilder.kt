@@ -43,9 +43,11 @@ object PromptBuilder {
      * sur mobile de 30s à moins de 3s.
      */
     private const val LANGUAGE_AND_TONE_DIRECTIVE =
-        "Tu écris exclusivement en français oral, vivant et naturel. Phrases courtes de messagerie " +
-            "(1 à 2 phrases max, jamais de pavé). Ne réfléchis jamais à voix haute et n'affiche jamais " +
-            "de balises <think> ou <thinking>. Varie tes répliques sans jamais te répéter."
+        "Tu incarnes ce personnage en français oral, vivant, expressif et naturel. " +
+            "RÈGLE CRITIQUE : Ne répète JAMAIS, ne paraphrase jamais et ne fais aucun écho des paroles, " +
+            "questions ou messages de l'utilisateur. Réagis et réponds directement avec tes propres pensées, " +
+            "sentiments et réparties. Fais progresser l'échange avec spontanéité et immersion. " +
+            "Ne réfléchis jamais à voix haute et n'affiche aucune balise <think> ou <thinking>."
 
     /**
      * Format jeu de rôle textuel : actions entre *astérisques*, pensées entre (parenthèses), dialogue direct.
@@ -256,23 +258,14 @@ object PromptBuilder {
                 append("\n")
             }
             append("$userLabel : $newUserMessage\n\n")
-            // Directive explicite plutôt qu'un simple "${character.name} :" en fin de prompt :
-            // ce dernier format (façon "complète cette réplique") convient à un modèle de base
-            // texte, mais Gemini Nano est un modèle *instruit*, pas un modèle de complétion — un
-            // simple nom suivi de ":" ne lui indique pas clairement qu'il doit répondre
-            // précisément au dernier message ci-dessus plutôt que de continuer la scène à sa
-            // façon (d'où des réponses qui semblent ignorer ce que vient de dire l'utilisateur,
-            // voire se répéter d'un tour à l'autre). En citant explicitement le dernier message,
-            // l'instruction ancre la génération dessus au lieu de laisser le modèle "deviner" la
-            // suite. Le backend llama.cpp n'a pas ce problème : il utilise le vrai patron de
-            // dialogue du modèle (voir buildPrompt/applyChatTemplate), pas un texte à compléter.
+            // Directive claire : Gemini Nano répond en tant que personnage sans répéter le message de l'utilisateur
             append(
-                "Réponds maintenant UNIQUEMENT en tant que ${character.name}, précisément à ce " +
-                    "dernier message de $userLabel : « $newUserMessage ». Ne recommence pas la " +
-                    "scène, ne pars pas sur une idée sans rapport : réagis à ce qui vient d'être " +
-                    "dit. N'écris que la réplique de ${character.name} elle-même, sans répéter " +
-                    "son nom ni ajouter de guillemets autour."
+                "Instruction : Réponds maintenant en incarnant fidèlement ${character.name}. " +
+                    "Réagis au message de $userLabel avec ta propre personnalité, tes émotions et des actions immersives entre astérisques. " +
+                    "Fais progresser l'échange sans JAMAIS répéter ni paraphraser ce que $userLabel vient de dire. " +
+                    "Donne uniquement la réplique directe de ${character.name} :\n"
             )
+            append("${character.name} : ")
         }
     }
 

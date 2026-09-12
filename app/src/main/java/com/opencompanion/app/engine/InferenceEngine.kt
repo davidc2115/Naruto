@@ -179,8 +179,9 @@ class InferenceEngine(private val context: Context) {
 
     /** Nombre approximatif de tokens que consommerait [text] dans le contexte actuel. */
     fun tokenCount(text: String): Int {
+        if (text.isEmpty()) return 0
         val h = handle
-        if (h == 0L || text.isEmpty()) return 0
+        if (h == 0L) return (text.length / 4).coerceAtLeast(1)
         return LlamaBridge.nativeTokenCount(h, text.toByteArray(Charsets.UTF_8))
     }
 

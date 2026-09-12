@@ -50,6 +50,25 @@ internal fun splitIntoBubbles(text: String): List<String> {
     return head + tail
 }
 
+internal fun cleanSpeakerPrefix(text: String, characterName: String): String {
+    var result = text.trim()
+    val prefixes = listOf(
+        "$characterName :",
+        "$characterName:",
+        "assistant :",
+        "assistant:",
+        "Assistant :",
+        "Assistant:"
+    )
+    for (prefix in prefixes) {
+        if (result.startsWith(prefix, ignoreCase = true)) {
+            result = result.substring(prefix.length).trim()
+            break
+        }
+    }
+    return result
+}
+
 data class ChatUiState(
     val character: CharacterEntity? = null,
     val messages: List<ChatMessageEntity> = emptyList(),
@@ -324,7 +343,7 @@ class ChatViewModel(
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
                     if (text.isNotBlank()) {
-                        splitIntoBubbles(text).forEach {
+                        splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
                         }
                     } else {
@@ -376,7 +395,7 @@ class ChatViewModel(
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
                     if (text.isNotBlank()) {
-                        splitIntoBubbles(text).forEach {
+                        splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
                         }
                     }
@@ -488,7 +507,7 @@ class ChatViewModel(
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
                     if (text.isNotBlank()) {
-                        splitIntoBubbles(text).forEach {
+                        splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
                         }
                     } else {
