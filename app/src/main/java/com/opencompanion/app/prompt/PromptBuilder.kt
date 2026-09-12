@@ -229,9 +229,9 @@ object PromptBuilder {
     ): String {
         // Marge de sécurité généreuse : ~4000 tokens au total pour AICore, on réserve la sortie
         // demandée plus une marge, et on garde le reste pour system + historique + message.
-        val budget = (NANO_TOKEN_BUDGET - maxOutputTokens - SAFETY_MARGIN_TOKENS).coerceAtLeast(256)
-        val systemPrompt = buildSystemPrompt(character, userProfile)
-        val userLabel = userProfile.displayName
+        // Pour Gemini Nano (SFW / NPU), on n'injecte jamais les mots-clés adultes/NSFW qui déclencheraient
+        // immédiatement les filtres de sécurité système de Google AICore.
+        val systemPrompt = buildSystemPrompt(character, userProfile, allowNsfw = false)
 
         var used = estimateTokens(systemPrompt) + estimateTokens(newUserMessage)
         val kept = ArrayDeque<ChatTurn>()

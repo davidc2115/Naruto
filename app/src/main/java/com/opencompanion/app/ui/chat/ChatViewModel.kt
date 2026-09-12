@@ -18,6 +18,8 @@ import com.opencompanion.app.engine.GenerationEvent
 import com.opencompanion.app.engine.GenerationParams
 import com.opencompanion.app.engine.InferenceEngine
 import com.opencompanion.app.engine.NanoBridge
+import com.opencompanion.app.engine.DialogueMode
+import com.opencompanion.app.engine.DialogueRouter
 import com.opencompanion.app.engine.parseApiKeys
 import com.opencompanion.app.prompt.PromptBuilder
 import kotlinx.coroutines.Job
@@ -80,6 +82,8 @@ data class ChatUiState(
      *  plutôt que par le moteur llama.cpp embarqué — voir [ChatViewModel.resolveActiveBackend]. */
     val usingNano: Boolean = false,
     val selectedModelName: String? = null,
+    val dialogueMode: DialogueMode = DialogueMode.AUTO_HYBRID,
+    val activeEngineLabel: String? = null,
 )
 
 class ChatViewModel(
@@ -95,8 +99,22 @@ class ChatViewModel(
     private val _status = MutableStateFlow(EngineStatus.IDLE)
     private val _statusMessage = MutableStateFlow<String?>(null)
     private val _usingNano = MutableStateFlow(false)
+    private val _dialogueMode = MutableStateFlow(DialogueMode.AUTO_HYBRID)
+    private val _activeEngineLabel = MutableStateFlow<String?>(null)
     private var generationJob: Job? = null
     private var gpuRetryUsed = false
+
+    fun setDialogueMode(mode: DialogueMode) {
+        _dialogueMode.value = mode
+    }
+
+    fun cycleDialogueMode() {
+        _dialogueMode.value = when (_dialogueMode.value) {
+            DialogueMode.AUTO_HYBRID -> DialogueMode.FORCE_NSFW
+            DialogueMode.FORCE_NSFW -> DialogueMode.FORCE_SFW
+            DialogueMode.FORCE_SFW -> DialogueMode.AUTO_HYBRID
+        }
+    }
 
     init {
         viewModelScope.launch {
@@ -122,8 +140,22 @@ class ChatViewModel(
         }
     }
 
-    private val _engineState = combine(_streamingText, _status, _usingNano) { streaming, status, usingNano ->
-        Triple(streaming, status, usingNano)
+    private data class CombinedEngineState(
+        val streaming: String,
+        val status: EngineStatus,
+        val usingNano: Boolean,
+        val mode: DialogueMode,
+        val label: String?,
+    )
+
+    private val _engineState = combine(
+        _streamingText,
+        _status,
+        _usingNano,
+        _dialogueMode,
+        _activeEngineLabel,
+    ) { streaming, status, usingNano, mode, label ->
+        CombinedEngineState(streaming, status, usingNano, mode, label)
     }
 
     val uiState: StateFlow<ChatUiState> = combine(
@@ -131,7 +163,7 @@ class ChatViewModel(
         repository.observeMessages(characterId),
         _engineState,
         settingsRepository.settings,
-    ) { character, messages, (streaming, status, usingNano), settings ->
+    ) { character, messages, engineState, settings ->
         val modelName = when (settings.enginePreference) {
             EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
                 "Cloud : ${settings.cloudModelName.substringAfterLast('/')}"
@@ -145,12 +177,14 @@ class ChatViewModel(
         ChatUiState(
             character = character,
             messages = messages,
-            streamingText = streaming,
-            status = status,
+            streamingText = engineState.streaming,
+            status = engineState.status,
             statusMessage = _statusMessage.value,
             usingGpu = engine.isUsingGpu,
-            usingNano = usingNano,
+            usingNano = engineState.usingNano,
             selectedModelName = modelName,
+            dialogueMode = engineState.mode,
+            activeEngineLabel = engineState.label,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChatUiState())
 
@@ -184,11 +218,19 @@ class ChatViewModel(
             repository.incrementAffection(characterId)
 
             val settings = settingsRepository.settings.first()
-            val backend = resolveActiveBackend(settings.enginePreference)
+            val recentHistory = repository.getMessages(characterId)
+            val backend = resolveActiveBackend(
+                preference = settings.enginePreference,
+                userMessage = trimmed,
+                recentHistory = recentHistory,
+                hasLocalModel = !settings.selectedModelPath.isNullOrBlank(),
+                allowNsfwPreference = settings.allowNsfwMode,
+            )
 
             when (backend) {
                 EngineBackend.AICORE -> {
                     _usingNano.value = true
+                    _activeEngineLabel.value = "⚡ Gemini Nano (NPU • SFW)"
                     runNanoGeneration(
                         character = character,
                         settings = settings,
@@ -199,11 +241,14 @@ class ChatViewModel(
                 EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE,
                 EngineBackend.CLOUD_CUSTOM_OPENAI, EngineBackend.CLOUD_GROQ, EngineBackend.CLOUD_GEMINI -> {
                     _usingNano.value = false
+                    _activeEngineLabel.value = "☁️ ${settings.cloudModelName.substringAfterLast('/')}"
                     runCloudGeneration(character, settings, backend)
                     return@launch
                 }
                 else -> {
                     _usingNano.value = false
+                    val modelBaseName = settings.selectedModelPath?.let { java.io.File(it).name.removeSuffix(".gguf") } ?: "IA Locale"
+                    _activeEngineLabel.value = "🔓 $modelBaseName (Non censurée • NSFW)"
                     if (settings.selectedModelPath == null) {
                         _status.value = EngineStatus.NO_MODEL_CONFIGURED
                         _statusMessage.value = "Choisis un modèle dans les réglages avant de discuter."
@@ -211,19 +256,25 @@ class ChatViewModel(
                     }
                     val loaded = loadModelIfNeeded(settings)
                     if (!loaded) return@launch
-                    runGeneration(character, settings, allowGpuRetry = true)
+                    runGeneration(character, settings.copy(allowNsfwMode = true), allowGpuRetry = true)
                 }
             }
         }
     }
 
     /**
-     * Détermine le moteur à utiliser pour ce message. En [EngineBackend.AUTO] (réglage par
-     * défaut), on essaie Gemini Nano si AICore le rapporte disponible *maintenant* — pas
-     * "téléchargeable" ni "en cours de téléchargement", ces deux états déclenchent le repli
-     * immédiat sur llama.cpp plutôt que d'attendre. Voir docs/MODELES_ET_AICORE.md.
+     * Détermine le moteur à utiliser pour ce message avec relais intelligent SFW ↔ NSFW.
+     * En mode [EngineBackend.AUTO], analyse si le dialogue relève du domaine adulte / NSFW :
+     * si oui, l'IA locale non censurée prend le relais pour garantir des réponses débridées et
+     * cohérentes ; sinon, Gemini Nano (NPU ⚡) répond avec une rapidité maximale.
      */
-    private suspend fun resolveActiveBackend(preference: EngineBackend): EngineBackend = when (preference) {
+    private suspend fun resolveActiveBackend(
+        preference: EngineBackend,
+        userMessage: String = "",
+        recentHistory: List<ChatMessageEntity> = emptyList(),
+        hasLocalModel: Boolean = false,
+        allowNsfwPreference: Boolean = false,
+    ): EngineBackend = when (preference) {
         EngineBackend.LLAMA_CPP -> EngineBackend.LLAMA_CPP
         EngineBackend.AICORE -> EngineBackend.AICORE
         EngineBackend.CLOUD_FREE_NO_KEY -> EngineBackend.CLOUD_FREE_NO_KEY
@@ -233,10 +284,26 @@ class ChatViewModel(
         EngineBackend.CLOUD_GROQ -> EngineBackend.CLOUD_GROQ
         EngineBackend.CLOUD_GEMINI -> EngineBackend.CLOUD_GEMINI
         EngineBackend.AUTO -> {
-            if (nanoBridge.checkAvailability() == NanoBridge.NanoAvailability.AVAILABLE) {
-                EngineBackend.AICORE
-            } else {
-                EngineBackend.LLAMA_CPP
+            val nanoAvailable = nanoBridge.checkAvailability() == NanoBridge.NanoAvailability.AVAILABLE
+            when (_dialogueMode.value) {
+                DialogueMode.FORCE_NSFW -> {
+                    if (hasLocalModel) EngineBackend.LLAMA_CPP else if (nanoAvailable) EngineBackend.AICORE else EngineBackend.LLAMA_CPP
+                }
+                DialogueMode.FORCE_SFW -> {
+                    if (nanoAvailable) EngineBackend.AICORE else EngineBackend.LLAMA_CPP
+                }
+                DialogueMode.AUTO_HYBRID -> {
+                    val isNsfw = allowNsfwPreference || DialogueRouter.isNsfw(userMessage, recentHistory)
+                    if (isNsfw && hasLocalModel) {
+                        // Bascule fluide et automatique sur l'IA locale non censurée
+                        EngineBackend.LLAMA_CPP
+                    } else if (nanoAvailable) {
+                        // SFW : Gemini Nano NPU
+                        EngineBackend.AICORE
+                    } else {
+                        EngineBackend.LLAMA_CPP
+                    }
+                }
             }
         }
     }
@@ -394,10 +461,14 @@ class ChatViewModel(
                     val text = _streamingText.value
                     _streamingText.value = ""
                     _status.value = EngineStatus.IDLE
-                    if (text.isNotBlank()) {
+                    if (text.isNotBlank() && !DialogueRouter.isRefusalOrEmpty(text)) {
                         splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
                         }
+                    } else {
+                        // Refus AICore ou réponse vide -> bascule automatique sur l'IA locale non censurée
+                        nanoFailed = true
+                        nanoErrorMessage = "Contenu filtré par AICore (relais IA non censurée activé)"
                     }
                 }
                 is GenerationEvent.Error -> {
@@ -412,9 +483,11 @@ class ChatViewModel(
             _streamingText.value = ""
             if (allowFallbackToLlama && settings.selectedModelPath != null) {
                 _usingNano.value = false
-                _statusMessage.value = "Gemini Nano indisponible ($nanoErrorMessage) : bascule sur le modèle local."
+                val localName = java.io.File(settings.selectedModelPath).name.removeSuffix(".gguf")
+                _activeEngineLabel.value = "🔓 $localName (Relais non censuré • NSFW)"
+                _statusMessage.value = "Relais IA Locale activé ($localName)."
                 if (loadModelIfNeeded(settings)) {
-                    runGeneration(character, settings, allowGpuRetry = true)
+                    runGeneration(character, settings.copy(allowNsfwMode = true), allowGpuRetry = true)
                 }
             } else {
                 _status.value = EngineStatus.LOAD_ERROR
@@ -486,7 +559,7 @@ class ChatViewModel(
             contextSize = settings.contextSize,
             reservedForResponse = settings.maxResponseTokens,
             userProfile = resolveUserProfile(character),
-            allowNsfw = settings.allowNsfwMode,
+            allowNsfw = settings.allowNsfwMode || _dialogueMode.value != DialogueMode.FORCE_SFW,
         )
 
         var gpuFailed = false

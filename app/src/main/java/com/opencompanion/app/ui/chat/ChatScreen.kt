@@ -21,11 +21,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
+import com.opencompanion.app.engine.DialogueMode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
@@ -116,20 +119,26 @@ fun ChatScreen(
                         Column {
                         Text(state.character?.name ?: "…", style = MaterialTheme.typography.titleMedium)
                         if (state.character != null) {
+                            val modeTag = when (state.dialogueMode) {
+                                DialogueMode.AUTO_HYBRID -> "Auto"
+                                DialogueMode.FORCE_NSFW -> "NSFW 🔓"
+                                DialogueMode.FORCE_SFW -> "SFW ⚡"
+                            }
+                            val engineInfo = state.activeEngineLabel ?: when {
+                                state.status == EngineStatus.LOADING_MODEL -> {
+                                    val name = state.selectedModelName ?: "Modèle local"
+                                    "⏳ Chargement de $name…"
+                                }
+                                state.usingNano -> "⚡ NPU (Gemini Nano)"
+                                state.selectedModelName != null -> {
+                                    val hw = if (state.usingGpu) "GPU" else "CPU"
+                                    "🧠 ${state.selectedModelName} ($hw)"
+                                }
+                                state.usingGpu -> "🧠 Modèle local (GPU)"
+                                else -> "🧠 Modèle local (CPU)"
+                            }
                             Text(
-                                when {
-                                    state.status == EngineStatus.LOADING_MODEL -> {
-                                        val name = state.selectedModelName ?: "Modèle local"
-                                        "⏳ Chargement de $name…"
-                                    }
-                                    state.usingNano -> "⚡ NPU Matériel (Gemini Nano)"
-                                    state.selectedModelName != null -> {
-                                        val hw = if (state.usingGpu) "GPU Vulkan" else "CPU"
-                                        "🧠 ${state.selectedModelName} ($hw)"
-                                    }
-                                    state.usingGpu -> "🧠 Modèle local (GPU Vulkan)"
-                                    else -> "🧠 Modèle local (CPU)"
-                                },
+                                "$engineInfo • $modeTag",
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         }
@@ -140,6 +149,27 @@ fun ChatScreen(
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
                 },
                 actions = {
+                    // Bascule fluide SFW ↔ NSFW (1 clic)
+                    IconButton(onClick = { viewModel.cycleDialogueMode() }) {
+                        val (icon, tint, desc) = when (state.dialogueMode) {
+                            DialogueMode.AUTO_HYBRID -> Triple(
+                                Icons.Filled.AutoAwesome,
+                                MaterialTheme.colorScheme.primary,
+                                "Mode Auto : SFW ⚡ NPU ↔ NSFW 🔓 Locale"
+                            )
+                            DialogueMode.FORCE_NSFW -> Triple(
+                                Icons.Filled.Bolt,
+                                MaterialTheme.colorScheme.error,
+                                "Mode Débridé NSFW forcé (IA Locale)"
+                            )
+                            DialogueMode.FORCE_SFW -> Triple(
+                                Icons.Filled.Bolt,
+                                MaterialTheme.colorScheme.tertiary,
+                                "Mode SFW forcé (Gemini Nano NPU)"
+                            )
+                        }
+                        Icon(icon, contentDescription = desc, tint = tint)
+                    }
                     if (state.character != null) {
                         IconButton(onClick = { showRelationshipDialog = true }) {
                             Icon(
@@ -156,6 +186,21 @@ fun ChatScreen(
                         Icon(Icons.Filled.DeleteSweep, contentDescription = "Options")
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                        DropdownMenuItem(
+                            text = { Text(if (state.dialogueMode == DialogueMode.AUTO_HYBRID) "✓ Mode Auto SFW ↔ NSFW" else "Mode Auto SFW ↔ NSFW") },
+                            leadingIcon = { Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                            onClick = { menuExpanded = false; viewModel.setDialogueMode(DialogueMode.AUTO_HYBRID) },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(if (state.dialogueMode == DialogueMode.FORCE_NSFW) "✓ Mode Débridé NSFW 🔓" else "Mode Débridé NSFW 🔓") },
+                            leadingIcon = { Icon(Icons.Filled.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                            onClick = { menuExpanded = false; viewModel.setDialogueMode(DialogueMode.FORCE_NSFW) },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(if (state.dialogueMode == DialogueMode.FORCE_SFW) "✓ Mode SFW ⚡ (Gemini Nano)" else "Mode SFW ⚡ (Gemini Nano)") },
+                            leadingIcon = { Icon(Icons.Filled.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary) },
+                            onClick = { menuExpanded = false; viewModel.setDialogueMode(DialogueMode.FORCE_SFW) },
+                        )
                         DropdownMenuItem(
                             text = { Text("Changer de persona") },
                             onClick = { menuExpanded = false; showPersonaPicker = true },
