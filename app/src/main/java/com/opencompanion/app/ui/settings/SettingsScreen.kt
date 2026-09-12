@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -33,6 +34,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -173,7 +175,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 EngineCategory.GROQ -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            "Crée une clé API gratuite sur console.groq.com/keys.",
+                            "Crée une clé API gratuite sur console.groq.com/keys (vitesse 300 à 500+ tokens/sec).",
                             style = MaterialTheme.typography.bodySmall,
                         )
                         ApiKeysField(
@@ -186,16 +188,28 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             value = state.settings.groqModelName,
                             onValueChange = viewModel::setGroqModelName,
                             label = { Text("Modèle") },
-                            placeholder = { Text("openai/gpt-oss-120b") },
+                            placeholder = { Text("llama-3.3-70b-versatile") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilterChip(
+                                selected = state.settings.groqModelName == "llama-3.3-70b-versatile",
+                                onClick = { viewModel.setGroqModelName("llama-3.3-70b-versatile") },
+                                label = { Text("Llama 3.3 70B ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.groqModelName == "llama-3.1-8b-instant",
+                                onClick = { viewModel.setGroqModelName("llama-3.1-8b-instant") },
+                                label = { Text("Llama 3.1 8B ⚡") }
+                            )
+                        }
                     }
                 }
                 EngineCategory.GEMINI -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            "Crée une clé API gratuite sur aistudio.google.com/apikey.",
+                            "Crée une clé API gratuite sur aistudio.google.com/apikey (modèles Google ultra-récents).",
                             style = MaterialTheme.typography.bodySmall,
                         )
                         ApiKeysField(
@@ -208,10 +222,56 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             value = state.settings.geminiModelName,
                             onValueChange = viewModel::setGeminiModelName,
                             label = { Text("Modèle") },
-                            placeholder = { Text("gemini-3.5-flash") },
+                            placeholder = { Text("gemini-2.0-flash") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilterChip(
+                                selected = state.settings.geminiModelName == "gemini-2.0-flash",
+                                onClick = { viewModel.setGeminiModelName("gemini-2.0-flash") },
+                                label = { Text("Gemini 2.0 Flash ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.geminiModelName == "gemini-1.5-flash",
+                                onClick = { viewModel.setGeminiModelName("gemini-1.5-flash") },
+                                label = { Text("Gemini 1.5 Flash ⚡") }
+                            )
+                        }
+                    }
+                }
+                EngineCategory.OPENAI -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            "Crée une clé API sur platform.openai.com/api-keys.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        ApiKeysField(
+                            value = state.settings.openAiApiKey,
+                            onValueChange = viewModel::setOpenAiApiKey,
+                            label = "Clé(s) API OpenAI",
+                            placeholder = "sk-proj-...",
+                        )
+                        OutlinedTextField(
+                            value = state.settings.openAiModelName,
+                            onValueChange = viewModel::setOpenAiModelName,
+                            label = { Text("Modèle OpenAI") },
+                            placeholder = { Text("gpt-4o-mini") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilterChip(
+                                selected = state.settings.openAiModelName == "gpt-4o-mini",
+                                onClick = { viewModel.setOpenAiModelName("gpt-4o-mini") },
+                                label = { Text("GPT-4o mini ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.openAiModelName == "gpt-4o",
+                                onClick = { viewModel.setOpenAiModelName("gpt-4o") },
+                                label = { Text("GPT-4o 🧠") }
+                            )
+                        }
                     }
                 }
                 EngineCategory.CUSTOM_CLOUD -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
@@ -479,18 +539,17 @@ private fun engineBackendLabel(backend: EngineBackend): String = when (backend) 
     EngineBackend.AUTO -> "Auto (⚡ NPU matériel si dispo, sinon llama.cpp)"
     EngineBackend.AICORE -> "⚡ NPU Matériel : Gemini Nano (AICore, ultra-rapide)"
     EngineBackend.LLAMA_CPP -> "Modèle local (llama.cpp sur l'appareil)"
-    EngineBackend.CLOUD_GROQ -> "☁️ Groq (avec ta clé API)"
-    EngineBackend.CLOUD_GEMINI -> "☁️ Gemini (avec ta clé API)"
+    EngineBackend.CLOUD_GROQ -> "⚡ Groq Cloud (avec ta clé API)"
+    EngineBackend.CLOUD_GEMINI -> "✨ Google Gemini Cloud (avec ta clé API)"
+    EngineBackend.CLOUD_OPENAI -> "🧠 OpenAI ChatGPT (avec ta clé API)"
     EngineBackend.CLOUD_OPENROUTER -> "☁️ OpenRouter Cloud (avec ta clé API)"
     EngineBackend.CLOUD_KOBOLD_HORDE -> "🌐 KoboldAI Horde (réseau communautaire tiers, sans clé)"
     EngineBackend.CLOUD_CUSTOM_OPENAI -> "🛠️ API Cloud personnalisée / compatible OpenAI"
 }
 
 /**
- * Regroupe les 9 [EngineBackend] techniques en 5 familles compréhensibles pour l'utilisateur, afin
- * de remplacer l'ancienne liste plate de 9 boutons radio par 5 grandes cartes (voir
- * [EngineCategoryCard]). Chaque famille garde son propre bloc de réglages détaillés en dessous
- * (choix précis + clé API le cas échéant).
+ * Regroupe les 10 [EngineBackend] techniques en 6 familles compréhensibles pour l'utilisateur, afin
+ * de remplacer l'ancienne liste plate par de grandes cartes (voir [EngineCategoryCard]).
  */
 private enum class EngineCategory(
     val title: String,
@@ -505,16 +564,22 @@ private enum class EngineCategory(
         defaultBackend = EngineBackend.AUTO,
     ),
     GROQ(
-        title = "Groq",
-        subtitle = "Cloud très rapide, clé API gratuite",
+        title = "Groq Cloud (Ultra-rapide ⚡)",
+        subtitle = "300+ tok/s, clé API gratuite",
         icon = Icons.Filled.Bolt,
         defaultBackend = EngineBackend.CLOUD_GROQ,
     ),
     GEMINI(
-        title = "Gemini",
-        subtitle = "Cloud Google, clé API gratuite",
+        title = "Google Gemini Cloud ✨",
+        subtitle = "Gemini 2.0 / 1.5 Flash, clé API gratuite",
         icon = Icons.Filled.AutoAwesome,
         defaultBackend = EngineBackend.CLOUD_GEMINI,
+    ),
+    OPENAI(
+        title = "OpenAI ChatGPT 🧠",
+        subtitle = "GPT-4o mini, GPT-4o, clé API OpenAI",
+        icon = Icons.Filled.Psychology,
+        defaultBackend = EngineBackend.CLOUD_OPENAI,
     ),
     CUSTOM_CLOUD(
         title = "Cloud personnalisé",
@@ -534,6 +599,7 @@ private fun engineCategoryOf(backend: EngineBackend): EngineCategory = when (bac
     EngineBackend.AUTO, EngineBackend.AICORE, EngineBackend.LLAMA_CPP -> EngineCategory.LOCAL
     EngineBackend.CLOUD_GROQ -> EngineCategory.GROQ
     EngineBackend.CLOUD_GEMINI -> EngineCategory.GEMINI
+    EngineBackend.CLOUD_OPENAI -> EngineCategory.OPENAI
     EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_CUSTOM_OPENAI -> EngineCategory.CUSTOM_CLOUD
     EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_KOBOLD_HORDE -> EngineCategory.ANONYMOUS
 }

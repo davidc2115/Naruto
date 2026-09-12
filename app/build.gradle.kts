@@ -34,8 +34,10 @@ android {
         // docs/VULKAN_NOTES.md. Le CPU reste le repli automatique sur tout appareil API 28+.
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        val propVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull()
+        val finalVersionCode = propVersionCode ?: 100
+        versionCode = finalVersionCode
+        versionName = "0.2.$finalVersionCode"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -78,15 +80,26 @@ android {
         }
     }
 
+    signingConfigs {
+        create("opencompanion") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("opencompanion")
         }
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
+            signingConfig = signingConfigs.getByName("opencompanion")
         }
     }
 

@@ -129,6 +129,13 @@ fun ChatScreen(
                                     val name = state.selectedModelName ?: "Modèle local"
                                     "⏳ Chargement de $name…"
                                 }
+                                state.selectedModelName != null && (
+                                    state.selectedModelName.startsWith("⚡") ||
+                                    state.selectedModelName.startsWith("✨") ||
+                                    state.selectedModelName.startsWith("🧠") ||
+                                    state.selectedModelName.startsWith("☁️") ||
+                                    state.selectedModelName.startsWith("Cloud")
+                                ) -> state.selectedModelName
                                 state.usingNano -> "⚡ NPU (Gemini Nano)"
                                 state.selectedModelName != null -> {
                                     val hw = if (state.usingGpu) "GPU" else "CPU"

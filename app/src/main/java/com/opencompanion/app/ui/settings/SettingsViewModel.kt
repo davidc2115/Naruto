@@ -197,6 +197,8 @@ class SettingsViewModel(
     fun setGroqModelName(model: String) = viewModelScope.launch { settingsRepository.setGroqModelName(model) }
     fun setGeminiApiKey(key: String) = viewModelScope.launch { settingsRepository.setGeminiApiKey(key) }
     fun setGeminiModelName(model: String) = viewModelScope.launch { settingsRepository.setGeminiModelName(model) }
+    fun setOpenAiApiKey(key: String) = viewModelScope.launch { settingsRepository.setOpenAiApiKey(key) }
+    fun setOpenAiModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiModelName(model) }
 
     fun consumeMessage() {
         _message.value = null

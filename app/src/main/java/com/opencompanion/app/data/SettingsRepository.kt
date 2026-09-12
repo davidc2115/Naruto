@@ -30,7 +30,8 @@ enum class EngineBackend {
     // (compte Groq / compte Google AI Studio), donc pas de bascule automatique de l'un vers
     // l'autre — seulement une sélection manuelle dans les réglages (voir ChatViewModel).
     CLOUD_GROQ,
-    CLOUD_GEMINI
+    CLOUD_GEMINI,
+    CLOUD_OPENAI,
 }
 
 /** Genre déclaré par l'utilisateur, injecté dans le prompt système (voir PromptBuilder) pour
@@ -92,9 +93,11 @@ data class EngineSettings(
     val cloudModelName: String = "Hermes-3-Llama-3.1-8B",
     val cloudEndpointUrl: String = "https://openrouter.ai/api/v1/chat/completions",
     val groqApiKey: String = "",
-    val groqModelName: String = "openai/gpt-oss-120b",
+    val groqModelName: String = "llama-3.3-70b-versatile",
     val geminiApiKey: String = "",
-    val geminiModelName: String = "gemini-3.5-flash",
+    val geminiModelName: String = "gemini-2.0-flash",
+    val openAiApiKey: String = "",
+    val openAiModelName: String = "gpt-4o-mini",
 )
 
 /**
@@ -129,6 +132,8 @@ class SettingsRepository(private val context: Context) {
         val GROQ_MODEL_NAME = stringPreferencesKey("groq_model_name")
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
         val GEMINI_MODEL_NAME = stringPreferencesKey("gemini_model_name")
+        val OPENAI_API_KEY = stringPreferencesKey("openai_api_key")
+        val OPENAI_MODEL_NAME = stringPreferencesKey("openai_model_name")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
     }
@@ -185,18 +190,13 @@ class SettingsRepository(private val context: Context) {
             cloudModelName = prefs[Keys.CLOUD_MODEL_NAME] ?: "nousresearch/hermes-3-llama-3.1-8b:free",
             cloudEndpointUrl = prefs[Keys.CLOUD_ENDPOINT_URL] ?: "https://openrouter.ai/api/v1/chat/completions",
             groqApiKey = prefs[Keys.GROQ_API_KEY] ?: "",
-            // Corrige automatiquement l'ancien défaut "llama-3.3-70b-versatile" (coupé pour les
-            // comptes gratuits/développeur par Groq le 16/08/2026) s'il a été enregistré tel
-            // quel — sans ça, quelqu'un qui n'a jamais touché ce champ resterait bloqué sur un
-            // modèle mort après une mise à jour de l'app plutôt que de bénéficier du nouveau défaut.
-            groqModelName = prefs[Keys.GROQ_MODEL_NAME]?.takeUnless { it == "llama-3.3-70b-versatile" }
-                ?: "openai/gpt-oss-120b",
+            groqModelName = prefs[Keys.GROQ_MODEL_NAME]?.takeUnless { it == "openai/gpt-oss-120b" }
+                ?: "llama-3.3-70b-versatile",
             geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
-            // Même correction pour "gemini-2.0-flash", mis hors service par Google en 2026 — voir
-            // CloudEngineBridge.generateGemini pour la référence à la doc à jour en cas de
-            // nouvelle obsolescence.
-            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.takeUnless { it == "gemini-2.0-flash" }
-                ?: "gemini-3.5-flash",
+            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.takeUnless { it == "gemini-3.5-flash" }
+                ?: "gemini-2.0-flash",
+            openAiApiKey = prefs[Keys.OPENAI_API_KEY] ?: "",
+            openAiModelName = prefs[Keys.OPENAI_MODEL_NAME] ?: "gpt-4o-mini",
         )
     }
 
@@ -253,6 +253,12 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setGeminiModelName(model: String) = context.dataStore.edit {
         if (model.isBlank()) it.remove(Keys.GEMINI_MODEL_NAME) else it[Keys.GEMINI_MODEL_NAME] = model.trim()
+    }
+    suspend fun setOpenAiApiKey(key: String) = context.dataStore.edit {
+        if (key.isBlank()) it.remove(Keys.OPENAI_API_KEY) else it[Keys.OPENAI_API_KEY] = key.trim()
+    }
+    suspend fun setOpenAiModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.OPENAI_MODEL_NAME) else it[Keys.OPENAI_MODEL_NAME] = model.trim()
     }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->

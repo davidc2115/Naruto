@@ -370,10 +370,7 @@ class CloudEngineBridge {
                 send(GenerationEvent.Error("Aucune clé API Gemini configurée (Réglages → Moteur d'IA)."))
                 return@channelFlow
             }
-            // "gemini-2.0-flash" (l'ancien défaut) a été mis hors service par Google en 2026 —
-            // voir la doc officielle des modèles Gemini pour la liste à jour si celui-ci
-            // devient à son tour obsolète (erreur 404 "is not found for API version").
-            val model = modelName.ifBlank { "gemini-3.5-flash" }
+            val model = modelName.ifBlank { "gemini-2.0-flash" }
             val url = URL(
                 "https://generativelanguage.googleapis.com/v1beta/models/$model:streamGenerateContent" +
                     "?alt=sse&key=${apiKey.trim()}"
@@ -440,6 +437,26 @@ class CloudEngineBridge {
             connection?.disconnect()
         }
     }.flowOn(Dispatchers.IO)
+
+    /**
+     * Inférence via l'API officielle OpenAI (api.openai.com) en streaming SSE.
+     */
+    fun generateOpenAi(
+        apiKey: String,
+        modelName: String,
+        turns: List<ChatTurn>,
+        maxTokens: Int = 768,
+        temperature: Float = 0.8f,
+    ): Flow<GenerationEvent> = generateWithKeyRotation(parseApiKeys(apiKey)) { key ->
+        generateOpenAiCompatible(
+            endpointUrl = "https://api.openai.com/v1/chat/completions",
+            apiKey = key,
+            modelName = modelName.ifBlank { "gpt-4o-mini" },
+            turns = turns,
+            maxTokens = maxTokens,
+            temperature = temperature,
+        )
+    }
 
     private fun extractTokenFromGemini(jsonStr: String): String? {
         val root = jsonParser.parseToJsonElement(jsonStr).jsonObject

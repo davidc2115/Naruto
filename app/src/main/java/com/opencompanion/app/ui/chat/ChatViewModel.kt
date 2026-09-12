@@ -165,11 +165,12 @@ class ChatViewModel(
         settingsRepository.settings,
     ) { character, messages, engineState, settings ->
         val modelName = when (settings.enginePreference) {
+            EngineBackend.CLOUD_GROQ -> "⚡ Groq : ${settings.groqModelName}"
+            EngineBackend.CLOUD_GEMINI -> "✨ Gemini : ${settings.geminiModelName}"
+            EngineBackend.CLOUD_OPENAI -> "🧠 OpenAI : ${settings.openAiModelName}"
             EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE, EngineBackend.CLOUD_CUSTOM_OPENAI -> {
                 "Cloud : ${settings.cloudModelName.substringAfterLast('/')}"
             }
-            EngineBackend.CLOUD_GROQ -> "Groq : ${settings.groqModelName}"
-            EngineBackend.CLOUD_GEMINI -> "Gemini : ${settings.geminiModelName}"
             else -> settings.selectedModelPath?.let { path ->
                 java.io.File(path).name.removeSuffix(".gguf")
             }
@@ -239,9 +240,15 @@ class ChatViewModel(
                     return@launch
                 }
                 EngineBackend.CLOUD_FREE_NO_KEY, EngineBackend.CLOUD_OPENROUTER, EngineBackend.CLOUD_KOBOLD_HORDE,
-                EngineBackend.CLOUD_CUSTOM_OPENAI, EngineBackend.CLOUD_GROQ, EngineBackend.CLOUD_GEMINI -> {
+                EngineBackend.CLOUD_CUSTOM_OPENAI, EngineBackend.CLOUD_GROQ, EngineBackend.CLOUD_GEMINI, EngineBackend.CLOUD_OPENAI -> {
                     _usingNano.value = false
-                    _activeEngineLabel.value = "☁️ ${settings.cloudModelName.substringAfterLast('/')}"
+                    val cloudLabel = when (backend) {
+                        EngineBackend.CLOUD_GROQ -> "⚡ Groq : ${settings.groqModelName}"
+                        EngineBackend.CLOUD_GEMINI -> "✨ Gemini : ${settings.geminiModelName}"
+                        EngineBackend.CLOUD_OPENAI -> "🧠 OpenAI : ${settings.openAiModelName}"
+                        else -> "☁️ ${settings.cloudModelName.substringAfterLast('/')}"
+                    }
+                    _activeEngineLabel.value = cloudLabel
                     runCloudGeneration(character, settings, backend)
                     return@launch
                 }
@@ -266,7 +273,8 @@ class ChatViewModel(
      * Détermine le moteur à utiliser pour ce message avec relais intelligent SFW ↔ NSFW.
      * En mode [EngineBackend.AUTO], analyse si le dialogue relève du domaine adulte / NSFW :
      * si oui, l'IA locale non censurée prend le relais pour garantir des réponses débridées et
-     * cohérentes ; sinon, Gemini Nano (NPU ⚡) répond avec une rapidité maximale.
+     * cohérentes ; sinon, Gemini Nano (NPU ⚡) répond avec une rapidité maximale, ou le Cloud ultra-rapide
+     * configuré (Groq, Gemini, OpenAI) si le NPU n'est pas disponible sur l'appareil.
      */
     private suspend fun resolveActiveBackend(
         preference: EngineBackend,
@@ -283,14 +291,30 @@ class ChatViewModel(
         EngineBackend.CLOUD_CUSTOM_OPENAI -> EngineBackend.CLOUD_CUSTOM_OPENAI
         EngineBackend.CLOUD_GROQ -> EngineBackend.CLOUD_GROQ
         EngineBackend.CLOUD_GEMINI -> EngineBackend.CLOUD_GEMINI
+        EngineBackend.CLOUD_OPENAI -> EngineBackend.CLOUD_OPENAI
         EngineBackend.AUTO -> {
             val nanoAvailable = nanoBridge.checkAvailability() == NanoBridge.NanoAvailability.AVAILABLE
+            val settings = settingsRepository.settings.first()
+            val hasFastCloud = settings.groqApiKey.isNotBlank() || settings.geminiApiKey.isNotBlank() || settings.openAiApiKey.isNotBlank()
+            val fastCloudBackend = when {
+                settings.groqApiKey.isNotBlank() -> EngineBackend.CLOUD_GROQ
+                settings.geminiApiKey.isNotBlank() -> EngineBackend.CLOUD_GEMINI
+                settings.openAiApiKey.isNotBlank() -> EngineBackend.CLOUD_OPENAI
+                else -> EngineBackend.LLAMA_CPP
+            }
+
             when (_dialogueMode.value) {
                 DialogueMode.FORCE_NSFW -> {
-                    if (hasLocalModel) EngineBackend.LLAMA_CPP else if (nanoAvailable) EngineBackend.AICORE else EngineBackend.LLAMA_CPP
+                    if (hasLocalModel) EngineBackend.LLAMA_CPP
+                    else if (settings.groqApiKey.isNotBlank()) EngineBackend.CLOUD_GROQ
+                    else if (settings.openAiApiKey.isNotBlank()) EngineBackend.CLOUD_OPENAI
+                    else if (nanoAvailable) EngineBackend.AICORE
+                    else EngineBackend.LLAMA_CPP
                 }
                 DialogueMode.FORCE_SFW -> {
-                    if (nanoAvailable) EngineBackend.AICORE else EngineBackend.LLAMA_CPP
+                    if (nanoAvailable) EngineBackend.AICORE
+                    else if (hasFastCloud) fastCloudBackend
+                    else EngineBackend.LLAMA_CPP
                 }
                 DialogueMode.AUTO_HYBRID -> {
                     val isNsfw = allowNsfwPreference || DialogueRouter.isNsfw(userMessage, recentHistory)
@@ -300,6 +324,9 @@ class ChatViewModel(
                     } else if (nanoAvailable) {
                         // SFW : Gemini Nano NPU
                         EngineBackend.AICORE
+                    } else if (hasFastCloud) {
+                        // Si le téléphone n'a pas le NPU Gemini Nano, passe sur le Cloud rapide
+                        fastCloudBackend
                     } else {
                         EngineBackend.LLAMA_CPP
                     }
@@ -391,6 +418,14 @@ class ChatViewModel(
                     temperature = settings.temperature,
                 )
             }
+        } else if (backend == EngineBackend.CLOUD_OPENAI) {
+            cloudBridge.generateOpenAi(
+                apiKey = settings.openAiApiKey,
+                modelName = settings.openAiModelName,
+                turns = turns,
+                maxTokens = settings.maxResponseTokens,
+                temperature = settings.temperature,
+            )
         } else {
             cloudBridge.generateWithKeyRotation(parseApiKeys(settings.cloudApiKey)) { key ->
                 cloudBridge.generateOpenAiCompatible(
