@@ -12,6 +12,8 @@ import com.opencompanion.app.ui.browse.CharacterBrowserScreen
 import com.opencompanion.app.ui.browse.CharacterBrowserViewModel
 import com.opencompanion.app.ui.chat.ChatScreen
 import com.opencompanion.app.ui.chat.ChatViewModel
+import com.opencompanion.app.ui.characterdetail.CharacterDetailScreen
+import com.opencompanion.app.ui.characterdetail.CharacterDetailViewModel
 import com.opencompanion.app.ui.charactereditor.CharacterEditorScreen
 import com.opencompanion.app.ui.charactereditor.CharacterEditorViewModel
 import com.opencompanion.app.ui.characterlist.CharacterListScreen
@@ -23,12 +25,14 @@ import com.opencompanion.app.ui.settings.SettingsViewModel
 
 private object Routes {
     const val CHARACTERS = "characters"
+    const val CHARACTER_DETAIL = "character/{characterId}"
     const val EDITOR = "editor?characterId={characterId}"
     const val CHAT = "chat/{characterId}"
     const val SETTINGS = "settings"
     const val BROWSE_IMPORT = "browse_import"
     const val PERSONAS = "personas"
 
+    fun characterDetail(characterId: Long) = "character/$characterId"
     fun editor(characterId: Long? = null) = "editor?characterId=${characterId ?: -1}"
     fun chat(characterId: Long) = "chat/$characterId"
 }
@@ -46,12 +50,31 @@ fun AppNav(app: OpenCompanionApplication) {
             )
             CharacterListScreen(
                 viewModel = vm,
+                onOpenCharacterDetail = { id -> navController.navigate(Routes.characterDetail(id)) },
                 onOpenChat = { id -> navController.navigate(Routes.chat(id)) },
                 onCreateCharacter = { navController.navigate(Routes.editor()) },
                 onEditCharacter = { id -> navController.navigate(Routes.editor(id)) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onBrowseImport = { navController.navigate(Routes.BROWSE_IMPORT) },
                 onOpenPersonas = { navController.navigate(Routes.PERSONAS) },
+            )
+        }
+
+        composable(
+            Routes.CHARACTER_DETAIL,
+            arguments = listOf(navArgument("characterId") { type = NavType.LongType }),
+        ) { backStackEntry ->
+            val characterId = backStackEntry.arguments?.getLong("characterId") ?: return@composable
+            val vm: CharacterDetailViewModel = viewModel(
+                factory = AppViewModelFactory {
+                    CharacterDetailViewModel(characterId, app.characterRepository, app.settingsRepository)
+                },
+            )
+            CharacterDetailScreen(
+                viewModel = vm,
+                onBack = { navController.popBackStack() },
+                onOpenChat = { id -> navController.navigate(Routes.chat(id)) },
+                onEditCharacter = { id -> navController.navigate(Routes.editor(id)) },
             )
         }
 

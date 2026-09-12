@@ -55,9 +55,12 @@ même mécanisme que l'import par URL déjà existant), répartis en deux profil
 | Qwen3 0.6B | ⚡ Rapide | ~0,40 Go | 0,6 Md | Apache 2.0 |
 | Gemma 3 1B | ⚡ Rapide | ~0,81 Go | 1 Md | Gemma (Google) |
 | Llama 3.2 1B | ⚡ Rapide | ~0,81 Go | 1 Md | Llama 3.2 Community License |
+| Llama 3.2 1B Uncensored | ⚡ Rapide (NSFW/RP) | ~0,77 Go | 1 Md | Llama 3.2 Community License |
+| Qwen 2.5 1.5B Abliterated | ⚡ Rapide (NSFW/RP) | ~1,10 Go | 1,5 Md | Apache 2.0 |
 | Phi-4-mini | ★ Qualité | ~2,49 Go | 3,8 Md | MIT |
 | Qwen3 4B | ★ Qualité | ~2,50 Go | 4 Md | Apache 2.0 |
 | Gemma 3 4B | ★ Qualité | ~2,49 Go | 4 Md | Gemma (Google) |
+| Llama 3.2 3B Uncensored | ★ Qualité (NSFW/RP) | ~2,24 Go | 3,2 Md | Llama 3.2 Community License |
 
 Détail dans [`engine/RecommendedModels.kt`](../app/src/main/java/com/opencompanion/app/engine/RecommendedModels.kt).
 Le profil **Rapide** vise une réponse quasi instantanée même en CPU pur ; le profil **Qualité**

@@ -77,6 +77,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CharacterListScreen(
     viewModel: CharacterListViewModel,
+    onOpenCharacterDetail: (Long) -> Unit,
     onOpenChat: (Long) -> Unit,
     onCreateCharacter: () -> Unit,
     onEditCharacter: (Long) -> Unit,
@@ -212,7 +213,8 @@ fun CharacterListScreen(
                 items(characters, key = { it.id }) { character ->
                     CharacterCard(
                         character = character,
-                        onClick = { onOpenChat(character.id) },
+                        onClick = { onOpenCharacterDetail(character.id) },
+                        onQuickChat = { onOpenChat(character.id) },
                         onEdit = { onEditCharacter(character.id) },
                         onDelete = { scope.launch { viewModel.deleteCharacter(character) } },
                     )
@@ -277,6 +279,7 @@ private fun EmptyState(modifier: Modifier, onCreateCharacter: () -> Unit, onBrow
 private fun CharacterCard(
     character: CharacterEntity,
     onClick: () -> Unit,
+    onQuickChat: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -345,7 +348,7 @@ private fun CharacterCard(
                 IconButton(onClick = { menuExpanded = true }) {
                     Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Color(0x66000000)) {
                         Icon(
-                            Icons.Filled.Delete,
+                            Icons.Filled.Edit,
                             contentDescription = "Options",
                             tint = Color.White,
                             modifier = Modifier.padding(6.dp),
@@ -354,7 +357,17 @@ private fun CharacterCard(
                 }
                 DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                     DropdownMenuItem(
-                        text = { Text("Modifier") },
+                        text = { Text("Présentation & Profil") },
+                        leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                        onClick = { menuExpanded = false; onClick() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Discuter directement") },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null) },
+                        onClick = { menuExpanded = false; onQuickChat() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Modifier la fiche") },
                         leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                         onClick = { menuExpanded = false; onEdit() },
                     )
