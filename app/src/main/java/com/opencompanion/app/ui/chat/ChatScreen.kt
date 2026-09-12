@@ -124,22 +124,23 @@ fun ChatScreen(
                                 DialogueMode.FORCE_NSFW -> "NSFW 🔓"
                                 DialogueMode.FORCE_SFW -> "SFW ⚡"
                             }
+                            val modelName = state.selectedModelName
                             val engineInfo = state.activeEngineLabel ?: when {
                                 state.status == EngineStatus.LOADING_MODEL -> {
-                                    val name = state.selectedModelName ?: "Modèle local"
+                                    val name = modelName ?: "Modèle local"
                                     "⏳ Chargement de $name…"
                                 }
-                                state.selectedModelName != null && (
-                                    state.selectedModelName.startsWith("⚡") ||
-                                    state.selectedModelName.startsWith("✨") ||
-                                    state.selectedModelName.startsWith("🧠") ||
-                                    state.selectedModelName.startsWith("☁️") ||
-                                    state.selectedModelName.startsWith("Cloud")
-                                ) -> state.selectedModelName
+                                modelName != null && (
+                                    modelName.startsWith("⚡") ||
+                                    modelName.startsWith("✨") ||
+                                    modelName.startsWith("🧠") ||
+                                    modelName.startsWith("☁️") ||
+                                    modelName.startsWith("Cloud")
+                                ) -> modelName
                                 state.usingNano -> "⚡ NPU (Gemini Nano)"
-                                state.selectedModelName != null -> {
+                                modelName != null -> {
                                     val hw = if (state.usingGpu) "GPU" else "CPU"
-                                    "🧠 ${state.selectedModelName} ($hw)"
+                                    "🧠 $modelName ($hw)"
                                 }
                                 state.usingGpu -> "🧠 Modèle local (GPU)"
                                 else -> "🧠 Modèle local (CPU)"
