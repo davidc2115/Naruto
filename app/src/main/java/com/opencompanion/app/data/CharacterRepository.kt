@@ -2,6 +2,7 @@ package com.opencompanion.app.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * Point d'accès unique aux personnages et à l'historique de conversation.
@@ -146,7 +147,7 @@ class CharacterRepository(
         val current = character.galleryMedia.toMutableList()
         if (!current.contains(mediaPathOrUrl)) {
             current.add(mediaPathOrUrl)
-            val json = kotlinx.serialization.encodeToString(current)
+            val json = kotlinx.serialization.json.Json.encodeToString(current)
             characterDao.update(character.copy(galleryMediaJson = json))
         }
     }
@@ -155,7 +156,7 @@ class CharacterRepository(
         val character = characterDao.getById(characterId) ?: return
         val current = character.galleryMedia.toMutableList()
         if (current.remove(mediaPathOrUrl)) {
-            val json = kotlinx.serialization.encodeToString(current)
+            val json = kotlinx.serialization.json.Json.encodeToString(current)
             characterDao.update(character.copy(galleryMediaJson = json))
         }
     }
