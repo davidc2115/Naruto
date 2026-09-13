@@ -38,24 +38,17 @@ class OpenCompanionApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         applicationScope.launch {
-            characterRepository.seedSampleCharactersIfEmpty()
-            characterRepository.ensureDefaultPersonaSeeded(settingsRepository.userProfile.first())
-            // Catalogue élargi (voir CharacterRepository.seedExpandedCatalog) : drapeau à part de
-            // seedSampleCharactersIfEmpty pour atteindre aussi les comptes déjà créés, une seule
-            // fois, sans jamais faire réapparaître des personnages que l'utilisateur aurait
-            // supprimés depuis.
-            if (!settingsRepository.expandedCatalogSeeded.first()) {
-                characterRepository.seedExpandedCatalog()
+            if (!settingsRepository.momStepmomCatalogSeeded.first()) {
+                // Remplacement complet des anciens personnages par le catalogue exclusif Mère & Belle-Mère
+                characterRepository.resetWithMomAndStepmomCatalog()
+                settingsRepository.setMomStepmomCatalogSeeded(true)
                 settingsRepository.setExpandedCatalogSeeded(true)
-            }
-            if (!settingsRepository.familyPackSeeded.first()) {
-                characterRepository.seedFamilyPack()
                 settingsRepository.setFamilyPackSeeded(true)
-            }
-            if (!settingsRepository.catalog200Seeded.first()) {
-                characterRepository.seedCatalog200()
                 settingsRepository.setCatalog200Seeded(true)
+            } else {
+                characterRepository.seedSampleCharactersIfEmpty()
             }
+            characterRepository.ensureDefaultPersonaSeeded(settingsRepository.userProfile.first())
         }
     }
 }

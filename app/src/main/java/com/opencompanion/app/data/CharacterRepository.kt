@@ -77,6 +77,15 @@ class CharacterRepository(
         ExtendedCatalog.characters.forEach { characterDao.upsert(it) }
     }
 
+    /**
+     * Réinitialise complètement tous les personnages et installe le catalogue exclusif
+     * Mère & Belle-Mère inspiré de SpicyChat/JuicyChat (40 personnages uniques avec galeries complètes).
+     */
+    suspend fun resetWithMomAndStepmomCatalog() {
+        characterDao.clearAll()
+        MomAndStepmomCatalog.characters.forEach { characterDao.upsert(it) }
+    }
+
     // --- Personas utilisateur (voir UserPersonaEntity) --------------------------------------
 
     fun observePersonas(): Flow<List<UserPersonaEntity>> = personaDao.observeAll()

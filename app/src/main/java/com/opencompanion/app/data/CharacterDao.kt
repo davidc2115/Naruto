@@ -30,4 +30,7 @@ interface CharacterDao {
 
     @Query("SELECT COUNT(*) FROM characters")
     suspend fun count(): Int
+
+    @Query("DELETE FROM characters")
+    suspend fun clearAll()
 }

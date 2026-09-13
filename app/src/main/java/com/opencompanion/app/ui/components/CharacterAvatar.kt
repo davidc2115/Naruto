@@ -47,8 +47,12 @@ fun CharacterAvatar(
         val targetPx = with(density) { 200.dp.toPx() }.toInt().coerceAtLeast(64)
         val bitmapState = produceState<Bitmap?>(initialValue = null, avatarPath, name) {
             value = withContext(Dispatchers.IO) {
-                if (!avatarPath.isNullOrBlank() && !avatarPath.startsWith("asset://")) {
-                    decodeSampledBitmap(avatarPath, targetPx)
+                if (!avatarPath.isNullOrBlank()) {
+                    if (avatarPath.startsWith("http://") || avatarPath.startsWith("https://")) {
+                        loadHttpAvatar(context, avatarPath, targetPx)
+                    } else if (!avatarPath.startsWith("asset://")) {
+                        decodeSampledBitmap(avatarPath, targetPx)
+                    } else null
                 } else null
             } ?: withContext(Dispatchers.IO) {
                 loadAssetAvatar(context, avatarPath, name, targetPx)
@@ -159,3 +163,30 @@ private fun loadAssetAvatar(context: Context, avatarPath: String?, name: String,
     return null
 }
 
+private fun loadHttpAvatar(context: Context, url: String, targetPx: Int): Bitmap? {
+    return try {
+        val cacheDir = File(context.cacheDir, "avatar_cache").apply { mkdirs() }
+        val hashName = url.hashCode().toString() + ".cache"
+        val cachedFile = File(cacheDir, hashName)
+        if (cachedFile.exists() && cachedFile.length() > 0) {
+            return decodeSampledBitmap(cachedFile.absolutePath, targetPx)
+        }
+        val conn = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+            connectTimeout = 8_000
+            readTimeout = 12_000
+            setRequestProperty("User-Agent", "Mozilla/5.0 OpenCompanion/1.0")
+        }
+        if (conn.responseCode in 200..299) {
+            conn.inputStream.use { input ->
+                cachedFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            decodeSampledBitmap(cachedFile.absolutePath, targetPx)
+        } else {
+            null
+        }
+    } catch (_: Exception) {
+        null
+    }
+}
