@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.drawable.AnimatedImageDrawable
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.widget.ImageView
@@ -293,7 +294,7 @@ fun MediaLightboxDialog(
 }
 
 /**
- * Affiche une image, un GIF ou une vidéo selon son extension et son chemin.
+ * Affiche une image, un GIF animé ou une vidéo avec décodage matériel et mise en cache disque.
  */
 @Composable
 private fun MediaDisplay(
@@ -306,42 +307,91 @@ private fun MediaDisplay(
     val isVideo = mediaPath.endsWith(".mp4", ignoreCase = true) || mediaPath.endsWith(".webm", ignoreCase = true)
     val isGif = mediaPath.endsWith(".gif", ignoreCase = true)
 
-    if (isVideo && !isThumbnail) {
-        // Lecteur vidéo interactif
-        AndroidView(
-            factory = { ctx ->
-                VideoView(ctx).apply {
-                    val mediaController = MediaController(ctx)
-                    mediaController.setAnchorView(this)
-                    setMediaController(mediaController)
-                    if (mediaPath.startsWith("http://") || mediaPath.startsWith("https://")) {
-                        setVideoURI(Uri.parse(mediaPath))
-                    } else {
-                        setVideoPath(mediaPath)
-                    }
-                    setOnPreparedListener { mp ->
-                        mp.isLooping = true
-                        start()
-                    }
+    val fileState = produceState<File?>(initialValue = null, mediaPath) {
+        value = resolveMediaFile(context, mediaPath)
+    }
+    val file = fileState.value
+
+    if (file == null) {
+        Box(modifier, contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(if (isThumbnail) 24.dp else 36.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp,
+            )
+        }
+        return
+    }
+
+    if (isVideo) {
+        if (isThumbnail) {
+            val thumbBitmap = produceState<Bitmap?>(initialValue = null, file) {
+                value = withContext(Dispatchers.IO) {
+                    runCatching {
+                        val retriever = MediaMetadataRetriever()
+                        retriever.setDataSource(file.absolutePath)
+                        val bmp = retriever.getFrameAtTime(1_000_000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+                            ?: retriever.frameAtTime
+                        retriever.release()
+                        bmp
+                    }.getOrNull()
                 }
-            },
-            modifier = modifier,
-        )
-    } else if (isGif && Build.VERSION.SDK_INT >= 28 && !mediaPath.startsWith("http")) {
-        // GIF animé via ImageDecoder sur Android moderne
+            }.value
+
+            Box(modifier = modifier, contentAlignment = Alignment.Center) {
+                if (thumbBitmap != null) {
+                    Image(
+                        bitmap = thumbBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = contentScale,
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize().background(Color(0xFF161426)))
+                }
+                Surface(
+                    shape = CircleShape,
+                    color = Color(0x99000000),
+                    modifier = Modifier.size(28.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.padding(4.dp),
+                    )
+                }
+            }
+        } else {
+            AndroidView(
+                factory = { ctx ->
+                    VideoView(ctx).apply {
+                        val mc = MediaController(ctx)
+                        mc.setAnchorView(this)
+                        setMediaController(mc)
+                        setVideoPath(file.absolutePath)
+                        setOnPreparedListener { mp ->
+                            mp.isLooping = true
+                            start()
+                        }
+                        setOnErrorListener { _, _, _ -> true }
+                    }
+                },
+                modifier = modifier,
+            )
+        }
+    } else if (isGif && Build.VERSION.SDK_INT >= 28) {
         AndroidView(
             factory = { ctx ->
                 ImageView(ctx).apply {
                     this.scaleType = if (isThumbnail) ImageView.ScaleType.CENTER_CROP else ImageView.ScaleType.FIT_CENTER
                     runCatching {
-                        val file = File(mediaPath)
-                        if (file.exists()) {
-                            val source = ImageDecoder.createSource(file)
-                            val drawable = ImageDecoder.decodeDrawable(source)
-                            setImageDrawable(drawable)
-                            if (drawable is AnimatedImageDrawable) {
-                                drawable.start()
-                            }
+                        val source = ImageDecoder.createSource(file)
+                        val drawable = ImageDecoder.decodeDrawable(source)
+                        setImageDrawable(drawable)
+                        if (drawable is AnimatedImageDrawable) {
+                            drawable.repeatCount = AnimatedImageDrawable.REPEAT_INFINITE
+                            drawable.start()
                         }
                     }
                 }
@@ -349,13 +399,11 @@ private fun MediaDisplay(
             modifier = modifier,
         )
     } else {
-        // Image statique ou fallback bitmap
-        val bitmapState = produceState<Bitmap?>(initialValue = null, mediaPath) {
+        val bitmapState = produceState<Bitmap?>(initialValue = null, file) {
             value = withContext(Dispatchers.IO) {
-                loadMediaBitmap(context, mediaPath, if (isThumbnail) 300 else 1600)
+                decodeSampledBitmap(file.absolutePath, if (isThumbnail) 300 else 1600)
             }
         }
-
         val bitmap = bitmapState.value
         if (bitmap != null) {
             Image(
@@ -372,45 +420,74 @@ private fun MediaDisplay(
     }
 }
 
-private fun loadMediaBitmap(context: Context, path: String, targetPx: Int): Bitmap? {
+/**
+ * Résout n'importe quel média (asset embarqué, URL web ou fichier local) en un fichier local réel
+ * avec mise en cache disque automatique pour lecture directe, fluide et instantanée.
+ */
+private suspend fun resolveMediaFile(context: Context, path: String): File? = withContext(Dispatchers.IO) {
     try {
         if (path.startsWith("asset:///") || path.startsWith("assets/")) {
-            val clean = path.removePrefix("asset:///").removePrefix("assets/")
-            return context.assets.open(clean).use { stream ->
-                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                BitmapFactory.decodeStream(stream, null, bounds)
-                var s = 1
-                val maxDim = maxOf(bounds.outWidth, bounds.outHeight)
-                while (maxDim / (s * 2) >= targetPx) s *= 2
-                context.assets.open(clean).use { s2 ->
-                    BitmapFactory.decodeStream(s2, null, BitmapFactory.Options().apply { inSampleSize = s })
+            val assetRel = path.removePrefix("asset:///").removePrefix("assets/")
+            val cacheDir = File(context.cacheDir, "bundled_media").apply { mkdirs() }
+            val cleanName = assetRel.replace('/', '_')
+            val cached = File(cacheDir, cleanName)
+            if (cached.exists() && cached.length() > 0L) {
+                return@withContext cached
+            }
+            context.assets.open(assetRel).use { input ->
+                cached.outputStream().use { output ->
+                    input.copyTo(output)
                 }
             }
+            return@withContext cached
         }
 
         if (path.startsWith("http://") || path.startsWith("https://")) {
+            val cacheDir = File(context.cacheDir, "network_media").apply { mkdirs() }
+            val cleanName = "${path.hashCode()}_" + path.substringAfterLast('/', "media.bin").take(30)
+            val cached = File(cacheDir, cleanName)
+            if (cached.exists() && cached.length() > 0L) {
+                return@withContext cached
+            }
             val conn = (URL(path).openConnection() as HttpURLConnection).apply {
-                connectTimeout = 10_000
-                readTimeout = 15_000
+                connectTimeout = 12_000
+                readTimeout = 20_000
                 setRequestProperty("User-Agent", "Mozilla/5.0 OpenCompanion/1.0")
             }
             if (conn.responseCode in 200..299) {
-                return conn.inputStream.use { stream ->
-                    BitmapFactory.decodeStream(stream)
+                conn.inputStream.use { input ->
+                    cached.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
                 }
+                return@withContext cached
             }
-            return null
+            return@withContext null
         }
 
-        val file = File(path)
-        if (file.exists()) {
-            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            BitmapFactory.decodeFile(path, bounds)
-            var s = 1
-            val maxDim = maxOf(bounds.outWidth, bounds.outHeight)
-            while (maxDim / (s * 2) >= targetPx) s *= 2
-            return BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = s })
-        }
-    } catch (_: Exception) {}
-    return null
+        val f = File(path)
+        if (f.exists() && f.isFile) return@withContext f
+        null
+    } catch (_: Exception) {
+        null
+    }
+}
+
+private fun decodeSampledBitmap(path: String, targetPx: Int): Bitmap? {
+    val file = File(path)
+    if (!file.exists() || !file.isFile) return null
+
+    val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(path, boundsOptions)
+    val (rawWidth, rawHeight) = boundsOptions.outWidth to boundsOptions.outHeight
+    if (rawWidth <= 0 || rawHeight <= 0) return null
+
+    var sampleSize = 1
+    val largest = maxOf(rawWidth, rawHeight)
+    while (largest / (sampleSize * 2) >= targetPx) {
+        sampleSize *= 2
+    }
+
+    val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+    return BitmapFactory.decodeFile(path, decodeOptions)
 }
