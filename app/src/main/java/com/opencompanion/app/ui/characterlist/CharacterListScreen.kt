@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -675,10 +676,10 @@ private fun ActiveChatItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             CharacterAvatar(
-                character = chat.character,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(14.dp)),
+                avatarPath = chat.character.avatarPath,
+                name = chat.character.name,
+                modifier = Modifier.size(56.dp),
+                shape = RoundedCornerShape(14.dp),
             )
             Column(
                 modifier = Modifier.weight(1f),
