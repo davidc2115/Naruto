@@ -482,13 +482,24 @@ class CloudEngineBridge {
                     is GenerationEvent.Error -> {
                         lastError = event.message
                         val msg = event.message.lowercase()
+                        val is401 = event.message.contains("401") || msg.contains("api_key_invalid") || msg.contains("unregistered")
+                        if (is401) {
+                            send(GenerationEvent.Error("Clé API Gemini invalide ou expirée (Code 401). Vérifie ta clé sur aistudio.google.com."))
+                            return@collect
+                        }
+
                         val is404 = event.message.contains("404")
+                        val is400 = event.message.contains("400")
                         val isUnavailable = msg.contains("no longer available") ||
                             msg.contains("not available") ||
                             msg.contains("not found") ||
                             msg.contains("not supported") ||
-                            msg.contains("is not found for api version")
-                        if (!tokenReceived && (is404 || isUnavailable)) {
+                            msg.contains("is not found for api version") ||
+                            msg.contains("invalid argument") ||
+                            msg.contains("bad request") ||
+                            msg.contains("decommissioned") ||
+                            msg.contains("deprecated")
+                        if (!tokenReceived && (is404 || is400 || isUnavailable)) {
                             isModelUnavailable = true
                         } else {
                             send(event)
@@ -520,14 +531,15 @@ class CloudEngineBridge {
     ): Flow<GenerationEvent> = channelFlow {
         var connection: HttpURLConnection? = null
         try {
-            if (apiKey.isBlank()) {
+            val cleanKey = apiKey.trim().removeSurrounding("\"").removeSurrounding("'")
+            if (cleanKey.isBlank()) {
                 send(GenerationEvent.Error("Aucune clé API Gemini configurée (Réglages → Moteur d'IA)."))
                 return@channelFlow
             }
             val cleanModel = sanitizeGeminiModel(modelName)
             val url = URL(
                 "https://generativelanguage.googleapis.com/v1beta/models/$cleanModel:streamGenerateContent" +
-                    "?alt=sse&key=${apiKey.trim()}"
+                    "?alt=sse&key=$cleanKey"
             )
             connection = (url.openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
@@ -535,7 +547,7 @@ class CloudEngineBridge {
                 readTimeout = 60_000
                 doOutput = true
                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                setRequestProperty("x-goog-api-key", apiKey.trim())
+                setRequestProperty("x-goog-api-key", cleanKey)
                 setRequestProperty("User-Agent", "OpenCompanion/1.0")
             }
 
@@ -573,19 +585,19 @@ class CloudEngineBridge {
                 ))
             }
 
+            // Uniquement les 4 catégories supportées par Gemini avec BLOCK_NONE (sans CIVIC_INTEGRITY qui cause 400)
             val safetySettings = listOf(
                 mapOf("category" to "HARM_CATEGORY_HARASSMENT", "threshold" to "BLOCK_NONE"),
                 mapOf("category" to "HARM_CATEGORY_HATE_SPEECH", "threshold" to "BLOCK_NONE"),
                 mapOf("category" to "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold" to "BLOCK_NONE"),
                 mapOf("category" to "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold" to "BLOCK_NONE"),
-                mapOf("category" to "HARM_CATEGORY_CIVIC_INTEGRITY", "threshold" to "BLOCK_NONE"),
             )
 
             val payloadMap = mutableMapOf<String, Any>(
                 "contents" to contents,
                 "generationConfig" to mapOf(
-                    "temperature" to temperature,
-                    "maxOutputTokens" to maxTokens.coerceIn(64, 2048),
+                    "temperature" to temperature.coerceIn(0.0f, 2.0f),
+                    "maxOutputTokens" to maxTokens.coerceIn(64, 4096),
                 ),
                 "safetySettings" to safetySettings,
             )
@@ -688,9 +700,29 @@ class CloudEngineBridge {
             val root = jsonParser.parseToJsonElement(errorBody).jsonObject
             val errObj = root["error"]?.jsonObject
             val msg = errObj?.get("message")?.jsonPrimitive?.content ?: root["message"]?.jsonPrimitive?.content
-            msg ?: "Erreur HTTP $code"
+            if (!msg.isNullOrBlank()) {
+                if (code == 401) {
+                    return "Clé API non valide (401) : $msg (vérifie ta clé sur aistudio.google.com)"
+                }
+                return msg
+            }
+            when (code) {
+                400 -> "Requête non supportée par le modèle (Code 400)."
+                401 -> "Clé API non valide ou expirée (Code 401). Vérifie ta clé dans les Réglages."
+                403 -> "Accès refusé ou quota dépassé (Code 403)."
+                404 -> "Modèle indisponible ou introuvable (Code 404)."
+                429 -> "Limite de requêtes atteinte (Code 429). Réessaie dans un instant."
+                else -> "Erreur HTTP $code"
+            }
         } catch (_: Exception) {
-            "Erreur HTTP $code"
+            when (code) {
+                400 -> "Requête non supportée (Code 400)."
+                401 -> "Clé API non valide ou expirée (Code 401). Vérifie ta clé dans les Réglages."
+                403 -> "Accès refusé ou quota dépassé (Code 403)."
+                404 -> "Modèle indisponible (Code 404)."
+                429 -> "Limite de requêtes atteinte (Code 429)."
+                else -> "Erreur HTTP $code"
+            }
         }
     }
 
