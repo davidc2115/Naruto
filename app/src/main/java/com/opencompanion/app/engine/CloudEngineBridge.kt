@@ -1017,23 +1017,44 @@ REQUIREMENTS:
      * Génère une véritable image réaliste avec Google Gemini (Imagen 3) ou OpenAI DALL-E 3 en repli,
      * et l'enregistre dans le stockage privé de l'application sous [outputDir].
      */
+    /**
+     * Génère une véritable image réaliste avec Google Gemini (Imagen 3), OpenAI DALL-E 3,
+     * ou un repli photoréaliste haute fidélité (FLUX.1), et l'enregistre dans le stockage privé de l'application.
+     */
     suspend fun generateCharacterSceneImage(
         geminiApiKey: String,
         openAiApiKey: String? = null,
+        cloudApiKey: String? = null,
         character: CharacterEntity,
         recentMessages: List<ChatMessageEntity>,
         userCustomInstruction: String? = null,
         outputDir: File,
     ): Result<File> = withContext(Dispatchers.IO) {
         runCatching {
-            val prompt = buildSceneImagePrompt(geminiApiKey, character, recentMessages, userCustomInstruction)
-            val geminiKeys = parseApiKeys(geminiApiKey)
+            val prompt = buildSceneImagePrompt(geminiApiKey.ifBlank { cloudApiKey ?: "" }, character, recentMessages, userCustomInstruction)
+            
+            // Collecter toutes les clés Gemini possibles
+            val allGeminiKeys = mutableListOf<String>()
+            if (geminiApiKey.isNotBlank()) allGeminiKeys.addAll(parseApiKeys(geminiApiKey))
+            if (!cloudApiKey.isNullOrBlank() && cloudApiKey.trim().startsWith("AIza")) {
+                allGeminiKeys.addAll(parseApiKeys(cloudApiKey))
+            }
 
-            // 1. Tentative avec Google Gemini Imagen 3 (imagen-3.0-generateImages)
-            for (key in geminiKeys) {
+            // Collecter toutes les clés OpenAI / OpenRouter possibles
+            val allOpenAiKeys = mutableListOf<String>()
+            if (!openAiApiKey.isNullOrBlank()) allOpenAiKeys.addAll(parseApiKeys(openAiApiKey))
+            if (!cloudApiKey.isNullOrBlank() && (cloudApiKey.trim().startsWith("sk-") || cloudApiKey.trim().startsWith("Bearer "))) {
+                allOpenAiKeys.addAll(parseApiKeys(cloudApiKey))
+            }
+
+            var lastError: String? = null
+
+            // 1. Tentative avec Google Gemini Imagen 3
+            for (key in allGeminiKeys.distinct()) {
                 val imagenEndpoints = listOf(
                     "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generateImages:generate?key=$key",
-                    "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generateImages:generate?key=$key"
+                    "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generateImages:generate?key=$key",
+                    "https://generativelanguage.googleapis.com/v1/models/imagen-3.0-generateImages:generate?key=$key"
                 )
 
                 for (targetUrl in imagenEndpoints) {
@@ -1075,15 +1096,18 @@ REQUIREMENTS:
                                 return@runCatching file
                             }
                         } else {
+                            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            lastError = "Google Gemini ($code): ${err.take(150)}"
                             conn.disconnect()
                         }
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        lastError = "Erreur réseau Gemini: ${e.message}"
+                    }
                 }
             }
 
             // 2. Repli éventuel sur OpenAI DALL-E 3 si clé OpenAI disponible
-            val openAiKeys = if (!openAiApiKey.isNullOrBlank()) parseApiKeys(openAiApiKey) else emptyList()
-            for (key in openAiKeys) {
+            for (key in allOpenAiKeys.distinct()) {
                 try {
                     val url = URL("https://api.openai.com/v1/images/generations")
                     val conn = (url.openConnection() as HttpURLConnection).apply {
@@ -1123,12 +1147,39 @@ REQUIREMENTS:
                             return@runCatching file
                         }
                     } else {
+                        val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                        lastError = "OpenAI ($code): ${err.take(150)}"
                         conn.disconnect()
                     }
-                } catch (_: Exception) {}
+                } catch (e: Exception) {
+                    lastError = "Erreur réseau OpenAI: ${e.message}"
+                }
             }
 
-            error("Impossible de générer l'image : configure ta clé API Gemini dans les Réglages.")
+            // 3. Repli photoréaliste haute fidélité (FLUX.1 / SDXL) pour garantir le résultat sans jamais bloquer l'utilisateur
+            try {
+                val encodedPrompt = java.net.URLEncoder.encode(prompt, "UTF-8")
+                val fallbackUrl = "https://image.pollinations.ai/prompt/$encodedPrompt?width=768&height=960&model=flux&nologo=true"
+                val conn = (URL(fallbackUrl).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 30_000
+                    readTimeout = 60_000
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile)")
+                }
+                if (conn.responseCode in 200..299) {
+                    val bytes = conn.inputStream.use { it.readBytes() }
+                    conn.disconnect()
+                    if (bytes.size > 5000) {
+                        val file = File(outputDir, "scene_${character.id}_${System.currentTimeMillis()}.jpg")
+                        file.writeBytes(bytes)
+                        return@runCatching file
+                    }
+                }
+                conn.disconnect()
+            } catch (e: Exception) {
+                // Ignore et remonte la dernière erreur détaillée
+            }
+
+            error(lastError ?: "Échec de génération de la photo. Vérifiez votre connexion internet ou vos clés API.")
         }
     }
 }

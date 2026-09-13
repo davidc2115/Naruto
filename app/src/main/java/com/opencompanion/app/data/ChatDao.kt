@@ -27,4 +27,7 @@ interface ChatDao {
 
     @Query("DELETE FROM chat_messages WHERE id = :messageId")
     suspend fun deleteMessage(messageId: Long)
+
+    @Query("UPDATE chat_messages SET characterId = :targetId WHERE characterId = :sourceId")
+    suspend fun migrateMessages(sourceId: Long, targetId: Long)
 }

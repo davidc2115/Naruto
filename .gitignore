@@ -21,3 +21,4 @@ app/schemas/
 # macOS / éditeurs
 .DS_Store
 *.swp
+photo_cache/

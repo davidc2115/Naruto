@@ -686,12 +686,13 @@ class ChatViewModel(
         viewModelScope.launch {
             val character = repository.getCharacter(characterId) ?: return@launch
             val settings = settingsRepository.settings.first()
-            val geminiKey = settings.geminiApiKey.trim()
-
-            if (geminiKey.isBlank() && settings.openAiApiKey.isBlank()) {
-                _statusMessage.value = "Renseigne ta clé API Gemini dans les Réglages pour générer des photos réalistes."
-                return@launch
+            val geminiKey = settings.geminiApiKey.trim().ifBlank {
+                if (settings.cloudApiKey.trim().startsWith("AIza")) settings.cloudApiKey.trim() else ""
             }
+            val openAiKey = settings.openAiApiKey.trim().ifBlank {
+                if (settings.cloudApiKey.trim().startsWith("sk-")) settings.cloudApiKey.trim() else ""
+            }
+            val cloudKey = settings.cloudApiKey.trim()
 
             _isGeneratingImage.value = true
             val recentMessages = repository.getMessages(characterId)
@@ -699,7 +700,8 @@ class ChatViewModel(
 
             val result = cloudBridge.generateCharacterSceneImage(
                 geminiApiKey = geminiKey,
-                openAiApiKey = settings.openAiApiKey.trim().takeIf { it.isNotBlank() },
+                openAiApiKey = openAiKey.takeIf { it.isNotBlank() },
+                cloudApiKey = cloudKey.takeIf { it.isNotBlank() },
                 character = character,
                 recentMessages = recentMessages,
                 userCustomInstruction = customPrompt,

@@ -106,10 +106,46 @@ class CharacterRepository(
      */
     suspend fun syncMomAndStepmomCatalog() {
         val existingCharacters = characterDao.getAll()
-        val existingByName = existingCharacters.associateBy { it.name }
 
+        // 1. Dédoublonnage par nom : fusionner les doublons ayant le même nom exact
+        val byExactName = existingCharacters.groupBy { it.name.trim() }
+        for ((_, duplicates) in byExactName) {
+            if (duplicates.size > 1) {
+                val primary = duplicates.maxByOrNull { chatDao.countMessagesForCharacter(it.id) }
+                    ?: duplicates.first()
+                for (other in duplicates) {
+                    if (other.id != primary.id) {
+                        chatDao.migrateMessages(sourceId = other.id, targetId = primary.id)
+                        characterDao.delete(other)
+                    }
+                }
+            }
+        }
+
+        // Recharger la liste après dédoublonnage
+        val cleanExisting = characterDao.getAll()
+        val existingByName = cleanExisting.associateBy { it.name.trim() }
+        val catalogNames = MomAndStepmomCatalog.characters.map { it.name.trim() }.toSet()
+
+        // 2. Nettoyage des anciens personnages orphelins (ex: anciens Cassandra Vidal 1, 2, 3...)
+        // S'ils ont 0 message et ne font pas partie du catalogue officiel, on les supprime.
+        // S'ils ont des messages créés par l'utilisateur, on les conserve scrupuleusement avec une image valide !
+        for (oldChar in cleanExisting) {
+            if (!catalogNames.contains(oldChar.name.trim())) {
+                val msgCount = chatDao.countMessagesForCharacter(oldChar.id)
+                if (msgCount == 0 && oldChar.isBundledSample) {
+                    characterDao.delete(oldChar)
+                } else if (msgCount > 0 && (oldChar.avatarPath.isBlank() || !oldChar.avatarPath.startsWith("asset:///avatars/"))) {
+                    // Réparer l'avatar si manquant
+                    val fallback = MomAndStepmomCatalog.characters.firstOrNull()?.avatarPath ?: "asset:///avatars/valerie_mercier.jpg"
+                    characterDao.update(oldChar.copy(avatarPath = fallback))
+                }
+            }
+        }
+
+        // 3. Synchronisation et mise à jour des 410 personnages officiels
         for (newChar in MomAndStepmomCatalog.characters) {
-            val existing = existingByName[newChar.name]
+            val existing = existingByName[newChar.name.trim()]
             if (existing != null) {
                 val hasMessages = chatDao.countMessagesForCharacter(existing.id) > 0
                 val updated = existing.copy(
