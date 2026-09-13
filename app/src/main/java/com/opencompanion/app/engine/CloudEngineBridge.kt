@@ -42,8 +42,35 @@ val DEPRECATED_GEMINI_MODELS = setOf(
     "gemini-pro-vision",
     "gemini-1.5-flash-001",
     "gemini-1.5-pro-001",
+    "gemini-2.5-flash",
     "gemini-3.5-flash",
 )
+
+/**
+ * Assainit rigoureusement le nom du modèle Gemini : supprime tous les préfixes "models/",
+ * "model/", slashes parasites, et remappe les modèles dépréciés ou inexistants vers un modèle stable.
+ */
+fun sanitizeGeminiModel(raw: String): String {
+    var s = raw.trim()
+    while (s.startsWith("models/")) {
+        s = s.substring(7).trim()
+    }
+    while (s.startsWith("model/")) {
+        s = s.substring(6).trim()
+    }
+    s = s.trim('/', ' ', '\t', '\n', '\r')
+    if (s.isBlank() ||
+        s in DEPRECATED_GEMINI_MODELS ||
+        s.startsWith("gemini-1.0") ||
+        s == "gemini-pro" ||
+        s == "gemini-pro-vision" ||
+        s == "gemini-2.5-flash" ||
+        s == "gemini-3.5-flash"
+    ) {
+        return "gemini-2.0-flash"
+    }
+    return s
+}
 
 private val HTTP_STATUS_IN_MESSAGE = Regex("\\((\\d{3})\\)")
 
@@ -411,13 +438,77 @@ class CloudEngineBridge {
         maxTokens: Int = 768,
         temperature: Float = 0.8f,
     ): Flow<GenerationEvent> = generateWithKeyRotation(parseApiKeys(apiKey), providerTag = "gemini") { key ->
-        generateGeminiInternal(
+        generateGeminiWithFallback(
             apiKey = key,
-            modelName = modelName,
+            initialModel = sanitizeGeminiModel(modelName),
             turns = turns,
             maxTokens = maxTokens,
             temperature = temperature,
         )
+    }
+
+    /**
+     * Chaîne de secours intelligente : si le modèle demandé renvoie 404 (modèle déprécié, non supporté
+     * sur cette clé ou non existant), bascule automatiquement et de façon totalement transparente
+     * sur les modèles actifs universels (gemini-2.0-flash, gemini-1.5-flash, gemini-2.0-flash-lite, etc.).
+     */
+    private fun generateGeminiWithFallback(
+        apiKey: String,
+        initialModel: String,
+        turns: List<ChatTurn>,
+        maxTokens: Int,
+        temperature: Float,
+    ): Flow<GenerationEvent> = channelFlow {
+        val candidateModels = linkedSetOf(
+            sanitizeGeminiModel(initialModel),
+            "gemini-2.0-flash",
+            "gemini-1.5-flash",
+            "gemini-2.0-flash-lite-preview-02-05",
+            "gemini-1.5-pro",
+            "gemini-1.5-flash-8b",
+        ).toList()
+
+        for ((index, modelToTry) in candidateModels.withIndex()) {
+            var tokenReceived = false
+            var isModelUnavailable = false
+            var lastError = ""
+
+            generateGeminiInternal(apiKey, modelToTry, turns, maxTokens, temperature).collect { event ->
+                when (event) {
+                    is GenerationEvent.Token -> {
+                        tokenReceived = true
+                        send(event)
+                    }
+                    is GenerationEvent.Error -> {
+                        lastError = event.message
+                        val msg = event.message.lowercase()
+                        val is404 = event.message.contains("404")
+                        val isUnavailable = msg.contains("no longer available") ||
+                            msg.contains("not available") ||
+                            msg.contains("not found") ||
+                            msg.contains("not supported") ||
+                            msg.contains("is not found for api version")
+                        if (!tokenReceived && (is404 || isUnavailable)) {
+                            isModelUnavailable = true
+                        } else {
+                            send(event)
+                        }
+                    }
+                    else -> send(event)
+                }
+            }
+
+            // Si au moins un token a été reçu ou si ce n'est pas une erreur de modèle indisponible, on termine
+            if (tokenReceived || !isModelUnavailable) {
+                return@channelFlow
+            }
+
+            // Si c'est le dernier modèle candidat et que tous ont échoué
+            if (index == candidateModels.lastIndex) {
+                send(GenerationEvent.Error(lastError))
+                return@channelFlow
+            }
+        }
     }
 
     private fun generateGeminiInternal(
@@ -433,13 +524,7 @@ class CloudEngineBridge {
                 send(GenerationEvent.Error("Aucune clé API Gemini configurée (Réglages → Moteur d'IA)."))
                 return@channelFlow
             }
-            val cleanModel = modelName.trim().removePrefix("models/").let { raw ->
-                if (raw in DEPRECATED_GEMINI_MODELS || raw.isBlank() || raw.startsWith("gemini-1.0") || raw == "gemini-pro") {
-                    "gemini-2.0-flash"
-                } else {
-                    raw
-                }
-            }
+            val cleanModel = sanitizeGeminiModel(modelName)
             val url = URL(
                 "https://generativelanguage.googleapis.com/v1beta/models/$cleanModel:streamGenerateContent" +
                     "?alt=sse&key=${apiKey.trim()}"
@@ -450,6 +535,7 @@ class CloudEngineBridge {
                 readTimeout = 60_000
                 doOutput = true
                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                setRequestProperty("x-goog-api-key", apiKey.trim())
                 setRequestProperty("User-Agent", "OpenCompanion/1.0")
             }
 
@@ -517,15 +603,6 @@ class CloudEngineBridge {
             if (responseCode !in 200..299) {
                 val errorText = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
                 val errorMsg = parseErrorMessage(errorText, responseCode)
-                val isUnavailable = responseCode == 404 ||
-                    errorMsg.contains("no longer available", ignoreCase = true) ||
-                    errorMsg.contains("not available", ignoreCase = true) ||
-                    errorMsg.contains("not found", ignoreCase = true)
-
-                if (isUnavailable && cleanModel != "gemini-2.0-flash") {
-                    generateGeminiInternal(apiKey, "gemini-2.0-flash", turns, maxTokens, temperature).collect { send(it) }
-                    return@channelFlow
-                }
                 send(GenerationEvent.Error("Gemini ($responseCode) : $errorMsg"))
                 return@channelFlow
             }

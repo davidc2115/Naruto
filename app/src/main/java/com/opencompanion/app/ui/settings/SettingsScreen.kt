@@ -296,12 +296,17 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             FilterChip(
                                 selected = state.settings.geminiModelName == "gemini-2.0-flash",
                                 onClick = { viewModel.setGeminiModelName("gemini-2.0-flash") },
-                                label = { Text("Gemini 2.0 Flash ⭐") }
+                                label = { Text("2.0 Flash ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.geminiModelName == "gemini-1.5-flash",
+                                onClick = { viewModel.setGeminiModelName("gemini-1.5-flash") },
+                                label = { Text("1.5 Flash ⚡") }
                             )
                             FilterChip(
                                 selected = state.settings.geminiModelName == "gemini-2.0-flash-lite-preview-02-05",
                                 onClick = { viewModel.setGeminiModelName("gemini-2.0-flash-lite-preview-02-05") },
-                                label = { Text("Gemini 2.0 Lite ⚡") }
+                                label = { Text("2.0 Lite 🚀") }
                             )
                         }
                     }

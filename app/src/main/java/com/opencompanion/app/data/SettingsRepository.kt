@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.opencompanion.app.engine.DECOMMISSIONED_GROQ_MODELS
 import com.opencompanion.app.engine.DEPRECATED_GEMINI_MODELS
+import com.opencompanion.app.engine.sanitizeGeminiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -204,9 +205,7 @@ class SettingsRepository(private val context: Context) {
             groqModelName = prefs[Keys.GROQ_MODEL_NAME]?.takeUnless { it in DECOMMISSIONED_GROQ_MODELS || it.isBlank() }
                 ?: "llama-3.3-70b-versatile",
             geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
-            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.trim()?.removePrefix("models/")?.takeUnless {
-                it in DEPRECATED_GEMINI_MODELS || it.startsWith("gemini-1.0") || it == "gemini-pro" || it.isBlank()
-            } ?: "gemini-2.0-flash",
+            geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.let(::sanitizeGeminiModel) ?: "gemini-2.0-flash",
             openAiApiKey = prefs[Keys.OPENAI_API_KEY] ?: "",
             openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
         )
@@ -265,13 +264,7 @@ class SettingsRepository(private val context: Context) {
         if (key.isBlank()) it.remove(Keys.GEMINI_API_KEY) else it[Keys.GEMINI_API_KEY] = key.trim()
     }
     suspend fun setGeminiModelName(model: String) = context.dataStore.edit {
-        val clean = model.trim().removePrefix("models/")
-        val sanitized = if (clean in DEPRECATED_GEMINI_MODELS || clean.startsWith("gemini-1.0") || clean == "gemini-pro" || clean.isBlank()) {
-            "gemini-2.0-flash"
-        } else {
-            clean
-        }
-        it[Keys.GEMINI_MODEL_NAME] = sanitized
+        it[Keys.GEMINI_MODEL_NAME] = sanitizeGeminiModel(model)
     }
     suspend fun setOpenAiApiKey(key: String) = context.dataStore.edit {
         if (key.isBlank()) it.remove(Keys.OPENAI_API_KEY) else it[Keys.OPENAI_API_KEY] = key.trim()
