@@ -298,9 +298,9 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                 label = { Text("Gemini 2.0 Flash ⭐") }
                             )
                             FilterChip(
-                                selected = state.settings.geminiModelName == "gemini-1.5-flash",
-                                onClick = { viewModel.setGeminiModelName("gemini-1.5-flash") },
-                                label = { Text("Gemini 1.5 Flash ⚡") }
+                                selected = state.settings.geminiModelName == "gemini-2.0-flash-lite-preview-02-05",
+                                onClick = { viewModel.setGeminiModelName("gemini-2.0-flash-lite-preview-02-05") },
+                                label = { Text("Gemini 2.0 Lite ⚡") }
                             )
                         }
                     }
@@ -824,19 +824,41 @@ private fun EngineCategoryCard(category: EngineCategory, selected: Boolean, onCl
  *  rotation automatique quand le quota d'une clé est atteint (voir `generateWithKeyRotation`). */
 @Composable
 private fun ApiKeysField(value: String, onValueChange: (String) -> Unit, label: String, placeholder: String) {
-    Column {
+    val keys = remember(value) { com.opencompanion.app.engine.parseApiKeys(value) }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
             placeholder = { Text(placeholder) },
+            minLines = 2,
+            maxLines = 4,
             modifier = Modifier.fillMaxWidth(),
         )
-        Text(
-            "Plusieurs clés ? Une par ligne (ou séparées par une virgule) — la suivante est " +
-                "utilisée automatiquement si le quota d'une clé est atteint.",
-            style = MaterialTheme.typography.bodySmall,
-        )
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            Text(
+                "Multi-clés : 1 clé par ligne ou virgule",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (keys.size > 1) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                ) {
+                    Text(
+                        "🔄 Multi-clés actif (${keys.size} clés)",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+            }
+        }
     }
 }
 

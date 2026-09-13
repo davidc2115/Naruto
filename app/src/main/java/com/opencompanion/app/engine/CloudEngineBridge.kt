@@ -35,17 +35,17 @@ val DECOMMISSIONED_GROQ_MODELS = setOf(
     "gemma2-9b-it",
 )
 
-private val HTTP_STATUS_IN_MESSAGE = Regex("\\((\\d{3})\\)")
+val DEPRECATED_GEMINI_MODELS = setOf(
+    "gemini-1.0-pro",
+    "gemini-1.0-pro-vision",
+    "gemini-pro",
+    "gemini-pro-vision",
+    "gemini-1.5-flash-001",
+    "gemini-1.5-pro-001",
+    "gemini-3.5-flash",
+)
 
-/** true si [message] (formaté par les fonctions generate* de [CloudEngineBridge], ex.
- *  "Gemini (429) : ...") correspond à une erreur d'authentification ou de quota — les seuls cas
- *  où réessayer avec une AUTRE clé API a une chance de résoudre le problème (401/403 = clé
- *  invalide/refusée, 429 = quota épuisé). Une 404 (mauvais nom de modèle/URL) ou une erreur
- *  réseau échouerait de la même façon avec n'importe quelle clé : inutile de toutes les essayer. */
-private fun isKeyRotationCandidate(message: String): Boolean {
-    val code = HTTP_STATUS_IN_MESSAGE.find(message)?.groupValues?.get(1)?.toIntOrNull() ?: return false
-    return code == 401 || code == 403 || code == 429
-}
+private val HTTP_STATUS_IN_MESSAGE = Regex("\\((\\d{3})\\)")
 
 /**
  * Moteur d'inférence Cloud : effectue les requêtes en streaming ou en polling vers des providers
@@ -54,35 +54,39 @@ private fun isKeyRotationCandidate(message: String): Boolean {
 class CloudEngineBridge {
 
     private val jsonParser = Json { ignoreUnknownKeys = true; isLenient = true }
+    private val activeKeyIndices = java.util.concurrent.ConcurrentHashMap<String, Int>()
 
     /**
-     * Essaie [attempt] successivement avec chaque clé de [apiKeys] tant que l'échec est une
-     * erreur d'authentification/quota (voir [isKeyRotationCandidate]) et qu'AUCUN token n'a
+     * Essaie [attempt] successivement avec chaque clé de [apiKeys] tant qu'AUCUN token n'a
      * encore été reçu — pour que plusieurs clés API gratuites du même provider servent de
-     * réserve les unes des autres, sans surveillance manuelle à chaque quota atteint. Une fois
-     * qu'un token a été émis, on ne bascule plus : rejouer la génération sur une autre clé
-     * dupliquerait/mélangerait une réponse déjà commencée plutôt que de vraiment la réparer.
-     * [apiKeys] vide = une seule tentative avec une clé vide (comportement identique à avant
-     * l'introduction du multi-clés, pour les backends qui tolèrent une clé absente).
+     * réserve les unes des autres (multi-clés / rotation automatique transparente).
+     * Mémorise l'index de la clé qui fonctionne pour éviter de réinterroger une clé en cooldown.
      */
     fun generateWithKeyRotation(
         apiKeys: List<String>,
+        providerTag: String = "default",
         attempt: (String) -> Flow<GenerationEvent>,
     ): Flow<GenerationEvent> = channelFlow {
         val keys = apiKeys.ifEmpty { listOf("") }
+        val startIndex = (activeKeyIndices[providerTag] ?: 0) % keys.size
         var lastErrorMessage: String? = null
-        for ((index, key) in keys.withIndex()) {
+
+        for (offset in keys.indices) {
+            val currentIndex = (startIndex + offset) % keys.size
+            val key = keys[currentIndex]
             var tokenEmitted = false
             var shouldTryNextKey = false
+
             attempt(key).collect { event ->
                 when (event) {
                     is GenerationEvent.Token -> {
                         tokenEmitted = true
+                        activeKeyIndices[providerTag] = currentIndex
                         send(event)
                     }
                     is GenerationEvent.Error -> {
                         lastErrorMessage = event.message
-                        if (!tokenEmitted && index < keys.lastIndex && isKeyRotationCandidate(event.message)) {
+                        if (!tokenEmitted && offset < keys.lastIndex) {
                             shouldTryNextKey = true
                         } else {
                             send(event)
@@ -211,8 +215,25 @@ class CloudEngineBridge {
                 }
             }
 
-            val messagesList = turns.map { turn ->
-                mapOf("role" to turn.role, "content" to turn.content)
+            val messagesList = mutableListOf<Map<String, String>>()
+            for (turn in turns) {
+                val content = turn.content.trim()
+                if (content.isBlank()) continue
+                val role = when (turn.role) {
+                    "assistant", "model" -> "assistant"
+                    "system" -> "system"
+                    else -> "user"
+                }
+                if (messagesList.isNotEmpty() && messagesList.last()["role"] == role) {
+                    val prev = messagesList.removeAt(messagesList.lastIndex)
+                    messagesList.add(mapOf("role" to role, "content" to "${prev["content"]}\n\n$content"))
+                } else {
+                    messagesList.add(mapOf("role" to role, "content" to content))
+                }
+            }
+            if (messagesList.isEmpty()) {
+                send(GenerationEvent.Error("Historique vide pour la génération."))
+                return@channelFlow
             }
 
             val effectiveModel = if (targetUrl.contains("groq.com") && (modelName in DECOMMISSIONED_GROQ_MODELS || modelName.isBlank())) {
@@ -225,7 +246,7 @@ class CloudEngineBridge {
                 "model" to effectiveModel,
                 "messages" to messagesList,
                 "temperature" to temperature,
-                "max_tokens" to maxTokens,
+                "max_tokens" to maxTokens.coerceIn(64, 1024),
                 "stream" to true
             )
 
@@ -239,6 +260,11 @@ class CloudEngineBridge {
             if (responseCode !in 200..299) {
                 val errorText = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
                 val errorMsg = parseErrorMessage(errorText, responseCode)
+                if (targetUrl.contains("groq.com") && effectiveModel != "llama-3.3-70b-versatile" &&
+                    (errorMsg.contains("decommissioned", ignoreCase = true) || errorMsg.contains("not found", ignoreCase = true))) {
+                    generateOpenAiCompatible(targetUrl, apiKey, "llama-3.3-70b-versatile", turns, maxTokens, temperature).collect { send(it) }
+                    return@channelFlow
+                }
                 send(GenerationEvent.Error("Serveur Cloud ($responseCode) : $errorMsg"))
                 return@channelFlow
             }
@@ -384,6 +410,22 @@ class CloudEngineBridge {
         turns: List<ChatTurn>,
         maxTokens: Int = 768,
         temperature: Float = 0.8f,
+    ): Flow<GenerationEvent> = generateWithKeyRotation(parseApiKeys(apiKey), providerTag = "gemini") { key ->
+        generateGeminiInternal(
+            apiKey = key,
+            modelName = modelName,
+            turns = turns,
+            maxTokens = maxTokens,
+            temperature = temperature,
+        )
+    }
+
+    private fun generateGeminiInternal(
+        apiKey: String,
+        modelName: String,
+        turns: List<ChatTurn>,
+        maxTokens: Int = 768,
+        temperature: Float = 0.8f,
     ): Flow<GenerationEvent> = channelFlow {
         var connection: HttpURLConnection? = null
         try {
@@ -391,9 +433,15 @@ class CloudEngineBridge {
                 send(GenerationEvent.Error("Aucune clé API Gemini configurée (Réglages → Moteur d'IA)."))
                 return@channelFlow
             }
-            val model = modelName.ifBlank { "gemini-2.0-flash" }
+            val cleanModel = modelName.trim().removePrefix("models/").let { raw ->
+                if (raw in DEPRECATED_GEMINI_MODELS || raw.isBlank() || raw.startsWith("gemini-1.0") || raw == "gemini-pro") {
+                    "gemini-2.0-flash"
+                } else {
+                    raw
+                }
+            }
             val url = URL(
-                "https://generativelanguage.googleapis.com/v1beta/models/$model:streamGenerateContent" +
+                "https://generativelanguage.googleapis.com/v1beta/models/$cleanModel:streamGenerateContent" +
                     "?alt=sse&key=${apiKey.trim()}"
             )
             connection = (url.openConnection() as HttpURLConnection).apply {
@@ -402,15 +450,43 @@ class CloudEngineBridge {
                 readTimeout = 60_000
                 doOutput = true
                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                setRequestProperty("User-Agent", "OpenCompanion/1.0")
             }
 
             val systemText = turns.firstOrNull { it.role == "system" }?.content
-            val contents = turns.filter { it.role != "system" }.map { turn ->
-                mapOf(
-                    "role" to if (turn.role == "assistant") "model" else "user",
-                    "parts" to listOf(mapOf("text" to turn.content)),
-                )
+            val rawContents = turns.filter { it.role != "system" && it.content.isNotBlank() }
+            val contents = mutableListOf<Map<String, Any>>()
+            for (turn in rawContents) {
+                val geminiRole = if (turn.role == "assistant") "model" else "user"
+                if (contents.isNotEmpty() && contents.last()["role"] == geminiRole) {
+                    val last = contents.removeAt(contents.lastIndex)
+                    @Suppress("UNCHECKED_CAST")
+                    val existingParts = (last["parts"] as? List<Map<String, String>>) ?: emptyList()
+                    val mergedText = (existingParts.firstOrNull()?.get("text") ?: "") + "\n\n" + turn.content
+                    contents.add(mapOf(
+                        "role" to geminiRole,
+                        "parts" to listOf(mapOf("text" to mergedText))
+                    ))
+                } else {
+                    contents.add(mapOf(
+                        "role" to geminiRole,
+                        "parts" to listOf(mapOf("text" to turn.content))
+                    ))
+                }
             }
+            if (contents.isEmpty()) {
+                contents.add(mapOf(
+                    "role" to "user",
+                    "parts" to listOf(mapOf("text" to "Bonjour"))
+                ))
+            }
+            if (contents.first()["role"] != "user") {
+                contents.add(0, mapOf(
+                    "role" to "user",
+                    "parts" to listOf(mapOf("text" to "..."))
+                ))
+            }
+
             val safetySettings = listOf(
                 mapOf("category" to "HARM_CATEGORY_HARASSMENT", "threshold" to "BLOCK_NONE"),
                 mapOf("category" to "HARM_CATEGORY_HATE_SPEECH", "threshold" to "BLOCK_NONE"),
@@ -423,7 +499,7 @@ class CloudEngineBridge {
                 "contents" to contents,
                 "generationConfig" to mapOf(
                     "temperature" to temperature,
-                    "maxOutputTokens" to maxTokens,
+                    "maxOutputTokens" to maxTokens.coerceIn(64, 2048),
                 ),
                 "safetySettings" to safetySettings,
             )
@@ -440,7 +516,17 @@ class CloudEngineBridge {
             val responseCode = connection.responseCode
             if (responseCode !in 200..299) {
                 val errorText = connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                send(GenerationEvent.Error("Gemini ($responseCode) : ${parseErrorMessage(errorText, responseCode)}"))
+                val errorMsg = parseErrorMessage(errorText, responseCode)
+                val isUnavailable = responseCode == 404 ||
+                    errorMsg.contains("no longer available", ignoreCase = true) ||
+                    errorMsg.contains("not available", ignoreCase = true) ||
+                    errorMsg.contains("not found", ignoreCase = true)
+
+                if (isUnavailable && cleanModel != "gemini-2.0-flash") {
+                    generateGeminiInternal(apiKey, "gemini-2.0-flash", turns, maxTokens, temperature).collect { send(it) }
+                    return@channelFlow
+                }
+                send(GenerationEvent.Error("Gemini ($responseCode) : $errorMsg"))
                 return@channelFlow
             }
 
@@ -477,7 +563,7 @@ class CloudEngineBridge {
         turns: List<ChatTurn>,
         maxTokens: Int = 768,
         temperature: Float = 0.8f,
-    ): Flow<GenerationEvent> = generateWithKeyRotation(parseApiKeys(apiKey)) { key ->
+    ): Flow<GenerationEvent> = generateWithKeyRotation(parseApiKeys(apiKey), providerTag = "openai") { key ->
         generateOpenAiCompatible(
             endpointUrl = "https://api.openai.com/v1/chat/completions",
             apiKey = key,
@@ -614,24 +700,31 @@ class CloudEngineBridge {
                 val name = obj["name"]?.jsonPrimitive?.content ?: return@mapNotNull null
                 val methods = obj["supportedGenerationMethods"]?.jsonArray?.map { m -> m.jsonPrimitive.content } ?: emptyList()
                 val id = name.removePrefix("models/")
-                if (methods.contains("generateContent") && !id.contains("embedding") && !id.contains("aqa")) {
+                if (methods.contains("generateContent") &&
+                    !id.contains("embedding") &&
+                    !id.contains("aqa") &&
+                    id !in DEPRECATED_GEMINI_MODELS &&
+                    !id.startsWith("gemini-1.0") &&
+                    id != "gemini-pro"
+                ) {
                     id
                 } else null
             }.sortedWith(Comparator { a, b ->
                 fun rank(s: String) = when {
                     s == "gemini-2.0-flash" -> 0
                     s == "gemini-2.0-flash-lite-preview-02-05" -> 1
-                    s == "gemini-1.5-flash" -> 2
-                    s == "gemini-1.5-pro" -> 3
-                    s.startsWith("gemini-2.0") -> 4
-                    s.startsWith("gemini-1.5") -> 5
-                    else -> 6
+                    s.startsWith("gemini-2.5-flash") -> 2
+                    s == "gemini-1.5-flash" -> 3
+                    s == "gemini-1.5-pro" -> 4
+                    s.startsWith("gemini-2.0") -> 5
+                    s.startsWith("gemini-1.5") -> 6
+                    else -> 7
                 }
                 val rA = rank(a)
                 val rB = rank(b)
                 if (rA != rB) rA.compareTo(rB) else a.compareTo(b)
             })
-            if (models.isEmpty()) listOf("gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro") else models
+            if (models.isEmpty()) listOf("gemini-2.0-flash", "gemini-2.0-flash-lite-preview-02-05", "gemini-1.5-flash") else models
         }
     }
 

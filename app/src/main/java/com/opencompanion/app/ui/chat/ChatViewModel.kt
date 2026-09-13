@@ -367,6 +367,19 @@ class ChatViewModel(
         _status.value = EngineStatus.GENERATING
         _streamingText.value = ""
 
+        // Pour Groq Free Tier (limite de 6 000 TPM sur llama-3.3-70b), limiter le contexte effectif
+        // pour ne pas saturer le quota TPM en 1 ou 2 messages.
+        val effectiveContextSize = if (backend == EngineBackend.CLOUD_GROQ) {
+            minOf(settings.contextSize, 2500)
+        } else {
+            settings.contextSize
+        }
+        val effectiveMaxTokens = if (backend == EngineBackend.CLOUD_GROQ) {
+            minOf(settings.maxResponseTokens, 512)
+        } else {
+            settings.maxResponseTokens
+        }
+
         val fullHistory = repository.getMessages(characterId)
         val lastUserMessage = fullHistory.lastOrNull { it.role == MessageRole.USER }?.content.orEmpty()
         val turns = PromptBuilder.buildTurns(
@@ -374,8 +387,8 @@ class ChatViewModel(
             history = fullHistory.dropLast(1),
             newUserMessage = lastUserMessage,
             engine = engine,
-            contextSize = settings.contextSize,
-            reservedForResponse = settings.maxResponseTokens,
+            contextSize = effectiveContextSize,
+            reservedForResponse = effectiveMaxTokens,
             userProfile = resolveUserProfile(character),
             allowNsfw = settings.allowNsfwMode || _dialogueMode.value != DialogueMode.FORCE_SFW,
         )
@@ -383,7 +396,7 @@ class ChatViewModel(
         val flow = if (backend == EngineBackend.CLOUD_FREE_NO_KEY) {
             cloudBridge.generateFreeNoKeyCloud(
                 turns = turns,
-                maxTokens = settings.maxResponseTokens,
+                maxTokens = effectiveMaxTokens,
                 temperature = settings.temperature,
             )
         } else if (backend == EngineBackend.CLOUD_KOBOLD_HORDE) {
@@ -391,50 +404,44 @@ class ChatViewModel(
                 apiKey = settings.cloudApiKey,
                 modelName = settings.cloudModelName,
                 turns = turns,
-                maxTokens = settings.maxResponseTokens,
+                maxTokens = effectiveMaxTokens,
                 temperature = settings.temperature,
             )
         } else if (backend == EngineBackend.CLOUD_GROQ) {
-            // Groq expose une API compatible OpenAI : on réutilise le client générique plutôt
-            // qu'une fonction dédiée, seule l'URL d'endpoint change. Plusieurs clés (une par
-            // ligne dans les réglages) tournent automatiquement en cas de clé invalide/quota
-            // atteint — voir CloudEngineBridge.generateWithKeyRotation.
-            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.groqApiKey)) { key ->
+            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.groqApiKey), providerTag = "groq") { key ->
                 cloudBridge.generateOpenAiCompatible(
                     endpointUrl = "https://api.groq.com/openai/v1/chat/completions",
                     apiKey = key,
                     modelName = settings.groqModelName,
                     turns = turns,
-                    maxTokens = settings.maxResponseTokens,
+                    maxTokens = effectiveMaxTokens,
                     temperature = settings.temperature,
                 )
             }
         } else if (backend == EngineBackend.CLOUD_GEMINI) {
-            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.geminiApiKey)) { key ->
-                cloudBridge.generateGemini(
-                    apiKey = key,
-                    modelName = settings.geminiModelName,
-                    turns = turns,
-                    maxTokens = settings.maxResponseTokens,
-                    temperature = settings.temperature,
-                )
-            }
+            cloudBridge.generateGemini(
+                apiKey = settings.geminiApiKey,
+                modelName = settings.geminiModelName,
+                turns = turns,
+                maxTokens = effectiveMaxTokens,
+                temperature = settings.temperature,
+            )
         } else if (backend == EngineBackend.CLOUD_OPENAI) {
             cloudBridge.generateOpenAi(
                 apiKey = settings.openAiApiKey,
                 modelName = settings.openAiModelName,
                 turns = turns,
-                maxTokens = settings.maxResponseTokens,
+                maxTokens = effectiveMaxTokens,
                 temperature = settings.temperature,
             )
         } else {
-            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.cloudApiKey)) { key ->
+            cloudBridge.generateWithKeyRotation(parseApiKeys(settings.cloudApiKey), providerTag = "custom") { key ->
                 cloudBridge.generateOpenAiCompatible(
                     endpointUrl = settings.cloudEndpointUrl,
                     apiKey = key,
                     modelName = settings.cloudModelName,
                     turns = turns,
-                    maxTokens = settings.maxResponseTokens,
+                    maxTokens = effectiveMaxTokens,
                     temperature = settings.temperature,
                 )
             }
