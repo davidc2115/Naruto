@@ -67,6 +67,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole

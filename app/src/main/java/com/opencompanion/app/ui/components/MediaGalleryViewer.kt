@@ -297,7 +297,7 @@ fun MediaLightboxDialog(
  * Affiche une image, un GIF animé ou une vidéo avec décodage matériel et mise en cache disque.
  */
 @Composable
-private fun MediaDisplay(
+fun MediaDisplay(
     mediaPath: String,
     modifier: Modifier,
     contentScale: ContentScale,
