@@ -135,7 +135,7 @@ class CharacterRepository(
                 val msgCount = chatDao.countMessagesForCharacter(oldChar.id)
                 if (msgCount == 0 && oldChar.isBundledSample) {
                     characterDao.delete(oldChar)
-                } else if (msgCount > 0 && (oldChar.avatarPath.isBlank() || !oldChar.avatarPath.startsWith("asset:///avatars/"))) {
+                } else if (msgCount > 0 && (oldChar.avatarPath.isNullOrBlank() || !oldChar.avatarPath.orEmpty().startsWith("asset:///avatars/"))) {
                     // Réparer l'avatar si manquant
                     val fallback = MomAndStepmomCatalog.characters.firstOrNull()?.avatarPath ?: "asset:///avatars/valerie_mercier.jpg"
                     characterDao.update(oldChar.copy(avatarPath = fallback))
