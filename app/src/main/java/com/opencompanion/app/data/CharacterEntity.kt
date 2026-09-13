@@ -70,11 +70,11 @@ data class CharacterEntity(
      *  d'œil pour l'utilisateur comme pour orienter le ton du modèle. */
     val relationshipStage: String
         get() = when {
-            affectionLevel >= 80 -> "Intime"
-            affectionLevel >= 60 -> "Proche"
-            affectionLevel >= 40 -> "Ami·e"
-            affectionLevel >= 20 -> "Connaissance"
-            else -> "Inconnu·e"
+            affectionLevel >= 80 -> "Confiance profonde"
+            affectionLevel >= 60 -> "Forte complicité"
+            affectionLevel >= 40 -> "Complicité naissante"
+            affectionLevel >= 20 -> "Bonne entente"
+            else -> "Contact initial"
         }
 }
 

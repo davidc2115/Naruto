@@ -70,20 +70,44 @@ object DialogueRouter {
         "policy violation"
     )
 
+    private val SFW_RESET_PATTERNS = listOf(
+        "on mange", "j'ai faim", "repas", "déjeuner", "dîner", "cuisine", "cuisiner",
+        "bonne nuit", "vais dormir", "aller dormir", "au lit pour dormir", "sommeil", "fatigué", "fatiguée",
+        "au travail", "partir au travail", "au bureau", "je dois partir", "je dois y aller", "il faut que j'y aille",
+        "on s'habille", "rhabille", "remets tes vêtements", "remettre mes vêtements", "habille-toi", "m'habiller",
+        "calme-toi", "arrête", "stop", "assez", "pas maintenant", "quelqu'un arrive", "on va nous entendre",
+        "mes cours", "tes devoirs", "école", "fac", "université", "au fait", "dis-moi", "quelle heure"
+    )
+
     /**
      * Détermine si le message actuel ou le contexte immédiat nécessite de router vers
      * le modèle non censuré local.
      */
     fun isNsfw(message: String, recentContext: List<ChatMessageEntity> = emptyList()): Boolean {
-        val lower = message.lowercase()
+        val lower = message.lowercase().trim()
 
-        // 1. Détection dans le texte direct du message
+        // 1. Détection explicite de transition ou retour vers le SFW / quotidien
+        val hasSfwReset = SFW_RESET_PATTERNS.any { lower.contains(it) }
+
+        // 2. Détection dans le texte direct du message
+        var directNsfwHit = false
         for (pattern in NSFW_PATTERNS) {
             val regex = Regex("""(?i)\b${Regex.escape(pattern)}""")
-            if (regex.containsMatchIn(lower)) return true
+            if (regex.containsMatchIn(lower)) {
+                directNsfwHit = true
+                break
+            }
         }
 
-        // 2. Détection dans les actions de jeu de rôle entre astérisques ou parenthèses
+        // Si l'utilisateur exprime clairement une volonté de passer à une activité SFW/quotidien,
+        // et qu'il n'y a pas d'action physique crue explicite dans son message, on retourne en SFW !
+        if (hasSfwReset && !directNsfwHit) {
+            return false
+        }
+
+        if (directNsfwHit) return true
+
+        // 3. Détection dans les actions de jeu de rôle entre astérisques ou parenthèses
         val actions = Regex("""(\*[^*]+\*|\([^)]+\))""").findAll(message)
         for (action in actions) {
             val actLower = action.value.lowercase()
@@ -92,9 +116,9 @@ object DialogueRouter {
             }
         }
 
-        // 3. Si le message est une relance brève (ex: "oui", "continue...", "encore"),
+        // 4. Si le message est une relance brève (ex: "oui", "continue...", "encore"),
         // on vérifie si la dernière réplique du personnage était déjà dans un registre intime
-        if (lower.trim().length <= 30 && recentContext.isNotEmpty()) {
+        if (lower.length <= 30 && recentContext.isNotEmpty() && !hasSfwReset) {
             val lastAssistant = recentContext.lastOrNull { it.role.name == "ASSISTANT" }?.content.orEmpty().lowercase()
             var contextHits = 0
             for (pattern in NSFW_PATTERNS) {
