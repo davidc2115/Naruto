@@ -64,12 +64,16 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.ChatMessageEntity
 import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.UserPersonaEntity
 import com.opencompanion.app.ui.components.CharacterAvatar
+import com.opencompanion.app.ui.components.MediaDisplay
+import com.opencompanion.app.ui.components.MediaLightboxDialog
 import com.opencompanion.app.ui.theme.BrandGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,6 +92,9 @@ fun ChatScreen(
     var showRelationshipDialog by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val context = LocalContext.current
+    var lightboxImage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(state.messages.size, state.streamingText) {
         val target = state.messages.size // +1 pour la bulle de streaming si présente
@@ -195,6 +202,16 @@ fun ChatScreen(
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(
+                            text = { Text("📸 Générer une photo réaliste") },
+                            leadingIcon = { Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                            onClick = {
+                                menuExpanded = false
+                                val customText = input.text.trim().takeIf { it.isNotBlank() }
+                                viewModel.generateSceneImage(context, customText)
+                                if (customText != null) input = TextFieldValue("")
+                            },
+                        )
+                        DropdownMenuItem(
                             text = { Text(if (state.dialogueMode == DialogueMode.AUTO_HYBRID) "✓ Mode Auto SFW ↔ NSFW" else "Mode Auto SFW ↔ NSFW") },
                             leadingIcon = { Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                             onClick = { menuExpanded = false; viewModel.setDialogueMode(DialogueMode.AUTO_HYBRID) },
@@ -229,6 +246,7 @@ fun ChatScreen(
                 value = input,
                 onValueChange = { input = it },
                 isGenerating = isGenerating,
+                isGeneratingImage = state.isGeneratingImage,
                 onSend = {
                     if (input.text.isNotBlank()) {
                         viewModel.sendMessage(input.text)
@@ -236,6 +254,9 @@ fun ChatScreen(
                     }
                 },
                 onStop = viewModel::stopGeneration,
+                onGeneratePhoto = { customText ->
+                    viewModel.generateSceneImage(context, customText)
+                },
             )
         },
     ) { padding ->
@@ -250,7 +271,41 @@ fun ChatScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(state.messages, key = { it.id }) { message ->
-                    MessageBubble(message)
+                    MessageBubble(message, onImageClick = { lightboxImage = it })
+                }
+                if (state.isGeneratingImage) {
+                    item(key = "generating_image") {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(14.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Column {
+                                    Text(
+                                        "Génération de la photo réaliste avec Gemini…",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    )
+                                    Text(
+                                        "Synchronisation de la scène, pose, tenue et mémoire…",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
                 if (state.streamingText.isNotEmpty() || state.status == EngineStatus.LOADING_MODEL) {
                     item(key = "streaming") {
@@ -259,6 +314,14 @@ fun ChatScreen(
                 }
             }
         }
+    }
+
+    lightboxImage?.let { path ->
+        MediaLightboxDialog(
+            mediaList = listOf(path),
+            characterName = state.character?.name.orEmpty(),
+            onDismiss = { lightboxImage = null },
+        )
     }
 
     if (showPersonaPicker) {
@@ -413,8 +476,17 @@ private val UserBubbleShape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.d
 private val CharBubbleShape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bottomStart = 4.dp, bottomEnd = 18.dp)
 
 @Composable
-private fun MessageBubble(message: ChatMessageEntity) {
+private fun MessageBubble(
+    message: ChatMessageEntity,
+    onImageClick: (String) -> Unit = {},
+) {
     val isUser = message.role == MessageRole.USER
+    val content = message.content
+    val imgRegex = Regex("\\[IMG:(.*?)\\]")
+    val imgMatch = imgRegex.find(content)
+    val imagePath = imgMatch?.groupValues?.get(1)
+    val textContent = if (imagePath != null) content.replace(imgRegex, "").trim() else content
+
     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start) {
         Box(
             modifier = Modifier
@@ -426,10 +498,33 @@ private fun MessageBubble(message: ChatMessageEntity) {
                 )
                 .widthIn(max = 300.dp),
         ) {
-            Text(
-                text = formatRoleplayText(message.content, isUser),
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-            )
+            Column(Modifier.padding(if (imagePath != null) 6.dp else 14.dp, if (imagePath != null) 6.dp else 10.dp)) {
+                if (imagePath != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { onImageClick(imagePath) },
+                    ) {
+                        MediaDisplay(
+                            mediaPath = imagePath,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                            isThumbnail = false,
+                        )
+                    }
+                    if (textContent.isNotBlank()) {
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+                if (textContent.isNotBlank()) {
+                    Text(
+                        text = formatRoleplayText(textContent, isUser),
+                        modifier = if (imagePath != null) Modifier.padding(horizontal = 8.dp, vertical = 4.dp) else Modifier,
+                    )
+                }
+            }
         }
     }
 }
@@ -496,25 +591,41 @@ private fun ChatInputBar(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     isGenerating: Boolean,
+    isGeneratingImage: Boolean,
     onSend: () -> Unit,
     onStop: () -> Unit,
+    onGeneratePhoto: (String?) -> Unit,
 ) {
     Surface(color = MaterialTheme.colorScheme.surface, tonalElevation = 3.dp) {
         Column(Modifier.padding(horizontal = 8.dp, vertical = 6.dp)) {
-            // Boutons "Action"/"Pensée" : insèrent les mêmes marqueurs (*…*, (…)) que ceux
-            // enseignés au modèle (voir PromptBuilder.ROLEPLAY_FORMAT_DIRECTIVE), pour que
-            // l'utilisateur puisse lui aussi écrire des actions/pensées mises en forme dans ses
-            // propres messages, sans avoir à taper les astérisques/parenthèses de tête.
+            // Boutons "Action"/"Pensée" / "Photo réaliste"
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                AssistChip(
+                    onClick = {
+                        val custom = value.text.trim().takeIf { it.isNotBlank() }
+                        onGeneratePhoto(custom)
+                        if (custom != null) onValueChange(TextFieldValue(""))
+                    },
+                    label = { Text("📸 Photo réaliste") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Filled.AutoAwesome,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    enabled = !isGenerating && !isGeneratingImage,
+                )
                 AssistChip(
                     onClick = { onValueChange(wrapWithMarkers(value, "*", "*")) },
                     label = { Text("Action *…*") },
-                    enabled = !isGenerating,
+                    enabled = !isGenerating && !isGeneratingImage,
                 )
                 AssistChip(
                     onClick = { onValueChange(wrapWithMarkers(value, "(", ")")) },
                     label = { Text("Pensée (…)") },
-                    enabled = !isGenerating,
+                    enabled = !isGenerating && !isGeneratingImage,
                 )
             }
             Spacer(Modifier.height(4.dp))
@@ -527,11 +638,11 @@ private fun ChatInputBar(
                     value = value,
                     onValueChange = onValueChange,
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Écris un message…") },
-                    enabled = !isGenerating,
+                    placeholder = { Text(if (isGeneratingImage) "Génération de la photo en cours…" else "Écris un message ou une demande de photo…") },
+                    enabled = !isGenerating && !isGeneratingImage,
                     maxLines = 5,
                 )
-                val sendButtonBrush = if (isGenerating) {
+                val sendButtonBrush = if (isGenerating || isGeneratingImage) {
                     val c = MaterialTheme.colorScheme.surfaceVariant
                     Brush.linearGradient(listOf(c, c))
                 } else {
@@ -549,7 +660,7 @@ private fun ChatInputBar(
                             Icon(Icons.Filled.Stop, contentDescription = "Arrêter", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     } else {
-                        IconButton(onClick = onSend) {
+                        IconButton(onClick = onSend, enabled = !isGeneratingImage) {
                             Icon(Icons.Filled.Send, contentDescription = "Envoyer", tint = androidx.compose.ui.graphics.Color.White)
                         }
                     }

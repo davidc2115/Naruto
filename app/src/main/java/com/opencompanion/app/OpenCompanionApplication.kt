@@ -38,16 +38,12 @@ class OpenCompanionApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         applicationScope.launch {
-            if (!settingsRepository.momStepmomCatalogSeeded.first()) {
-                // Remplacement complet des anciens personnages par le catalogue exclusif Mère & Belle-Mère
-                characterRepository.resetWithMomAndStepmomCatalog()
-                settingsRepository.setMomStepmomCatalogSeeded(true)
-                settingsRepository.setExpandedCatalogSeeded(true)
-                settingsRepository.setFamilyPackSeeded(true)
-                settingsRepository.setCatalog200Seeded(true)
-            } else {
-                characterRepository.seedSampleCharactersIfEmpty()
-            }
+            // Synchronisation intelligente non destructrice : préserve 100% des conversations et des notes
+            characterRepository.syncMomAndStepmomCatalog()
+            settingsRepository.setMomStepmomCatalogSeeded(true)
+            settingsRepository.setExpandedCatalogSeeded(true)
+            settingsRepository.setFamilyPackSeeded(true)
+            settingsRepository.setCatalog200Seeded(true)
             characterRepository.ensureDefaultPersonaSeeded(settingsRepository.userProfile.first())
         }
     }

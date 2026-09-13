@@ -100,12 +100,39 @@ class CharacterRepository(
     }
 
     /**
-     * Réinitialise complètement tous les personnages et installe le catalogue exclusif
-     * Mère & Belle-Mère inspiré de SpicyChat/JuicyChat (40 personnages uniques avec galeries complètes).
+     * Synchronise intelligemment le grand catalogue sans JAMAIS supprimer les personnages
+     * ni les conversations existantes. Conserve scrupuleusement l'ID, le niveau d'affection,
+     * les notes de mémoire, le persona actif et l'intégralité de l'historique de discussion.
      */
+    suspend fun syncMomAndStepmomCatalog() {
+        val existingCharacters = characterDao.getAll()
+        val existingByName = existingCharacters.associateBy { it.name }
+
+        for (newChar in MomAndStepmomCatalog.characters) {
+            val existing = existingByName[newChar.name]
+            if (existing != null) {
+                val hasMessages = chatDao.countMessagesForCharacter(existing.id) > 0
+                val updated = existing.copy(
+                    description = newChar.description,
+                    personality = newChar.personality,
+                    scenario = newChar.scenario,
+                    firstMessage = if (!hasMessages) newChar.firstMessage else existing.firstMessage,
+                    exampleDialogue = newChar.exampleDialogue,
+                    avatarPath = newChar.avatarPath,
+                    tagsCsv = newChar.tagsCsv,
+                    creator = newChar.creator,
+                    isBundledSample = true,
+                    galleryMediaJson = newChar.galleryMediaJson,
+                )
+                characterDao.update(updated)
+            } else {
+                characterDao.upsert(newChar)
+            }
+        }
+    }
+
     suspend fun resetWithMomAndStepmomCatalog() {
-        characterDao.clearAll()
-        MomAndStepmomCatalog.characters.forEach { characterDao.upsert(it) }
+        syncMomAndStepmomCatalog()
     }
 
     // --- Personas utilisateur (voir UserPersonaEntity) --------------------------------------

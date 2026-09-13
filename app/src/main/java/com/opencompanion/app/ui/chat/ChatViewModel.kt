@@ -84,6 +84,7 @@ data class ChatUiState(
     val selectedModelName: String? = null,
     val dialogueMode: DialogueMode = DialogueMode.AUTO_HYBRID,
     val activeEngineLabel: String? = null,
+    val isGeneratingImage: Boolean = false,
 )
 
 class ChatViewModel(
@@ -101,6 +102,7 @@ class ChatViewModel(
     private val _usingNano = MutableStateFlow(false)
     private val _dialogueMode = MutableStateFlow(DialogueMode.AUTO_HYBRID)
     private val _activeEngineLabel = MutableStateFlow<String?>(null)
+    private val _isGeneratingImage = MutableStateFlow(false)
     private var generationJob: Job? = null
     private var gpuRetryUsed = false
 
@@ -146,6 +148,7 @@ class ChatViewModel(
         val usingNano: Boolean,
         val mode: DialogueMode,
         val label: String?,
+        val isGeneratingImage: Boolean,
     )
 
     private val _engineState = combine(
@@ -153,9 +156,9 @@ class ChatViewModel(
         _status,
         _usingNano,
         _dialogueMode,
-        _activeEngineLabel,
-    ) { streaming, status, usingNano, mode, label ->
-        CombinedEngineState(streaming, status, usingNano, mode, label)
+        combine(_activeEngineLabel, _isGeneratingImage) { label, isGenImg -> label to isGenImg }
+    ) { streaming, status, usingNano, mode, (label, isGenImg) ->
+        CombinedEngineState(streaming, status, usingNano, mode, label, isGenImg)
     }
 
     val uiState: StateFlow<ChatUiState> = combine(
@@ -186,6 +189,7 @@ class ChatViewModel(
             selectedModelName = modelName,
             dialogueMode = engineState.mode,
             activeEngineLabel = engineState.label,
+            isGeneratingImage = engineState.isGeneratingImage,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ChatUiState())
 
@@ -672,6 +676,52 @@ class ChatViewModel(
 
     fun clearHistory() {
         viewModelScope.launch { repository.clearHistory(characterId) }
+    }
+
+    /**
+     * Génère une photo réaliste cohérente avec la conversation, la mémoire et le personnage.
+     */
+    fun generateSceneImage(context: android.content.Context, customPrompt: String? = null) {
+        if (_isGeneratingImage.value) return
+        viewModelScope.launch {
+            val character = repository.getCharacter(characterId) ?: return@launch
+            val settings = settingsRepository.settings.first()
+            val geminiKey = settings.geminiApiKey.trim()
+
+            if (geminiKey.isBlank() && settings.openAiApiKey.isBlank()) {
+                _statusMessage.value = "Renseigne ta clé API Gemini dans les Réglages pour générer des photos réalistes."
+                return@launch
+            }
+
+            _isGeneratingImage.value = true
+            val recentMessages = repository.getMessages(characterId)
+            val outputDir = java.io.File(context.filesDir, "chat_images").apply { mkdirs() }
+
+            val result = cloudBridge.generateCharacterSceneImage(
+                geminiApiKey = geminiKey,
+                openAiApiKey = settings.openAiApiKey.trim().takeIf { it.isNotBlank() },
+                character = character,
+                recentMessages = recentMessages,
+                userCustomInstruction = customPrompt,
+                outputDir = outputDir,
+            )
+
+            result.onSuccess { imageFile ->
+                _isGeneratingImage.value = false
+                repository.addGalleryMedia(characterId, imageFile.absolutePath)
+                val caption = if (!customPrompt.isNullOrBlank()) {
+                    "*${character.name} vous envoie cette photo suite à votre demande : « $customPrompt »*"
+                } else {
+                    "*${character.name} vous partage une photo prise sur le vif...*"
+                }
+                val messageContent = "[IMG:${imageFile.absolutePath}]\n$caption"
+                repository.appendMessage(characterId, MessageRole.ASSISTANT, messageContent)
+                repository.incrementAffection(characterId)
+            }.onFailure { err ->
+                _isGeneratingImage.value = false
+                _statusMessage.value = err.message ?: "Échec de génération de la photo."
+            }
+        }
     }
 
     fun consumeStatusMessage() {

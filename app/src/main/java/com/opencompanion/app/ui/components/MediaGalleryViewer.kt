@@ -465,7 +465,8 @@ private suspend fun resolveMediaFile(context: Context, path: String): File? = wi
             return@withContext null
         }
 
-        val f = File(path)
+        val cleanPath = path.removePrefix("file://")
+        val f = File(cleanPath)
         if (f.exists() && f.isFile) return@withContext f
         null
     } catch (_: Exception) {

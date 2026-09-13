@@ -22,6 +22,9 @@ interface ChatDao {
     @Query("DELETE FROM chat_messages WHERE characterId = :characterId")
     suspend fun clearHistory(characterId: Long)
 
+    @Query("SELECT COUNT(*) FROM chat_messages WHERE characterId = :characterId")
+    suspend fun countMessagesForCharacter(characterId: Long): Int
+
     @Query("DELETE FROM chat_messages WHERE id = :messageId")
     suspend fun deleteMessage(messageId: Long)
 }

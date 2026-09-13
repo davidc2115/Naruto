@@ -10,9 +10,14 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import android.util.Base64
+import com.opencompanion.app.data.CharacterEntity
+import com.opencompanion.app.data.ChatMessageEntity
+import com.opencompanion.app.data.MessageRole
 
 /** Découpe une chaîne de clés API en liste utilisable : une clé par ligne (ou séparées par des
  *  virgules), lignes vides ignorées — permet de renseigner plusieurs clés (plusieurs comptes
@@ -905,6 +910,225 @@ class CloudEngineBridge {
                 if (aFree != bFree) (if (aFree) -1 else 1) else a.compareTo(b)
             })
             if (models.isEmpty()) listOf("nousresearch/hermes-3-llama-3.1-8b:free", "meta-llama/llama-3.3-70b-instruct:free") else models
+        }
+    }
+
+    /**
+     * Synthétise un prompt photographique ultra-détaillé et photoréaliste en anglais à partir :
+     * 1. De la description physique complète du personnage (traits, yeux, cheveux, silhouette, âge)
+     * 2. Des derniers messages échangés (pour capturer la tenue actuelle, la posture, l'émotion et le décor)
+     * 3. Des notes de mémoire persistantes et du niveau de relation
+     * 4. Des éventuelles consignes directes de l'utilisateur
+     */
+    suspend fun buildSceneImagePrompt(
+        geminiApiKey: String,
+        character: CharacterEntity,
+        recentMessages: List<ChatMessageEntity>,
+        userCustomInstruction: String? = null,
+    ): String = withContext(Dispatchers.IO) {
+        val keys = parseApiKeys(geminiApiKey)
+        if (keys.isNotEmpty()) {
+            val key = keys.first()
+            try {
+                val contextHistory = recentMessages.takeLast(6).joinToString("\n") {
+                    val roleLabel = if (it.role == MessageRole.USER) "User" else character.name
+                    "$roleLabel: ${it.content.take(150)}"
+                }
+                val memoryContext = if (character.memoryNotes.isNotBlank()) "\nPersistent memory: ${character.memoryNotes.take(200)}" else ""
+                val customPrompt = if (!userCustomInstruction.isNullOrBlank()) "\nUser specific instruction: $userCustomInstruction" else ""
+
+                val instructions = """
+Write an ultra-detailed, photorealistic prompt for generating a photo of ${character.name} in the active scene.
+CHARACTER PHYSICAL IDENTITY:
+${character.description}
+${character.tagsCsv}
+
+CONVERSATION CONTEXT & ENVIRONMENT:
+Relationship stage: ${character.relationshipStage}
+$memoryContext
+$contextHistory
+$customPrompt
+
+REQUIREMENTS:
+- Strictly maintain the character's exact facial structure, hair color/style, eye color, age, body proportions.
+- Accurately capture the current outfit and pose from the recent scene dialogue.
+- Format as a photographic raw prompt: 'photorealistic candid portrait photo of ..., 8k resolution, authentic detailed skin texture, cinematic soft natural lighting, masterpiece, shallow depth of field'.
+- Output ONLY the final prompt in English with no explanations.
+                """.trimIndent()
+
+                val url = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$key")
+                val conn = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    connectTimeout = 12_000
+                    readTimeout = 15_000
+                    doOutput = true
+                    setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                    setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                }
+
+                val payload = mapOf(
+                    "contents" to listOf(
+                        mapOf("role" to "user", "parts" to listOf(mapOf("text" to instructions)))
+                    ),
+                    "generationConfig" to mapOf(
+                        "temperature" to 0.7,
+                        "maxOutputTokens" to 300,
+                    )
+                )
+
+                conn.outputStream.use { os ->
+                    os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                    os.flush()
+                }
+
+                if (conn.responseCode in 200..299) {
+                    val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                    conn.disconnect()
+                    val root = jsonParser.parseToJsonElement(resp).jsonObject
+                    val text = root["candidates"]?.jsonArray?.firstOrNull()?.jsonObject
+                        ?.get("content")?.jsonObject
+                        ?.get("parts")?.jsonArray?.firstOrNull()?.jsonObject
+                        ?.get("text")?.jsonPrimitive?.content
+                    if (!text.isNullOrBlank()) {
+                        return@withContext text.trim().removeSurrounding("\"")
+                    }
+                }
+                conn.disconnect()
+            } catch (_: Exception) {}
+        }
+
+        // Repli déterministe immédiat en cas d'indisponibilité de la synthèse texte
+        buildString {
+            append("photorealistic raw 8k portrait photo of a woman named ${character.name}, ")
+            val phys = character.description.substringAfter("Description physique détaillée :", "").substringBefore("\n\n").trim()
+            if (phys.isNotBlank()) {
+                append("$phys, ")
+            }
+            if (!userCustomInstruction.isNullOrBlank()) {
+                append("$userCustomInstruction, ")
+            } else {
+                append("in casual elegant setting, looking towards camera, warm subtle expression, ")
+            }
+            append("natural authentic skin texture, cinematic soft lighting, masterpiece, 35mm photography")
+        }
+    }
+
+    /**
+     * Génère une véritable image réaliste avec Google Gemini (Imagen 3) ou OpenAI DALL-E 3 en repli,
+     * et l'enregistre dans le stockage privé de l'application sous [outputDir].
+     */
+    suspend fun generateCharacterSceneImage(
+        geminiApiKey: String,
+        openAiApiKey: String? = null,
+        character: CharacterEntity,
+        recentMessages: List<ChatMessageEntity>,
+        userCustomInstruction: String? = null,
+        outputDir: File,
+    ): Result<File> = withContext(Dispatchers.IO) {
+        runCatching {
+            val prompt = buildSceneImagePrompt(geminiApiKey, character, recentMessages, userCustomInstruction)
+            val geminiKeys = parseApiKeys(geminiApiKey)
+
+            // 1. Tentative avec Google Gemini Imagen 3 (imagen-3.0-generateImages)
+            for (key in geminiKeys) {
+                val imagenEndpoints = listOf(
+                    "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generateImages:generate?key=$key",
+                    "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generateImages:generate?key=$key"
+                )
+
+                for (targetUrl in imagenEndpoints) {
+                    try {
+                        val url = URL(targetUrl)
+                        val conn = (url.openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            connectTimeout = 25_000
+                            readTimeout = 45_000
+                            doOutput = true
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                        }
+
+                        val payload = mapOf(
+                            "prompt" to prompt,
+                            "number_of_images" to 1,
+                            "output_mime_type" to "image/jpeg",
+                            "aspect_ratio" to "1:1",
+                            "person_generation" to "ALLOW_ADULT"
+                        )
+
+                        conn.outputStream.use { os ->
+                            os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                            os.flush()
+                        }
+
+                        val code = conn.responseCode
+                        if (code in 200..299) {
+                            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                            conn.disconnect()
+                            val root = jsonParser.parseToJsonElement(resp).jsonObject
+                            val images = root["generatedImages"]?.jsonArray
+                            val b64 = images?.firstOrNull()?.jsonObject?.get("image")?.jsonObject?.get("imageBytes")?.jsonPrimitive?.content
+                            if (!b64.isNullOrBlank()) {
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
+                                file.writeBytes(bytes)
+                                return@runCatching file
+                            }
+                        } else {
+                            conn.disconnect()
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
+
+            // 2. Repli éventuel sur OpenAI DALL-E 3 si clé OpenAI disponible
+            val openAiKeys = if (!openAiApiKey.isNullOrBlank()) parseApiKeys(openAiApiKey) else emptyList()
+            for (key in openAiKeys) {
+                try {
+                    val url = URL("https://api.openai.com/v1/images/generations")
+                    val conn = (url.openConnection() as HttpURLConnection).apply {
+                        requestMethod = "POST"
+                        connectTimeout = 25_000
+                        readTimeout = 45_000
+                        doOutput = true
+                        setRequestProperty("Authorization", "Bearer $key")
+                        setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                        setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                    }
+
+                    val payload = mapOf(
+                        "model" to "dall-e-3",
+                        "prompt" to prompt,
+                        "n" to 1,
+                        "size" to "1024x1024",
+                        "response_format" to "b64_json"
+                    )
+
+                    conn.outputStream.use { os ->
+                        os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                        os.flush()
+                    }
+
+                    val code = conn.responseCode
+                    if (code in 200..299) {
+                        val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                        conn.disconnect()
+                        val root = jsonParser.parseToJsonElement(resp).jsonObject
+                        val data = root["data"]?.jsonArray
+                        val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
+                        if (!b64.isNullOrBlank()) {
+                            val bytes = Base64.decode(b64, Base64.DEFAULT)
+                            val file = File(outputDir, "openai_${character.id}_${System.currentTimeMillis()}.jpg")
+                            file.writeBytes(bytes)
+                            return@runCatching file
+                        }
+                    } else {
+                        conn.disconnect()
+                    }
+                } catch (_: Exception) {}
+            }
+
+            error("Impossible de générer l'image : configure ta clé API Gemini dans les Réglages.")
         }
     }
 }
