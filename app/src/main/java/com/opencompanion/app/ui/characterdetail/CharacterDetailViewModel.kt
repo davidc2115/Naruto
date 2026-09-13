@@ -61,4 +61,37 @@ class CharacterDetailViewModel(
             onComplete()
         }
     }
+
+    fun addGalleryMediaFromUri(uri: android.net.Uri, context: android.content.Context) {
+        viewModelScope.launch {
+            val bytes = runCatching {
+                context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull() ?: return@launch
+            val dir = java.io.File(context.filesDir, "gallery").apply { mkdirs() }
+            val mime = context.contentResolver.getType(uri) ?: ""
+            val ext = when {
+                mime.contains("gif") -> "gif"
+                mime.contains("video") || mime.contains("mp4") -> "mp4"
+                mime.contains("png") -> "png"
+                else -> "jpg"
+            }
+            val file = java.io.File(dir, "media_${characterId}_${System.currentTimeMillis()}.$ext")
+            file.writeBytes(bytes)
+            repository.addGalleryMedia(characterId, file.absolutePath)
+        }
+    }
+
+    fun addGalleryMediaFromUrl(url: String) {
+        viewModelScope.launch {
+            if (url.isNotBlank()) {
+                repository.addGalleryMedia(characterId, url.trim())
+            }
+        }
+    }
+
+    fun removeGalleryMedia(mediaPathOrUrl: String) {
+        viewModelScope.launch {
+            repository.removeGalleryMedia(characterId, mediaPathOrUrl)
+        }
+    }
 }

@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -20,6 +22,44 @@ class CharacterListViewModel(
 
     val characters: StateFlow<List<CharacterEntity>> =
         repository.observeCharacters().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val searchQuery = MutableStateFlow("")
+    val selectedTag = MutableStateFlow<String?>(null)
+
+    val filteredCharacters: StateFlow<List<CharacterEntity>> =
+        combine(characters, searchQuery, selectedTag) { list, query, tag ->
+            list.filter { char ->
+                val matchesQuery = query.isBlank() ||
+                    char.name.contains(query, ignoreCase = true) ||
+                    char.description.contains(query, ignoreCase = true) ||
+                    char.personality.contains(query, ignoreCase = true) ||
+                    char.scenario.contains(query, ignoreCase = true) ||
+                    char.tags.any { it.contains(query, ignoreCase = true) }
+                val matchesTag = tag == null || char.tags.any { it.equals(tag, ignoreCase = true) }
+                matchesQuery && matchesTag
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val popularTags: StateFlow<List<String>> =
+        characters.map { list ->
+            list.flatMap { it.tags }
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .groupingBy { it }
+                .eachCount()
+                .toList()
+                .sortedByDescending { it.second }
+                .map { it.first }
+                .take(25)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
+    }
+
+    fun setSelectedTag(tag: String?) {
+        selectedTag.value = if (selectedTag.value == tag) null else tag
+    }
 
     private val _importMessage = MutableStateFlow<String?>(null)
     val importMessage: StateFlow<String?> = _importMessage.asStateFlow()

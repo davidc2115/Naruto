@@ -53,7 +53,13 @@ class CharacterImportManager(
         cookieHeader: String? = null,
         autoTranslateFrench: Boolean = true,
     ): ImportResult = withContext(Dispatchers.IO) {
-        var currentUrl = url
+        var currentUrl = url.trim()
+        if (currentUrl.contains("chub.ai/characters/") && !currentUrl.contains("api.chub.ai")) {
+            val path = currentUrl.substringAfter("chub.ai/characters/").trimEnd('/')
+            if (path.isNotBlank() && path.contains('/')) {
+                currentUrl = "https://api.chub.ai/api/characters/$path?full=true"
+            }
+        }
         var redirects = 0
         val maxRedirects = 10
         var bytes: ByteArray? = null
@@ -161,6 +167,36 @@ class CharacterImportManager(
         }
         if (avatarBytes != null) {
             entity = entity.copy(avatarPath = saveAvatar(avatarBytes, entity.name))
+        } else if (cardData.avatarUrl.isNotBlank()) {
+            val downloadedAvatar = downloadBytes(cardData.avatarUrl)
+            if (downloadedAvatar != null) {
+                entity = entity.copy(avatarPath = saveAvatar(downloadedAvatar, entity.name))
+            }
+        }
+
+        // Si la fiche embarque des médias de galerie (images, gifs, vidéos), télécharger les URLs
+        if (cardData.gallery.isNotEmpty()) {
+            val localGallery = mutableListOf<String>()
+            for ((idx, mediaUrl) in cardData.gallery.withIndex()) {
+                if (mediaUrl.startsWith("http://") || mediaUrl.startsWith("https://")) {
+                    val mediaBytes = downloadBytes(mediaUrl)
+                    if (mediaBytes != null) {
+                        val ext = when {
+                            mediaUrl.contains(".gif", ignoreCase = true) -> "gif"
+                            mediaUrl.contains(".mp4", ignoreCase = true) -> "mp4"
+                            mediaUrl.contains(".webm", ignoreCase = true) -> "webm"
+                            mediaUrl.contains(".png", ignoreCase = true) -> "png"
+                            else -> "jpg"
+                        }
+                        localGallery.add(saveGalleryMedia(mediaBytes, "${entity.name}_gal_$idx", ext))
+                    } else {
+                        localGallery.add(mediaUrl)
+                    }
+                } else {
+                    localGallery.add(mediaUrl)
+                }
+            }
+            entity = entity.copy(galleryMediaJson = kotlinx.serialization.json.Json.encodeToString(localGallery))
         }
 
         val id = repository.saveCharacter(entity)
@@ -216,6 +252,30 @@ class CharacterImportManager(
         }
 
         return null
+    }
+
+    fun saveGalleryMedia(bytes: ByteArray, name: String, extension: String = "jpg"): String {
+        val dir = File(context.filesDir, "gallery").apply { mkdirs() }
+        val ext = if (extension.startsWith(".")) extension else ".$extension"
+        val file = File(dir, "${sanitizeFileName(name)}_${System.currentTimeMillis()}$ext")
+        file.writeBytes(bytes)
+        return file.absolutePath
+    }
+
+    private fun downloadBytes(url: String): ByteArray? {
+        return runCatching {
+            val conn = (URL(url).openConnection() as HttpURLConnection).apply {
+                connectTimeout = 15_000
+                readTimeout = 15_000
+                setRequestProperty(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 OpenCompanion/1.0"
+                )
+            }
+            if (conn.responseCode in 200..299) {
+                conn.inputStream.use { it.readBytes() }
+            } else null
+        }.getOrNull()
     }
 
     private fun saveAvatar(bytes: ByteArray, name: String): String {

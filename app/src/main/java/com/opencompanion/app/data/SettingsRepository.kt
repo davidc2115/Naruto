@@ -138,6 +138,15 @@ class SettingsRepository(private val context: Context) {
         val OPENAI_MODEL_NAME = stringPreferencesKey("openai_model_name")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
+        val CATALOG_200_SEEDED = booleanPreferencesKey("catalog_200_seeded")
+    }
+
+    val catalog200Seeded: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.CATALOG_200_SEEDED] ?: false
+    }
+
+    suspend fun setCatalog200Seeded(value: Boolean) = context.dataStore.edit {
+        it[Keys.CATALOG_200_SEEDED] = value
     }
 
     /**

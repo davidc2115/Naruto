@@ -74,6 +74,34 @@ object CharacterCardCodec {
         val finalMesExample = decoded.mesExample.ifBlank { getStringField(dataObject, "mes_example", "example_dialogue", "dialogue_examples", "mes_examples", "examples") }
         val finalCreatorNotes = decoded.creatorNotes.ifBlank { getStringField(dataObject, "creator_notes", "comment", "notes") }
         val finalSystemPrompt = decoded.systemPrompt.ifBlank { getStringField(dataObject, "system_prompt", "custom_text", "system_prompt_override") }
+        val finalAvatarUrl = decoded.avatarUrl.ifBlank {
+            getStringField(dataObject, "avatar_url", "avatar", "image", "character_image", "cover_image", "picture", "photo_url")
+        }.ifBlank {
+            getStringField(root, "avatar_url", "avatar", "image", "character_image", "cover_image", "picture", "photo_url")
+        }
+
+        val extractedTags = if (decoded.tags.isNotEmpty()) {
+            decoded.tags
+        } else {
+            val tagsElem = dataObject["tags"] ?: dataObject["categories"] ?: dataObject["topics"] ?: root["tags"] ?: root["categories"]
+            when (tagsElem) {
+                is kotlinx.serialization.json.JsonArray -> tagsElem.mapNotNull { it.jsonPrimitive.contentOrNull }
+                else -> {
+                    val str = getStringField(dataObject, "tags", "categories", "topics")
+                    if (str.isNotBlank()) str.split(",").map { it.trim() } else emptyList()
+                }
+            }
+        }
+
+        val extractedGallery = if (decoded.gallery.isNotEmpty()) {
+            decoded.gallery
+        } else {
+            val galElem = dataObject["gallery"] ?: dataObject["images"] ?: dataObject["photos"] ?: root["gallery"] ?: root["images"]
+            when (galElem) {
+                is kotlinx.serialization.json.JsonArray -> galElem.mapNotNull { it.jsonPrimitive.contentOrNull }
+                else -> emptyList()
+            }
+        }
 
         return decoded.copy(
             name = finalName,
@@ -84,6 +112,9 @@ object CharacterCardCodec {
             mesExample = finalMesExample,
             creatorNotes = finalCreatorNotes,
             systemPrompt = finalSystemPrompt,
+            tags = extractedTags,
+            avatarUrl = finalAvatarUrl,
+            gallery = extractedGallery,
         )
     }
 
@@ -101,6 +132,7 @@ object CharacterCardCodec {
                 tags = entity.tags,
                 creator = entity.creator,
                 characterVersion = entity.characterVersion,
+                gallery = entity.galleryMedia,
             ),
         )
         return json.encodeToString(card)
@@ -120,4 +152,5 @@ fun CharacterCardData.toEntity(isBundledSample: Boolean = false): CharacterEntit
     creator = creator,
     characterVersion = characterVersion,
     isBundledSample = isBundledSample,
+    galleryMediaJson = kotlinx.serialization.json.Json.encodeToString(gallery),
 )

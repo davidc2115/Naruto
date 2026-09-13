@@ -1,6 +1,7 @@
 package com.opencompanion.app.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.encodeToString
 
 /**
  * Point d'accès unique aux personnages et à l'historique de conversation.
@@ -67,6 +68,14 @@ class CharacterRepository(
         SampleCharacters.familyPack.forEach { characterDao.upsert(it) }
     }
 
+    /**
+     * Ajoute le grand catalogue de 200 personnages (voir [ExtendedCatalog.characters]) —
+     * une seule fois via `SettingsRepository.catalog200Seeded`.
+     */
+    suspend fun seedCatalog200() {
+        ExtendedCatalog.characters.forEach { characterDao.upsert(it) }
+    }
+
     // --- Personas utilisateur (voir UserPersonaEntity) --------------------------------------
 
     fun observePersonas(): Flow<List<UserPersonaEntity>> = personaDao.observeAll()
@@ -130,6 +139,25 @@ class CharacterRepository(
     suspend fun incrementAffection(characterId: Long, amount: Int = 2) {
         val character = characterDao.getById(characterId) ?: return
         characterDao.update(character.copy(affectionLevel = (character.affectionLevel + amount).coerceIn(0, 100)))
+    }
+
+    suspend fun addGalleryMedia(characterId: Long, mediaPathOrUrl: String) {
+        val character = characterDao.getById(characterId) ?: return
+        val current = character.galleryMedia.toMutableList()
+        if (!current.contains(mediaPathOrUrl)) {
+            current.add(mediaPathOrUrl)
+            val json = kotlinx.serialization.encodeToString(current)
+            characterDao.update(character.copy(galleryMediaJson = json))
+        }
+    }
+
+    suspend fun removeGalleryMedia(characterId: Long, mediaPathOrUrl: String) {
+        val character = characterDao.getById(characterId) ?: return
+        val current = character.galleryMedia.toMutableList()
+        if (current.remove(mediaPathOrUrl)) {
+            val json = kotlinx.serialization.encodeToString(current)
+            characterDao.update(character.copy(galleryMediaJson = json))
+        }
     }
 
     /**

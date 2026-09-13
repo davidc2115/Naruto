@@ -15,26 +15,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -86,7 +92,11 @@ fun CharacterListScreen(
     onBrowseImport: () -> Unit,
     onOpenPersonas: () -> Unit,
 ) {
-    val characters by viewModel.characters.collectAsState()
+    val characters by viewModel.filteredCharacters.collectAsState()
+    val allCharacters by viewModel.characters.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedTag by viewModel.selectedTag.collectAsState()
+    val popularTags by viewModel.popularTags.collectAsState()
     val importMessage by viewModel.importMessage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -201,24 +211,110 @@ fun CharacterListScreen(
             }
         },
     ) { padding ->
-        if (characters.isEmpty()) {
-            EmptyState(Modifier.padding(padding).fillMaxSize(), onCreateCharacter, onBrowseImport)
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.padding(padding).fillMaxSize(),
-                contentPadding = PaddingValues(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                items(characters, key = { it.id }) { character ->
-                    CharacterCard(
-                        character = character,
-                        onClick = { onOpenCharacterDetail(character.id) },
-                        onQuickChat = { onOpenChat(character.id) },
-                        onEdit = { onEditCharacter(character.id) },
-                        onDelete = { scope.launch { viewModel.deleteCharacter(character) } },
-                    )
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+        ) {
+            // Barre de recherche
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { viewModel.setSearchQuery(it) },
+                placeholder = { Text("Rechercher par nom, tag, scénario...") },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Rechercher") },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                            Icon(Icons.Filled.Clear, contentDescription = "Effacer")
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
+            )
+
+            // Filtres par tags populaires
+            if (popularTags.isNotEmpty()) {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    item {
+                        FilterChip(
+                            selected = selectedTag == null,
+                            onClick = { viewModel.setSelectedTag(null) },
+                            label = { Text("Tous (${allCharacters.size})") },
+                            shape = RoundedCornerShape(16.dp),
+                        )
+                    }
+                    items(popularTags) { tag ->
+                        FilterChip(
+                            selected = selectedTag == tag,
+                            onClick = { viewModel.setSelectedTag(tag) },
+                            label = { Text("#$tag") },
+                            shape = RoundedCornerShape(16.dp),
+                        )
+                    }
+                }
+            }
+
+            // Affichage de la liste / grille
+            if (allCharacters.isEmpty()) {
+                EmptyState(Modifier.fillMaxSize(), onCreateCharacter, onBrowseImport)
+            } else if (characters.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(24.dp),
+                    ) {
+                        Icon(
+                            Icons.Filled.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.height(48.dp),
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            "Aucun personnage trouvé",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "Aucun résultat pour cette recherche ou ce tag.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Button(onClick = {
+                            viewModel.setSearchQuery("")
+                            viewModel.setSelectedTag(null)
+                        }) {
+                            Text("Réinitialiser les filtres")
+                        }
+                    }
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    items(characters, key = { it.id }) { character ->
+                        CharacterCard(
+                            character = character,
+                            onClick = { onOpenCharacterDetail(character.id) },
+                            onQuickChat = { onOpenChat(character.id) },
+                            onEdit = { onEditCharacter(character.id) },
+                            onDelete = { scope.launch { viewModel.deleteCharacter(character) } },
+                        )
+                    }
                 }
             }
         }
@@ -407,15 +503,15 @@ private fun UrlImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) 
         text = {
             Column {
                 Text(
-                    "Colle le lien direct vers une image PNG (fiche embarquée) ou un fichier JSON " +
-                        "de personnage, depuis n'importe quel site.",
+                    "Colle le lien direct vers un personnage ou une fiche depuis Chub AI, SpicyChat, " +
+                        "Janitor AI, RosyTalk, Polybuzz, ou une URL directe (image PNG embarquée / JSON).",
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = url,
                     onValueChange = { url = it },
-                    placeholder = { Text("https://…") },
+                    placeholder = { Text("https://chub.ai/characters/... ou lien direct") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )

@@ -47,9 +47,23 @@ data class CharacterEntity(
      *  indicateur simple et honnête plutôt qu'une prétendue analyse de sentiment — et reste
      *  ajustable manuellement par l'utilisateur (voir ChatScreen, dialogue "Relation & Mémoire"). */
     val affectionLevel: Int = 0,
+    /** Liste JSON des médias (photos, GIFs, vidéos) associés à la galerie de ce personnage. */
+    val galleryMediaJson: String = "[]",
 ) {
     val tags: List<String>
         get() = tagsCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+    val galleryMedia: List<String>
+        get() = runCatching {
+            val trimmed = galleryMediaJson.trim()
+            if (trimmed.startsWith("[")) {
+                kotlinx.serialization.json.Json.decodeFromString<List<String>>(trimmed)
+            } else if (trimmed.isNotBlank()) {
+                trimmed.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+            } else {
+                emptyList()
+            }
+        }.getOrDefault(emptyList())
 
     /** Étiquette qualitative dérivée de [affectionLevel], pour l'affichage et pour le prompt
      *  système — des seuils simples plutôt qu'une échelle continue, plus lisibles d'un coup

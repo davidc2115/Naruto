@@ -34,4 +34,6 @@ data class CharacterCardData(
     val creator: String = "",
     @SerialName("character_version") val characterVersion: String = "",
     val extensions: JsonObject? = null,
+    @SerialName("avatar_url") val avatarUrl: String = "",
+    val gallery: List<String> = emptyList(),
 )

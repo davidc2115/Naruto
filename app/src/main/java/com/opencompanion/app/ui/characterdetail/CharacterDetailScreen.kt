@@ -1,11 +1,16 @@
 package com.opencompanion.app.ui.characterdetail
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,15 +29,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShortText
+import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,6 +54,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,6 +64,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,12 +72,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.resolveCharacterPlaceholders
 import com.opencompanion.app.ui.components.CharacterAvatar
+import com.opencompanion.app.ui.components.MediaLightboxDialog
+import com.opencompanion.app.ui.components.MediaThumbnailItem
 import com.opencompanion.app.ui.theme.AccentPink
 import com.opencompanion.app.ui.theme.BrandGradient
 
@@ -82,10 +98,27 @@ fun CharacterDetailScreen(
     onOpenChat: (Long) -> Unit,
     onEditCharacter: (Long) -> Unit,
 ) {
+    val context = LocalContext.current
     val state by viewModel.uiState.collectAsState()
     var showResetConfirmDialog by remember { mutableStateOf(false) }
+    var showLightbox by remember { mutableStateOf(false) }
+    var lightboxIndex by remember { mutableIntStateOf(0) }
+    var showAddMediaDialog by remember { mutableStateOf(false) }
+    var mediaUrlInput by remember { mutableStateOf("") }
+
+    val mediaPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri: Uri? ->
+        uri?.let { viewModel.addGalleryMediaFromUri(it, context) }
+    }
 
     val character = state.character
+    val allMedia = remember(character?.avatarPath, character?.galleryMedia) {
+        val list = mutableListOf<String>()
+        character?.avatarPath?.takeIf { it.isNotBlank() }?.let { list.add(it) }
+        character?.galleryMedia?.let { list.addAll(it) }
+        list.distinct()
+    }
     if (character == null) {
         Scaffold(
             topBar = {
@@ -240,14 +273,40 @@ fun CharacterDetailScreen(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CharacterAvatar(
-                        avatarPath = character.avatarPath,
-                        name = character.name,
+                    Box(
                         modifier = Modifier
                             .size(160.dp)
-                            .clip(RoundedCornerShape(24.dp)),
-                        shape = RoundedCornerShape(24.dp),
-                    )
+                            .clip(RoundedCornerShape(24.dp))
+                            .clickable {
+                                if (allMedia.isNotEmpty()) {
+                                    lightboxIndex = 0
+                                    showLightbox = true
+                                }
+                            },
+                    ) {
+                        CharacterAvatar(
+                            avatarPath = character.avatarPath,
+                            name = character.name,
+                            modifier = Modifier.fillMaxSize(),
+                            shape = RoundedCornerShape(24.dp),
+                        )
+                        Surface(
+                            color = Color(0x66000000),
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                Icons.Filled.ZoomIn,
+                                contentDescription = "Agrandir",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .padding(4.dp),
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(14.dp))
                     Text(
                         character.name,
@@ -280,6 +339,82 @@ fun CharacterDetailScreen(
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                     )
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Galerie Photos, GIFs & Vidéos
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(Modifier.padding(14.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.Collections,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "Galerie Médias",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            if (allMedia.isNotEmpty()) {
+                                Spacer(Modifier.width(8.dp))
+                                Surface(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = CircleShape,
+                                ) {
+                                    Text(
+                                        "${allMedia.size}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                    )
+                                }
+                            }
+                        }
+                        TextButton(
+                            onClick = { showAddMediaDialog = true },
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("Ajouter", style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
+                    if (allMedia.isEmpty()) {
+                        Text(
+                            "Aucun média dans la galerie. Touchez « Ajouter » pour importer des photos, GIFs ou vidéos !",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            itemsIndexed(allMedia) { index, mediaPath ->
+                                MediaThumbnailItem(
+                                    mediaPath = mediaPath,
+                                    onClick = {
+                                        lightboxIndex = index
+                                        showLightbox = true
+                                    },
+                                )
                             }
                         }
                     }
@@ -466,5 +601,75 @@ fun CharacterDetailScreen(
 
             Spacer(Modifier.height(20.dp))
         }
+    }
+
+    if (showLightbox && allMedia.isNotEmpty()) {
+        MediaLightboxDialog(
+            mediaList = allMedia,
+            initialIndex = lightboxIndex.coerceIn(0, allMedia.size - 1),
+            onDismiss = { showLightbox = false },
+            onDeleteMedia = { mediaToDelete ->
+                viewModel.removeGalleryMedia(mediaToDelete)
+            },
+        )
+    }
+
+    if (showAddMediaDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddMediaDialog = false },
+            title = { Text("Ajouter un média") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        "Importez une photo, un GIF animé ou une vidéo (MP4/WebM) pour enrichir la galerie de ${character.name}.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Button(
+                        onClick = {
+                            showAddMediaDialog = false
+                            mediaPickerLauncher.launch("*/*")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(Icons.Filled.FileUpload, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Choisir depuis mon appareil")
+                    }
+                    Text(
+                        "— OU —",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                    )
+                    OutlinedTextField(
+                        value = mediaUrlInput,
+                        onValueChange = { mediaUrlInput = it },
+                        placeholder = { Text("https://... (URL d'image, GIF ou vidéo)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val url = mediaUrlInput.trim()
+                        if (url.isNotBlank()) {
+                            viewModel.addGalleryMediaFromUrl(url)
+                            mediaUrlInput = ""
+                            showAddMediaDialog = false
+                        }
+                    },
+                    enabled = mediaUrlInput.isNotBlank(),
+                ) {
+                    Text("Ajouter par URL")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddMediaDialog = false }) {
+                    Text("Annuler")
+                }
+            },
+        )
     }
 }

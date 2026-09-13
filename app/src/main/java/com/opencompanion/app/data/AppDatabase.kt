@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [CharacterEntity::class, ChatMessageEntity::class, UserPersonaEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -56,13 +56,20 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Ajoute la galerie médias (photos, GIFs, vidéos) par personnage. */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `characters` ADD COLUMN `galleryMediaJson` TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "opencompanion.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
             }
     }
 }
