@@ -15,6 +15,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+enum class HomeTab {
+    DISCOVERY,
+    CHATS,
+}
+
 class CharacterListViewModel(
     private val repository: CharacterRepository,
     private val importManager: CharacterImportManager,
@@ -22,6 +27,15 @@ class CharacterListViewModel(
 
     val characters: StateFlow<List<CharacterEntity>> =
         repository.observeCharacters().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val activeChats: StateFlow<List<com.opencompanion.app.data.ActiveChatConversation>> =
+        repository.observeActiveChats().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val currentTab = MutableStateFlow(HomeTab.DISCOVERY)
+
+    fun selectTab(tab: HomeTab) {
+        currentTab.value = tab
+    }
 
     val searchQuery = MutableStateFlow("")
     val selectedTag = MutableStateFlow<String?>(null)

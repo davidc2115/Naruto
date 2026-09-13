@@ -1,6 +1,7 @@
 package com.opencompanion.app.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -40,6 +41,27 @@ class CharacterRepository(
     suspend fun clearHistory(characterId: Long) = chatDao.clearHistory(characterId)
 
     suspend fun deleteMessage(messageId: Long) = chatDao.deleteMessage(messageId)
+
+    /**
+     * Observe toutes les conversations actives (personnages avec lesquels au moins un message
+     * a été échangé), ordonnées de la plus récente à la plus ancienne, avec le dernier message
+     * et le nombre de messages.
+     */
+    fun observeActiveChats(): Flow<List<ActiveChatConversation>> =
+        combine(characterDao.observeAll(), chatDao.observeAllMessages()) { characters, messages ->
+            val charMap = characters.associateBy { it.id }
+            messages.groupBy { it.characterId }
+                .mapNotNull { (charId, charMessages) ->
+                    val char = charMap[charId] ?: return@mapNotNull null
+                    val latest = charMessages.maxByOrNull { it.timestamp } ?: return@mapNotNull null
+                    ActiveChatConversation(
+                        character = char,
+                        lastMessage = latest,
+                        messageCount = charMessages.size,
+                    )
+                }
+                .sortedByDescending { it.lastMessage.timestamp }
+        }
 
     /** Insère les personnages de démonstration si la base est vide (premier lancement). */
     suspend fun seedSampleCharactersIfEmpty() {
@@ -770,3 +792,13 @@ private object SampleCharacters {
         ),
     )
 }
+
+/**
+ * Représente une conversation en cours avec un personnage, incluant le dernier message
+ * échangé et le nombre total de messages, pour l'affichage dans l'onglet « Conversations ».
+ */
+data class ActiveChatConversation(
+    val character: CharacterEntity,
+    val lastMessage: ChatMessageEntity,
+    val messageCount: Int,
+)

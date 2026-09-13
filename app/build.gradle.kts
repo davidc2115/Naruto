@@ -35,7 +35,7 @@ android {
         minSdk = 28
         targetSdk = 36
         val propVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull()
-        val finalVersionCode = propVersionCode ?: 104
+        val finalVersionCode = propVersionCode ?: 105
         versionCode = finalVersionCode
         versionName = "0.2.$finalVersionCode"
 

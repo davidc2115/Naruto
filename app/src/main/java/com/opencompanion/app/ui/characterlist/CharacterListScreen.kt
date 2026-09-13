@@ -14,13 +14,16 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
@@ -45,6 +48,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
@@ -68,7 +75,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.opencompanion.app.data.ActiveChatConversation
 import com.opencompanion.app.data.CharacterEntity
+import com.opencompanion.app.data.MessageRole
 import com.opencompanion.app.data.resolveCharacterPlaceholders
 import com.opencompanion.app.ui.components.CharacterAvatar
 import com.opencompanion.app.ui.theme.BrandGradient
@@ -98,6 +107,8 @@ fun CharacterListScreen(
     val selectedTag by viewModel.selectedTag.collectAsState()
     val popularTags by viewModel.popularTags.collectAsState()
     val importMessage by viewModel.importMessage.collectAsState()
+    val activeChats by viewModel.activeChats.collectAsState()
+    val currentTab by viewModel.currentTab.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var menuExpanded by remember { mutableStateOf(false) }
@@ -126,7 +137,7 @@ fun CharacterListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Mes personnages",
+                        if (currentTab == HomeTab.DISCOVERY) "Explorer (${allCharacters.size})" else "Conversations (${activeChats.size})",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
@@ -144,78 +155,113 @@ fun CharacterListScreen(
                 ),
             )
         },
+        bottomBar = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ) {
+                NavigationBarItem(
+                    selected = currentTab == HomeTab.DISCOVERY,
+                    onClick = { viewModel.selectTab(HomeTab.DISCOVERY) },
+                    icon = { Icon(Icons.Filled.AutoAwesome, contentDescription = "Personnages") },
+                    label = { Text("Personnages") },
+                )
+                NavigationBarItem(
+                    selected = currentTab == HomeTab.CHATS,
+                    onClick = { viewModel.selectTab(HomeTab.CHATS) },
+                    icon = {
+                        if (activeChats.isNotEmpty()) {
+                            BadgedBox(badge = { Badge { Text("${activeChats.size}") } }) {
+                                Icon(Icons.AutoMirrored.Filled.Message, contentDescription = "Chats")
+                            }
+                        } else {
+                            Icon(Icons.AutoMirrored.Filled.Message, contentDescription = "Chats")
+                        }
+                    },
+                    label = { Text("Chats") },
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = onOpenSettings,
+                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Réglages") },
+                    label = { Text("Réglages") },
+                )
+            }
+        },
         floatingActionButton = {
-            Box {
-                FloatingActionButton(
-                    onClick = { menuExpanded = true },
-                    containerColor = Color.Transparent,
-                    elevation = FloatingActionButtonDefaultsElevation(),
-                    modifier = Modifier.background(BrandGradient, shape = RoundedCornerShape(16.dp)),
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Nouveau", tint = Color.White)
-                }
-                DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text("Créer un personnage") },
-                        leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                        onClick = { menuExpanded = false; onCreateCharacter() },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Importer un fichier (.png / .json)") },
-                        leadingIcon = { Icon(Icons.Filled.FileUpload, contentDescription = null) },
-                        onClick = {
-                            menuExpanded = false
-                            // "application/octet-stream" en plus des types attendus : de nombreux
-                            // gestionnaires de fichiers / fournisseurs de documents annoncent ce
-                            // type générique pour un .png ou .json dont l'origine ne renseigne pas
-                            // le vrai type MIME (fichier extrait d'une archive, sans extension,
-                            // etc.) — sans lui, ces fichiers pourtant valides étaient invisibles
-                            // dans le sélecteur. Le contenu réel est de toute façon revérifié dans
-                            // CharacterImportManager (signature PNG / premier caractère '{').
-                            filePicker.launch(
-                                arrayOf(
-                                    "image/png",
-                                    "application/json",
-                                    "text/plain",
-                                    "application/octet-stream",
-                                ),
-                            )
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Importer plusieurs fiches (.png / .json)") },
-                        leadingIcon = { Icon(Icons.Filled.FileUpload, contentDescription = null) },
-                        onClick = {
-                            menuExpanded = false
-                            multiFilePicker.launch(
-                                arrayOf(
-                                    "image/png",
-                                    "application/json",
-                                    "text/plain",
-                                    "application/octet-stream",
-                                ),
-                            )
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Importer depuis une URL") },
-                        leadingIcon = { Icon(Icons.Filled.Link, contentDescription = null) },
-                        onClick = { menuExpanded = false; showUrlDialog = true },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Parcourir un site pour importer") },
-                        leadingIcon = { Icon(Icons.Filled.Language, contentDescription = null) },
-                        onClick = { menuExpanded = false; onBrowseImport() },
-                    )
+            if (currentTab == HomeTab.DISCOVERY) {
+                Box {
+                    FloatingActionButton(
+                        onClick = { menuExpanded = true },
+                        containerColor = Color.Transparent,
+                        elevation = FloatingActionButtonDefaultsElevation(),
+                        modifier = Modifier.background(BrandGradient, shape = RoundedCornerShape(16.dp)),
+                    ) {
+                        Icon(Icons.Filled.Add, contentDescription = "Nouveau", tint = Color.White)
+                    }
+                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Créer un personnage") },
+                            leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                            onClick = { menuExpanded = false; onCreateCharacter() },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Importer un fichier (.png / .json)") },
+                            leadingIcon = { Icon(Icons.Filled.FileUpload, contentDescription = null) },
+                            onClick = {
+                                menuExpanded = false
+                                filePicker.launch(
+                                    arrayOf(
+                                        "image/png",
+                                        "application/json",
+                                        "text/plain",
+                                        "application/octet-stream",
+                                    ),
+                                )
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Importer plusieurs fiches (.png / .json)") },
+                            leadingIcon = { Icon(Icons.Filled.FileUpload, contentDescription = null) },
+                            onClick = {
+                                menuExpanded = false
+                                multiFilePicker.launch(
+                                    arrayOf(
+                                        "image/png",
+                                        "application/json",
+                                        "text/plain",
+                                        "application/octet-stream",
+                                    ),
+                                )
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Importer depuis une URL") },
+                            leadingIcon = { Icon(Icons.Filled.Link, contentDescription = null) },
+                            onClick = { menuExpanded = false; showUrlDialog = true },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Parcourir un site pour importer") },
+                            leadingIcon = { Icon(Icons.Filled.Language, contentDescription = null) },
+                            onClick = { menuExpanded = false; onBrowseImport() },
+                        )
+                    }
                 }
             }
         },
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-        ) {
+        if (currentTab == HomeTab.CHATS) {
+            ActiveChatsView(
+                activeChats = activeChats,
+                onOpenChat = onOpenChat,
+                onExploreCharacters = { viewModel.selectTab(HomeTab.DISCOVERY) },
+                modifier = Modifier.padding(padding),
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize(),
+            ) {
             // Barre de recherche
             OutlinedTextField(
                 value = searchQuery,
@@ -318,6 +364,7 @@ fun CharacterListScreen(
                 }
             }
         }
+    }
     }
 
     if (showUrlDialog) {
@@ -525,3 +572,168 @@ private fun UrlImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) 
         dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } },
     )
 }
+
+@Composable
+private fun ActiveChatsView(
+    activeChats: List<ActiveChatConversation>,
+    onOpenChat: (Long) -> Unit,
+    onExploreCharacters: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (activeChats.isEmpty()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                ),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Message,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        "Aucune conversation en cours",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        "Discutez avec n'importe quel personnage pour retrouver vos échanges ici et reprendre votre histoire à tout moment !",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    )
+                    Button(
+                        onClick = onExploreCharacters,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Explorer les personnages")
+                    }
+                }
+            }
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            item {
+                Text(
+                    "Vos discussions actives (${activeChats.size})",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                )
+            }
+            items(activeChats, key = { it.character.id }) { chat ->
+                ActiveChatItem(
+                    chat = chat,
+                    onClick = { onOpenChat(chat.character.id) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActiveChatItem(
+    chat: ActiveChatConversation,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            CharacterAvatar(
+                character = chat.character,
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(14.dp)),
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        chat.character.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        formatRelativeTime(chat.lastMessage.timestamp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Text(
+                    chat.character.description.substringBefore("\n").take(45),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                val senderPrefix = if (chat.lastMessage.role == MessageRole.USER) "Vous : " else ""
+                Text(
+                    senderPrefix + chat.lastMessage.content,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+private fun formatRelativeTime(timestamp: Long): String {
+    val now = System.currentTimeMillis()
+    val diff = now - timestamp
+    val minutes = diff / (60 * 1000)
+    val hours = diff / (60 * 60 * 1000)
+    val days = diff / (24 * 60 * 60 * 1000)
+    return when {
+        minutes < 1 -> "À l'instant"
+        minutes < 60 -> "${minutes}m"
+        hours < 24 -> "${hours}h"
+        days == 1L -> "Hier"
+        else -> "${days}j"
+    }
+}
+

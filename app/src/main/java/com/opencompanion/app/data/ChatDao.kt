@@ -10,6 +10,9 @@ interface ChatDao {
     @Query("SELECT * FROM chat_messages WHERE characterId = :characterId ORDER BY timestamp ASC")
     fun observeMessages(characterId: Long): Flow<List<ChatMessageEntity>>
 
+    @Query("SELECT * FROM chat_messages ORDER BY timestamp DESC")
+    fun observeAllMessages(): Flow<List<ChatMessageEntity>>
+
     @Query("SELECT * FROM chat_messages WHERE characterId = :characterId ORDER BY timestamp ASC")
     suspend fun getMessages(characterId: Long): List<ChatMessageEntity>
 
