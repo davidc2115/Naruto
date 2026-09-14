@@ -40,7 +40,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Tendre, Protection, Orage, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valerie_mercier.jpg\", \"asset:///avatars/valerie_mercier_sexy.jpg\", \"asset:///avatars/valerie_mercier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valerie_mercier.jpg\", \"asset:///avatars/valerie_mercier_sexy.jpg\", \"asset:///avatars/valerie_mercier_intime.jpg\", \"asset:///avatars/valerie_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sylvie Fontaine",
@@ -53,7 +53,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Littérature, Vin, Confidences, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sylvie_fontaine.jpg\", \"asset:///avatars/sylvie_fontaine_sexy.jpg\", \"asset:///avatars/sylvie_fontaine_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sylvie_fontaine.jpg\", \"asset:///avatars/sylvie_fontaine_sexy.jpg\", \"asset:///avatars/sylvie_fontaine_intime.jpg\", \"asset:///avatars/sylvie_fontaine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice Laurent",
@@ -66,7 +66,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Provence, Cuisine, Chaleureuse, Complice, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_laurent.jpg\", \"asset:///avatars/beatrice_laurent_sexy.jpg\", \"asset:///avatars/beatrice_laurent_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_laurent.jpg\", \"asset:///avatars/beatrice_laurent_sexy.jpg\", \"asset:///avatars/beatrice_laurent_intime.jpg\", \"asset:///avatars/beatrice_laurent_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chantal Lambert",
@@ -79,7 +79,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Élégante, Décoratrice, Atelier, Charme, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chantal_lambert.jpg\", \"asset:///avatars/chantal_lambert_sexy.jpg\", \"asset:///avatars/chantal_lambert_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chantal_lambert.jpg\", \"asset:///avatars/chantal_lambert_sexy.jpg\", \"asset:///avatars/chantal_lambert_intime.jpg\", \"asset:///avatars/chantal_lambert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Pascale Richard",
@@ -92,7 +92,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Infirmière, Massage, Fatigue, Vulnérabilité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/pascale_richard.jpg\", \"asset:///avatars/pascale_richard_sexy.jpg\", \"asset:///avatars/pascale_richard_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/pascale_richard.jpg\", \"asset:///avatars/pascale_richard_sexy.jpg\", \"asset:///avatars/pascale_richard_intime.jpg\", \"asset:///avatars/pascale_richard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Martine Blanc",
@@ -105,7 +105,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Aristocratie, Manoir, Autoritaire, Possessive, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/martine_blanc.jpg\", \"asset:///avatars/martine_blanc_sexy.jpg\", \"asset:///avatars/martine_blanc_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/martine_blanc.jpg\", \"asset:///avatars/martine_blanc_sexy.jpg\", \"asset:///avatars/martine_blanc_intime.jpg\", \"asset:///avatars/martine_blanc_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laurence Robin",
@@ -118,7 +118,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Art, Galerie, Champagne, Audace, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laurence_robin.jpg\", \"asset:///avatars/laurence_robin_sexy.jpg\", \"asset:///avatars/laurence_robin_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laurence_robin.jpg\", \"asset:///avatars/laurence_robin_sexy.jpg\", \"asset:///avatars/laurence_robin_intime.jpg\", \"asset:///avatars/laurence_robin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Denise Fournier",
@@ -131,7 +131,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Vin, Bourgogne, Héritage, Luxe, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/denise_fournier.jpg\", \"asset:///avatars/denise_fournier_sexy.jpg\", \"asset:///avatars/denise_fournier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/denise_fournier.jpg\", \"asset:///avatars/denise_fournier_sexy.jpg\", \"asset:///avatars/denise_fournier_intime.jpg\", \"asset:///avatars/denise_fournier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Corinne Petit",
@@ -144,7 +144,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Yoga, Spiritualité, Tactile, Sérénité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/corinne_petit.jpg\", \"asset:///avatars/corinne_petit_sexy.jpg\", \"asset:///avatars/corinne_petit_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/corinne_petit.jpg\", \"asset:///avatars/corinne_petit_sexy.jpg\", \"asset:///avatars/corinne_petit_intime.jpg\", \"asset:///avatars/corinne_petit_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sandrine Marchand",
@@ -157,7 +157,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Photo, Studio, Passion, Regard, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sandrine_marchand.jpg\", \"asset:///avatars/sandrine_marchand_sexy.jpg\", \"asset:///avatars/sandrine_marchand_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sandrine_marchand.jpg\", \"asset:///avatars/sandrine_marchand_sexy.jpg\", \"asset:///avatars/sandrine_marchand_intime.jpg\", \"asset:///avatars/sandrine_marchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Véronique Aubert",
@@ -170,7 +170,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Notaire, Bureau, Double-vie, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/veronique_aubert.jpg\", \"asset:///avatars/veronique_aubert_sexy.jpg\", \"asset:///avatars/veronique_aubert_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/veronique_aubert.jpg\", \"asset:///avatars/veronique_aubert_sexy.jpg\", \"asset:///avatars/veronique_aubert_intime.jpg\", \"asset:///avatars/veronique_aubert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marie-Hélène Colin",
@@ -183,7 +183,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Musique, Piano, Concert, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marie_helene_colin.jpg\", \"asset:///avatars/marie_helene_colin_sexy.jpg\", \"asset:///avatars/marie_helene_colin_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marie_helene_colin.jpg\", \"asset:///avatars/marie_helene_colin_sexy.jpg\", \"asset:///avatars/marie_helene_colin_intime.jpg\", \"asset:///avatars/marie_helene_colin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Brigitte Vidal",
@@ -196,7 +196,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Douceur, Linge, Délaissée, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/brigitte_vidal.jpg\", \"asset:///avatars/brigitte_vidal_sexy.jpg\", \"asset:///avatars/brigitte_vidal_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/brigitte_vidal.jpg\", \"asset:///avatars/brigitte_vidal_sexy.jpg\", \"asset:///avatars/brigitte_vidal_intime.jpg\", \"asset:///avatars/brigitte_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Florence Guérin",
@@ -209,7 +209,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Tennis, Piscine, Sportive, Taquine, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/florence_guerin.jpg\", \"asset:///avatars/florence_guerin_sexy.jpg\", \"asset:///avatars/florence_guerin_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/florence_guerin.jpg\", \"asset:///avatars/florence_guerin_sexy.jpg\", \"asset:///avatars/florence_guerin_intime.jpg\", \"asset:///avatars/florence_guerin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Leroy",
@@ -222,7 +222,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Pharmacie, Soin, Stéthoscope, Battements, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_leroy.jpg\", \"asset:///avatars/nathalie_leroy_sexy.jpg\", \"asset:///avatars/nathalie_leroy_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_leroy.jpg\", \"asset:///avatars/nathalie_leroy_sexy.jpg\", \"asset:///avatars/nathalie_leroy_intime.jpg\", \"asset:///avatars/nathalie_leroy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Carole Caron",
@@ -235,7 +235,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Café, Dimanche, Chaleureuse, Matin, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/carole_caron.jpg\", \"asset:///avatars/carole_caron_sexy.jpg\", \"asset:///avatars/carole_caron_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/carole_caron.jpg\", \"asset:///avatars/carole_caron_sexy.jpg\", \"asset:///avatars/carole_caron_intime.jpg\", \"asset:///avatars/carole_caron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Danielle Lemaire",
@@ -248,7 +248,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Danse, Studio, Souplesse, Posture, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/danielle_lemaire.jpg\", \"asset:///avatars/danielle_lemaire_sexy.jpg\", \"asset:///avatars/danielle_lemaire_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/danielle_lemaire.jpg\", \"asset:///avatars/danielle_lemaire_sexy.jpg\", \"asset:///avatars/danielle_lemaire_intime.jpg\", \"asset:///avatars/danielle_lemaire_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mireille Bouchet",
@@ -261,7 +261,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Antiquaire, Miroir, Vintage, Mystère, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mireille_bouchet.jpg\", \"asset:///avatars/mireille_bouchet_sexy.jpg\", \"asset:///avatars/mireille_bouchet_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mireille_bouchet.jpg\", \"asset:///avatars/mireille_bouchet_sexy.jpg\", \"asset:///avatars/mireille_bouchet_intime.jpg\", \"asset:///avatars/mireille_bouchet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Françoise Denis",
@@ -274,7 +274,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Anniversaire, Douceur, Écoute, Gâteau, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/francoise_denis.jpg\", \"asset:///avatars/francoise_denis_sexy.jpg\", \"asset:///avatars/francoise_denis_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/francoise_denis.jpg\", \"asset:///avatars/francoise_denis_sexy.jpg\", \"asset:///avatars/francoise_denis_intime.jpg\", \"asset:///avatars/francoise_denis_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Hélène Marceau",
@@ -287,7 +287,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Médecin, Soin, Cabinet, Auscultation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/helene_marceau.jpg\", \"asset:///avatars/helene_marceau_sexy.jpg\", \"asset:///avatars/helene_marceau_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/helene_marceau.jpg\", \"asset:///avatars/helene_marceau_sexy.jpg\", \"asset:///avatars/helene_marceau_intime.jpg\", \"asset:///avatars/helene_marceau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Josiane Lambert",
@@ -300,7 +300,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Cuisine, Périgord, Truffe, Gastronomie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/josiane_lambert.jpg\", \"asset:///avatars/josiane_lambert_sexy.jpg\", \"asset:///avatars/josiane_lambert_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/josiane_lambert.jpg\", \"asset:///avatars/josiane_lambert_sexy.jpg\", \"asset:///avatars/josiane_lambert_intime.jpg\", \"asset:///avatars/josiane_lambert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Anne-Sophie Girard",
@@ -313,7 +313,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Avocate, Paris, Champagne, Détente, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/anne_sophie_girard.jpg\", \"asset:///avatars/anne_sophie_girard_sexy.jpg\", \"asset:///avatars/anne_sophie_girard_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/anne_sophie_girard.jpg\", \"asset:///avatars/anne_sophie_girard_sexy.jpg\", \"asset:///avatars/anne_sophie_girard_intime.jpg\", \"asset:///avatars/anne_sophie_girard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Claire Delorme",
@@ -326,7 +326,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Botanique, Serre, Orchidées, Nature, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/claire_delorme.jpg\", \"asset:///avatars/claire_delorme_sexy.jpg\", \"asset:///avatars/claire_delorme_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/claire_delorme.jpg\", \"asset:///avatars/claire_delorme_sexy.jpg\", \"asset:///avatars/claire_delorme_intime.jpg\", \"asset:///avatars/claire_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Monique Tessier",
@@ -339,7 +339,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Banque, Autorité, Contrôle, Trouble, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/monique_tessier.jpg\", \"asset:///avatars/monique_tessier_sexy.jpg\", \"asset:///avatars/monique_tessier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/monique_tessier.jpg\", \"asset:///avatars/monique_tessier_sexy.jpg\", \"asset:///avatars/monique_tessier_intime.jpg\", \"asset:///avatars/monique_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Évelyne Morel",
@@ -352,7 +352,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Parfum, Grasse, Musc, Sensualité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/evelyne_morel.jpg\", \"asset:///avatars/evelyne_morel_sexy.jpg\", \"asset:///avatars/evelyne_morel_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/evelyne_morel.jpg\", \"asset:///avatars/evelyne_morel_sexy.jpg\", \"asset:///avatars/evelyne_morel_intime.jpg\", \"asset:///avatars/evelyne_morel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Claudine Barret",
@@ -365,7 +365,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Théâtre, Scène, Passion, Drame, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/claudine_barret.jpg\", \"asset:///avatars/claudine_barret_sexy.jpg\", \"asset:///avatars/claudine_barret_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/claudine_barret.jpg\", \"asset:///avatars/claudine_barret_sexy.jpg\", \"asset:///avatars/claudine_barret_intime.jpg\", \"asset:///avatars/claudine_barret_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Muriel Renard",
@@ -378,7 +378,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Littérature, Traduction, Romance, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/muriel_renard.jpg\", \"asset:///avatars/muriel_renard_sexy.jpg\", \"asset:///avatars/muriel_renard_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/muriel_renard.jpg\", \"asset:///avatars/muriel_renard_sexy.jpg\", \"asset:///avatars/muriel_renard_intime.jpg\", \"asset:///avatars/muriel_renard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Catherine Vasseur",
@@ -391,7 +391,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Vin, Sommelier, Cave, Accord, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/catherine_vasseur.jpg\", \"asset:///avatars/catherine_vasseur_sexy.jpg\", \"asset:///avatars/catherine_vasseur_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/catherine_vasseur.jpg\", \"asset:///avatars/catherine_vasseur_sexy.jpg\", \"asset:///avatars/catherine_vasseur_intime.jpg\", \"asset:///avatars/catherine_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Patricia Dubois",
@@ -404,7 +404,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Dordogne, Balancelle, Crépuscule, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/patricia_dubois.jpg\", \"asset:///avatars/patricia_dubois_sexy.jpg\", \"asset:///avatars/patricia_dubois_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/patricia_dubois.jpg\", \"asset:///avatars/patricia_dubois_sexy.jpg\", \"asset:///avatars/patricia_dubois_intime.jpg\", \"asset:///avatars/patricia_dubois_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Isabelle Gauthier",
@@ -417,7 +417,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Mère, Famille, Mature, Sculpture, Marbre, Atelier, Art, Anatomie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/isabelle_gauthier.jpg\", \"asset:///avatars/isabelle_gauthier_sexy.jpg\", \"asset:///avatars/isabelle_gauthier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/isabelle_gauthier.jpg\", \"asset:///avatars/isabelle_gauthier_sexy.jpg\", \"asset:///avatars/isabelle_gauthier_intime.jpg\", \"asset:///avatars/isabelle_gauthier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clara Delacroix",
@@ -430,7 +430,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Mannequin, Séduction, Villa, Dressing, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clara_delacroix.jpg\", \"asset:///avatars/clara_delacroix_sexy.jpg\", \"asset:///avatars/clara_delacroix_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clara_delacroix.jpg\", \"asset:///avatars/clara_delacroix_sexy.jpg\", \"asset:///avatars/clara_delacroix_intime.jpg\", \"asset:///avatars/clara_delacroix_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Inès Morales",
@@ -443,7 +443,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Fitness, Sport, Coach, Latina, Musculation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ines_morales.jpg\", \"asset:///avatars/ines_morales_sexy.jpg\", \"asset:///avatars/ines_morales_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ines_morales.jpg\", \"asset:///avatars/ines_morales_sexy.jpg\", \"asset:///avatars/ines_morales_intime.jpg\", \"asset:///avatars/ines_morales_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Léa Marchand",
@@ -456,7 +456,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Étudiante, Droit, Timide, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lea_marchand.jpg\", \"asset:///avatars/lea_marchand_sexy.jpg\", \"asset:///avatars/lea_marchand_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lea_marchand.jpg\", \"asset:///avatars/lea_marchand_sexy.jpg\", \"asset:///avatars/lea_marchand_intime.jpg\", \"asset:///avatars/lea_marchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Roche",
@@ -469,7 +469,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Artiste, Vin, Canapé, Complicité, Âge proche, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_roche.jpg\", \"asset:///avatars/camille_roche_sexy.jpg\", \"asset:///avatars/camille_roche_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_roche.jpg\", \"asset:///avatars/camille_roche_sexy.jpg\", \"asset:///avatars/camille_roche_intime.jpg\", \"asset:///avatars/camille_roche_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Manon Vasseur",
@@ -482,7 +482,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Nuisette, Dentelle, Couloir, Nuit, Provocante, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/manon_vasseur.jpg\", \"asset:///avatars/manon_vasseur_sexy.jpg\", \"asset:///avatars/manon_vasseur_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/manon_vasseur.jpg\", \"asset:///avatars/manon_vasseur_sexy.jpg\", \"asset:///avatars/manon_vasseur_intime.jpg\", \"asset:///avatars/manon_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélissa Garnier",
@@ -495,7 +495,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Champagne, Balcon, Fête, Épicurienne, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melissa_garnier.jpg\", \"asset:///avatars/melissa_garnier_sexy.jpg\", \"asset:///avatars/melissa_garnier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melissa_garnier.jpg\", \"asset:///avatars/melissa_garnier_sexy.jpg\", \"asset:///avatars/melissa_garnier_intime.jpg\", \"asset:///avatars/melissa_garnier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Romane Castan",
@@ -508,7 +508,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Mode, Styliste, Mètre-ruban, Cuir, Provocation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/romane_castan.jpg\", \"asset:///avatars/romane_castan_sexy.jpg\", \"asset:///avatars/romane_castan_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/romane_castan.jpg\", \"asset:///avatars/romane_castan_sexy.jpg\", \"asset:///avatars/romane_castan_intime.jpg\", \"asset:///avatars/romane_castan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Élodie Chauveau",
@@ -521,7 +521,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Expresso, Tailleur, Matin, Contrôle, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elodie_chauveau.jpg\", \"asset:///avatars/elodie_chauveau_sexy.jpg\", \"asset:///avatars/elodie_chauveau_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elodie_chauveau.jpg\", \"asset:///avatars/elodie_chauveau_sexy.jpg\", \"asset:///avatars/elodie_chauveau_intime.jpg\", \"asset:///avatars/elodie_chauveau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Roxane Legrand",
@@ -534,7 +534,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Moto, Garage, Aventure, Sportive, Complice, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/roxane_legrand.jpg\", \"asset:///avatars/roxane_legrand_sexy.jpg\", \"asset:///avatars/roxane_legrand_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/roxane_legrand.jpg\", \"asset:///avatars/roxane_legrand_sexy.jpg\", \"asset:///avatars/roxane_legrand_intime.jpg\", \"asset:///avatars/roxane_legrand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sarah Benali",
@@ -547,7 +547,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Danse, Orientale, Musique, Hanches, Hypnotique, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sarah_benali.jpg\", \"asset:///avatars/sarah_benali_sexy.jpg\", \"asset:///avatars/sarah_benali_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sarah_benali.jpg\", \"asset:///avatars/sarah_benali_sexy.jpg\", \"asset:///avatars/sarah_benali_intime.jpg\", \"asset:///avatars/sarah_benali_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alicia de Montmirail",
@@ -560,7 +560,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Joaillerie, Soie, Orage, Nuit, Aristocratie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alicia_de_montmirail.jpg\", \"asset:///avatars/alicia_de_montmirail_sexy.jpg\", \"asset:///avatars/alicia_de_montmirail_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alicia_de_montmirail.jpg\", \"asset:///avatars/alicia_de_montmirail_sexy.jpg\", \"asset:///avatars/alicia_de_montmirail_intime.jpg\", \"asset:///avatars/alicia_de_montmirail_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tatiana Morozov",
@@ -573,7 +573,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Piano, Chopin, Russe, Glace et Feu, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tatiana_morozov.jpg\", \"asset:///avatars/tatiana_morozov_sexy.jpg\", \"asset:///avatars/tatiana_morozov_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tatiana_morozov.jpg\", \"asset:///avatars/tatiana_morozov_sexy.jpg\", \"asset:///avatars/tatiana_morozov_intime.jpg\", \"asset:///avatars/tatiana_morozov_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clémence Vautier",
@@ -586,7 +586,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Jacuzzi, Bikini, Étoiles, Pétillante, Spontanée, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clemence_vautier.jpg\", \"asset:///avatars/clemence_vautier_sexy.jpg\", \"asset:///avatars/clemence_vautier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clemence_vautier.jpg\", \"asset:///avatars/clemence_vautier_sexy.jpg\", \"asset:///avatars/clemence_vautier_intime.jpg\", \"asset:///avatars/clemence_vautier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alix de Montaigu",
@@ -599,7 +599,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Équitation, Bottes, Cuir, Écuries, Autoritaire, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alix_de_montaigu.jpg\", \"asset:///avatars/alix_de_montaigu_sexy.jpg\", \"asset:///avatars/alix_de_montaigu_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alix_de_montaigu.jpg\", \"asset:///avatars/alix_de_montaigu_sexy.jpg\", \"asset:///avatars/alix_de_montaigu_intime.jpg\", \"asset:///avatars/alix_de_montaigu_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Marchal",
@@ -612,7 +612,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Cannes, Côte d'Azur, Immobilier, Terrasse, Mer, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_marchal.jpg\", \"asset:///avatars/sophie_marchal_sexy.jpg\", \"asset:///avatars/sophie_marchal_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_marchal.jpg\", \"asset:///avatars/sophie_marchal_sexy.jpg\", \"asset:///avatars/sophie_marchal_intime.jpg\", \"asset:///avatars/sophie_marchal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jade Valette",
@@ -625,7 +625,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Influenceuse, Vidéo, Vlog, Espiègle, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jade_valette.jpg\", \"asset:///avatars/jade_valette_sexy.jpg\", \"asset:///avatars/jade_valette_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jade_valette.jpg\", \"asset:///avatars/jade_valette_sexy.jpg\", \"asset:///avatars/jade_valette_intime.jpg\", \"asset:///avatars/jade_valette_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Noémie Leroux",
@@ -638,7 +638,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Sommelière, Vin, Réserve, Cuir, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/noemie_leroux.jpg\", \"asset:///avatars/noemie_leroux_sexy.jpg\", \"asset:///avatars/noemie_leroux_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/noemie_leroux.jpg\", \"asset:///avatars/noemie_leroux_sexy.jpg\", \"asset:///avatars/noemie_leroux_intime.jpg\", \"asset:///avatars/noemie_leroux_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Ambre Chevalier",
@@ -651,7 +651,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Radio, Voix, Nuit, Jazz, Confidences, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ambre_chevalier.jpg\", \"asset:///avatars/ambre_chevalier_sexy.jpg\", \"asset:///avatars/ambre_chevalier_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ambre_chevalier.jpg\", \"asset:///avatars/ambre_chevalier_sexy.jpg\", \"asset:///avatars/ambre_chevalier_intime.jpg\", \"asset:///avatars/ambre_chevalier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Océane Brun",
@@ -664,7 +664,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Piscine, Apnée, Maillot, Solaire, Pari, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/oceane_brun.jpg\", \"asset:///avatars/oceane_brun_sexy.jpg\", \"asset:///avatars/oceane_brun_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/oceane_brun.jpg\", \"asset:///avatars/oceane_brun_sexy.jpg\", \"asset:///avatars/oceane_brun_intime.jpg\", \"asset:///avatars/oceane_brun_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Maëva Perrot",
@@ -677,7 +677,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Tango, Danse, Rouge, Étreinte, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/maeva_perrot.jpg\", \"asset:///avatars/maeva_perrot_sexy.jpg\", \"asset:///avatars/maeva_perrot_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/maeva_perrot.jpg\", \"asset:///avatars/maeva_perrot_sexy.jpg\", \"asset:///avatars/maeva_perrot_intime.jpg\", \"asset:///avatars/maeva_perrot_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cassandra Vidal",
@@ -690,7 +690,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Sauna, Spa, Massage, Huile, Chaleur, Détente, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cassandra_vidal.jpg\", \"asset:///avatars/cassandra_vidal_sexy.jpg\", \"asset:///avatars/cassandra_vidal_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cassandra_vidal.jpg\", \"asset:///avatars/cassandra_vidal_sexy.jpg\", \"asset:///avatars/cassandra_vidal_intime.jpg\", \"asset:///avatars/cassandra_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Lou-Ann Faure",
@@ -703,7 +703,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Chocolat, Cuisine, Pâtisserie, Gourmande, Malice, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lou_ann_faure.jpg\", \"asset:///avatars/lou_ann_faure_sexy.jpg\", \"asset:///avatars/lou_ann_faure_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lou_ann_faure.jpg\", \"asset:///avatars/lou_ann_faure_sexy.jpg\", \"asset:///avatars/lou_ann_faure_intime.jpg\", \"asset:///avatars/lou_ann_faure_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Kelly Morin",
@@ -716,7 +716,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Enquête, Journaliste, Vérité, Curieuse, Cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/kelly_morin.jpg\", \"asset:///avatars/kelly_morin_sexy.jpg\", \"asset:///avatars/kelly_morin_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/kelly_morin.jpg\", \"asset:///avatars/kelly_morin_sexy.jpg\", \"asset:///avatars/kelly_morin_intime.jpg\", \"asset:///avatars/kelly_morin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tiffany Germain",
@@ -729,7 +729,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Bar, Cocktails, Nuit, Corset, Provocante, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tiffany_germain.jpg\", \"asset:///avatars/tiffany_germain_sexy.jpg\", \"asset:///avatars/tiffany_germain_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tiffany_germain.jpg\", \"asset:///avatars/tiffany_germain_sexy.jpg\", \"asset:///avatars/tiffany_germain_intime.jpg\", \"asset:///avatars/tiffany_germain_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Stella Bianchi",
@@ -742,7 +742,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Italienne, Milan, Soie, Velours, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/stella_bianchi.jpg\", \"asset:///avatars/stella_bianchi_sexy.jpg\", \"asset:///avatars/stella_bianchi_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/stella_bianchi.jpg\", \"asset:///avatars/stella_bianchi_sexy.jpg\", \"asset:///avatars/stella_bianchi_intime.jpg\", \"asset:///avatars/stella_bianchi_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jennifer Boyer",
@@ -755,7 +755,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Pilote, Uniforme, Tokyo, Commande, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jennifer_boyer.jpg\", \"asset:///avatars/jennifer_boyer_sexy.jpg\", \"asset:///avatars/jennifer_boyer_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jennifer_boyer.jpg\", \"asset:///avatars/jennifer_boyer_sexy.jpg\", \"asset:///avatars/jennifer_boyer_intime.jpg\", \"asset:///avatars/jennifer_boyer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jessica Lemoine",
@@ -768,7 +768,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Aquarelle, Art, Pinceau, Crépuscule, Bohème, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jessica_lemoine.jpg\", \"asset:///avatars/jessica_lemoine_sexy.jpg\", \"asset:///avatars/jessica_lemoine_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jessica_lemoine.jpg\", \"asset:///avatars/jessica_lemoine_sexy.jpg\", \"asset:///avatars/jessica_lemoine_intime.jpg\", \"asset:///avatars/jessica_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Fiona Marchand",
@@ -781,7 +781,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Mer, Corse, Plongée, Néoprène, Solaire, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/fiona_marchand.jpg\", \"asset:///avatars/fiona_marchand_sexy.jpg\", \"asset:///avatars/fiona_marchand_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/fiona_marchand.jpg\", \"asset:///avatars/fiona_marchand_sexy.jpg\", \"asset:///avatars/fiona_marchand_intime.jpg\", \"asset:///avatars/fiona_marchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Samantha Giraud",
@@ -794,7 +794,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Monaco, Yacht, Champagne, Dos-nu, Mer, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/samantha_giraud.jpg\", \"asset:///avatars/samantha_giraud_sexy.jpg\", \"asset:///avatars/samantha_giraud_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/samantha_giraud.jpg\", \"asset:///avatars/samantha_giraud_sexy.jpg\", \"asset:///avatars/samantha_giraud_intime.jpg\", \"asset:///avatars/samantha_giraud_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cindy Renaud",
@@ -807,7 +807,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Jeune, Poker, Cartes, Défi, Jeu, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cindy_renaud.jpg\", \"asset:///avatars/cindy_renaud_sexy.jpg\", \"asset:///avatars/cindy_renaud_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cindy_renaud.jpg\", \"asset:///avatars/cindy_renaud_sexy.jpg\", \"asset:///avatars/cindy_renaud_intime.jpg\", \"asset:///avatars/cindy_renaud_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Caroline Duvall",
@@ -820,7 +820,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Château, Bordeaux, Aristocratie, Chandelier, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/caroline_duvall.jpg\", \"asset:///avatars/caroline_duvall_sexy.jpg\", \"asset:///avatars/caroline_duvall_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/caroline_duvall.jpg\", \"asset:///avatars/caroline_duvall_sexy.jpg\", \"asset:///avatars/caroline_duvall_intime.jpg\", \"asset:///avatars/caroline_duvall_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Estelle Vautrin",
@@ -833,7 +833,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Chirurgien, Beauté, Soie, Nuit, Observation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/estelle_vautrin.jpg\", \"asset:///avatars/estelle_vautrin_sexy.jpg\", \"asset:///avatars/estelle_vautrin_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/estelle_vautrin.jpg\", \"asset:///avatars/estelle_vautrin_sexy.jpg\", \"asset:///avatars/estelle_vautrin_intime.jpg\", \"asset:///avatars/estelle_vautrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Patricia Renard",
@@ -846,7 +846,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Hôtellerie, Bureau, Cuir, Rouge, Pouvoir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/patricia_renard.jpg\", \"asset:///avatars/patricia_renard_sexy.jpg\", \"asset:///avatars/patricia_renard_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/patricia_renard.jpg\", \"asset:///avatars/patricia_renard_sexy.jpg\", \"asset:///avatars/patricia_renard_intime.jpg\", \"asset:///avatars/patricia_renard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laurence Mercier",
@@ -859,7 +859,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Architecte, Plans, Villa, Intimité, Trouble, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laurence_mercier.jpg\", \"asset:///avatars/laurence_mercier_sexy.jpg\", \"asset:///avatars/laurence_mercier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laurence_mercier.jpg\", \"asset:///avatars/laurence_mercier_sexy.jpg\", \"asset:///avatars/laurence_mercier_intime.jpg\", \"asset:///avatars/laurence_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sabine Le Gall",
@@ -872,7 +872,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Haras, Normandie, Chevaux, Tweed, Nature, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sabine_le_gall.jpg\", \"asset:///avatars/sabine_le_gall_sexy.jpg\", \"asset:///avatars/sabine_le_gall_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sabine_le_gall.jpg\", \"asset:///avatars/sabine_le_gall_sexy.jpg\", \"asset:///avatars/sabine_le_gall_intime.jpg\", \"asset:///avatars/sabine_le_gall_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Audrey Caron",
@@ -885,7 +885,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Danse, Cabaret, Jazz, Sensuelle, Cambrure, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/audrey_caron.jpg\", \"asset:///avatars/audrey_caron_sexy.jpg\", \"asset:///avatars/audrey_caron_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/audrey_caron.jpg\", \"asset:///avatars/audrey_caron_sexy.jpg\", \"asset:///avatars/audrey_caron_intime.jpg\", \"asset:///avatars/audrey_caron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nadine Boucher",
@@ -898,7 +898,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Clinique, Médecin, Pluie, Dimanche, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nadine_boucher.jpg\", \"asset:///avatars/nadine_boucher_sexy.jpg\", \"asset:///avatars/nadine_boucher_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nadine_boucher.jpg\", \"asset:///avatars/nadine_boucher_sexy.jpg\", \"asset:///avatars/nadine_boucher_intime.jpg\", \"asset:///avatars/nadine_boucher_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Muriel Faure",
@@ -911,7 +911,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Droit, Sorbonne, Débat, Tentation, Soie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/muriel_faure.jpg\", \"asset:///avatars/muriel_faure_sexy.jpg\", \"asset:///avatars/muriel_faure_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/muriel_faure.jpg\", \"asset:///avatars/muriel_faure_sexy.jpg\", \"asset:///avatars/muriel_faure_intime.jpg\", \"asset:///avatars/muriel_faure_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Isabelle Guérin",
@@ -924,7 +924,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Gastronomie, Gourmande, Miel, Vin, Épicurienne, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/isabelle_guerin.jpg\", \"asset:///avatars/isabelle_guerin_sexy.jpg\", \"asset:///avatars/isabelle_guerin_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/isabelle_guerin.jpg\", \"asset:///avatars/isabelle_guerin_sexy.jpg\", \"asset:///avatars/isabelle_guerin_intime.jpg\", \"asset:///avatars/isabelle_guerin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sylvie Blondel",
@@ -937,7 +937,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Cinéma, Casting, Écran, Charisme, Artiste, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sylvie_blondel.jpg\", \"asset:///avatars/sylvie_blondel_sexy.jpg\", \"asset:///avatars/sylvie_blondel_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sylvie_blondel.jpg\", \"asset:///avatars/sylvie_blondel_sexy.jpg\", \"asset:///avatars/sylvie_blondel_intime.jpg\", \"asset:///avatars/sylvie_blondel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Véronique Sorel",
@@ -950,7 +950,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Joaillerie, Vendôme, Saphir, Miroir, Boudoir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/veronique_sorel.jpg\", \"asset:///avatars/veronique_sorel_sexy.jpg\", \"asset:///avatars/veronique_sorel_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/veronique_sorel.jpg\", \"asset:///avatars/veronique_sorel_sexy.jpg\", \"asset:///avatars/veronique_sorel_intime.jpg\", \"asset:///avatars/veronique_sorel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Céline Tanguy",
@@ -963,7 +963,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Laboratoire, Phéromones, Cosmétique, Massage, Science, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/celine_tanguy.jpg\", \"asset:///avatars/celine_tanguy_sexy.jpg\", \"asset:///avatars/celine_tanguy_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/celine_tanguy.jpg\", \"asset:///avatars/celine_tanguy_sexy.jpg\", \"asset:///avatars/celine_tanguy_intime.jpg\", \"asset:///avatars/celine_tanguy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Brigitte Lamy",
@@ -976,7 +976,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Golf, Côte d'Azur, Sport, Voiturette, Soleil, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/brigitte_lamy.jpg\", \"asset:///avatars/brigitte_lamy_sexy.jpg\", \"asset:///avatars/brigitte_lamy_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/brigitte_lamy.jpg\", \"asset:///avatars/brigitte_lamy_sexy.jpg\", \"asset:///avatars/brigitte_lamy_intime.jpg\", \"asset:///avatars/brigitte_lamy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Christine Veyron",
@@ -989,7 +989,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Art, Contemporain, Conventions, Galerie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/christine_veyron.jpg\", \"asset:///avatars/christine_veyron_sexy.jpg\", \"asset:///avatars/christine_veyron_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/christine_veyron.jpg\", \"asset:///avatars/christine_veyron_sexy.jpg\", \"asset:///avatars/christine_veyron_intime.jpg\", \"asset:///avatars/christine_veyron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Diane Colbert",
@@ -1002,7 +1002,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Scénographe, Soie, Coussins, Décor, Romance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/diane_colbert.jpg\", \"asset:///avatars/diane_colbert_sexy.jpg\", \"asset:///avatars/diane_colbert_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/diane_colbert.jpg\", \"asset:///avatars/diane_colbert_sexy.jpg\", \"asset:///avatars/diane_colbert_intime.jpg\", \"asset:///avatars/diane_colbert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Éléonore de Saint-Ange",
@@ -1015,7 +1015,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Château, Loire, Roseraie, Velours, Aristocrate, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/eleonore_de_saint_ange.jpg\", \"asset:///avatars/eleonore_de_saint_ange_sexy.jpg\", \"asset:///avatars/eleonore_de_saint_ange_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/eleonore_de_saint_ange.jpg\", \"asset:///avatars/eleonore_de_saint_ange_sexy.jpg\", \"asset:///avatars/eleonore_de_saint_ange_intime.jpg\", \"asset:///avatars/eleonore_de_saint_ange_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice de La Tour",
@@ -1028,7 +1028,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Politique, Pouvoir, Lâcher-prise, Tailleur, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_de_la_tour.jpg\", \"asset:///avatars/beatrice_de_la_tour_sexy.jpg\", \"asset:///avatars/beatrice_de_la_tour_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_de_la_tour.jpg\", \"asset:///avatars/beatrice_de_la_tour_sexy.jpg\", \"asset:///avatars/beatrice_de_la_tour_intime.jpg\", \"asset:///avatars/beatrice_de_la_tour_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Geneviève Castillon",
@@ -1041,7 +1041,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Cheminée, Hiver, Plaid, Lecture, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/genevieve_castillon.jpg\", \"asset:///avatars/genevieve_castillon_sexy.jpg\", \"asset:///avatars/genevieve_castillon_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/genevieve_castillon.jpg\", \"asset:///avatars/genevieve_castillon_sexy.jpg\", \"asset:///avatars/genevieve_castillon_intime.jpg\", \"asset:///avatars/genevieve_castillon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Armelle Guichard",
@@ -1054,7 +1054,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Couture, Mode, Paris, Atelier, Muse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/armelle_guichard.jpg\", \"asset:///avatars/armelle_guichard_sexy.jpg\", \"asset:///avatars/armelle_guichard_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/armelle_guichard.jpg\", \"asset:///avatars/armelle_guichard_sexy.jpg\", \"asset:///avatars/armelle_guichard_intime.jpg\", \"asset:///avatars/armelle_guichard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Fabienne Monnier",
@@ -1067,7 +1067,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Provence, Vigne, Rosé, Soleil, Chaleur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/fabienne_monnier.jpg\", \"asset:///avatars/fabienne_monnier_sexy.jpg\", \"asset:///avatars/fabienne_monnier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/fabienne_monnier.jpg\", \"asset:///avatars/fabienne_monnier_sexy.jpg\", \"asset:///avatars/fabienne_monnier_intime.jpg\", \"asset:///avatars/fabienne_monnier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Ghislaine Barreau",
@@ -1080,7 +1080,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Musique, Clavecin, Baroque, Tension, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ghislaine_barreau.jpg\", \"asset:///avatars/ghislaine_barreau_sexy.jpg\", \"asset:///avatars/ghislaine_barreau_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ghislaine_barreau.jpg\", \"asset:///avatars/ghislaine_barreau_sexy.jpg\", \"asset:///avatars/ghislaine_barreau_intime.jpg\", \"asset:///avatars/ghislaine_barreau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Annick Prévost",
@@ -1093,7 +1093,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Voyage, Santorin, Grèce, Évasion, Aventure, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/annick_prevost.jpg\", \"asset:///avatars/annick_prevost_sexy.jpg\", \"asset:///avatars/annick_prevost_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/annick_prevost.jpg\", \"asset:///avatars/annick_prevost_sexy.jpg\", \"asset:///avatars/annick_prevost_intime.jpg\", \"asset:///avatars/annick_prevost_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Colette Voisin",
@@ -1106,7 +1106,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Restauration, Art, Musée, Précision, Beauté, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/colette_voisin.jpg\", \"asset:///avatars/colette_voisin_sexy.jpg\", \"asset:///avatars/colette_voisin_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/colette_voisin.jpg\", \"asset:///avatars/colette_voisin_sexy.jpg\", \"asset:///avatars/colette_voisin_intime.jpg\", \"asset:///avatars/colette_voisin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Maryse Lefort",
@@ -1119,7 +1119,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Médecin, Pédiatre, Réconfort, Cachemire, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/maryse_lefort.jpg\", \"asset:///avatars/maryse_lefort_sexy.jpg\", \"asset:///avatars/maryse_lefort_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/maryse_lefort.jpg\", \"asset:///avatars/maryse_lefort_sexy.jpg\", \"asset:///avatars/maryse_lefort_intime.jpg\", \"asset:///avatars/maryse_lefort_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chantal Dumont",
@@ -1132,7 +1132,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Gala, Deauville, Robe, Bijoux, Mondaine, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chantal_dumont.jpg\", \"asset:///avatars/chantal_dumont_sexy.jpg\", \"asset:///avatars/chantal_dumont_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chantal_dumont.jpg\", \"asset:///avatars/chantal_dumont_sexy.jpg\", \"asset:///avatars/chantal_dumont_intime.jpg\", \"asset:///avatars/chantal_dumont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Roselyne Caron",
@@ -1145,7 +1145,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Édition, Littérature, Manuscrits, Lettre, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/roselyne_caron.jpg\", \"asset:///avatars/roselyne_caron_sexy.jpg\", \"asset:///avatars/roselyne_caron_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/roselyne_caron.jpg\", \"asset:///avatars/roselyne_caron_sexy.jpg\", \"asset:///avatars/roselyne_caron_intime.jpg\", \"asset:///avatars/roselyne_caron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Michèle Aubry",
@@ -1158,7 +1158,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Quercy, Truffe, Terroir, Passion, Nature, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/michele_aubry.jpg\", \"asset:///avatars/michele_aubry_sexy.jpg\", \"asset:///avatars/michele_aubry_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/michele_aubry.jpg\", \"asset:///avatars/michele_aubry_sexy.jpg\", \"asset:///avatars/michele_aubry_intime.jpg\", \"asset:///avatars/michele_aubry_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Viviane Boucher",
@@ -1171,7 +1171,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Yoga, Zen, Souffle, Énergie, Matin, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/viviane_boucher.jpg\", \"asset:///avatars/viviane_boucher_sexy.jpg\", \"asset:///avatars/viviane_boucher_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/viviane_boucher.jpg\", \"asset:///avatars/viviane_boucher_sexy.jpg\", \"asset:///avatars/viviane_boucher_intime.jpg\", \"asset:///avatars/viviane_boucher_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Francine Delmas",
@@ -1184,7 +1184,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Musée, Rodin, Sculpture, Histoire, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/francine_delmas.jpg\", \"asset:///avatars/francine_delmas_sexy.jpg\", \"asset:///avatars/francine_delmas_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/francine_delmas.jpg\", \"asset:///avatars/francine_delmas_sexy.jpg\", \"asset:///avatars/francine_delmas_intime.jpg\", \"asset:///avatars/francine_delmas_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nicole Gaillard",
@@ -1197,7 +1197,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Mature, Beaune, Bourgogne, Vin, Cave, Cristal, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nicole_gaillard.jpg\", \"asset:///avatars/nicole_gaillard_sexy.jpg\", \"asset:///avatars/nicole_gaillard_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nicole_gaillard.jpg\", \"asset:///avatars/nicole_gaillard_sexy.jpg\", \"asset:///avatars/nicole_gaillard_intime.jpg\", \"asset:///avatars/nicole_gaillard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Morgane Delattre",
@@ -1210,7 +1210,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Séduction, Piscine, Week-end, Provocation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/morgane_delattre.jpg\", \"asset:///avatars/morgane_delattre_sexy.jpg\", \"asset:///avatars/morgane_delattre_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/morgane_delattre.jpg\", \"asset:///avatars/morgane_delattre_sexy.jpg\", \"asset:///avatars/morgane_delattre_intime.jpg\", \"asset:///avatars/morgane_delattre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Vanessa Giraud",
@@ -1223,7 +1223,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Confidente, Psychologie, Intuition, Thé, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/vanessa_giraud.jpg\", \"asset:///avatars/vanessa_giraud_sexy.jpg\", \"asset:///avatars/vanessa_giraud_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/vanessa_giraud.jpg\", \"asset:///avatars/vanessa_giraud_sexy.jpg\", \"asset:///avatars/vanessa_giraud_intime.jpg\", \"asset:///avatars/vanessa_giraud_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marion Vernier",
@@ -1236,7 +1236,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Architecte, Chambre, Lit, Rénovation, Audace, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marion_vernier.jpg\", \"asset:///avatars/marion_vernier_sexy.jpg\", \"asset:///avatars/marion_vernier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marion_vernier.jpg\", \"asset:///avatars/marion_vernier_sexy.jpg\", \"asset:///avatars/marion_vernier_intime.jpg\", \"asset:///avatars/marion_vernier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Élisabeth Faure",
@@ -1249,7 +1249,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Notaire, Voiture, Nuit, Secret, Bourgeoise, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elisabeth_faure.jpg\", \"asset:///avatars/elisabeth_faure_sexy.jpg\", \"asset:///avatars/elisabeth_faure_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elisabeth_faure.jpg\", \"asset:///avatars/elisabeth_faure_sexy.jpg\", \"asset:///avatars/elisabeth_faure_intime.jpg\", \"asset:///avatars/elisabeth_faure_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Karine Tessier",
@@ -1262,7 +1262,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Yoga, Jardin, Zen, Tactile, Énergie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/karine_tessier.jpg\", \"asset:///avatars/karine_tessier_sexy.jpg\", \"asset:///avatars/karine_tessier_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/karine_tessier.jpg\", \"asset:///avatars/karine_tessier_sexy.jpg\", \"asset:///avatars/karine_tessier_intime.jpg\", \"asset:///avatars/karine_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sandrine Boivin",
@@ -1275,7 +1275,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Cuisine, Tarte, Enfance, Gourmande, Nostalgie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sandrine_boivin.jpg\", \"asset:///avatars/sandrine_boivin_sexy.jpg\", \"asset:///avatars/sandrine_boivin_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sandrine_boivin.jpg\", \"asset:///avatars/sandrine_boivin_sexy.jpg\", \"asset:///avatars/sandrine_boivin_intime.jpg\", \"asset:///avatars/sandrine_boivin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Castelnau",
@@ -1288,7 +1288,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Tennis, Sportive, Défi, Vestiaire, Compétitive, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_castelnau.jpg\", \"asset:///avatars/julie_castelnau_sexy.jpg\", \"asset:///avatars/julie_castelnau_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_castelnau.jpg\", \"asset:///avatars/julie_castelnau_sexy.jpg\", \"asset:///avatars/julie_castelnau_intime.jpg\", \"asset:///avatars/julie_castelnau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Anne-Laure Meunier",
@@ -1301,7 +1301,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Vin, Cave, Sommelière, Dégustation, Cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/anne_laure_meunier.jpg\", \"asset:///avatars/anne_laure_meunier_sexy.jpg\", \"asset:///avatars/anne_laure_meunier_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/anne_laure_meunier.jpg\", \"asset:///avatars/anne_laure_meunier_sexy.jpg\", \"asset:///avatars/anne_laure_meunier_intime.jpg\", \"asset:///avatars/anne_laure_meunier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sonia Khelifi",
@@ -1314,7 +1314,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Danse, Rythme, Studio, Dentelle, Fusion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sonia_khelifi.jpg\", \"asset:///avatars/sonia_khelifi_sexy.jpg\", \"asset:///avatars/sonia_khelifi_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sonia_khelifi.jpg\", \"asset:///avatars/sonia_khelifi_sexy.jpg\", \"asset:///avatars/sonia_khelifi_intime.jpg\", \"asset:///avatars/sonia_khelifi_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice Dumas",
@@ -1327,7 +1327,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Vacances, Massage, Crème, Épaules, Chaleur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_dumas.jpg\", \"asset:///avatars/beatrice_dumas_sexy.jpg\", \"asset:///avatars/beatrice_dumas_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_dumas.jpg\", \"asset:///avatars/beatrice_dumas_sexy.jpg\", \"asset:///avatars/beatrice_dumas_intime.jpg\", \"asset:///avatars/beatrice_dumas_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Pauline Roy",
@@ -1340,7 +1340,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Photographe, Studio, Contre-jour, Objectif, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/pauline_roy.jpg\", \"asset:///avatars/pauline_roy_sexy.jpg\", \"asset:///avatars/pauline_roy_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/pauline_roy.jpg\", \"asset:///avatars/pauline_roy_sexy.jpg\", \"asset:///avatars/pauline_roy_intime.jpg\", \"asset:///avatars/pauline_roy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Catherine Vilar",
@@ -1353,7 +1353,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Nuit, Terrasse, Manoir, Lune, Aristocratie, Cachemire, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/catherine_vilar.jpg\", \"asset:///avatars/catherine_vilar_sexy.jpg\", \"asset:///avatars/catherine_vilar_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/catherine_vilar.jpg\", \"asset:///avatars/catherine_vilar_sexy.jpg\", \"asset:///avatars/catherine_vilar_intime.jpg\", \"asset:///avatars/catherine_vilar_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Lefèvre",
@@ -1366,7 +1366,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Lingerie, Dentelle, Boutique, Nuit, Complice, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_lefevre.jpg\", \"asset:///avatars/sophie_lefevre_sexy.jpg\", \"asset:///avatars/sophie_lefevre_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_lefevre.jpg\", \"asset:///avatars/sophie_lefevre_sexy.jpg\", \"asset:///avatars/sophie_lefevre_intime.jpg\", \"asset:///avatars/sophie_lefevre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Charlotte Brémont",
@@ -1379,7 +1379,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Livres, Manuscrit, Passion, Intellectuelle, Lunettes, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/charlotte_bremont.jpg\", \"asset:///avatars/charlotte_bremont_sexy.jpg\", \"asset:///avatars/charlotte_bremont_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/charlotte_bremont.jpg\", \"asset:///avatars/charlotte_bremont_sexy.jpg\", \"asset:///avatars/charlotte_bremont_intime.jpg\", \"asset:///avatars/charlotte_bremont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Odile Charpentier",
@@ -1392,7 +1392,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Équitation, Cuir, Haras, Directe, Puissance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/odile_charpentier.jpg\", \"asset:///avatars/odile_charpentier_sexy.jpg\", \"asset:///avatars/odile_charpentier_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/odile_charpentier.jpg\", \"asset:///avatars/odile_charpentier_sexy.jpg\", \"asset:///avatars/odile_charpentier_intime.jpg\", \"asset:///avatars/odile_charpentier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Valérie Courtin",
@@ -1405,7 +1405,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Bijoux, Joaillerie, Métal, Atelier, Contact, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valerie_courtin.jpg\", \"asset:///avatars/valerie_courtin_sexy.jpg\", \"asset:///avatars/valerie_courtin_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valerie_courtin.jpg\", \"asset:///avatars/valerie_courtin_sexy.jpg\", \"asset:///avatars/valerie_courtin_intime.jpg\", \"asset:///avatars/valerie_courtin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Christelle Masson",
@@ -1418,7 +1418,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Tango, Danse, Cambrure, Pluie, Guidage, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/christelle_masson.jpg\", \"asset:///avatars/christelle_masson_sexy.jpg\", \"asset:///avatars/christelle_masson_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/christelle_masson.jpg\", \"asset:///avatars/christelle_masson_sexy.jpg\", \"asset:///avatars/christelle_masson_intime.jpg\", \"asset:///avatars/christelle_masson_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sandra Lemarchand",
@@ -1431,7 +1431,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Safari, Aventure, Voyage, Tropiques, Baroudeuse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sandra_lemarchand.jpg\", \"asset:///avatars/sandra_lemarchand_sexy.jpg\", \"asset:///avatars/sandra_lemarchand_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sandra_lemarchand.jpg\", \"asset:///avatars/sandra_lemarchand_sexy.jpg\", \"asset:///avatars/sandra_lemarchand_intime.jpg\", \"asset:///avatars/sandra_lemarchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Séverine Guyot",
@@ -1444,7 +1444,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Botanique, Serre, Orchidée, Parfum, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/severine_guyot.jpg\", \"asset:///avatars/severine_guyot_sexy.jpg\", \"asset:///avatars/severine_guyot_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/severine_guyot.jpg\", \"asset:///avatars/severine_guyot_sexy.jpg\", \"asset:///avatars/severine_guyot_intime.jpg\", \"asset:///avatars/severine_guyot_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Delphine Cordier",
@@ -1457,7 +1457,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Porto, Palace, Parisienne, Soie, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/delphine_cordier.jpg\", \"asset:///avatars/delphine_cordier_sexy.jpg\", \"asset:///avatars/delphine_cordier_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/delphine_cordier.jpg\", \"asset:///avatars/delphine_cordier_sexy.jpg\", \"asset:///avatars/delphine_cordier_intime.jpg\", \"asset:///avatars/delphine_cordier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Magali Rochefort",
@@ -1470,7 +1470,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Théâtre, Scène, Passion, Drame, Projecteur, Velours, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/magali_rochefort.jpg\", \"asset:///avatars/magali_rochefort_sexy.jpg\", \"asset:///avatars/magali_rochefort_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/magali_rochefort.jpg\", \"asset:///avatars/magali_rochefort_sexy.jpg\", \"asset:///avatars/magali_rochefort_intime.jpg\", \"asset:///avatars/magali_rochefort_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Blondeau",
@@ -1483,7 +1483,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Immobilier, Loft, Paris, Nuit, Penthouse, Luxe, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_blondeau.jpg\", \"asset:///avatars/nathalie_blondeau_sexy.jpg\", \"asset:///avatars/nathalie_blondeau_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_blondeau.jpg\", \"asset:///avatars/nathalie_blondeau_sexy.jpg\", \"asset:///avatars/nathalie_blondeau_intime.jpg\", \"asset:///avatars/nathalie_blondeau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Emmanuelle Royer",
@@ -1496,7 +1496,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Piano, Musique, Duo, Romantique, Mousseline, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emmanuelle_royer.jpg\", \"asset:///avatars/emmanuelle_royer_sexy.jpg\", \"asset:///avatars/emmanuelle_royer_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emmanuelle_royer.jpg\", \"asset:///avatars/emmanuelle_royer_sexy.jpg\", \"asset:///avatars/emmanuelle_royer_intime.jpg\", \"asset:///avatars/emmanuelle_royer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Coralie Jacquet",
@@ -1509,7 +1509,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Risotto, Truffe, Bistrot, Cuisine, Gourmandise, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/coralie_jacquet.jpg\", \"asset:///avatars/coralie_jacquet_sexy.jpg\", \"asset:///avatars/coralie_jacquet_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/coralie_jacquet.jpg\", \"asset:///avatars/coralie_jacquet_sexy.jpg\", \"asset:///avatars/coralie_jacquet_intime.jpg\", \"asset:///avatars/coralie_jacquet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Myriam Bertin",
@@ -1522,7 +1522,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de la Mère, Milf, Histoire, Archives, Château, Patrimoine, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/myriam_bertin.jpg\", \"asset:///avatars/myriam_bertin_sexy.jpg\", \"asset:///avatars/myriam_bertin_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/myriam_bertin.jpg\", \"asset:///avatars/myriam_bertin_sexy.jpg\", \"asset:///avatars/myriam_bertin_intime.jpg\", \"asset:///avatars/myriam_bertin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Évelyne Bertrand",
@@ -1535,7 +1535,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Bureau, Tailleur, Secret, Nuit, Pouvoir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/evelyne_bertrand.jpg\", \"asset:///avatars/evelyne_bertrand_sexy.jpg\", \"asset:///avatars/evelyne_bertrand_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/evelyne_bertrand.jpg\", \"asset:///avatars/evelyne_bertrand_sexy.jpg\", \"asset:///avatars/evelyne_bertrand_intime.jpg\", \"asset:///avatars/evelyne_bertrand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mathilde Roussel",
@@ -1548,7 +1548,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Avocate, Procès, Champagne, Bureau, Escarpins, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mathilde_roussel.jpg\", \"asset:///avatars/mathilde_roussel_sexy.jpg\", \"asset:///avatars/mathilde_roussel_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mathilde_roussel.jpg\", \"asset:///avatars/mathilde_roussel_sexy.jpg\", \"asset:///avatars/mathilde_roussel_intime.jpg\", \"asset:///avatars/mathilde_roussel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Carole Vaneck",
@@ -1561,7 +1561,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, RH, Psychologie, Bureau, Charisme, Dossier, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/carole_vaneck.jpg\", \"asset:///avatars/carole_vaneck_sexy.jpg\", \"asset:///avatars/carole_vaneck_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/carole_vaneck.jpg\", \"asset:///avatars/carole_vaneck_sexy.jpg\", \"asset:///avatars/carole_vaneck_intime.jpg\", \"asset:///avatars/carole_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Hélène Boucher",
@@ -1574,7 +1574,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Affaires, Hôtel, Suite, Contrat, Pouvoir, Négociation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/helene_boucher.jpg\", \"asset:///avatars/helene_boucher_sexy.jpg\", \"asset:///avatars/helene_boucher_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/helene_boucher.jpg\", \"asset:///avatars/helene_boucher_sexy.jpg\", \"asset:///avatars/helene_boucher_intime.jpg\", \"asset:///avatars/helene_boucher_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sabrina Meyer",
@@ -1587,7 +1587,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Marketing, Cuir, Écran, Pénombre, Créative, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sabrina_meyer.jpg\", \"asset:///avatars/sabrina_meyer_sexy.jpg\", \"asset:///avatars/sabrina_meyer_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sabrina_meyer.jpg\", \"asset:///avatars/sabrina_meyer_sexy.jpg\", \"asset:///avatars/sabrina_meyer_intime.jpg\", \"asset:///avatars/sabrina_meyer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Astrid Von Berg",
@@ -1600,7 +1600,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Audit, Suisse, Froideur, Rigueur, Archives, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/astrid_von_berg.jpg\", \"asset:///avatars/astrid_von_berg_sexy.jpg\", \"asset:///avatars/astrid_von_berg_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/astrid_von_berg.jpg\", \"asset:///avatars/astrid_von_berg_sexy.jpg\", \"asset:///avatars/astrid_von_berg_intime.jpg\", \"asset:///avatars/astrid_von_berg_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nadia Belkacem",
@@ -1613,7 +1613,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Chantier, Architecte, Pluie, Casque, Forte, Terrain, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nadia_belkacem.jpg\", \"asset:///avatars/nadia_belkacem_sexy.jpg\", \"asset:///avatars/nadia_belkacem_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nadia_belkacem.jpg\", \"asset:///avatars/nadia_belkacem_sexy.jpg\", \"asset:///avatars/nadia_belkacem_intime.jpg\", \"asset:///avatars/nadia_belkacem_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Victoria Sterling",
@@ -1626,7 +1626,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Anglaise, Affaires, Club, Savile Row, Pouvoir, Thé, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/victoria_sterling.jpg\", \"asset:///avatars/victoria_sterling_sexy.jpg\", \"asset:///avatars/victoria_sterling_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/victoria_sterling.jpg\", \"asset:///avatars/victoria_sterling_sexy.jpg\", \"asset:///avatars/victoria_sterling_intime.jpg\", \"asset:///avatars/victoria_sterling_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cécile Maréchal",
@@ -1639,7 +1639,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Juridique, Droit, Contrat, Lunettes, Perles, Négociation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cecile_marechal.jpg\", \"asset:///avatars/cecile_marechal_sexy.jpg\", \"asset:///avatars/cecile_marechal_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cecile_marechal.jpg\", \"asset:///avatars/cecile_marechal_sexy.jpg\", \"asset:///avatars/cecile_marechal_intime.jpg\", \"asset:///avatars/cecile_marechal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laureline Fabre",
@@ -1652,7 +1652,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Commerciale, Aéroport, VIP, Escarpins, Écarlate, Négociation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laureline_fabre.jpg\", \"asset:///avatars/laureline_fabre_sexy.jpg\", \"asset:///avatars/laureline_fabre_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laureline_fabre.jpg\", \"asset:///avatars/laureline_fabre_sexy.jpg\", \"asset:///avatars/laureline_fabre_intime.jpg\", \"asset:///avatars/laureline_fabre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Géraldine Pruvost",
@@ -1665,7 +1665,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Comptable, Chiffres, Minuit, Rigueur, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/geraldine_pruvost.jpg\", \"asset:///avatars/geraldine_pruvost_sexy.jpg\", \"asset:///avatars/geraldine_pruvost_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/geraldine_pruvost.jpg\", \"asset:///avatars/geraldine_pruvost_sexy.jpg\", \"asset:///avatars/geraldine_pruvost_intime.jpg\", \"asset:///avatars/geraldine_pruvost_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Véronique Jamet",
@@ -1678,7 +1678,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Communication, Presse, Conférence, Image, Champagne, Paris, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/veronique_jamet.jpg\", \"asset:///avatars/veronique_jamet_sexy.jpg\", \"asset:///avatars/veronique_jamet_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/veronique_jamet.jpg\", \"asset:///avatars/veronique_jamet_sexy.jpg\", \"asset:///avatars/veronique_jamet_intime.jpg\", \"asset:///avatars/veronique_jamet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Solène Picard",
@@ -1691,7 +1691,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Ingénieure, Laboratoire, Innovation, Brevet, Énergie, Jeune, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/solene_picard.jpg\", \"asset:///avatars/solene_picard_sexy.jpg\", \"asset:///avatars/solene_picard_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/solene_picard.jpg\", \"asset:///avatars/solene_picard_sexy.jpg\", \"asset:///avatars/solene_picard_intime.jpg\", \"asset:///avatars/solene_picard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Chardin",
@@ -1704,7 +1704,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Achats, Défi, Négociation, Bleu roi, Fermeté, Pouvoir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_chardin.jpg\", \"asset:///avatars/nathalie_chardin_sexy.jpg\", \"asset:///avatars/nathalie_chardin_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_chardin.jpg\", \"asset:///avatars/nathalie_chardin_sexy.jpg\", \"asset:///avatars/nathalie_chardin_intime.jpg\", \"asset:///avatars/nathalie_chardin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Dorothée Vasseur",
@@ -1717,7 +1717,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Médecin, Santé, Massage, Trapèzes, Douceur, Soin, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/dorothee_vasseur.jpg\", \"asset:///avatars/dorothee_vasseur_sexy.jpg\", \"asset:///avatars/dorothee_vasseur_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/dorothee_vasseur.jpg\", \"asset:///avatars/dorothee_vasseur_sexy.jpg\", \"asset:///avatars/dorothee_vasseur_intime.jpg\", \"asset:///avatars/dorothee_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alexia Dumoulin",
@@ -1730,7 +1730,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Événementiel, Congrès, Coulisses, Nuit, Robe noire, Détente, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alexia_dumoulin.jpg\", \"asset:///avatars/alexia_dumoulin_sexy.jpg\", \"asset:///avatars/alexia_dumoulin_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alexia_dumoulin.jpg\", \"asset:///avatars/alexia_dumoulin_sexy.jpg\", \"asset:///avatars/alexia_dumoulin_intime.jpg\", \"asset:///avatars/alexia_dumoulin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Constance Vaneau",
@@ -1743,7 +1743,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Londres, City, Juridique, Hermès, Martini, Hôtel, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/constance_vaneau.jpg\", \"asset:///avatars/constance_vaneau_sexy.jpg\", \"asset:///avatars/constance_vaneau_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/constance_vaneau.jpg\", \"asset:///avatars/constance_vaneau_sexy.jpg\", \"asset:///avatars/constance_vaneau_intime.jpg\", \"asset:///avatars/constance_vaneau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Virginie Tessier",
@@ -1756,7 +1756,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Mécénat, Art, Sculpture, Culture, Soie, Émeraude, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/virginie_tessier.jpg\", \"asset:///avatars/virginie_tessier_sexy.jpg\", \"asset:///avatars/virginie_tessier_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/virginie_tessier.jpg\", \"asset:///avatars/virginie_tessier_sexy.jpg\", \"asset:///avatars/virginie_tessier_intime.jpg\", \"asset:///avatars/virginie_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice Langlois",
@@ -1769,7 +1769,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Stratégie, Sociologue, Bibliothèque, Tendances, Authenticité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_langlois.jpg\", \"asset:///avatars/beatrice_langlois_sexy.jpg\", \"asset:///avatars/beatrice_langlois_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_langlois.jpg\", \"asset:///avatars/beatrice_langlois_sexy.jpg\", \"asset:///avatars/beatrice_langlois_intime.jpg\", \"asset:///avatars/beatrice_langlois_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Diane de Saint-Germain",
@@ -1782,7 +1782,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Chasse, Forêt, Armagnac, Domaine, Aristocrate, Cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/diane_de_saint_germain.jpg\", \"asset:///avatars/diane_de_saint_germain_sexy.jpg\", \"asset:///avatars/diane_de_saint_germain_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/diane_de_saint_germain.jpg\", \"asset:///avatars/diane_de_saint_germain_sexy.jpg\", \"asset:///avatars/diane_de_saint_germain_intime.jpg\", \"asset:///avatars/diane_de_saint_germain_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Isabelle Meunier",
@@ -1795,7 +1795,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Banque, Coffre, Fusion, Titres, Pouvoir, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/isabelle_meunier.jpg\", \"asset:///avatars/isabelle_meunier_sexy.jpg\", \"asset:///avatars/isabelle_meunier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/isabelle_meunier.jpg\", \"asset:///avatars/isabelle_meunier_sexy.jpg\", \"asset:///avatars/isabelle_meunier_intime.jpg\", \"asset:///avatars/isabelle_meunier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Dang",
@@ -1808,7 +1808,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Logistique, Asie, Jade, Nuit, Écrans, Cargos, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_dang.jpg\", \"asset:///avatars/sophie_dang_sexy.jpg\", \"asset:///avatars/sophie_dang_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_dang.jpg\", \"asset:///avatars/sophie_dang_sexy.jpg\", \"asset:///avatars/sophie_dang_intime.jpg\", \"asset:///avatars/sophie_dang_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélanie Castillon",
@@ -1821,7 +1821,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Cheffe de cabinet, Agenda, Gala, Moleskine, Champagne, Astuce, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melanie_castillon.jpg\", \"asset:///avatars/melanie_castillon_sexy.jpg\", \"asset:///avatars/melanie_castillon_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melanie_castillon.jpg\", \"asset:///avatars/melanie_castillon_sexy.jpg\", \"asset:///avatars/melanie_castillon_intime.jpg\", \"asset:///avatars/melanie_castillon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Caroline Berthier",
@@ -1834,7 +1834,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Paysagiste, Toit-terrasse, Végétal, Étoiles, Jardin, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/caroline_berthier.jpg\", \"asset:///avatars/caroline_berthier_sexy.jpg\", \"asset:///avatars/caroline_berthier_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/caroline_berthier.jpg\", \"asset:///avatars/caroline_berthier_sexy.jpg\", \"asset:///avatars/caroline_berthier_intime.jpg\", \"asset:///avatars/caroline_berthier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Valérie Guillon",
@@ -1847,7 +1847,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collègue du Père, Diplomate, Bruxelles, Europe, Tailleur, Négociation, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valerie_guillon.jpg\", \"asset:///avatars/valerie_guillon_sexy.jpg\", \"asset:///avatars/valerie_guillon_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valerie_guillon.jpg\", \"asset:///avatars/valerie_guillon_sexy.jpg\", \"asset:///avatars/valerie_guillon_intime.jpg\", \"asset:///avatars/valerie_guillon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chloé Vaneck",
@@ -1860,7 +1860,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Frère, Cuisine, Campagne, Été, Complicité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chloe_vaneck.jpg\", \"asset:///avatars/chloe_vaneck_sexy.jpg\", \"asset:///avatars/chloe_vaneck_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chloe_vaneck.jpg\", \"asset:///avatars/chloe_vaneck_sexy.jpg\", \"asset:///avatars/chloe_vaneck_intime.jpg\", \"asset:///avatars/chloe_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélanie Roux",
@@ -1873,7 +1873,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Terrasse, Cigarette, Crépuscule, Blanche, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melanie_roux.jpg\", \"asset:///avatars/melanie_roux_sexy.jpg\", \"asset:///avatars/melanie_roux_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melanie_roux.jpg\", \"asset:///avatars/melanie_roux_sexy.jpg\", \"asset:///avatars/melanie_roux_intime.jpg\", \"asset:///avatars/melanie_roux_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alice Fontaine",
@@ -1886,7 +1886,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Bibliothèque, Dentelle, Échelle, Douceur, Timide, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alice_fontaine.jpg\", \"asset:///avatars/alice_fontaine_sexy.jpg\", \"asset:///avatars/alice_fontaine_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alice_fontaine.jpg\", \"asset:///avatars/alice_fontaine_sexy.jpg\", \"asset:///avatars/alice_fontaine_intime.jpg\", \"asset:///avatars/alice_fontaine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Romane Vidal",
@@ -1899,7 +1899,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Fitness, Sport, Musculation, Énergie, Tactile, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/romane_vidal.jpg\", \"asset:///avatars/romane_vidal_sexy.jpg\", \"asset:///avatars/romane_vidal_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/romane_vidal.jpg\", \"asset:///avatars/romane_vidal_sexy.jpg\", \"asset:///avatars/romane_vidal_intime.jpg\", \"asset:///avatars/romane_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Lucie Moreau",
@@ -1912,7 +1912,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Massage, Infirmière, Fatigue, Canapé, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lucie_moreau.jpg\", \"asset:///avatars/lucie_moreau_sexy.jpg\", \"asset:///avatars/lucie_moreau_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lucie_moreau.jpg\", \"asset:///avatars/lucie_moreau_sexy.jpg\", \"asset:///avatars/lucie_moreau_intime.jpg\", \"asset:///avatars/lucie_moreau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Emma Gauthier",
@@ -1925,7 +1925,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Avocate, Whisky, Soie, Nuit, Audace, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emma_gauthier.jpg\", \"asset:///avatars/emma_gauthier_sexy.jpg\", \"asset:///avatars/emma_gauthier_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emma_gauthier.jpg\", \"asset:///avatars/emma_gauthier_sexy.jpg\", \"asset:///avatars/emma_gauthier_intime.jpg\", \"asset:///avatars/emma_gauthier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Dorothée Blanc",
@@ -1938,7 +1938,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Voyage, Italie, Tonnelle, Été, Solaire, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/dorothee_blanc.jpg\", \"asset:///avatars/dorothee_blanc_sexy.jpg\", \"asset:///avatars/dorothee_blanc_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/dorothee_blanc.jpg\", \"asset:///avatars/dorothee_blanc_sexy.jpg\", \"asset:///avatars/dorothee_blanc_intime.jpg\", \"asset:///avatars/dorothee_blanc_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clara Vasseur",
@@ -1951,7 +1951,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Architecture, Croquis, Grange, Bohème, Jeune, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clara_vasseur.jpg\", \"asset:///avatars/clara_vasseur_sexy.jpg\", \"asset:///avatars/clara_vasseur_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clara_vasseur.jpg\", \"asset:///avatars/clara_vasseur_sexy.jpg\", \"asset:///avatars/clara_vasseur_intime.jpg\", \"asset:///avatars/clara_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Juliette Perrin",
@@ -1964,7 +1964,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Sommelière, Dégustation, Cave, Arômes, Pénombre, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/juliette_perrin.jpg\", \"asset:///avatars/juliette_perrin_sexy.jpg\", \"asset:///avatars/juliette_perrin_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/juliette_perrin.jpg\", \"asset:///avatars/juliette_perrin_sexy.jpg\", \"asset:///avatars/juliette_perrin_intime.jpg\", \"asset:///avatars/juliette_perrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mathilde Lemoine",
@@ -1977,7 +1977,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Musique, Violoncelle, Bach, Vibration, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mathilde_lemoine.jpg\", \"asset:///avatars/mathilde_lemoine_sexy.jpg\", \"asset:///avatars/mathilde_lemoine_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mathilde_lemoine.jpg\", \"asset:///avatars/mathilde_lemoine_sexy.jpg\", \"asset:///avatars/mathilde_lemoine_intime.jpg\", \"asset:///avatars/mathilde_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Besson",
@@ -1990,7 +1990,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Art, Galerie, Carmin, Glamour, Provocation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_besson.jpg\", \"asset:///avatars/camille_besson_sexy.jpg\", \"asset:///avatars/camille_besson_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_besson.jpg\", \"asset:///avatars/camille_besson_sexy.jpg\", \"asset:///avatars/camille_besson_intime.jpg\", \"asset:///avatars/camille_besson_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Manon Lefebvre",
@@ -2003,7 +2003,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Mode, Velours, Atelier, Styliste, Complice, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/manon_lefebvre.jpg\", \"asset:///avatars/manon_lefebvre_sexy.jpg\", \"asset:///avatars/manon_lefebvre_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/manon_lefebvre.jpg\", \"asset:///avatars/manon_lefebvre_sexy.jpg\", \"asset:///avatars/manon_lefebvre_intime.jpg\", \"asset:///avatars/manon_lefebvre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sarah Delorme",
@@ -2016,7 +2016,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Enquête, Balcon, Nuit, Secret, Journaliste, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sarah_delorme.jpg\", \"asset:///avatars/sarah_delorme_sexy.jpg\", \"asset:///avatars/sarah_delorme_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sarah_delorme.jpg\", \"asset:///avatars/sarah_delorme_sexy.jpg\", \"asset:///avatars/sarah_delorme_intime.jpg\", \"asset:///avatars/sarah_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Océane Marchand",
@@ -2029,7 +2029,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Piscine, Sport, Solaire, Course, Défi, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/oceane_marchand.jpg\", \"asset:///avatars/oceane_marchand_sexy.jpg\", \"asset:///avatars/oceane_marchand_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/oceane_marchand.jpg\", \"asset:///avatars/oceane_marchand_sexy.jpg\", \"asset:///avatars/oceane_marchand_intime.jpg\", \"asset:///avatars/oceane_marchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Léa Guichard",
@@ -2042,7 +2042,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Pâtisserie, Macaron, Cuisine, Gourmande, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lea_guichard.jpg\", \"asset:///avatars/lea_guichard_sexy.jpg\", \"asset:///avatars/lea_guichard_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lea_guichard.jpg\", \"asset:///avatars/lea_guichard_sexy.jpg\", \"asset:///avatars/lea_guichard_intime.jpg\", \"asset:///avatars/lea_guichard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Charlotte Barret",
@@ -2055,7 +2055,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Vétérinaire, Campagne, Animaux, Laine, Écurie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/charlotte_barret.jpg\", \"asset:///avatars/charlotte_barret_sexy.jpg\", \"asset:///avatars/charlotte_barret_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/charlotte_barret.jpg\", \"asset:///avatars/charlotte_barret_sexy.jpg\", \"asset:///avatars/charlotte_barret_intime.jpg\", \"asset:///avatars/charlotte_barret_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laura Mercier",
@@ -2068,7 +2068,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Danse, Souplesse, Grand écart, Miroir, Contact, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laura_mercier.jpg\", \"asset:///avatars/laura_mercier_sexy.jpg\", \"asset:///avatars/laura_mercier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laura_mercier.jpg\", \"asset:///avatars/laura_mercier_sexy.jpg\", \"asset:///avatars/laura_mercier_intime.jpg\", \"asset:///avatars/laura_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Inès Caron",
@@ -2081,7 +2081,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Flamenco, Espagnol, Guitare, Andalouse, Soleil, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ines_caron.jpg\", \"asset:///avatars/ines_caron_sexy.jpg\", \"asset:///avatars/ines_caron_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ines_caron.jpg\", \"asset:///avatars/ines_caron_sexy.jpg\", \"asset:///avatars/ines_caron_intime.jpg\", \"asset:///avatars/ines_caron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Pauline Duval",
@@ -2094,7 +2094,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Fraises, Potager, Permaculture, Nature, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/pauline_duval.jpg\", \"asset:///avatars/pauline_duval_sexy.jpg\", \"asset:///avatars/pauline_duval_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/pauline_duval.jpg\", \"asset:///avatars/pauline_duval_sexy.jpg\", \"asset:///avatars/pauline_duval_intime.jpg\", \"asset:///avatars/pauline_duval_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marine Girard",
@@ -2107,7 +2107,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Communication, Télétravail, Vin blanc, Canapé, Complicité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marine_girard.jpg\", \"asset:///avatars/marine_girard_sexy.jpg\", \"asset:///avatars/marine_girard_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marine_girard.jpg\", \"asset:///avatars/marine_girard_sexy.jpg\", \"asset:///avatars/marine_girard_intime.jpg\", \"asset:///avatars/marine_girard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cindy Joubert",
@@ -2120,7 +2120,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Cocktails, Bar, Palace, Gingembre, Nuit, Provocation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cindy_joubert.jpg\", \"asset:///avatars/cindy_joubert_sexy.jpg\", \"asset:///avatars/cindy_joubert_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cindy_joubert.jpg\", \"asset:///avatars/cindy_joubert_sexy.jpg\", \"asset:///avatars/cindy_joubert_intime.jpg\", \"asset:///avatars/cindy_joubert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Fabre",
@@ -2133,7 +2133,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Surf, Océan, Landes, Vagues, Soleil, Sauvage, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_fabre.jpg\", \"asset:///avatars/julie_fabre_sexy.jpg\", \"asset:///avatars/julie_fabre_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_fabre.jpg\", \"asset:///avatars/julie_fabre_sexy.jpg\", \"asset:///avatars/julie_fabre_intime.jpg\", \"asset:///avatars/julie_fabre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Audrey Vian",
@@ -2146,7 +2146,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Littérature, Ronsard, Poésie, Bibliothèque, Romance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/audrey_vian.jpg\", \"asset:///avatars/audrey_vian_sexy.jpg\", \"asset:///avatars/audrey_vian_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/audrey_vian.jpg\", \"asset:///avatars/audrey_vian_sexy.jpg\", \"asset:///avatars/audrey_vian_intime.jpg\", \"asset:///avatars/audrey_vian_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jessica Royer",
@@ -2159,7 +2159,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Ostéopathe, Massage, Dos, Tensions, Soin, Tactile, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jessica_royer.jpg\", \"asset:///avatars/jessica_royer_sexy.jpg\", \"asset:///avatars/jessica_royer_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jessica_royer.jpg\", \"asset:///avatars/jessica_royer_sexy.jpg\", \"asset:///avatars/jessica_royer_intime.jpg\", \"asset:///avatars/jessica_royer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marion Castan",
@@ -2172,7 +2172,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Famille, Jazz, Piano, Voix, Satin, Nuit, Chanson, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marion_castan.jpg\", \"asset:///avatars/marion_castan_sexy.jpg\", \"asset:///avatars/marion_castan_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marion_castan.jpg\", \"asset:///avatars/marion_castan_sexy.jpg\", \"asset:///avatars/marion_castan_intime.jpg\", \"asset:///avatars/marion_castan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Aurélie",
@@ -2185,7 +2185,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Voyage, Libre, Câlin, Parfum, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_aurelie.jpg\", \"asset:///avatars/tante_aurelie_sexy.jpg\", \"asset:///avatars/tante_aurelie_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_aurelie.jpg\", \"asset:///avatars/tante_aurelie_sexy.jpg\", \"asset:///avatars/tante_aurelie_intime.jpg\", \"asset:///avatars/tante_aurelie_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Solange",
@@ -2198,7 +2198,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Château, Aristocratie, Perles, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_solange.jpg\", \"asset:///avatars/tante_solange_sexy.jpg\", \"asset:///avatars/tante_solange_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_solange.jpg\", \"asset:///avatars/tante_solange_sexy.jpg\", \"asset:///avatars/tante_solange_intime.jpg\", \"asset:///avatars/tante_solange_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Martine",
@@ -2211,7 +2211,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Littérature, Poésie, Cachemire, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_martine.jpg\", \"asset:///avatars/tante_martine_sexy.jpg\", \"asset:///avatars/tante_martine_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_martine.jpg\", \"asset:///avatars/tante_martine_sexy.jpg\", \"asset:///avatars/tante_martine_intime.jpg\", \"asset:///avatars/tante_martine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Constance",
@@ -2224,7 +2224,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Adoptive, Famille, Peinture, Artiste, Soleil, Torse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_constance.jpg\", \"asset:///avatars/tante_constance_sexy.jpg\", \"asset:///avatars/tante_constance_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_constance.jpg\", \"asset:///avatars/tante_constance_sexy.jpg\", \"asset:///avatars/tante_constance_intime.jpg\", \"asset:///avatars/tante_constance_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Nathalie",
@@ -2237,7 +2237,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Affaires, Bureau, Autorité, Pouvoir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_nathalie.jpg\", \"asset:///avatars/tante_nathalie_sexy.jpg\", \"asset:///avatars/tante_nathalie_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_nathalie.jpg\", \"asset:///avatars/tante_nathalie_sexy.jpg\", \"asset:///avatars/tante_nathalie_intime.jpg\", \"asset:///avatars/tante_nathalie_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Viviane",
@@ -2250,7 +2250,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Piano, Musique, Orage, Velours, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_viviane.jpg\", \"asset:///avatars/tante_viviane_sexy.jpg\", \"asset:///avatars/tante_viviane_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_viviane.jpg\", \"asset:///avatars/tante_viviane_sexy.jpg\", \"asset:///avatars/tante_viviane_intime.jpg\", \"asset:///avatars/tante_viviane_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Monique",
@@ -2263,7 +2263,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Cuisine, Bastide, Terroir, Gourmande, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_monique.jpg\", \"asset:///avatars/tante_monique_sexy.jpg\", \"asset:///avatars/tante_monique_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_monique.jpg\", \"asset:///avatars/tante_monique_sexy.jpg\", \"asset:///avatars/tante_monique_intime.jpg\", \"asset:///avatars/tante_monique_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Claire",
@@ -2276,7 +2276,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Jardin, Confidences, Douceur, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_claire.jpg\", \"asset:///avatars/tante_claire_sexy.jpg\", \"asset:///avatars/tante_claire_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_claire.jpg\", \"asset:///avatars/tante_claire_sexy.jpg\", \"asset:///avatars/tante_claire_intime.jpg\", \"asset:///avatars/tante_claire_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Gisèle",
@@ -2289,7 +2289,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Antiquités, Mystère, Ébène, Pénombre, Tentation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_gisele.jpg\", \"asset:///avatars/tante_gisele_sexy.jpg\", \"asset:///avatars/tante_gisele_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_gisele.jpg\", \"asset:///avatars/tante_gisele_sexy.jpg\", \"asset:///avatars/tante_gisele_intime.jpg\", \"asset:///avatars/tante_gisele_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Béatrice",
@@ -2302,7 +2302,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Danse, Posture, Élégance, Cambrure, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_beatrice.jpg\", \"asset:///avatars/tante_beatrice_sexy.jpg\", \"asset:///avatars/tante_beatrice_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_beatrice.jpg\", \"asset:///avatars/tante_beatrice_sexy.jpg\", \"asset:///avatars/tante_beatrice_intime.jpg\", \"asset:///avatars/tante_beatrice_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Éléonore",
@@ -2315,7 +2315,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Avocate, Vermillon, Champagne, Hôtel, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_eleonore.jpg\", \"asset:///avatars/tante_eleonore_sexy.jpg\", \"asset:///avatars/tante_eleonore_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_eleonore.jpg\", \"asset:///avatars/tante_eleonore_sexy.jpg\", \"asset:///avatars/tante_eleonore_intime.jpg\", \"asset:///avatars/tante_eleonore_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Sylvie",
@@ -2328,7 +2328,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Herboriste, Lavande, Tisane, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_sylvie.jpg\", \"asset:///avatars/tante_sylvie_sexy.jpg\", \"asset:///avatars/tante_sylvie_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_sylvie.jpg\", \"asset:///avatars/tante_sylvie_sexy.jpg\", \"asset:///avatars/tante_sylvie_intime.jpg\", \"asset:///avatars/tante_sylvie_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Christine",
@@ -2341,7 +2341,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Voilier, Mer, Marin, Aventure, Large, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_christine.jpg\", \"asset:///avatars/tante_christine_sexy.jpg\", \"asset:///avatars/tante_christine_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_christine.jpg\", \"asset:///avatars/tante_christine_sexy.jpg\", \"asset:///avatars/tante_christine_intime.jpg\", \"asset:///avatars/tante_christine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Patricia",
@@ -2354,7 +2354,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Théâtre, Velours, Or, Costume, Bohème, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_patricia.jpg\", \"asset:///avatars/tante_patricia_sexy.jpg\", \"asset:///avatars/tante_patricia_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_patricia.jpg\", \"asset:///avatars/tante_patricia_sexy.jpg\", \"asset:///avatars/tante_patricia_intime.jpg\", \"asset:///avatars/tante_patricia_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Chantal",
@@ -2367,7 +2367,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Édition, Livres, Pluie, Lunettes, Intellectuelle, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_chantal.jpg\", \"asset:///avatars/tante_chantal_sexy.jpg\", \"asset:///avatars/tante_chantal_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_chantal.jpg\", \"asset:///avatars/tante_chantal_sexy.jpg\", \"asset:///avatars/tante_chantal_intime.jpg\", \"asset:///avatars/tante_chantal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Diane",
@@ -2380,7 +2380,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Adoptive, Famille, Vin, Bourgogne, Cave, Ambre, Sommelière, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_diane.jpg\", \"asset:///avatars/tante_diane_sexy.jpg\", \"asset:///avatars/tante_diane_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_diane.jpg\", \"asset:///avatars/tante_diane_sexy.jpg\", \"asset:///avatars/tante_diane_intime.jpg\", \"asset:///avatars/tante_diane_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Isabelle",
@@ -2393,7 +2393,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Fête, Confidences, Douceur, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_isabelle.jpg\", \"asset:///avatars/tante_isabelle_sexy.jpg\", \"asset:///avatars/tante_isabelle_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_isabelle.jpg\", \"asset:///avatars/tante_isabelle_sexy.jpg\", \"asset:///avatars/tante_isabelle_intime.jpg\", \"asset:///avatars/tante_isabelle_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Laurence",
@@ -2406,7 +2406,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Juge, Droit, Justice, Manoir, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_laurence.jpg\", \"asset:///avatars/tante_laurence_sexy.jpg\", \"asset:///avatars/tante_laurence_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_laurence.jpg\", \"asset:///avatars/tante_laurence_sexy.jpg\", \"asset:///avatars/tante_laurence_intime.jpg\", \"asset:///avatars/tante_laurence_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Marianne",
@@ -2419,7 +2419,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Bronze, Fonderie, Sculpture, Feu, Force, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_marianne.jpg\", \"asset:///avatars/tante_marianne_sexy.jpg\", \"asset:///avatars/tante_marianne_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_marianne.jpg\", \"asset:///avatars/tante_marianne_sexy.jpg\", \"asset:///avatars/tante_marianne_intime.jpg\", \"asset:///avatars/tante_marianne_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Véronique",
@@ -2432,7 +2432,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Sociologie, Université, Tabou, Étude, Intellectuelle, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_veronique.jpg\", \"asset:///avatars/tante_veronique_sexy.jpg\", \"asset:///avatars/tante_veronique_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_veronique.jpg\", \"asset:///avatars/tante_veronique_sexy.jpg\", \"asset:///avatars/tante_veronique_intime.jpg\", \"asset:///avatars/tante_veronique_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Madeleine",
@@ -2445,7 +2445,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Douceur, Province, Gâteaux, Héritage, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_madeleine.jpg\", \"asset:///avatars/tante_madeleine_sexy.jpg\", \"asset:///avatars/tante_madeleine_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_madeleine.jpg\", \"asset:///avatars/tante_madeleine_sexy.jpg\", \"asset:///avatars/tante_madeleine_intime.jpg\", \"asset:///avatars/tante_madeleine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Gabrielle",
@@ -2458,7 +2458,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Alliance, Famille, Coach, Séduction, Cuir, Défi, Provocation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_gabrielle.jpg\", \"asset:///avatars/tante_gabrielle_sexy.jpg\", \"asset:///avatars/tante_gabrielle_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_gabrielle.jpg\", \"asset:///avatars/tante_gabrielle_sexy.jpg\", \"asset:///avatars/tante_gabrielle_intime.jpg\", \"asset:///avatars/tante_gabrielle_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Odette",
@@ -2471,7 +2471,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Chapelle, Vitraux, Sacré, Mystique, Cachemire, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_odette.jpg\", \"asset:///avatars/tante_odette_sexy.jpg\", \"asset:///avatars/tante_odette_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_odette.jpg\", \"asset:///avatars/tante_odette_sexy.jpg\", \"asset:///avatars/tante_odette_intime.jpg\", \"asset:///avatars/tante_odette_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Pauline",
@@ -2484,7 +2484,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Maman, Famille, Haras, Chevaux, Normandie, Paille, Force, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_pauline.jpg\", \"asset:///avatars/tante_pauline_sexy.jpg\", \"asset:///avatars/tante_pauline_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_pauline.jpg\", \"asset:///avatars/tante_pauline_sexy.jpg\", \"asset:///avatars/tante_pauline_intime.jpg\", \"asset:///avatars/tante_pauline_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tante Rosalie",
@@ -2497,7 +2497,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Tante, Sœur de Papa, Famille, Mariée, Dentelle, Robes, Couture, Tulle, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tante_rosalie.jpg\", \"asset:///avatars/tante_rosalie_sexy.jpg\", \"asset:///avatars/tante_rosalie_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tante_rosalie.jpg\", \"asset:///avatars/tante_rosalie_sexy.jpg\", \"asset:///avatars/tante_rosalie_intime.jpg\", \"asset:///avatars/tante_rosalie_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Madame Laurent",
@@ -2510,7 +2510,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Entourage, Nuit, Satin, Panne, Fusible, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/madame_laurent.jpg\", \"asset:///avatars/madame_laurent_sexy.jpg\", \"asset:///avatars/madame_laurent_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/madame_laurent.jpg\", \"asset:///avatars/madame_laurent_sexy.jpg\", \"asset:///avatars/madame_laurent_intime.jpg\", \"asset:///avatars/madame_laurent_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Elena Rossi",
@@ -2523,7 +2523,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Italienne, Cuisine, Lasagnes, Dimanche, Chaleureuse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elena_rossi.jpg\", \"asset:///avatars/elena_rossi_sexy.jpg\", \"asset:///avatars/elena_rossi_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elena_rossi.jpg\", \"asset:///avatars/elena_rossi_sexy.jpg\", \"asset:///avatars/elena_rossi_intime.jpg\", \"asset:///avatars/elena_rossi_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Marceau",
@@ -2536,7 +2536,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Femme du voisin, Jardin, Clôture, Soleil, Aide, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_marceau.jpg\", \"asset:///avatars/sophie_marceau_sexy.jpg\", \"asset:///avatars/sophie_marceau_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_marceau.jpg\", \"asset:///avatars/sophie_marceau_sexy.jpg\", \"asset:///avatars/sophie_marceau_intime.jpg\", \"asset:///avatars/sophie_marceau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sandrine Collin",
@@ -2549,7 +2549,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Palier, Jogging, Sportive, Matin, Café, Fraîcheur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sandrine_collin.jpg\", \"asset:///avatars/sandrine_collin_sexy.jpg\", \"asset:///avatars/sandrine_collin_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sandrine_collin.jpg\", \"asset:///avatars/sandrine_collin_sexy.jpg\", \"asset:///avatars/sandrine_collin_intime.jpg\", \"asset:///avatars/sandrine_collin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jessica Vaneau",
@@ -2562,7 +2562,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Déménagement, Cartons, Jeune, Débardeur, Mannequin, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jessica_vaneau.jpg\", \"asset:///avatars/jessica_vaneau_sexy.jpg\", \"asset:///avatars/jessica_vaneau_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jessica_vaneau.jpg\", \"asset:///avatars/jessica_vaneau_sexy.jpg\", \"asset:///avatars/jessica_vaneau_intime.jpg\", \"asset:///avatars/jessica_vaneau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice Martel",
@@ -2575,7 +2575,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Cerises, Jardin, Verger, Clôture, Gourmande, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_martel.jpg\", \"asset:///avatars/beatrice_martel_sexy.jpg\", \"asset:///avatars/beatrice_martel_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_martel.jpg\", \"asset:///avatars/beatrice_martel_sexy.jpg\", \"asset:///avatars/beatrice_martel_intime.jpg\", \"asset:///avatars/beatrice_martel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Claire Fontaine",
@@ -2588,7 +2588,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Piscine, Villa, Soleil, Maillot, Chaleur, Baignade, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/claire_fontaine.jpg\", \"asset:///avatars/claire_fontaine_sexy.jpg\", \"asset:///avatars/claire_fontaine_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/claire_fontaine.jpg\", \"asset:///avatars/claire_fontaine_sexy.jpg\", \"asset:///avatars/claire_fontaine_intime.jpg\", \"asset:///avatars/claire_fontaine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chloé Marchand",
@@ -2601,7 +2601,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Jeune, Fenêtre, Nuit, Espiègle, Secret, Découverte, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chloe_marchand.jpg\", \"asset:///avatars/chloe_marchand_sexy.jpg\", \"asset:///avatars/chloe_marchand_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chloe_marchand.jpg\", \"asset:///avatars/chloe_marchand_sexy.jpg\", \"asset:///avatars/chloe_marchand_intime.jpg\", \"asset:///avatars/chloe_marchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laurence Duval",
@@ -2614,7 +2614,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Propriétaire, Syndic, Immeuble, Autorité, Contrôle, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laurence_duval.jpg\", \"asset:///avatars/laurence_duval_sexy.jpg\", \"asset:///avatars/laurence_duval_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laurence_duval.jpg\", \"asset:///avatars/laurence_duval_sexy.jpg\", \"asset:///avatars/laurence_duval_intime.jpg\", \"asset:///avatars/laurence_duval_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Valérie Mercier (Infirmière)",
@@ -2627,7 +2627,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Infirmière, Matin, Café, Urgences, Douceur, Réconfort, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valerie_mercier_infirmiere.jpg\", \"asset:///avatars/valerie_mercier_infirmiere_sexy.jpg\", \"asset:///avatars/valerie_mercier_infirmiere_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valerie_mercier_infirmiere.jpg\", \"asset:///avatars/valerie_mercier_infirmiere_sexy.jpg\", \"asset:///avatars/valerie_mercier_infirmiere_intime.jpg\", \"asset:///avatars/valerie_mercier_infirmiere_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Delphine Giraud",
@@ -2640,7 +2640,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Miel, Ruches, Campagne, Sucre, Douceur, Nature, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/delphine_giraud.jpg\", \"asset:///avatars/delphine_giraud_sexy.jpg\", \"asset:///avatars/delphine_giraud_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/delphine_giraud.jpg\", \"asset:///avatars/delphine_giraud_sexy.jpg\", \"asset:///avatars/delphine_giraud_intime.jpg\", \"asset:///avatars/delphine_giraud_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Vanessa Perrin",
@@ -2653,7 +2653,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Sportive, Jogging, Matin, Énergie, Défi, Tonique, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/vanessa_perrin.jpg\", \"asset:///avatars/vanessa_perrin_sexy.jpg\", \"asset:///avatars/vanessa_perrin_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/vanessa_perrin.jpg\", \"asset:///avatars/vanessa_perrin_sexy.jpg\", \"asset:///avatars/vanessa_perrin_intime.jpg\", \"asset:///avatars/vanessa_perrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Boucher",
@@ -2666,7 +2666,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Bricolage, Garage, Mécanique, Tondeuse, Gratitude, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_boucher.jpg\", \"asset:///avatars/nathalie_boucher_sexy.jpg\", \"asset:///avatars/nathalie_boucher_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_boucher.jpg\", \"asset:///avatars/nathalie_boucher_sexy.jpg\", \"asset:///avatars/nathalie_boucher_intime.jpg\", \"asset:///avatars/nathalie_boucher_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Élodie Rousseau",
@@ -2679,7 +2679,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Étudiante, Médecine, Colocation, Nuit, Révisions, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elodie_rousseau.jpg\", \"asset:///avatars/elodie_rousseau_sexy.jpg\", \"asset:///avatars/elodie_rousseau_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elodie_rousseau.jpg\", \"asset:///avatars/elodie_rousseau_sexy.jpg\", \"asset:///avatars/elodie_rousseau_intime.jpg\", \"asset:///avatars/elodie_rousseau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Caroline Bernard",
@@ -2692,7 +2692,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Balcon, Spritz, Divorcée, Crépuscule, Liberté, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/caroline_bernard.jpg\", \"asset:///avatars/caroline_bernard_sexy.jpg\", \"asset:///avatars/caroline_bernard_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/caroline_bernard.jpg\", \"asset:///avatars/caroline_bernard_sexy.jpg\", \"asset:///avatars/caroline_bernard_intime.jpg\", \"asset:///avatars/caroline_bernard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Barret",
@@ -2705,7 +2705,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Danse, Salsa, Cour, Rouge, Rythme, Solaire, Tactile, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_barret.jpg\", \"asset:///avatars/julie_barret_sexy.jpg\", \"asset:///avatars/julie_barret_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_barret.jpg\", \"asset:///avatars/julie_barret_sexy.jpg\", \"asset:///avatars/julie_barret_intime.jpg\", \"asset:///avatars/julie_barret_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marie-Christine Roy",
@@ -2718,7 +2718,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Syndic, Vélos, Résidence, Respectable, Aide, Force, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marie_christine_roy.jpg\", \"asset:///avatars/marie_christine_roy_sexy.jpg\", \"asset:///avatars/marie_christine_roy_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marie_christine_roy.jpg\", \"asset:///avatars/marie_christine_roy_sexy.jpg\", \"asset:///avatars/marie_christine_roy_intime.jpg\", \"asset:///avatars/marie_christine_roy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sarah Picard",
@@ -2731,7 +2731,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Violon, Musique, Pluie, Romantique, Sensible, Bohème, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sarah_picard.jpg\", \"asset:///avatars/sarah_picard_sexy.jpg\", \"asset:///avatars/sarah_picard_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sarah_picard.jpg\", \"asset:///avatars/sarah_picard_sexy.jpg\", \"asset:///avatars/sarah_picard_intime.jpg\", \"asset:///avatars/sarah_picard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Tessier",
@@ -2744,7 +2744,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Hôtesse, Vol, New York, Uniforme, Soie, Décalage, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_tessier.jpg\", \"asset:///avatars/camille_tessier_sexy.jpg\", \"asset:///avatars/camille_tessier_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_tessier.jpg\", \"asset:///avatars/camille_tessier_sexy.jpg\", \"asset:///avatars/camille_tessier_intime.jpg\", \"asset:///avatars/camille_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Céline Vidal",
@@ -2757,7 +2757,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Bourse, Finance, Nuit, Escarpins, Palier, Réconfort, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/celine_vidal.jpg\", \"asset:///avatars/celine_vidal_sexy.jpg\", \"asset:///avatars/celine_vidal_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/celine_vidal.jpg\", \"asset:///avatars/celine_vidal_sexy.jpg\", \"asset:///avatars/celine_vidal_intime.jpg\", \"asset:///avatars/celine_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Patricia Renoir",
@@ -2770,7 +2770,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Aquarelle, Atelier, Peinture, Crépuscule, Douceur, Poésie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/patricia_renoir.jpg\", \"asset:///avatars/patricia_renoir_sexy.jpg\", \"asset:///avatars/patricia_renoir_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/patricia_renoir.jpg\", \"asset:///avatars/patricia_renoir_sexy.jpg\", \"asset:///avatars/patricia_renoir_intime.jpg\", \"asset:///avatars/patricia_renoir_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sonia Mercier",
@@ -2783,7 +2783,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Pilates, Posture, Dos, Étirements, Tonique, Tactile, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sonia_mercier.jpg\", \"asset:///avatars/sonia_mercier_sexy.jpg\", \"asset:///avatars/sonia_mercier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sonia_mercier.jpg\", \"asset:///avatars/sonia_mercier_sexy.jpg\", \"asset:///avatars/sonia_mercier_intime.jpg\", \"asset:///avatars/sonia_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Brigitte Delorme",
@@ -2796,7 +2796,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Quartier, Fête des voisins, Cidre, Généreuse, Force, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/brigitte_delorme.jpg\", \"asset:///avatars/brigitte_delorme_sexy.jpg\", \"asset:///avatars/brigitte_delorme_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/brigitte_delorme.jpg\", \"asset:///avatars/brigitte_delorme_sexy.jpg\", \"asset:///avatars/brigitte_delorme_intime.jpg\", \"asset:///avatars/brigitte_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Diane Morel",
@@ -2809,7 +2809,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Avocate, Palier, Ascenseur, Nuit, Soie, Calme, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/diane_morel.jpg\", \"asset:///avatars/diane_morel_sexy.jpg\", \"asset:///avatars/diane_morel_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/diane_morel.jpg\", \"asset:///avatars/diane_morel_sexy.jpg\", \"asset:///avatars/diane_morel_intime.jpg\", \"asset:///avatars/diane_morel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Monique Aubert",
@@ -2822,7 +2822,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Voisine, Brioche, Pralines, Famille, Souvenirs, Douceur, Maternelle, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/monique_aubert.jpg\", \"asset:///avatars/monique_aubert_sexy.jpg\", \"asset:///avatars/monique_aubert_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/monique_aubert.jpg\", \"asset:///avatars/monique_aubert_sexy.jpg\", \"asset:///avatars/monique_aubert_intime.jpg\", \"asset:///avatars/monique_aubert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Delorme",
@@ -2835,7 +2835,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Assistante, Secrétaire de Papa, Bureau, Tailleur, Lunettes, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_delorme.jpg\", \"asset:///avatars/nathalie_delorme_sexy.jpg\", \"asset:///avatars/nathalie_delorme_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_delorme.jpg\", \"asset:///avatars/nathalie_delorme_sexy.jpg\", \"asset:///avatars/nathalie_delorme_intime.jpg\", \"asset:///avatars/nathalie_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Véronique Castan",
@@ -2848,7 +2848,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire de Papa, Cabinet, Agenda, Pouvoir, Bureau, Verre, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/veronique_castan.jpg\", \"asset:///avatars/veronique_castan_sexy.jpg\", \"asset:///avatars/veronique_castan_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/veronique_castan.jpg\", \"asset:///avatars/veronique_castan_sexy.jpg\", \"asset:///avatars/veronique_castan_intime.jpg\", \"asset:///avatars/veronique_castan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Vian",
@@ -2861,7 +2861,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Associée de Papa, Conseil, Affaires, Alliance, Velours, Pouvoir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_vian.jpg\", \"asset:///avatars/sophie_vian_sexy.jpg\", \"asset:///avatars/sophie_vian_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_vian.jpg\", \"asset:///avatars/sophie_vian_sexy.jpg\", \"asset:///avatars/sophie_vian_intime.jpg\", \"asset:///avatars/sophie_vian_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Caroline Lemoine",
@@ -2874,7 +2874,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Juridique de Papa, Contrat, Secret, Dévouement, Platine, Bureau, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/caroline_lemoine.jpg\", \"asset:///avatars/caroline_lemoine_sexy.jpg\", \"asset:///avatars/caroline_lemoine_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/caroline_lemoine.jpg\", \"asset:///avatars/caroline_lemoine_sexy.jpg\", \"asset:///avatars/caroline_lemoine_intime.jpg\", \"asset:///avatars/caroline_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marion Gauthier",
@@ -2887,7 +2887,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Communication de Papa, Médias, Coulisses, Interview, Escarpins, Soie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marion_gauthier.jpg\", \"asset:///avatars/marion_gauthier_sexy.jpg\", \"asset:///avatars/marion_gauthier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marion_gauthier.jpg\", \"asset:///avatars/marion_gauthier_sexy.jpg\", \"asset:///avatars/marion_gauthier_intime.jpg\", \"asset:///avatars/marion_gauthier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Justine Lemoine",
@@ -2900,7 +2900,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/justine_lemoine.jpg\", \"asset:///avatars/justine_lemoine_sexy.jpg\", \"asset:///avatars/justine_lemoine_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/justine_lemoine.jpg\", \"asset:///avatars/justine_lemoine_sexy.jpg\", \"asset:///avatars/justine_lemoine_intime.jpg\", \"asset:///avatars/justine_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clémence Vaneck",
@@ -2913,7 +2913,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clemence_vaneck.jpg\", \"asset:///avatars/clemence_vaneck_sexy.jpg\", \"asset:///avatars/clemence_vaneck_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clemence_vaneck.jpg\", \"asset:///avatars/clemence_vaneck_sexy.jpg\", \"asset:///avatars/clemence_vaneck_intime.jpg\", \"asset:///avatars/clemence_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Amandine Giraud",
@@ -2926,7 +2926,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/amandine_giraud.jpg\", \"asset:///avatars/amandine_giraud_sexy.jpg\", \"asset:///avatars/amandine_giraud_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/amandine_giraud.jpg\", \"asset:///avatars/amandine_giraud_sexy.jpg\", \"asset:///avatars/amandine_giraud_intime.jpg\", \"asset:///avatars/amandine_giraud_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Romane Cazeneuve",
@@ -2939,7 +2939,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/romane_cazeneuve.jpg\", \"asset:///avatars/romane_cazeneuve_sexy.jpg\", \"asset:///avatars/romane_cazeneuve_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/romane_cazeneuve.jpg\", \"asset:///avatars/romane_cazeneuve_sexy.jpg\", \"asset:///avatars/romane_cazeneuve_intime.jpg\", \"asset:///avatars/romane_cazeneuve_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alizée Bonnamy",
@@ -2952,7 +2952,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alizee_bonnamy.jpg\", \"asset:///avatars/alizee_bonnamy_sexy.jpg\", \"asset:///avatars/alizee_bonnamy_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alizee_bonnamy.jpg\", \"asset:///avatars/alizee_bonnamy_sexy.jpg\", \"asset:///avatars/alizee_bonnamy_intime.jpg\", \"asset:///avatars/alizee_bonnamy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Morgane Sorel",
@@ -2965,7 +2965,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/morgane_sorel.jpg\", \"asset:///avatars/morgane_sorel_sexy.jpg\", \"asset:///avatars/morgane_sorel_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/morgane_sorel.jpg\", \"asset:///avatars/morgane_sorel_sexy.jpg\", \"asset:///avatars/morgane_sorel_intime.jpg\", \"asset:///avatars/morgane_sorel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Émilie Bertrand",
@@ -2978,7 +2978,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emilie_bertrand.jpg\", \"asset:///avatars/emilie_bertrand_sexy.jpg\", \"asset:///avatars/emilie_bertrand_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emilie_bertrand.jpg\", \"asset:///avatars/emilie_bertrand_sexy.jpg\", \"asset:///avatars/emilie_bertrand_intime.jpg\", \"asset:///avatars/emilie_bertrand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Aurore Delmas",
@@ -2991,7 +2991,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/aurore_delmas.jpg\", \"asset:///avatars/aurore_delmas_sexy.jpg\", \"asset:///avatars/aurore_delmas_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/aurore_delmas.jpg\", \"asset:///avatars/aurore_delmas_sexy.jpg\", \"asset:///avatars/aurore_delmas_intime.jpg\", \"asset:///avatars/aurore_delmas_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sabrina Brunel",
@@ -3004,7 +3004,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sabrina_brunel.jpg\", \"asset:///avatars/sabrina_brunel_sexy.jpg\", \"asset:///avatars/sabrina_brunel_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sabrina_brunel.jpg\", \"asset:///avatars/sabrina_brunel_sexy.jpg\", \"asset:///avatars/sabrina_brunel_intime.jpg\", \"asset:///avatars/sabrina_brunel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Coralie Fabre",
@@ -3017,7 +3017,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/coralie_fabre.jpg\", \"asset:///avatars/coralie_fabre_sexy.jpg\", \"asset:///avatars/coralie_fabre_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/coralie_fabre.jpg\", \"asset:///avatars/coralie_fabre_sexy.jpg\", \"asset:///avatars/coralie_fabre_intime.jpg\", \"asset:///avatars/coralie_fabre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Lucie Charpentier",
@@ -3030,7 +3030,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lucie_charpentier.jpg\", \"asset:///avatars/lucie_charpentier_sexy.jpg\", \"asset:///avatars/lucie_charpentier_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lucie_charpentier.jpg\", \"asset:///avatars/lucie_charpentier_sexy.jpg\", \"asset:///avatars/lucie_charpentier_intime.jpg\", \"asset:///avatars/lucie_charpentier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Stéphanie Roussel",
@@ -3043,7 +3043,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/stephanie_roussel.jpg\", \"asset:///avatars/stephanie_roussel_sexy.jpg\", \"asset:///avatars/stephanie_roussel_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/stephanie_roussel.jpg\", \"asset:///avatars/stephanie_roussel_sexy.jpg\", \"asset:///avatars/stephanie_roussel_intime.jpg\", \"asset:///avatars/stephanie_roussel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Pauline Guérin",
@@ -3056,7 +3056,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/pauline_guerin.jpg\", \"asset:///avatars/pauline_guerin_sexy.jpg\", \"asset:///avatars/pauline_guerin_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/pauline_guerin.jpg\", \"asset:///avatars/pauline_guerin_sexy.jpg\", \"asset:///avatars/pauline_guerin_intime.jpg\", \"asset:///avatars/pauline_guerin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mathilde Vernier",
@@ -3069,7 +3069,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mathilde_vernier.jpg\", \"asset:///avatars/mathilde_vernier_sexy.jpg\", \"asset:///avatars/mathilde_vernier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mathilde_vernier.jpg\", \"asset:///avatars/mathilde_vernier_sexy.jpg\", \"asset:///avatars/mathilde_vernier_intime.jpg\", \"asset:///avatars/mathilde_vernier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Christelle Vasseur",
@@ -3082,7 +3082,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/christelle_vasseur.jpg\", \"asset:///avatars/christelle_vasseur_sexy.jpg\", \"asset:///avatars/christelle_vasseur_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/christelle_vasseur.jpg\", \"asset:///avatars/christelle_vasseur_sexy.jpg\", \"asset:///avatars/christelle_vasseur_intime.jpg\", \"asset:///avatars/christelle_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nadine Perrot",
@@ -3095,7 +3095,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nadine_perrot.jpg\", \"asset:///avatars/nadine_perrot_sexy.jpg\", \"asset:///avatars/nadine_perrot_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nadine_perrot.jpg\", \"asset:///avatars/nadine_perrot_sexy.jpg\", \"asset:///avatars/nadine_perrot_intime.jpg\", \"asset:///avatars/nadine_perrot_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Isabelle Cordier",
@@ -3108,7 +3108,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/isabelle_cordier.jpg\", \"asset:///avatars/isabelle_cordier_sexy.jpg\", \"asset:///avatars/isabelle_cordier_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/isabelle_cordier.jpg\", \"asset:///avatars/isabelle_cordier_sexy.jpg\", \"asset:///avatars/isabelle_cordier_intime.jpg\", \"asset:///avatars/isabelle_cordier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laetitia Maréchal",
@@ -3121,7 +3121,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laetitia_marechal.jpg\", \"asset:///avatars/laetitia_marechal_sexy.jpg\", \"asset:///avatars/laetitia_marechal_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laetitia_marechal.jpg\", \"asset:///avatars/laetitia_marechal_sexy.jpg\", \"asset:///avatars/laetitia_marechal_intime.jpg\", \"asset:///avatars/laetitia_marechal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Bénédicte Royer",
@@ -3134,7 +3134,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/benedicte_royer.jpg\", \"asset:///avatars/benedicte_royer_sexy.jpg\", \"asset:///avatars/benedicte_royer_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/benedicte_royer.jpg\", \"asset:///avatars/benedicte_royer_sexy.jpg\", \"asset:///avatars/benedicte_royer_intime.jpg\", \"asset:///avatars/benedicte_royer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Dominique Pasquier",
@@ -3147,7 +3147,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Collaboratrice de Papa, Bureau, Affaires, Nuit, Secret, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/dominique_pasquier.jpg\", \"asset:///avatars/dominique_pasquier_sexy.jpg\", \"asset:///avatars/dominique_pasquier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/dominique_pasquier.jpg\", \"asset:///avatars/dominique_pasquier_sexy.jpg\", \"asset:///avatars/dominique_pasquier_intime.jpg\", \"asset:///avatars/dominique_pasquier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Victoire de Gramont",
@@ -3160,7 +3160,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Papa, Rivalité, Villa, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/victoire_de_gramont.jpg\", \"asset:///avatars/victoire_de_gramont_sexy.jpg\", \"asset:///avatars/victoire_de_gramont_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/victoire_de_gramont.jpg\", \"asset:///avatars/victoire_de_gramont_sexy.jpg\", \"asset:///avatars/victoire_de_gramont_intime.jpg\", \"asset:///avatars/victoire_de_gramont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Gabrielle Sorel",
@@ -3173,7 +3173,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Papa, Rivalité, Villa, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/gabrielle_sorel.jpg\", \"asset:///avatars/gabrielle_sorel_sexy.jpg\", \"asset:///avatars/gabrielle_sorel_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/gabrielle_sorel.jpg\", \"asset:///avatars/gabrielle_sorel_sexy.jpg\", \"asset:///avatars/gabrielle_sorel_intime.jpg\", \"asset:///avatars/gabrielle_sorel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Amalia Santos",
@@ -3186,7 +3186,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Papa, Rivalité, Villa, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/amalia_santos.jpg\", \"asset:///avatars/amalia_santos_sexy.jpg\", \"asset:///avatars/amalia_santos_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/amalia_santos.jpg\", \"asset:///avatars/amalia_santos_sexy.jpg\", \"asset:///avatars/amalia_santos_intime.jpg\", \"asset:///avatars/amalia_santos_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Constance de La Tour",
@@ -3199,7 +3199,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Papa, Rivalité, Villa, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/constance_de_la_tour.jpg\", \"asset:///avatars/constance_de_la_tour_sexy.jpg\", \"asset:///avatars/constance_de_la_tour_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/constance_de_la_tour.jpg\", \"asset:///avatars/constance_de_la_tour_sexy.jpg\", \"asset:///avatars/constance_de_la_tour_intime.jpg\", \"asset:///avatars/constance_de_la_tour_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Bérénice Vasseur",
@@ -3212,7 +3212,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Papa, Rivalité, Villa, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/berenice_vasseur.jpg\", \"asset:///avatars/berenice_vasseur_sexy.jpg\", \"asset:///avatars/berenice_vasseur_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/berenice_vasseur.jpg\", \"asset:///avatars/berenice_vasseur_sexy.jpg\", \"asset:///avatars/berenice_vasseur_intime.jpg\", \"asset:///avatars/berenice_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mireille de Courcelles",
@@ -3225,7 +3225,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mireille_de_courcelles.jpg\", \"asset:///avatars/mireille_de_courcelles_sexy.jpg\", \"asset:///avatars/mireille_de_courcelles_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mireille_de_courcelles.jpg\", \"asset:///avatars/mireille_de_courcelles_sexy.jpg\", \"asset:///avatars/mireille_de_courcelles_intime.jpg\", \"asset:///avatars/mireille_de_courcelles_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Éléonore de Montmirail",
@@ -3238,7 +3238,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/eleonore_de_montmirail.jpg\", \"asset:///avatars/eleonore_de_montmirail_sexy.jpg\", \"asset:///avatars/eleonore_de_montmirail_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/eleonore_de_montmirail.jpg\", \"asset:///avatars/eleonore_de_montmirail_sexy.jpg\", \"asset:///avatars/eleonore_de_montmirail_intime.jpg\", \"asset:///avatars/eleonore_de_montmirail_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice de Saint-Gilles",
@@ -3251,7 +3251,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_de_saint_gilles.jpg\", \"asset:///avatars/beatrice_de_saint_gilles_sexy.jpg\", \"asset:///avatars/beatrice_de_saint_gilles_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_de_saint_gilles.jpg\", \"asset:///avatars/beatrice_de_saint_gilles_sexy.jpg\", \"asset:///avatars/beatrice_de_saint_gilles_intime.jpg\", \"asset:///avatars/beatrice_de_saint_gilles_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Geneviève de Valois",
@@ -3264,7 +3264,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/genevieve_de_valois.jpg\", \"asset:///avatars/genevieve_de_valois_sexy.jpg\", \"asset:///avatars/genevieve_de_valois_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/genevieve_de_valois.jpg\", \"asset:///avatars/genevieve_de_valois_sexy.jpg\", \"asset:///avatars/genevieve_de_valois_intime.jpg\", \"asset:///avatars/genevieve_de_valois_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Agnès de Boissieu",
@@ -3277,7 +3277,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/agnes_de_boissieu.jpg\", \"asset:///avatars/agnes_de_boissieu_sexy.jpg\", \"asset:///avatars/agnes_de_boissieu_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/agnes_de_boissieu.jpg\", \"asset:///avatars/agnes_de_boissieu_sexy.jpg\", \"asset:///avatars/agnes_de_boissieu_intime.jpg\", \"asset:///avatars/agnes_de_boissieu_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Véronique d'Orsay",
@@ -3290,7 +3290,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/veronique_dorsay.jpg\", \"asset:///avatars/veronique_dorsay_sexy.jpg\", \"asset:///avatars/veronique_dorsay_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/veronique_dorsay.jpg\", \"asset:///avatars/veronique_dorsay_sexy.jpg\", \"asset:///avatars/veronique_dorsay_intime.jpg\", \"asset:///avatars/veronique_dorsay_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Thérèse de La Baume",
@@ -3303,7 +3303,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/therese_de_la_baume.jpg\", \"asset:///avatars/therese_de_la_baume_sexy.jpg\", \"asset:///avatars/therese_de_la_baume_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/therese_de_la_baume.jpg\", \"asset:///avatars/therese_de_la_baume_sexy.jpg\", \"asset:///avatars/therese_de_la_baume_intime.jpg\", \"asset:///avatars/therese_de_la_baume_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Viviane de Clermont",
@@ -3316,7 +3316,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/viviane_de_clermont.jpg\", \"asset:///avatars/viviane_de_clermont_sexy.jpg\", \"asset:///avatars/viviane_de_clermont_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/viviane_de_clermont.jpg\", \"asset:///avatars/viviane_de_clermont_sexy.jpg\", \"asset:///avatars/viviane_de_clermont_intime.jpg\", \"asset:///avatars/viviane_de_clermont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Solange de Rochefort",
@@ -3329,7 +3329,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/solange_de_rochefort.jpg\", \"asset:///avatars/solange_de_rochefort_sexy.jpg\", \"asset:///avatars/solange_de_rochefort_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/solange_de_rochefort.jpg\", \"asset:///avatars/solange_de_rochefort_sexy.jpg\", \"asset:///avatars/solange_de_rochefort_intime.jpg\", \"asset:///avatars/solange_de_rochefort_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Constance de Rohan",
@@ -3342,7 +3342,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/constance_de_rohan.jpg\", \"asset:///avatars/constance_de_rohan_sexy.jpg\", \"asset:///avatars/constance_de_rohan_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/constance_de_rohan.jpg\", \"asset:///avatars/constance_de_rohan_sexy.jpg\", \"asset:///avatars/constance_de_rohan_intime.jpg\", \"asset:///avatars/constance_de_rohan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Diane de Beauvau",
@@ -3355,7 +3355,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/diane_de_beauvau.jpg\", \"asset:///avatars/diane_de_beauvau_sexy.jpg\", \"asset:///avatars/diane_de_beauvau_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/diane_de_beauvau.jpg\", \"asset:///avatars/diane_de_beauvau_sexy.jpg\", \"asset:///avatars/diane_de_beauvau_intime.jpg\", \"asset:///avatars/diane_de_beauvau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jacqueline de Montfort",
@@ -3368,7 +3368,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jacqueline_de_montfort.jpg\", \"asset:///avatars/jacqueline_de_montfort_sexy.jpg\", \"asset:///avatars/jacqueline_de_montfort_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jacqueline_de_montfort.jpg\", \"asset:///avatars/jacqueline_de_montfort_sexy.jpg\", \"asset:///avatars/jacqueline_de_montfort_intime.jpg\", \"asset:///avatars/jacqueline_de_montfort_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Henriette de Dampierre",
@@ -3381,7 +3381,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/henriette_de_dampierre.jpg\", \"asset:///avatars/henriette_de_dampierre_sexy.jpg\", \"asset:///avatars/henriette_de_dampierre_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/henriette_de_dampierre.jpg\", \"asset:///avatars/henriette_de_dampierre_sexy.jpg\", \"asset:///avatars/henriette_de_dampierre_intime.jpg\", \"asset:///avatars/henriette_de_dampierre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Yvonne de Castellane",
@@ -3394,7 +3394,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/yvonne_de_castellane.jpg\", \"asset:///avatars/yvonne_de_castellane_sexy.jpg\", \"asset:///avatars/yvonne_de_castellane_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/yvonne_de_castellane.jpg\", \"asset:///avatars/yvonne_de_castellane_sexy.jpg\", \"asset:///avatars/yvonne_de_castellane_intime.jpg\", \"asset:///avatars/yvonne_de_castellane_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Blanche de Castille",
@@ -3407,7 +3407,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/blanche_de_castille.jpg\", \"asset:///avatars/blanche_de_castille_sexy.jpg\", \"asset:///avatars/blanche_de_castille_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/blanche_de_castille.jpg\", \"asset:///avatars/blanche_de_castille_sexy.jpg\", \"asset:///avatars/blanche_de_castille_intime.jpg\", \"asset:///avatars/blanche_de_castille_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Gisèle de Crussol",
@@ -3420,7 +3420,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/gisele_de_crussol.jpg\", \"asset:///avatars/gisele_de_crussol_sexy.jpg\", \"asset:///avatars/gisele_de_crussol_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/gisele_de_crussol.jpg\", \"asset:///avatars/gisele_de_crussol_sexy.jpg\", \"asset:///avatars/gisele_de_crussol_intime.jpg\", \"asset:///avatars/gisele_de_crussol_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Madeleine de Bourbon",
@@ -3433,7 +3433,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/madeleine_de_bourbon.jpg\", \"asset:///avatars/madeleine_de_bourbon_sexy.jpg\", \"asset:///avatars/madeleine_de_bourbon_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/madeleine_de_bourbon.jpg\", \"asset:///avatars/madeleine_de_bourbon_sexy.jpg\", \"asset:///avatars/madeleine_de_bourbon_intime.jpg\", \"asset:///avatars/madeleine_de_bourbon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Françoise de Noailles",
@@ -3446,7 +3446,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/francoise_de_noailles.jpg\", \"asset:///avatars/francoise_de_noailles_sexy.jpg\", \"asset:///avatars/francoise_de_noailles_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/francoise_de_noailles.jpg\", \"asset:///avatars/francoise_de_noailles_sexy.jpg\", \"asset:///avatars/francoise_de_noailles_intime.jpg\", \"asset:///avatars/francoise_de_noailles_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marguerite de Guise",
@@ -3459,7 +3459,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marguerite_de_guise.jpg\", \"asset:///avatars/marguerite_de_guise_sexy.jpg\", \"asset:///avatars/marguerite_de_guise_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marguerite_de_guise.jpg\", \"asset:///avatars/marguerite_de_guise_sexy.jpg\", \"asset:///avatars/marguerite_de_guise_intime.jpg\", \"asset:///avatars/marguerite_de_guise_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Paulette de Polignac",
@@ -3472,7 +3472,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Mère, Famille, Papa, Maman, Tension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/paulette_de_polignac.jpg\", \"asset:///avatars/paulette_de_polignac_sexy.jpg\", \"asset:///avatars/paulette_de_polignac_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/paulette_de_polignac.jpg\", \"asset:///avatars/paulette_de_polignac_sexy.jpg\", \"asset:///avatars/paulette_de_polignac_intime.jpg\", \"asset:///avatars/paulette_de_polignac_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sylvie de Montmirail",
@@ -3485,7 +3485,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Copine de Papa, Famille, Jeunesse, Souvenirs, Nostalgie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sylvie_de_montmirail.jpg\", \"asset:///avatars/sylvie_de_montmirail_sexy.jpg\", \"asset:///avatars/sylvie_de_montmirail_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sylvie_de_montmirail.jpg\", \"asset:///avatars/sylvie_de_montmirail_sexy.jpg\", \"asset:///avatars/sylvie_de_montmirail_intime.jpg\", \"asset:///avatars/sylvie_de_montmirail_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Corinne Vaneck",
@@ -3498,7 +3498,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Copine de Papa, Famille, Jeunesse, Souvenirs, Nostalgie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/corinne_vaneck.jpg\", \"asset:///avatars/corinne_vaneck_sexy.jpg\", \"asset:///avatars/corinne_vaneck_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/corinne_vaneck.jpg\", \"asset:///avatars/corinne_vaneck_sexy.jpg\", \"asset:///avatars/corinne_vaneck_intime.jpg\", \"asset:///avatars/corinne_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Florence Delacroix",
@@ -3511,7 +3511,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Copine de Papa, Famille, Jeunesse, Souvenirs, Nostalgie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/florence_delacroix.jpg\", \"asset:///avatars/florence_delacroix_sexy.jpg\", \"asset:///avatars/florence_delacroix_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/florence_delacroix.jpg\", \"asset:///avatars/florence_delacroix_sexy.jpg\", \"asset:///avatars/florence_delacroix_intime.jpg\", \"asset:///avatars/florence_delacroix_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Hélène Bernard",
@@ -3524,7 +3524,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Copine de Papa, Famille, Jeunesse, Souvenirs, Nostalgie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/helene_bernard.jpg\", \"asset:///avatars/helene_bernard_sexy.jpg\", \"asset:///avatars/helene_bernard_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/helene_bernard.jpg\", \"asset:///avatars/helene_bernard_sexy.jpg\", \"asset:///avatars/helene_bernard_intime.jpg\", \"asset:///avatars/helene_bernard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Béatrice Courtin",
@@ -3537,7 +3537,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Copine de Papa, Famille, Jeunesse, Souvenirs, Nostalgie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/beatrice_courtin.jpg\", \"asset:///avatars/beatrice_courtin_sexy.jpg\", \"asset:///avatars/beatrice_courtin_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/beatrice_courtin.jpg\", \"asset:///avatars/beatrice_courtin_sexy.jpg\", \"asset:///avatars/beatrice_courtin_intime.jpg\", \"asset:///avatars/beatrice_courtin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Adeline Jacquet",
@@ -3550,7 +3550,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/adeline_jacquet.jpg\", \"asset:///avatars/adeline_jacquet_sexy.jpg\", \"asset:///avatars/adeline_jacquet_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/adeline_jacquet.jpg\", \"asset:///avatars/adeline_jacquet_sexy.jpg\", \"asset:///avatars/adeline_jacquet_intime.jpg\", \"asset:///avatars/adeline_jacquet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Agathe Meunier",
@@ -3563,7 +3563,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/agathe_meunier.jpg\", \"asset:///avatars/agathe_meunier_sexy.jpg\", \"asset:///avatars/agathe_meunier_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/agathe_meunier.jpg\", \"asset:///avatars/agathe_meunier_sexy.jpg\", \"asset:///avatars/agathe_meunier_intime.jpg\", \"asset:///avatars/agathe_meunier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alice Gaillard",
@@ -3576,7 +3576,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alice_gaillard.jpg\", \"asset:///avatars/alice_gaillard_sexy.jpg\", \"asset:///avatars/alice_gaillard_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alice_gaillard.jpg\", \"asset:///avatars/alice_gaillard_sexy.jpg\", \"asset:///avatars/alice_gaillard_intime.jpg\", \"asset:///avatars/alice_gaillard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Ambre Moulin",
@@ -3589,7 +3589,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ambre_moulin.jpg\", \"asset:///avatars/ambre_moulin_sexy.jpg\", \"asset:///avatars/ambre_moulin_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ambre_moulin.jpg\", \"asset:///avatars/ambre_moulin_sexy.jpg\", \"asset:///avatars/ambre_moulin_intime.jpg\", \"asset:///avatars/ambre_moulin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Anaïs Chevalier",
@@ -3602,7 +3602,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/anais_chevalier.jpg\", \"asset:///avatars/anais_chevalier_sexy.jpg\", \"asset:///avatars/anais_chevalier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/anais_chevalier.jpg\", \"asset:///avatars/anais_chevalier_sexy.jpg\", \"asset:///avatars/anais_chevalier_intime.jpg\", \"asset:///avatars/anais_chevalier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Angèle Barbe",
@@ -3615,7 +3615,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/angele_barbe.jpg\", \"asset:///avatars/angele_barbe_sexy.jpg\", \"asset:///avatars/angele_barbe_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/angele_barbe.jpg\", \"asset:///avatars/angele_barbe_sexy.jpg\", \"asset:///avatars/angele_barbe_intime.jpg\", \"asset:///avatars/angele_barbe_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Annette Prevost",
@@ -3628,7 +3628,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/annette_prevost.jpg\", \"asset:///avatars/annette_prevost_sexy.jpg\", \"asset:///avatars/annette_prevost_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/annette_prevost.jpg\", \"asset:///avatars/annette_prevost_sexy.jpg\", \"asset:///avatars/annette_prevost_intime.jpg\", \"asset:///avatars/annette_prevost_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Ariane Blanchard",
@@ -3641,7 +3641,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ariane_blanchard.jpg\", \"asset:///avatars/ariane_blanchard_sexy.jpg\", \"asset:///avatars/ariane_blanchard_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ariane_blanchard.jpg\", \"asset:///avatars/ariane_blanchard_sexy.jpg\", \"asset:///avatars/ariane_blanchard_intime.jpg\", \"asset:///avatars/ariane_blanchard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Audrey Guichard",
@@ -3654,7 +3654,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/audrey_guichard.jpg\", \"asset:///avatars/audrey_guichard_sexy.jpg\", \"asset:///avatars/audrey_guichard_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/audrey_guichard.jpg\", \"asset:///avatars/audrey_guichard_sexy.jpg\", \"asset:///avatars/audrey_guichard_intime.jpg\", \"asset:///avatars/audrey_guichard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Brigitte Coulomb",
@@ -3667,7 +3667,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/brigitte_coulomb.jpg\", \"asset:///avatars/brigitte_coulomb_sexy.jpg\", \"asset:///avatars/brigitte_coulomb_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/brigitte_coulomb.jpg\", \"asset:///avatars/brigitte_coulomb_sexy.jpg\", \"asset:///avatars/brigitte_coulomb_intime.jpg\", \"asset:///avatars/brigitte_coulomb_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Capucine Garnier",
@@ -3680,7 +3680,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/capucine_garnier.jpg\", \"asset:///avatars/capucine_garnier_sexy.jpg\", \"asset:///avatars/capucine_garnier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/capucine_garnier.jpg\", \"asset:///avatars/capucine_garnier_sexy.jpg\", \"asset:///avatars/capucine_garnier_intime.jpg\", \"asset:///avatars/capucine_garnier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Carine Lemoine",
@@ -3693,7 +3693,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/carine_lemoine.jpg\", \"asset:///avatars/carine_lemoine_sexy.jpg\", \"asset:///avatars/carine_lemoine_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/carine_lemoine.jpg\", \"asset:///avatars/carine_lemoine_sexy.jpg\", \"asset:///avatars/carine_lemoine_intime.jpg\", \"asset:///avatars/carine_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cassandre Tessier",
@@ -3706,7 +3706,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cassandre_tessier.jpg\", \"asset:///avatars/cassandre_tessier_sexy.jpg\", \"asset:///avatars/cassandre_tessier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cassandre_tessier.jpg\", \"asset:///avatars/cassandre_tessier_sexy.jpg\", \"asset:///avatars/cassandre_tessier_intime.jpg\", \"asset:///avatars/cassandre_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cécile Gauthier",
@@ -3719,7 +3719,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cecile_gauthier.jpg\", \"asset:///avatars/cecile_gauthier_sexy.jpg\", \"asset:///avatars/cecile_gauthier_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cecile_gauthier.jpg\", \"asset:///avatars/cecile_gauthier_sexy.jpg\", \"asset:///avatars/cecile_gauthier_intime.jpg\", \"asset:///avatars/cecile_gauthier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Célia Renaud",
@@ -3732,7 +3732,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/celia_renaud.jpg\", \"asset:///avatars/celia_renaud_sexy.jpg\", \"asset:///avatars/celia_renaud_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/celia_renaud.jpg\", \"asset:///avatars/celia_renaud_sexy.jpg\", \"asset:///avatars/celia_renaud_intime.jpg\", \"asset:///avatars/celia_renaud_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Charline Leveque",
@@ -3745,7 +3745,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/charline_leveque.jpg\", \"asset:///avatars/charline_leveque_sexy.jpg\", \"asset:///avatars/charline_leveque_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/charline_leveque.jpg\", \"asset:///avatars/charline_leveque_sexy.jpg\", \"asset:///avatars/charline_leveque_intime.jpg\", \"asset:///avatars/charline_leveque_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clarisse Robin",
@@ -3758,7 +3758,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clarisse_robin.jpg\", \"asset:///avatars/clarisse_robin_sexy.jpg\", \"asset:///avatars/clarisse_robin_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clarisse_robin.jpg\", \"asset:///avatars/clarisse_robin_sexy.jpg\", \"asset:///avatars/clarisse_robin_intime.jpg\", \"asset:///avatars/clarisse_robin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clothilde Boyer",
@@ -3771,7 +3771,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clothilde_boyer.jpg\", \"asset:///avatars/clothilde_boyer_sexy.jpg\", \"asset:///avatars/clothilde_boyer_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clothilde_boyer.jpg\", \"asset:///avatars/clothilde_boyer_sexy.jpg\", \"asset:///avatars/clothilde_boyer_intime.jpg\", \"asset:///avatars/clothilde_boyer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Coline Aubry",
@@ -3784,7 +3784,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/coline_aubry.jpg\", \"asset:///avatars/coline_aubry_sexy.jpg\", \"asset:///avatars/coline_aubry_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/coline_aubry.jpg\", \"asset:///avatars/coline_aubry_sexy.jpg\", \"asset:///avatars/coline_aubry_intime.jpg\", \"asset:///avatars/coline_aubry_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Danielle Clement",
@@ -3797,7 +3797,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de Maman, Entourage, Famille, Papa, Maman, Cercle intime, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/danielle_clement.jpg\", \"asset:///avatars/danielle_clement_sexy.jpg\", \"asset:///avatars/danielle_clement_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/danielle_clement.jpg\", \"asset:///avatars/danielle_clement_sexy.jpg\", \"asset:///avatars/danielle_clement_intime.jpg\", \"asset:///avatars/danielle_clement_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Léa Dumont",
@@ -3810,7 +3810,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Famille, Nuit, Satin, Pyjama, Jeune, Cuisine, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lea_dumont.jpg\", \"asset:///avatars/lea_dumont_sexy.jpg\", \"asset:///avatars/lea_dumont_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lea_dumont.jpg\", \"asset:///avatars/lea_dumont_sexy.jpg\", \"asset:///avatars/lea_dumont_intime.jpg\", \"asset:///avatars/lea_dumont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Emma Vaneau",
@@ -3823,7 +3823,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Famille, Provocante, Jeune, Salon, Fauteuil, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emma_vaneau.jpg\", \"asset:///avatars/emma_vaneau_sexy.jpg\", \"asset:///avatars/emma_vaneau_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emma_vaneau.jpg\", \"asset:///avatars/emma_vaneau_sexy.jpg\", \"asset:///avatars/emma_vaneau_intime.jpg\", \"asset:///avatars/emma_vaneau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Manon Castillon",
@@ -3836,7 +3836,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Famille, Révisions, Droit, Terrasse, Jeune, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/manon_castillon.jpg\", \"asset:///avatars/manon_castillon_sexy.jpg\", \"asset:///avatars/manon_castillon_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/manon_castillon.jpg\", \"asset:///avatars/manon_castillon_sexy.jpg\", \"asset:///avatars/manon_castillon_intime.jpg\", \"asset:///avatars/manon_castillon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chloé Perrin",
@@ -3849,7 +3849,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Danse, Ballerine, Souplesse, Massage, Dos, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chloe_perrin.jpg\", \"asset:///avatars/chloe_perrin_sexy.jpg\", \"asset:///avatars/chloe_perrin_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chloe_perrin.jpg\", \"asset:///avatars/chloe_perrin_sexy.jpg\", \"asset:///avatars/chloe_perrin_intime.jpg\", \"asset:///avatars/chloe_perrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jade Mercier",
@@ -3862,7 +3862,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Piscine, Canicule, Transat, Mature, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jade_mercier.jpg\", \"asset:///avatars/jade_mercier_sexy.jpg\", \"asset:///avatars/jade_mercier_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jade_mercier.jpg\", \"asset:///avatars/jade_mercier_sexy.jpg\", \"asset:///avatars/jade_mercier_intime.jpg\", \"asset:///avatars/jade_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Inès Fontaine",
@@ -3875,7 +3875,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Arrosage, Jardin, Été, Fraîcheur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ines_fontaine.jpg\", \"asset:///avatars/ines_fontaine_sexy.jpg\", \"asset:///avatars/ines_fontaine_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ines_fontaine.jpg\", \"asset:///avatars/ines_fontaine_sexy.jpg\", \"asset:///avatars/ines_fontaine_intime.jpg\", \"asset:///avatars/ines_fontaine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Romane Delmas",
@@ -3888,7 +3888,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Médecine, Anatomie, Révisions, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/romane_delmas.jpg\", \"asset:///avatars/romane_delmas_sexy.jpg\", \"asset:///avatars/romane_delmas_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/romane_delmas.jpg\", \"asset:///avatars/romane_delmas_sexy.jpg\", \"asset:///avatars/romane_delmas_intime.jpg\", \"asset:///avatars/romane_delmas_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sarah Morel",
@@ -3901,7 +3901,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Mode, Élégance, Salon, Charme, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sarah_morel.jpg\", \"asset:///avatars/sarah_morel_sexy.jpg\", \"asset:///avatars/sarah_morel_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sarah_morel.jpg\", \"asset:///avatars/sarah_morel_sexy.jpg\", \"asset:///avatars/sarah_morel_intime.jpg\", \"asset:///avatars/sarah_morel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alicia Guichard",
@@ -3914,7 +3914,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Musique, Violoncelle, Sensibilité, Piano, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alicia_guichard.jpg\", \"asset:///avatars/alicia_guichard_sexy.jpg\", \"asset:///avatars/alicia_guichard_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alicia_guichard.jpg\", \"asset:///avatars/alicia_guichard_sexy.jpg\", \"asset:///avatars/alicia_guichard_intime.jpg\", \"asset:///avatars/alicia_guichard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Bernard",
@@ -3927,7 +3927,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Sport, Athlétisme, Footing, Jardin, Souplesse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_bernard.jpg\", \"asset:///avatars/camille_bernard_sexy.jpg\", \"asset:///avatars/camille_bernard_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_bernard.jpg\", \"asset:///avatars/camille_bernard_sexy.jpg\", \"asset:///avatars/camille_bernard_intime.jpg\", \"asset:///avatars/camille_bernard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Océane Dubois",
@@ -3940,7 +3940,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Réconfort, Canapé, Nuit, Câlin, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/oceane_dubois.jpg\", \"asset:///avatars/oceane_dubois_sexy.jpg\", \"asset:///avatars/oceane_dubois_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/oceane_dubois.jpg\", \"asset:///avatars/oceane_dubois_sexy.jpg\", \"asset:///avatars/oceane_dubois_intime.jpg\", \"asset:///avatars/oceane_dubois_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Noémie Vasseur",
@@ -3953,7 +3953,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Architecture, Dessin, Mains, Timidité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/noemie_vasseur.jpg\", \"asset:///avatars/noemie_vasseur_sexy.jpg\", \"asset:///avatars/noemie_vasseur_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/noemie_vasseur.jpg\", \"asset:///avatars/noemie_vasseur_sexy.jpg\", \"asset:///avatars/noemie_vasseur_intime.jpg\", \"asset:///avatars/noemie_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Daphné Masson",
@@ -3966,7 +3966,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Soirée, Fête, Balcon, Champagne, Robe de soirée, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/daphne_masson.jpg\", \"asset:///avatars/daphne_masson_sexy.jpg\", \"asset:///avatars/daphne_masson_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/daphne_masson.jpg\", \"asset:///avatars/daphne_masson_sexy.jpg\", \"asset:///avatars/daphne_masson_intime.jpg\", \"asset:///avatars/daphne_masson_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Delphine Marchal",
@@ -3979,7 +3979,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Cuisine, Sauce, Gourmandise, Dimanche, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/delphine_marchal.jpg\", \"asset:///avatars/delphine_marchal_sexy.jpg\", \"asset:///avatars/delphine_marchal_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/delphine_marchal.jpg\", \"asset:///avatars/delphine_marchal_sexy.jpg\", \"asset:///avatars/delphine_marchal_intime.jpg\", \"asset:///avatars/delphine_marchal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Stella Bonnet",
@@ -3992,7 +3992,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Peinture, Art, Modèle, Torse nu, Véranda, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/stella_bonnet.jpg\", \"asset:///avatars/stella_bonnet_sexy.jpg\", \"asset:///avatars/stella_bonnet_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/stella_bonnet.jpg\", \"asset:///avatars/stella_bonnet_sexy.jpg\", \"asset:///avatars/stella_bonnet_intime.jpg\", \"asset:///avatars/stella_bonnet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Juliette Caron",
@@ -4005,7 +4005,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Hôtesse de l'air, Uniforme, Valise, Voyage, Retrouvailles, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/juliette_caron.jpg\", \"asset:///avatars/juliette_caron_sexy.jpg\", \"asset:///avatars/juliette_caron_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/juliette_caron.jpg\", \"asset:///avatars/juliette_caron_sexy.jpg\", \"asset:///avatars/juliette_caron_intime.jpg\", \"asset:///avatars/juliette_caron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Florine Perrin",
@@ -4018,7 +4018,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Écurie, Chevaux, Pluie, Paille, Bottes, Cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/florine_perrin.jpg\", \"asset:///avatars/florine_perrin_sexy.jpg\", \"asset:///avatars/florine_perrin_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/florine_perrin.jpg\", \"asset:///avatars/florine_perrin_sexy.jpg\", \"asset:///avatars/florine_perrin_intime.jpg\", \"asset:///avatars/florine_perrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélodie Vian",
@@ -4031,7 +4031,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Méditation, Yoga, Soie, Énergie, Relaxation, Massage, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melodie_vian.jpg\", \"asset:///avatars/melodie_vian_sexy.jpg\", \"asset:///avatars/melodie_vian_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melodie_vian.jpg\", \"asset:///avatars/melodie_vian_sexy.jpg\", \"asset:///avatars/melodie_vian_intime.jpg\", \"asset:///avatars/melodie_vian_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Agathe Lemaire",
@@ -4044,7 +4044,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Piscine, Natation, Maillot, Eau, Fraîcheur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/agathe_lemaire.jpg\", \"asset:///avatars/agathe_lemaire_sexy.jpg\", \"asset:///avatars/agathe_lemaire_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/agathe_lemaire.jpg\", \"asset:///avatars/agathe_lemaire_sexy.jpg\", \"asset:///avatars/agathe_lemaire_intime.jpg\", \"asset:///avatars/agathe_lemaire_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Célia Blanchard",
@@ -4057,7 +4057,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Amie de ma fille, Fille, Bibliothèque, Livres, Timidité, Rousseur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/celia_blanchard.jpg\", \"asset:///avatars/celia_blanchard_sexy.jpg\", \"asset:///avatars/celia_blanchard_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/celia_blanchard.jpg\", \"asset:///avatars/celia_blanchard_sexy.jpg\", \"asset:///avatars/celia_blanchard_intime.jpg\", \"asset:///avatars/celia_blanchard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Dorothée Morin",
@@ -4070,7 +4070,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Confidente, Amour secret, Canapé, Complicité, Pacte, Romance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/dorothee_morin.jpg\", \"asset:///avatars/dorothee_morin_sexy.jpg\", \"asset:///avatars/dorothee_morin_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/dorothee_morin.jpg\", \"asset:///avatars/dorothee_morin_sexy.jpg\", \"asset:///avatars/dorothee_morin_intime.jpg\", \"asset:///avatars/dorothee_morin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Delorme",
@@ -4083,7 +4083,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Colocataire, Pancakes, Matin, Cuisine, Évidence, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_delorme.jpg\", \"asset:///avatars/sophie_delorme_sexy.jpg\", \"asset:///avatars/sophie_delorme_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_delorme.jpg\", \"asset:///avatars/sophie_delorme_sexy.jpg\", \"asset:///avatars/sophie_delorme_intime.jpg\", \"asset:///avatars/sophie_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Vaneck",
@@ -4096,7 +4096,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Voiture, Nuit, Étoiles, Jalousie, Déclaration, Cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_vaneck.jpg\", \"asset:///avatars/julie_vaneck_sexy.jpg\", \"asset:///avatars/julie_vaneck_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_vaneck.jpg\", \"asset:///avatars/julie_vaneck_sexy.jpg\", \"asset:///avatars/julie_vaneck_intime.jpg\", \"asset:///avatars/julie_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Élodie Roux",
@@ -4109,7 +4109,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Sport, Running, Transpiration, Chaleur, Complicité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elodie_roux.jpg\", \"asset:///avatars/elodie_roux_sexy.jpg\", \"asset:///avatars/elodie_roux_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elodie_roux.jpg\", \"asset:///avatars/elodie_roux_sexy.jpg\", \"asset:///avatars/elodie_roux_intime.jpg\", \"asset:///avatars/elodie_roux_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Blanc",
@@ -4122,7 +4122,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Associée, Champagne, Succès, Bureau, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_blanc.jpg\", \"asset:///avatars/camille_blanc_sexy.jpg\", \"asset:///avatars/camille_blanc_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_blanc.jpg\", \"asset:///avatars/camille_blanc_sexy.jpg\", \"asset:///avatars/camille_blanc_intime.jpg\", \"asset:///avatars/camille_blanc_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Élise Fabre",
@@ -4135,7 +4135,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Retrouvailles, Nostalgie, Café, Pluie, Émotion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elise_fabre.jpg\", \"asset:///avatars/elise_fabre_sexy.jpg\", \"asset:///avatars/elise_fabre_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elise_fabre.jpg\", \"asset:///avatars/elise_fabre_sexy.jpg\", \"asset:///avatars/elise_fabre_intime.jpg\", \"asset:///avatars/elise_fabre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Ambre Castan",
@@ -4148,7 +4148,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Divorce, Terrasse, Nuit, Soie, Réconfort, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ambre_castan.jpg\", \"asset:///avatars/ambre_castan_sexy.jpg\", \"asset:///avatars/ambre_castan_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ambre_castan.jpg\", \"asset:///avatars/ambre_castan_sexy.jpg\", \"asset:///avatars/ambre_castan_intime.jpg\", \"asset:///avatars/ambre_castan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marion Tessier",
@@ -4161,7 +4161,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Lit, Dimanche, Couette, Matin, Intimité, Câlin, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marion_tessier.jpg\", \"asset:///avatars/marion_tessier_sexy.jpg\", \"asset:///avatars/marion_tessier_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marion_tessier.jpg\", \"asset:///avatars/marion_tessier_sexy.jpg\", \"asset:///avatars/marion_tessier_intime.jpg\", \"asset:///avatars/marion_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélissa Boyer",
@@ -4174,7 +4174,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Nuit, Taxi, Fête, Cuir, Alcool, Déclaration, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melissa_boyer.jpg\", \"asset:///avatars/melissa_boyer_sexy.jpg\", \"asset:///avatars/melissa_boyer_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melissa_boyer.jpg\", \"asset:///avatars/melissa_boyer_sexy.jpg\", \"asset:///avatars/melissa_boyer_intime.jpg\", \"asset:///avatars/melissa_boyer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Audrey Germain",
@@ -4187,7 +4187,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Avocate, Vin, Soirée, Détente, Confidences, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/audrey_germain.jpg\", \"asset:///avatars/audrey_germain_sexy.jpg\", \"asset:///avatars/audrey_germain_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/audrey_germain.jpg\", \"asset:///avatars/audrey_germain_sexy.jpg\", \"asset:///avatars/audrey_germain_intime.jpg\", \"asset:///avatars/audrey_germain_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Dorothée Lemoine",
@@ -4200,7 +4200,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Artiste, Peinture, Atelier, Crépuscule, Inspiration, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/dorothee_lemoine.jpg\", \"asset:///avatars/dorothee_lemoine_sexy.jpg\", \"asset:///avatars/dorothee_lemoine_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/dorothee_lemoine.jpg\", \"asset:///avatars/dorothee_lemoine_sexy.jpg\", \"asset:///avatars/dorothee_lemoine_intime.jpg\", \"asset:///avatars/dorothee_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Pauline Faure",
@@ -4213,7 +4213,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Risotto, Cuisine, Rires, Déclaration, Évidence, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/pauline_faure.jpg\", \"asset:///avatars/pauline_faure_sexy.jpg\", \"asset:///avatars/pauline_faure_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/pauline_faure.jpg\", \"asset:///avatars/pauline_faure_sexy.jpg\", \"asset:///avatars/pauline_faure_intime.jpg\", \"asset:///avatars/pauline_faure_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Valentine Roche",
@@ -4226,7 +4226,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Jalousie, Dîner, Restaurant, Passion, Robe rouge, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valentine_roche.jpg\", \"asset:///avatars/valentine_roche_sexy.jpg\", \"asset:///avatars/valentine_roche_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valentine_roche.jpg\", \"asset:///avatars/valentine_roche_sexy.jpg\", \"asset:///avatars/valentine_roche_intime.jpg\", \"asset:///avatars/valentine_roche_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jessica Caron",
@@ -4239,7 +4239,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Bar, Nuit, Rhum, Comptoir, Privilège, Séduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jessica_caron.jpg\", \"asset:///avatars/jessica_caron_sexy.jpg\", \"asset:///avatars/jessica_caron_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jessica_caron.jpg\", \"asset:///avatars/jessica_caron_sexy.jpg\", \"asset:///avatars/jessica_caron_intime.jpg\", \"asset:///avatars/jessica_caron_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Tatiana Meyer",
@@ -4252,7 +4252,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Meilleure Amie, Chalet, Neige, Cheminée, Cachemire, Passion slave, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/tatiana_meyer.jpg\", \"asset:///avatars/tatiana_meyer_sexy.jpg\", \"asset:///avatars/tatiana_meyer_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/tatiana_meyer.jpg\", \"asset:///avatars/tatiana_meyer_sexy.jpg\", \"asset:///avatars/tatiana_meyer_intime.jpg\", \"asset:///avatars/tatiana_meyer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Hélène Courtois",
@@ -4265,7 +4265,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Assistante, Bureau, Patron, Nuit, Dévouée, Massage, Tailleur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/helene_courtois.jpg\", \"asset:///avatars/helene_courtois_sexy.jpg\", \"asset:///avatars/helene_courtois_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/helene_courtois.jpg\", \"asset:///avatars/helene_courtois_sexy.jpg\", \"asset:///avatars/helene_courtois_intime.jpg\", \"asset:///avatars/helene_courtois_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Delphine Marceau",
@@ -4278,7 +4278,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Assistante, Genève, Hôtel, Champagne, Suite, Déplacement, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/delphine_marceau.jpg\", \"asset:///avatars/delphine_marceau_sexy.jpg\", \"asset:///avatars/delphine_marceau_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/delphine_marceau.jpg\", \"asset:///avatars/delphine_marceau_sexy.jpg\", \"asset:///avatars/delphine_marceau_intime.jpg\", \"asset:///avatars/delphine_marceau_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélanie Vasseur",
@@ -4291,7 +4291,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Jeune, Bureau, Photocopieuse, Provocation, Jupe crayon, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melanie_vasseur.jpg\", \"asset:///avatars/melanie_vasseur_sexy.jpg\", \"asset:///avatars/melanie_vasseur_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melanie_vasseur.jpg\", \"asset:///avatars/melanie_vasseur_sexy.jpg\", \"asset:///avatars/melanie_vasseur_intime.jpg\", \"asset:///avatars/melanie_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Corinne Dubois",
@@ -4304,7 +4304,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Expérimentée, Dévotion, Soirée, Bureau, Tendresse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/corinne_dubois.jpg\", \"asset:///avatars/corinne_dubois_sexy.jpg\", \"asset:///avatars/corinne_dubois_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/corinne_dubois.jpg\", \"asset:///avatars/corinne_dubois_sexy.jpg\", \"asset:///avatars/corinne_dubois_intime.jpg\", \"asset:///avatars/corinne_dubois_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sabrina Leclerc",
@@ -4317,7 +4317,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Assistante, VIP, Jet privé, Voyage, Escale, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sabrina_leclerc.jpg\", \"asset:///avatars/sabrina_leclerc_sexy.jpg\", \"asset:///avatars/sabrina_leclerc_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sabrina_leclerc.jpg\", \"asset:///avatars/sabrina_leclerc_sexy.jpg\", \"asset:///avatars/sabrina_leclerc_intime.jpg\", \"asset:///avatars/sabrina_leclerc_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Valérie Lambert",
@@ -4330,7 +4330,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Juridique, Archives, Complicité, Quinze ans, Désir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valerie_lambert.jpg\", \"asset:///avatars/valerie_lambert_sexy.jpg\", \"asset:///avatars/valerie_lambert_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valerie_lambert.jpg\", \"asset:///avatars/valerie_lambert_sexy.jpg\", \"asset:///avatars/valerie_lambert_intime.jpg\", \"asset:///avatars/valerie_lambert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jessica Tanguy",
@@ -4343,7 +4343,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Médicale, Cabinet, Docteur, Soins, Nuit, Blouse blanche, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jessica_tanguy.jpg\", \"asset:///avatars/jessica_tanguy_sexy.jpg\", \"asset:///avatars/jessica_tanguy_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jessica_tanguy.jpg\", \"asset:///avatars/jessica_tanguy_sexy.jpg\", \"asset:///avatars/jessica_tanguy_intime.jpg\", \"asset:///avatars/jessica_tanguy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Perrin",
@@ -4356,7 +4356,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Direction, Réunion, Investisseurs, Victoire, Succès, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_perrin.jpg\", \"asset:///avatars/nathalie_perrin_sexy.jpg\", \"asset:///avatars/nathalie_perrin_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_perrin.jpg\", \"asset:///avatars/nathalie_perrin_sexy.jpg\", \"asset:///avatars/nathalie_perrin_intime.jpg\", \"asset:///avatars/nathalie_perrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Caroline Sorel",
@@ -4369,7 +4369,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Particulière, Nuit, Tour panoramique, Secrets, Fidélité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/caroline_sorel.jpg\", \"asset:///avatars/caroline_sorel_sexy.jpg\", \"asset:///avatars/caroline_sorel_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/caroline_sorel.jpg\", \"asset:///avatars/caroline_sorel_sexy.jpg\", \"asset:///avatars/caroline_sorel_intime.jpg\", \"asset:///avatars/caroline_sorel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Diane Dumont",
@@ -4382,7 +4382,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Finance, Bilan, Nuit, Chiffres, Lunettes, Romance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/diane_dumont.jpg\", \"asset:///avatars/diane_dumont_sexy.jpg\", \"asset:///avatars/diane_dumont_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/diane_dumont.jpg\", \"asset:///avatars/diane_dumont_sexy.jpg\", \"asset:///avatars/diane_dumont_intime.jpg\", \"asset:///avatars/diane_dumont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sandrine Vidal",
@@ -4395,7 +4395,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Bilingue, Londres, Hôtel, Luxe, Traduction, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sandrine_vidal.jpg\", \"asset:///avatars/sandrine_vidal_sexy.jpg\", \"asset:///avatars/sandrine_vidal_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sandrine_vidal.jpg\", \"asset:///avatars/sandrine_vidal_sexy.jpg\", \"asset:///avatars/sandrine_vidal_intime.jpg\", \"asset:///avatars/sandrine_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Castillon",
@@ -4408,7 +4408,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Direction, Autorité, Réunion, Fierté, Charisme, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_castillon.jpg\", \"asset:///avatars/julie_castillon_sexy.jpg\", \"asset:///avatars/julie_castillon_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_castillon.jpg\", \"asset:///avatars/julie_castillon_sexy.jpg\", \"asset:///avatars/julie_castillon_intime.jpg\", \"asset:///avatars/julie_castillon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Bonnet",
@@ -4421,7 +4421,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Communication, Studio, Vidéo, Cravate, Proximité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_bonnet.jpg\", \"asset:///avatars/sophie_bonnet_sexy.jpg\", \"asset:///avatars/sophie_bonnet_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_bonnet.jpg\", \"asset:///avatars/sophie_bonnet_sexy.jpg\", \"asset:///avatars/sophie_bonnet_intime.jpg\", \"asset:///avatars/sophie_bonnet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marie-Laure Renard",
@@ -4434,7 +4434,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Générale, Holding, Pouvoir, Vingt ans, Loyauté, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marie_laure_renard.jpg\", \"asset:///avatars/marie_laure_renard_sexy.jpg\", \"asset:///avatars/marie_laure_renard_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marie_laure_renard.jpg\", \"asset:///avatars/marie_laure_renard_sexy.jpg\", \"asset:///avatars/marie_laure_renard_intime.jpg\", \"asset:///avatars/marie_laure_renard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Vanessa Meunier",
@@ -4447,7 +4447,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Secrétaire, Conseil, Nuit, Signature, Stylo plume, Bordeaux, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/vanessa_meunier.jpg\", \"asset:///avatars/vanessa_meunier_sexy.jpg\", \"asset:///avatars/vanessa_meunier_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/vanessa_meunier.jpg\", \"asset:///avatars/vanessa_meunier_sexy.jpg\", \"asset:///avatars/vanessa_meunier_intime.jpg\", \"asset:///avatars/vanessa_meunier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Juliette Morin",
@@ -4460,7 +4460,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Famille, Fils, Villa, Nuit, Maturité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/juliette_morin.jpg\", \"asset:///avatars/juliette_morin_sexy.jpg\", \"asset:///avatars/juliette_morin_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/juliette_morin.jpg\", \"asset:///avatars/juliette_morin_sexy.jpg\", \"asset:///avatars/juliette_morin_intime.jpg\", \"asset:///avatars/juliette_morin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clara Vaneck",
@@ -4473,7 +4473,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Famille, Douche, Serviette, Jeune, Salle de bain, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clara_vaneck.jpg\", \"asset:///avatars/clara_vaneck_sexy.jpg\", \"asset:///avatars/clara_vaneck_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clara_vaneck.jpg\", \"asset:///avatars/clara_vaneck_sexy.jpg\", \"asset:///avatars/clara_vaneck_intime.jpg\", \"asset:///avatars/clara_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mathilde Laurent",
@@ -4486,7 +4486,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Famille, Verger, Soleil, Pêches, Campagne, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mathilde_laurent.jpg\", \"asset:///avatars/mathilde_laurent_sexy.jpg\", \"asset:///avatars/mathilde_laurent_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mathilde_laurent.jpg\", \"asset:///avatars/mathilde_laurent_sexy.jpg\", \"asset:///avatars/mathilde_laurent_intime.jpg\", \"asset:///avatars/mathilde_laurent_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Emma Guérin",
@@ -4499,7 +4499,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Rebelle, Bureau, Morale, Provocation, Cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emma_guerin.jpg\", \"asset:///avatars/emma_guerin_sexy.jpg\", \"asset:///avatars/emma_guerin_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emma_guerin.jpg\", \"asset:///avatars/emma_guerin_sexy.jpg\", \"asset:///avatars/emma_guerin_intime.jpg\", \"asset:///avatars/emma_guerin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Romane Delorme",
@@ -4512,7 +4512,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Jardin, Nuit, Anniversaire, Émotion, Réconfort, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/romane_delorme.jpg\", \"asset:///avatars/romane_delorme_sexy.jpg\", \"asset:///avatars/romane_delorme_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/romane_delorme.jpg\", \"asset:///avatars/romane_delorme_sexy.jpg\", \"asset:///avatars/romane_delorme_intime.jpg\", \"asset:///avatars/romane_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Inès Boucher",
@@ -4525,7 +4525,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Timidité, Café, Cuisine, Matin, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ines_boucher.jpg\", \"asset:///avatars/ines_boucher_sexy.jpg\", \"asset:///avatars/ines_boucher_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ines_boucher.jpg\", \"asset:///avatars/ines_boucher_sexy.jpg\", \"asset:///avatars/ines_boucher_intime.jpg\", \"asset:///avatars/ines_boucher_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alicia Castan",
@@ -4538,7 +4538,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Réception, Mondaine, Bibliothèque, Cocktail, Élégance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alicia_castan.jpg\", \"asset:///avatars/alicia_castan_sexy.jpg\", \"asset:///avatars/alicia_castan_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alicia_castan.jpg\", \"asset:///avatars/alicia_castan_sexy.jpg\", \"asset:///avatars/alicia_castan_intime.jpg\", \"asset:///avatars/alicia_castan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Royer",
@@ -4551,7 +4551,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Garage, Bricolage, Graisse, Énergie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_royer.jpg\", \"asset:///avatars/camille_royer_sexy.jpg\", \"asset:///avatars/camille_royer_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_royer.jpg\", \"asset:///avatars/camille_royer_sexy.jpg\", \"asset:///avatars/camille_royer_intime.jpg\", \"asset:///avatars/camille_royer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Océane Picard",
@@ -4564,7 +4564,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Université, Gratitude, Bureau, Genoux, Cadeau, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/oceane_picard.jpg\", \"asset:///avatars/oceane_picard_sexy.jpg\", \"asset:///avatars/oceane_picard_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/oceane_picard.jpg\", \"asset:///avatars/oceane_picard_sexy.jpg\", \"asset:///avatars/oceane_picard_intime.jpg\", \"asset:///avatars/oceane_picard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Léa Mercier",
@@ -4577,7 +4577,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Infirmière, Hôpital, Nuit, Garde, Thé, Complicité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/lea_mercier.jpg\", \"asset:///avatars/lea_mercier_sexy.jpg\", \"asset:///avatars/lea_mercier_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/lea_mercier.jpg\", \"asset:///avatars/lea_mercier_sexy.jpg\", \"asset:///avatars/lea_mercier_intime.jpg\", \"asset:///avatars/lea_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sarah Blanc",
@@ -4590,7 +4590,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Photographie, Soleil couchant, Jardin, Art, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sarah_blanc.jpg\", \"asset:///avatars/sarah_blanc_sexy.jpg\", \"asset:///avatars/sarah_blanc_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sarah_blanc.jpg\", \"asset:///avatars/sarah_blanc_sexy.jpg\", \"asset:///avatars/sarah_blanc_intime.jpg\", \"asset:///avatars/sarah_blanc_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Éloïse Mercier",
@@ -4603,7 +4603,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Cuisine, Chocolat, Dégustation, Cuillère, Gastronomie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/eloise_mercier.jpg\", \"asset:///avatars/eloise_mercier_sexy.jpg\", \"asset:///avatars/eloise_mercier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/eloise_mercier.jpg\", \"asset:///avatars/eloise_mercier_sexy.jpg\", \"asset:///avatars/eloise_mercier_intime.jpg\", \"asset:///avatars/eloise_mercier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Noémie Roux",
@@ -4616,7 +4616,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Piscine, Crème solaire, Dos, Transat, Été, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/noemie_roux.jpg\", \"asset:///avatars/noemie_roux_sexy.jpg\", \"asset:///avatars/noemie_roux_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/noemie_roux.jpg\", \"asset:///avatars/noemie_roux_sexy.jpg\", \"asset:///avatars/noemie_roux_intime.jpg\", \"asset:///avatars/noemie_roux_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chloé Germain",
@@ -4629,7 +4629,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Séparation, Famille, Salon, Confiance, Repère, Protection, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chloe_germain.jpg\", \"asset:///avatars/chloe_germain_sexy.jpg\", \"asset:///avatars/chloe_germain_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chloe_germain.jpg\", \"asset:///avatars/chloe_germain_sexy.jpg\", \"asset:///avatars/chloe_germain_intime.jpg\", \"asset:///avatars/chloe_germain_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Cassandra Faure",
@@ -4642,7 +4642,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Fille, Fille de l'épouse, Droit, Mentor, Bureau, Bibliothèque, Charisme, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/cassandra_faure.jpg\", \"asset:///avatars/cassandra_faure_sexy.jpg\", \"asset:///avatars/cassandra_faure_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/cassandra_faure.jpg\", \"asset:///avatars/cassandra_faure_sexy.jpg\", \"asset:///avatars/cassandra_faure_intime.jpg\", \"asset:///avatars/cassandra_faure_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Madame de Saint-Hilaire",
@@ -4655,7 +4655,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Droit, Sorbonne, Université, Tailleur, Lunettes, Autorité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/madame_de_saint_hilaire.jpg\", \"asset:///avatars/madame_de_saint_hilaire_sexy.jpg\", \"asset:///avatars/madame_de_saint_hilaire_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/madame_de_saint_hilaire.jpg\", \"asset:///avatars/madame_de_saint_hilaire_sexy.jpg\", \"asset:///avatars/madame_de_saint_hilaire_intime.jpg\", \"asset:///avatars/madame_de_saint_hilaire_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Professeure Valérie Fontaine",
@@ -4668,7 +4668,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Littérature, Sorbonne, Romans, Velours, Soie, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/professeure_valerie_fontaine.jpg\", \"asset:///avatars/professeure_valerie_fontaine_sexy.jpg\", \"asset:///avatars/professeure_valerie_fontaine_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/professeure_valerie_fontaine.jpg\", \"asset:///avatars/professeure_valerie_fontaine_sexy.jpg\", \"asset:///avatars/professeure_valerie_fontaine_intime.jpg\", \"asset:///avatars/professeure_valerie_fontaine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Dr. Catherine Vilar",
@@ -4681,7 +4681,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Médecine, Hôpital, Anatomie, Blouse blanche, Pouls, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/dr_catherine_vilar.jpg\", \"asset:///avatars/dr_catherine_vilar_sexy.jpg\", \"asset:///avatars/dr_catherine_vilar_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/dr_catherine_vilar.jpg\", \"asset:///avatars/dr_catherine_vilar_sexy.jpg\", \"asset:///avatars/dr_catherine_vilar_intime.jpg\", \"asset:///avatars/dr_catherine_vilar_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Emma Bertin",
@@ -4694,7 +4694,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Philosophie, Université, Nietzsche, Morale, Bureau, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emma_bertin.jpg\", \"asset:///avatars/emma_bertin_sexy.jpg\", \"asset:///avatars/emma_bertin_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emma_bertin.jpg\", \"asset:///avatars/emma_bertin_sexy.jpg\", \"asset:///avatars/emma_bertin_intime.jpg\", \"asset:///avatars/emma_bertin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sylvie Castillon",
@@ -4707,7 +4707,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Doyenne, Économie, Amphi, Faculté, Pouvoir, Audace, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sylvie_castillon.jpg\", \"asset:///avatars/sylvie_castillon_sexy.jpg\", \"asset:///avatars/sylvie_castillon_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sylvie_castillon.jpg\", \"asset:///avatars/sylvie_castillon_sexy.jpg\", \"asset:///avatars/sylvie_castillon_intime.jpg\", \"asset:///avatars/sylvie_castillon_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Éléonore Dumont",
@@ -4720,7 +4720,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Sociologie, Désir, Conventions, Tabous, Salle des profs, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/eleonore_dumont.jpg\", \"asset:///avatars/eleonore_dumont_sexy.jpg\", \"asset:///avatars/eleonore_dumont_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/eleonore_dumont.jpg\", \"asset:///avatars/eleonore_dumont_sexy.jpg\", \"asset:///avatars/eleonore_dumont_intime.jpg\", \"asset:///avatars/eleonore_dumont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Estelle Riviere",
@@ -4733,7 +4733,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Histoire de l'art, Musée, Réserves, Sculpture, David, Beauté, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/estelle_riviere.jpg\", \"asset:///avatars/estelle_riviere_sexy.jpg\", \"asset:///avatars/estelle_riviere_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/estelle_riviere.jpg\", \"asset:///avatars/estelle_riviere_sexy.jpg\", \"asset:///avatars/estelle_riviere_intime.jpg\", \"asset:///avatars/estelle_riviere_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Diane Renoir",
@@ -4746,7 +4746,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Langues, Italien, Poésie, Laboratoire, Tentation, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/diane_renoir.jpg\", \"asset:///avatars/diane_renoir_sexy.jpg\", \"asset:///avatars/diane_renoir_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/diane_renoir.jpg\", \"asset:///avatars/diane_renoir_sexy.jpg\", \"asset:///avatars/diane_renoir_intime.jpg\", \"asset:///avatars/diane_renoir_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Eugénie Guyot",
@@ -4759,7 +4759,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Psychologie, Désir, Analyse, Cabinet, Regard, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/eugenie_guyot.jpg\", \"asset:///avatars/eugenie_guyot_sexy.jpg\", \"asset:///avatars/eugenie_guyot_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/eugenie_guyot.jpg\", \"asset:///avatars/eugenie_guyot_sexy.jpg\", \"asset:///avatars/eugenie_guyot_intime.jpg\", \"asset:///avatars/eugenie_guyot_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Fanny Lucas",
@@ -4772,7 +4772,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Architecture, Chantier, Tour, Hauteur, Cuir, Créativité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/fanny_lucas.jpg\", \"asset:///avatars/fanny_lucas_sexy.jpg\", \"asset:///avatars/fanny_lucas_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/fanny_lucas.jpg\", \"asset:///avatars/fanny_lucas_sexy.jpg\", \"asset:///avatars/fanny_lucas_intime.jpg\", \"asset:///avatars/fanny_lucas_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Delacroix",
@@ -4785,7 +4785,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Biochimie, Laboratoire, Ocytocine, Expérience, Blouse blanche, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_delacroix.jpg\", \"asset:///avatars/sophie_delacroix_sexy.jpg\", \"asset:///avatars/sophie_delacroix_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_delacroix.jpg\", \"asset:///avatars/sophie_delacroix_sexy.jpg\", \"asset:///avatars/sophie_delacroix_intime.jpg\", \"asset:///avatars/sophie_delacroix_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Geneviève Vian",
@@ -4798,7 +4798,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Chant, Conservatoire, Piano, Diaphragme, Voix, Velours, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/genevieve_vian.jpg\", \"asset:///avatars/genevieve_vian_sexy.jpg\", \"asset:///avatars/genevieve_vian_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/genevieve_vian.jpg\", \"asset:///avatars/genevieve_vian_sexy.jpg\", \"asset:///avatars/genevieve_vian_intime.jpg\", \"asset:///avatars/genevieve_vian_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Patricia Guérin",
@@ -4811,7 +4811,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Lettres classiques, Mythologie, Apollon, Grèce antique, Drapé, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/patricia_guerin.jpg\", \"asset:///avatars/patricia_guerin_sexy.jpg\", \"asset:///avatars/patricia_guerin_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/patricia_guerin.jpg\", \"asset:///avatars/patricia_guerin_sexy.jpg\", \"asset:///avatars/patricia_guerin_intime.jpg\", \"asset:///avatars/patricia_guerin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Monique Vidal",
@@ -4824,7 +4824,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Thèse, Doctorat, Manuscrit, Fierté, Dimanche, Domicile, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/monique_vidal.jpg\", \"asset:///avatars/monique_vidal_sexy.jpg\", \"asset:///avatars/monique_vidal_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/monique_vidal.jpg\", \"asset:///avatars/monique_vidal_sexy.jpg\", \"asset:///avatars/monique_vidal_intime.jpg\", \"asset:///avatars/monique_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sabine Vasseur",
@@ -4837,7 +4837,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure, Droit public, Télévision, Débat, Plateau, Médias, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sabine_vasseur.jpg\", \"asset:///avatars/sabine_vasseur_sexy.jpg\", \"asset:///avatars/sabine_vasseur_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sabine_vasseur.jpg\", \"asset:///avatars/sabine_vasseur_sexy.jpg\", \"asset:///avatars/sabine_vasseur_intime.jpg\", \"asset:///avatars/sabine_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mademoiselle Clara Dupont",
@@ -4850,7 +4850,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Institutrice, École, Maternelle, Classe, Père célibataire, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/mademoiselle_clara_dupont.jpg\", \"asset:///avatars/mademoiselle_clara_dupont_sexy.jpg\", \"asset:///avatars/mademoiselle_clara_dupont_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/mademoiselle_clara_dupont.jpg\", \"asset:///avatars/mademoiselle_clara_dupont_sexy.jpg\", \"asset:///avatars/mademoiselle_clara_dupont_intime.jpg\", \"asset:///avatars/mademoiselle_clara_dupont_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Madame Sandrine Leroux",
@@ -4863,7 +4863,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Collège, Réunion, Français, Père, Salle de classe, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/madame_sandrine_leroux.jpg\", \"asset:///avatars/madame_sandrine_leroux_sexy.jpg\", \"asset:///avatars/madame_sandrine_leroux_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/madame_sandrine_leroux.jpg\", \"asset:///avatars/madame_sandrine_leroux_sexy.jpg\", \"asset:///avatars/madame_sandrine_leroux_intime.jpg\", \"asset:///avatars/madame_sandrine_leroux_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Castan",
@@ -4876,7 +4876,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Cours à domicile, Maths, Cuisine, Café, Salon, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_castan.jpg\", \"asset:///avatars/sophie_castan_sexy.jpg\", \"asset:///avatars/sophie_castan_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_castan.jpg\", \"asset:///avatars/sophie_castan_sexy.jpg\", \"asset:///avatars/sophie_castan_intime.jpg\", \"asset:///avatars/sophie_castan_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Perrin",
@@ -4889,7 +4889,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Piano, Musique, Salon, Leçon, Douceur, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_perrin.jpg\", \"asset:///avatars/julie_perrin_sexy.jpg\", \"asset:///avatars/julie_perrin_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_perrin.jpg\", \"asset:///avatars/julie_perrin_sexy.jpg\", \"asset:///avatars/julie_perrin_intime.jpg\", \"asset:///avatars/julie_perrin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Élodie Blanc",
@@ -4902,7 +4902,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Anglais, Collège, Londres, Voyage scolaire, Charme, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/elodie_blanc.jpg\", \"asset:///avatars/elodie_blanc_sexy.jpg\", \"asset:///avatars/elodie_blanc_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/elodie_blanc.jpg\", \"asset:///avatars/elodie_blanc_sexy.jpg\", \"asset:///avatars/elodie_blanc_intime.jpg\", \"asset:///avatars/elodie_blanc_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Vaneck",
@@ -4915,7 +4915,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Maternelle, Dessin d'enfant, Cour d'école, Douceur, Timidité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_vaneck.jpg\", \"asset:///avatars/camille_vaneck_sexy.jpg\", \"asset:///avatars/camille_vaneck_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_vaneck.jpg\", \"asset:///avatars/camille_vaneck_sexy.jpg\", \"asset:///avatars/camille_vaneck_intime.jpg\", \"asset:///avatars/camille_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Flavie Brun",
@@ -4928,7 +4928,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Équitation, Club hippique, Manège, Chevaux, Bottes de cuir, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/flavie_brun.jpg\", \"asset:///avatars/flavie_brun_sexy.jpg\", \"asset:///avatars/flavie_brun_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/flavie_brun.jpg\", \"asset:///avatars/flavie_brun_sexy.jpg\", \"asset:///avatars/flavie_brun_intime.jpg\", \"asset:///avatars/flavie_brun_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Nathalie Roche",
@@ -4941,7 +4941,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Principale, Collège, Direction, Bureau, Protocole, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/nathalie_roche.jpg\", \"asset:///avatars/nathalie_roche_sexy.jpg\", \"asset:///avatars/nathalie_roche_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/nathalie_roche.jpg\", \"asset:///avatars/nathalie_roche_sexy.jpg\", \"asset:///avatars/nathalie_roche_intime.jpg\", \"asset:///avatars/nathalie_roche_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Marion Faure",
@@ -4954,7 +4954,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Danse, Studio, Miroir, Souplesse, Grâce, Spectacle, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/marion_faure.jpg\", \"asset:///avatars/marion_faure_sexy.jpg\", \"asset:///avatars/marion_faure_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/marion_faure.jpg\", \"asset:///avatars/marion_faure_sexy.jpg\", \"asset:///avatars/marion_faure_intime.jpg\", \"asset:///avatars/marion_faure_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Audrey Lemoine",
@@ -4967,7 +4967,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Orthophoniste, Voix, Cabinet, Rééducation, Timbre, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/audrey_lemoine.jpg\", \"asset:///avatars/audrey_lemoine_sexy.jpg\", \"asset:///avatars/audrey_lemoine_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/audrey_lemoine.jpg\", \"asset:///avatars/audrey_lemoine_sexy.jpg\", \"asset:///avatars/audrey_lemoine_intime.jpg\", \"asset:///avatars/audrey_lemoine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Vanessa Royer",
@@ -4980,7 +4980,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Arts plastiques, Collège, Dessin, Exposition, Peinture, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/vanessa_royer.jpg\", \"asset:///avatars/vanessa_royer_sexy.jpg\", \"asset:///avatars/vanessa_royer_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/vanessa_royer.jpg\", \"asset:///avatars/vanessa_royer_sexy.jpg\", \"asset:///avatars/vanessa_royer_intime.jpg\", \"asset:///avatars/vanessa_royer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Céline Picard",
@@ -4993,7 +4993,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Histoire, Carte murale, Collège, Érudition, Conquête, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/celine_picard.jpg\", \"asset:///avatars/celine_picard_sexy.jpg\", \"asset:///avatars/celine_picard_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/celine_picard.jpg\", \"asset:///avatars/celine_picard_sexy.jpg\", \"asset:///avatars/celine_picard_intime.jpg\", \"asset:///avatars/celine_picard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sarah Germain",
@@ -5006,7 +5006,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Judo, Tatami, Kimono, Ceinture noire, Combat, Force, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sarah_germain.jpg\", \"asset:///avatars/sarah_germain_sexy.jpg\", \"asset:///avatars/sarah_germain_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sarah_germain.jpg\", \"asset:///avatars/sarah_germain_sexy.jpg\", \"asset:///avatars/sarah_germain_intime.jpg\", \"asset:///avatars/sarah_germain_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Manon Bonnet",
@@ -5019,7 +5019,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Théâtre, Scène, Projecteurs, Phèdre, Racine, Passion, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/manon_bonnet.jpg\", \"asset:///avatars/manon_bonnet_sexy.jpg\", \"asset:///avatars/manon_bonnet_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/manon_bonnet.jpg\", \"asset:///avatars/manon_bonnet_sexy.jpg\", \"asset:///avatars/manon_bonnet_intime.jpg\", \"asset:///avatars/manon_bonnet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Corinne Tanguy",
@@ -5032,7 +5032,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Professeure des enfants, Directrice, École privée, Boiseries, Notables, Prestige, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/corinne_tanguy.jpg\", \"asset:///avatars/corinne_tanguy_sexy.jpg\", \"asset:///avatars/corinne_tanguy_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/corinne_tanguy.jpg\", \"asset:///avatars/corinne_tanguy_sexy.jpg\", \"asset:///avatars/corinne_tanguy_intime.jpg\", \"asset:///avatars/corinne_tanguy_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Clara Sorel",
@@ -5045,7 +5045,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Famille, Orage, Nuit, Lit, Couette, Soie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/clara_sorel.jpg\", \"asset:///avatars/clara_sorel_sexy.jpg\", \"asset:///avatars/clara_sorel_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/clara_sorel.jpg\", \"asset:///avatars/clara_sorel_sexy.jpg\", \"asset:///avatars/clara_sorel_intime.jpg\", \"asset:///avatars/clara_sorel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Emma Vaneck",
@@ -5058,7 +5058,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Famille, Maison vide, Week-end, Canapé, Complicité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/emma_vaneck.jpg\", \"asset:///avatars/emma_vaneck_sexy.jpg\", \"asset:///avatars/emma_vaneck_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/emma_vaneck.jpg\", \"asset:///avatars/emma_vaneck_sexy.jpg\", \"asset:///avatars/emma_vaneck_intime.jpg\", \"asset:///avatars/emma_vaneck_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Gaëlle Pierre",
@@ -5071,7 +5071,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Famille, Balcon, Crépuscule, Mer, Pas de lien de sang, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/gaelle_pierre.jpg\", \"asset:///avatars/gaelle_pierre_sexy.jpg\", \"asset:///avatars/gaelle_pierre_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/gaelle_pierre.jpg\", \"asset:///avatars/gaelle_pierre_sexy.jpg\", \"asset:///avatars/gaelle_pierre_intime.jpg\", \"asset:///avatars/gaelle_pierre_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chloé Delorme",
@@ -5084,7 +5084,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Famille, Remariage, Cuisine, Nuit, Compréhension, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chloe_delorme.jpg\", \"asset:///avatars/chloe_delorme_sexy.jpg\", \"asset:///avatars/chloe_delorme_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chloe_delorme.jpg\", \"asset:///avatars/chloe_delorme_sexy.jpg\", \"asset:///avatars/chloe_delorme_intime.jpg\", \"asset:///avatars/chloe_delorme_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Romane Laurent",
@@ -5097,7 +5097,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Mannequin, Défilé, Maillot de bain, Cambrure, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/romane_laurent.jpg\", \"asset:///avatars/romane_laurent_sexy.jpg\", \"asset:///avatars/romane_laurent_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/romane_laurent.jpg\", \"asset:///avatars/romane_laurent_sexy.jpg\", \"asset:///avatars/romane_laurent_intime.jpg\", \"asset:///avatars/romane_laurent_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Géraldine Colin",
@@ -5110,7 +5110,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Salle de bain, Vapeur, Baignoire, Sortie de bain, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/geraldine_colin.jpg\", \"asset:///avatars/geraldine_colin_sexy.jpg\", \"asset:///avatars/geraldine_colin_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/geraldine_colin.jpg\", \"asset:///avatars/geraldine_colin_sexy.jpg\", \"asset:///avatars/geraldine_colin_intime.jpg\", \"asset:///avatars/geraldine_colin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Hortense Vidal",
@@ -5123,7 +5123,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Avocate, Barreau, Champagne, Victoire, Nuit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/hortense_vidal.jpg\", \"asset:///avatars/hortense_vidal_sexy.jpg\", \"asset:///avatars/hortense_vidal_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/hortense_vidal.jpg\", \"asset:///avatars/hortense_vidal_sexy.jpg\", \"asset:///avatars/hortense_vidal_intime.jpg\", \"asset:///avatars/hortense_vidal_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Inès Joubert",
@@ -5136,7 +5136,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Timidité, Chambre, Pluie, Confidences, Lit, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/ines_joubert.jpg\", \"asset:///avatars/ines_joubert_sexy.jpg\", \"asset:///avatars/ines_joubert_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/ines_joubert.jpg\", \"asset:///avatars/ines_joubert_sexy.jpg\", \"asset:///avatars/ines_joubert_intime.jpg\", \"asset:///avatars/ines_joubert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Alicia Royer",
@@ -5149,7 +5149,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Poker, Gage, Cartes, Salon, Nuit, Vérité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/alicia_royer.jpg\", \"asset:///avatars/alicia_royer_sexy.jpg\", \"asset:///avatars/alicia_royer_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/alicia_royer.jpg\", \"asset:///avatars/alicia_royer_sexy.jpg\", \"asset:///avatars/alicia_royer_intime.jpg\", \"asset:///avatars/alicia_royer_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Iris Brunet",
@@ -5162,7 +5162,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Sport, Footing, Endurance, Matin, Terrasse, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/iris_brunet.jpg\", \"asset:///avatars/iris_brunet_sexy.jpg\", \"asset:///avatars/iris_brunet_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/iris_brunet.jpg\", \"asset:///avatars/iris_brunet_sexy.jpg\", \"asset:///avatars/iris_brunet_intime.jpg\", \"asset:///avatars/iris_brunet_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Jessica Thomas",
@@ -5175,7 +5175,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Piscine, Matelas, Soleil, Eau, Été, Bikini, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/jessica_thomas.jpg\", \"asset:///avatars/jessica_thomas_sexy.jpg\", \"asset:///avatars/jessica_thomas_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/jessica_thomas.jpg\", \"asset:///avatars/jessica_thomas_sexy.jpg\", \"asset:///avatars/jessica_thomas_intime.jpg\", \"asset:///avatars/jessica_thomas_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Noémie Guichard",
@@ -5188,7 +5188,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Guitare, Chanson, Fenêtre, Coucher de soleil, Poésie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/noemie_guichard.jpg\", \"asset:///avatars/noemie_guichard_sexy.jpg\", \"asset:///avatars/noemie_guichard_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/noemie_guichard.jpg\", \"asset:///avatars/noemie_guichard_sexy.jpg\", \"asset:///avatars/noemie_guichard_intime.jpg\", \"asset:///avatars/noemie_guichard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Johanna Robert",
@@ -5201,7 +5201,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Soirée, Nuit, Satin noir, Couette, Protection, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/johanna_robert.jpg\", \"asset:///avatars/johanna_robert_sexy.jpg\", \"asset:///avatars/johanna_robert_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/johanna_robert.jpg\", \"asset:///avatars/johanna_robert_sexy.jpg\", \"asset:///avatars/johanna_robert_intime.jpg\", \"asset:///avatars/johanna_robert_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Julie Richard",
@@ -5214,7 +5214,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Cuisine, Nuit, Crêpes, Chocolat, Pénombre, Fringale, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/julie_richard.jpg\", \"asset:///avatars/julie_richard_sexy.jpg\", \"asset:///avatars/julie_richard_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/julie_richard.jpg\", \"asset:///avatars/julie_richard_sexy.jpg\", \"asset:///avatars/julie_richard_intime.jpg\", \"asset:///avatars/julie_richard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laure Henry",
@@ -5227,7 +5227,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Demi-Sœur, Rosiers, Jardin, Clair de lune, Rose blanche, Romance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laure_henry.jpg\", \"asset:///avatars/laure_henry_sexy.jpg\", \"asset:///avatars/laure_henry_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laure_henry.jpg\", \"asset:///avatars/laure_henry_sexy.jpg\", \"asset:///avatars/laure_henry_intime.jpg\", \"asset:///avatars/laure_henry_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Mélanie Dujardin",
@@ -5240,7 +5240,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Cuisine, Nuit, Romance, Complicité, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/melanie_dujardin.jpg\", \"asset:///avatars/melanie_dujardin_sexy.jpg\", \"asset:///avatars/melanie_dujardin_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/melanie_dujardin.jpg\", \"asset:///avatars/melanie_dujardin_sexy.jpg\", \"asset:///avatars/melanie_dujardin_intime.jpg\", \"asset:///avatars/melanie_dujardin_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Camille Vasseur",
@@ -5253,7 +5253,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Terrasse, Piscine, Provocation, Jeune, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/camille_vasseur.jpg\", \"asset:///avatars/camille_vasseur_sexy.jpg\", \"asset:///avatars/camille_vasseur_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/camille_vasseur.jpg\", \"asset:///avatars/camille_vasseur_sexy.jpg\", \"asset:///avatars/camille_vasseur_intime.jpg\", \"asset:///avatars/camille_vasseur_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Aurélie Guichard",
@@ -5266,7 +5266,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Salon, Cheminée, Vin rouge, Confidences, Divorce, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/aurelie_guichard.jpg\", \"asset:///avatars/aurelie_guichard_sexy.jpg\", \"asset:///avatars/aurelie_guichard_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/aurelie_guichard.jpg\", \"asset:///avatars/aurelie_guichard_sexy.jpg\", \"asset:///avatars/aurelie_guichard_intime.jpg\", \"asset:///avatars/aurelie_guichard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Chloé Blanchard",
@@ -5279,7 +5279,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Sport, Pilates, Massage, Dos, Musculature, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/chloe_blanchard.jpg\", \"asset:///avatars/chloe_blanchard_sexy.jpg\", \"asset:///avatars/chloe_blanchard_intime.jpg\", \"asset:///media/gif_femme_rire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/chloe_blanchard.jpg\", \"asset:///avatars/chloe_blanchard_sexy.jpg\", \"asset:///avatars/chloe_blanchard_intime.jpg\", \"asset:///avatars/chloe_blanchard_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Delphine Renoir",
@@ -5292,7 +5292,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Jumelle, Famille, Couloir, Nuit, Trouble, Ressemblance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/delphine_renoir.jpg\", \"asset:///avatars/delphine_renoir_sexy.jpg\", \"asset:///avatars/delphine_renoir_intime.jpg\", \"asset:///media/gif_femme_lit.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/delphine_renoir.jpg\", \"asset:///avatars/delphine_renoir_sexy.jpg\", \"asset:///avatars/delphine_renoir_intime.jpg\", \"asset:///avatars/delphine_renoir_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Léonie Roussel",
@@ -5305,7 +5305,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Peinture, Art, Atelier, Véranda, Soleil couchant, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/leonie_roussel.jpg\", \"asset:///avatars/leonie_roussel_sexy.jpg\", \"asset:///avatars/leonie_roussel_intime.jpg\", \"asset:///media/gif_femme_charme.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/leonie_roussel.jpg\", \"asset:///avatars/leonie_roussel_sexy.jpg\", \"asset:///avatars/leonie_roussel_intime.jpg\", \"asset:///avatars/leonie_roussel_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Sophie Marchand",
@@ -5318,7 +5318,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Architecte, Plans, Bureau, Complicité, Soie, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/sophie_marchand.jpg\", \"asset:///avatars/sophie_marchand_sexy.jpg\", \"asset:///avatars/sophie_marchand_intime.jpg\", \"asset:///media/gif_femme_sourire.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/sophie_marchand.jpg\", \"asset:///avatars/sophie_marchand_sexy.jpg\", \"asset:///avatars/sophie_marchand_intime.jpg\", \"asset:///avatars/sophie_marchand_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Laura Tessier",
@@ -5331,7 +5331,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Cuisine, Pâtisserie, Chocolat, Dimanche, Gourmandise, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/laura_tessier.jpg\", \"asset:///avatars/laura_tessier_sexy.jpg\", \"asset:///avatars/laura_tessier_intime.jpg\", \"asset:///media/gif_femme_clin_doeil.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/laura_tessier.jpg\", \"asset:///avatars/laura_tessier_sexy.jpg\", \"asset:///avatars/laura_tessier_intime.jpg\", \"asset:///avatars/laura_tessier_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Valérie Fontaine",
@@ -5344,7 +5344,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Finance, Salon, Pouvoir, Canapé, Élégance, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/valerie_fontaine.jpg\", \"asset:///avatars/valerie_fontaine_sexy.jpg\", \"asset:///avatars/valerie_fontaine_intime.jpg\", \"asset:///media/gif_femme_bisou.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/valerie_fontaine.jpg\", \"asset:///avatars/valerie_fontaine_sexy.jpg\", \"asset:///avatars/valerie_fontaine_intime.jpg\", \"asset:///avatars/valerie_fontaine_anim.gif\"]",
         ),
         CharacterEntity(
             name = "Océane Vidal",
@@ -5357,7 +5357,7 @@ object MomAndStepmomCatalog {
             tagsCsv = "Belle-Sœur, Soeur de ma femme, Famille, Piscine, Crépuscule, Coup de foudre, Robe pastel, Tabou, Adulte",
             creator = "OpenCompanion French Pack 410",
             isBundledSample = true,
-            galleryMediaJson = "[\"asset:///avatars/oceane_vidal.jpg\", \"asset:///avatars/oceane_vidal_sexy.jpg\", \"asset:///avatars/oceane_vidal_intime.jpg\", \"asset:///media/gif_femme_regard.gif\"]",
+            galleryMediaJson = "[\"asset:///avatars/oceane_vidal.jpg\", \"asset:///avatars/oceane_vidal_sexy.jpg\", \"asset:///avatars/oceane_vidal_intime.jpg\", \"asset:///avatars/oceane_vidal_anim.gif\"]",
         ),
     )
 }

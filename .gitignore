@@ -22,3 +22,4 @@ app/schemas/
 .DS_Store
 *.swp
 photo_cache/
+photo_library/

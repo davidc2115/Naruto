@@ -684,17 +684,31 @@ class ChatViewModel(
     fun generateSceneImage(context: android.content.Context, customPrompt: String? = null) {
         if (_isGeneratingImage.value) return
         viewModelScope.launch {
-            val character = repository.getCharacter(characterId) ?: return@launch
             val settings = settingsRepository.settings.first()
-            val geminiKey = settings.geminiApiKey.trim().ifBlank {
-                if (settings.cloudApiKey.trim().startsWith("AIza")) settings.cloudApiKey.trim() else ""
+            var geminiKey = settings.geminiApiKey.trim()
+            if (geminiKey.isBlank() && (settings.cloudApiKey.trim().startsWith("AIza") || settings.cloudApiKey.trim().length > 30 && !settings.cloudApiKey.trim().startsWith("gsk_") && !settings.cloudApiKey.trim().startsWith("sk-"))) {
+                geminiKey = settings.cloudApiKey.trim()
             }
             val openAiKey = settings.openAiApiKey.trim().ifBlank {
                 if (settings.cloudApiKey.trim().startsWith("sk-")) settings.cloudApiKey.trim() else ""
             }
             val cloudKey = settings.cloudApiKey.trim()
 
+            if (geminiKey.isBlank() && openAiKey.isBlank()) {
+                val hasGroq = settings.groqApiKey.isNotBlank() || settings.cloudApiKey.trim().startsWith("gsk_")
+                _statusMessage.value = if (hasGroq) {
+                    "La génération de photos utilise Google Gemini Imagen. Votre clé actuelle est configurée pour Groq (texte rapide). Ajoutez votre clé Google Gemini gratuite (aistudio.google.com) dans Réglages → Moteur d'IA."
+                } else {
+                    "Veuillez configurer votre clé API Google Gemini dans Réglages → Moteur d'IA (clé gratuite sur aistudio.google.com) pour générer des photos."
+                }
+                return@launch
+            }
+
             _isGeneratingImage.value = true
+            val character = repository.getCharacter(characterId) ?: run {
+                _isGeneratingImage.value = false
+                return@launch
+            }
             val recentMessages = repository.getMessages(characterId)
             val outputDir = java.io.File(context.filesDir, "chat_images").apply { mkdirs() }
 

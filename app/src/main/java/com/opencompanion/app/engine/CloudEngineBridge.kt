@@ -81,7 +81,7 @@ private val HTTP_STATUS_IN_MESSAGE = Regex("\\((\\d{3})\\)")
 
 /**
  * Moteur d'inférence Cloud : effectue les requêtes en streaming ou en polling vers des providers
- * d'IA Cloud gratuits, illimités et sans censure (OpenRouter, KoboldAI Horde, Pollinations, ou serveur compatible OpenAI).
+ * d'IA Cloud (Google Gemini Imagen 3, OpenAI DALL-E, OpenRouter, KoboldAI Horde, ou serveur compatible OpenAI).
  */
 class CloudEngineBridge {
 
@@ -134,59 +134,13 @@ class CloudEngineBridge {
 
     /**
      * Mode Cloud 100% Gratuit & Illimité SANS AUCUNE CLÉ API REQUISE.
-     * N'exige aucun compte ni clé : utilise les services publics anonymes débridés (Pollinations ➔ KoboldHorde anonyme).
+     * N'exige aucun compte ni clé : utilise KoboldAI Horde anonyme (clé publique anonyme 0000000000).
      */
     fun generateFreeNoKeyCloud(
         turns: List<ChatTurn>,
         maxTokens: Int = 768,
         temperature: Float = 0.8f,
     ): Flow<GenerationEvent> = channelFlow {
-        var success = false
-
-        // 1. Tentative via Pollinations AI (Accès anonyme public sans clé)
-        try {
-            val url = URL("https://text.pollinations.ai/openai")
-            val conn = (url.openConnection() as HttpURLConnection).apply {
-                requestMethod = "POST"
-                connectTimeout = 15_000
-                readTimeout = 30_000
-                doOutput = true
-                setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                setRequestProperty(
-                    "User-Agent",
-                    "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 OpenCompanion/1.0"
-                )
-            }
-
-            val messagesList = turns.map { turn -> mapOf("role" to turn.role, "content" to turn.content) }
-            val payload = mapOf(
-                "model" to "openai",
-                "messages" to messagesList,
-                "temperature" to temperature,
-                "max_tokens" to maxTokens
-            )
-
-            val jsonBody = buildJsonString(payload)
-            conn.outputStream.use { os ->
-                os.write(jsonBody.toByteArray(Charsets.UTF_8))
-                os.flush()
-            }
-
-            if (conn.responseCode in 200..299) {
-                val respText = conn.inputStream.bufferedReader().use { it.readText() }
-                val extractedText = parseJsonTextOrChoice(respText)
-                if (extractedText.isNotBlank()) {
-                    send(GenerationEvent.Token(extractedText))
-                    send(GenerationEvent.Done)
-                    success = true
-                }
-            }
-            conn.disconnect()
-        } catch (_: Exception) {}
-
-        if (success) return@channelFlow
-
-        // 2. Repli automatique sur KoboldAI Horde (Clé publique anonyme 0000000000 - 100% Sans Clé / Sans Inscription)
         generateKoboldHorde(
             apiKey = "0000000000",
             modelName = "Hermes-3-Llama-3.1-8B",
@@ -1049,18 +1003,79 @@ REQUIREMENTS:
 
             var lastError: String? = null
 
-            // 1. Tentative avec Google Gemini Imagen 3
+            if (allGeminiKeys.isEmpty() && allOpenAiKeys.isEmpty()) {
+                error("Pour générer des photos, veuillez renseigner votre clé API Google Gemini dans Réglages → Moteur d'IA (clé gratuite sur aistudio.google.com/apikey).")
+            }
+
+            // 1. Tentative avec Google Gemini Imagen 3 (Format officiel Google AI Studio predict et generateImages)
             for (key in allGeminiKeys.distinct()) {
-                val imagenEndpoints = listOf(
+                // Tentative A : Endpoint predict officiel Google AI Studio (imagen-3.0-generate-002)
+                val predictEndpoints = listOf(
+                    "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=$key",
+                    "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generate-002:predict?key=$key"
+                )
+
+                for (targetUrl in predictEndpoints) {
+                    try {
+                        val conn = (URL(targetUrl).openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            connectTimeout = 25_000
+                            readTimeout = 45_000
+                            doOutput = true
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                        }
+
+                        val payload = mapOf(
+                            "instances" to listOf(
+                                mapOf("prompt" to prompt)
+                            ),
+                            "parameters" to mapOf(
+                                "sampleCount" to 1,
+                                "aspectRatio" to "1:1",
+                                "outputMimeType" to "image/jpeg",
+                                "personGeneration" to "ALLOW_ADULT"
+                            )
+                        )
+
+                        conn.outputStream.use { os ->
+                            os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                            os.flush()
+                        }
+
+                        val code = conn.responseCode
+                        if (code in 200..299) {
+                            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                            conn.disconnect()
+                            val root = jsonParser.parseToJsonElement(resp).jsonObject
+                            val predictions = root["predictions"]?.jsonArray
+                            val b64 = predictions?.firstOrNull()?.jsonObject?.get("bytesBase64Encoded")?.jsonPrimitive?.content
+                            if (!b64.isNullOrBlank()) {
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
+                                file.writeBytes(bytes)
+                                return@runCatching file
+                            }
+                        } else {
+                            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            lastError = "Google Gemini ($code): ${err.take(200)}"
+                            conn.disconnect()
+                        }
+                    } catch (e: Exception) {
+                        lastError = "Erreur réseau Gemini: ${e.message}"
+                    }
+                }
+
+                // Tentative B : Endpoint generateImages (imagen-3.0)
+                val generateEndpoints = listOf(
                     "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generateImages:generate?key=$key",
                     "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generateImages:generate?key=$key",
                     "https://generativelanguage.googleapis.com/v1/models/imagen-3.0-generateImages:generate?key=$key"
                 )
 
-                for (targetUrl in imagenEndpoints) {
+                for (targetUrl in generateEndpoints) {
                     try {
-                        val url = URL(targetUrl)
-                        val conn = (url.openConnection() as HttpURLConnection).apply {
+                        val conn = (URL(targetUrl).openConnection() as HttpURLConnection).apply {
                             requestMethod = "POST"
                             connectTimeout = 25_000
                             readTimeout = 45_000
@@ -1097,7 +1112,7 @@ REQUIREMENTS:
                             }
                         } else {
                             val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                            lastError = "Google Gemini ($code): ${err.take(150)}"
+                            lastError = "Google Gemini ($code): ${err.take(200)}"
                             conn.disconnect()
                         }
                     } catch (e: Exception) {
@@ -1148,7 +1163,7 @@ REQUIREMENTS:
                         }
                     } else {
                         val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                        lastError = "OpenAI ($code): ${err.take(150)}"
+                        lastError = "OpenAI ($code): ${err.take(200)}"
                         conn.disconnect()
                     }
                 } catch (e: Exception) {
@@ -1156,30 +1171,7 @@ REQUIREMENTS:
                 }
             }
 
-            // 3. Repli photoréaliste haute fidélité (FLUX.1 / SDXL) pour garantir le résultat sans jamais bloquer l'utilisateur
-            try {
-                val encodedPrompt = java.net.URLEncoder.encode(prompt, "UTF-8")
-                val fallbackUrl = "https://image.pollinations.ai/prompt/$encodedPrompt?width=768&height=960&model=flux&nologo=true"
-                val conn = (URL(fallbackUrl).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 30_000
-                    readTimeout = 60_000
-                    setRequestProperty("User-Agent", "Mozilla/5.0 (Android; Mobile)")
-                }
-                if (conn.responseCode in 200..299) {
-                    val bytes = conn.inputStream.use { it.readBytes() }
-                    conn.disconnect()
-                    if (bytes.size > 5000) {
-                        val file = File(outputDir, "scene_${character.id}_${System.currentTimeMillis()}.jpg")
-                        file.writeBytes(bytes)
-                        return@runCatching file
-                    }
-                }
-                conn.disconnect()
-            } catch (e: Exception) {
-                // Ignore et remonte la dernière erreur détaillée
-            }
-
-            error(lastError ?: "Échec de génération de la photo. Vérifiez votre connexion internet ou vos clés API.")
+            error(lastError ?: "Échec de génération de la photo. Vérifiez votre clé API Google Gemini (aistudio.google.com) ou OpenAI dans les Réglages.")
         }
     }
 }
