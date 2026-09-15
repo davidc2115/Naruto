@@ -309,6 +309,31 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                 label = { Text("2.0 Lite 🚀") }
                             )
                         }
+                        OutlinedTextField(
+                            value = state.settings.geminiImageModelName,
+                            onValueChange = viewModel::setGeminiImageModelName,
+                            label = { Text("Modèle Génération d'Image (Gemini / Imagen)") },
+                            placeholder = { Text("imagen-3.0-generate-002") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilterChip(
+                                selected = state.settings.geminiImageModelName == "imagen-3.0-generate-002",
+                                onClick = { viewModel.setGeminiImageModelName("imagen-3.0-generate-002") },
+                                label = { Text("Imagen 3 ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.geminiImageModelName == "imagen-3.0-fast-generate-002",
+                                onClick = { viewModel.setGeminiImageModelName("imagen-3.0-fast-generate-002") },
+                                label = { Text("Imagen 3 Fast ⚡") }
+                            )
+                            FilterChip(
+                                selected = state.settings.geminiImageModelName == "imagen-4.0-generate-001",
+                                onClick = { viewModel.setGeminiImageModelName("imagen-4.0-generate-001") },
+                                label = { Text("Imagen 4 🚀") }
+                            )
+                        }
                     }
                 }
                 EngineCategory.OPENAI -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
@@ -326,7 +351,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                         OutlinedTextField(
                             value = state.settings.openAiModelName,
                             onValueChange = viewModel::setOpenAiModelName,
-                            label = { Text("Modèle OpenAI") },
+                            label = { Text("Modèle OpenAI (Texte)") },
                             placeholder = { Text("gpt-4o-mini") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
@@ -368,6 +393,26 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                 selected = state.settings.openAiModelName == "gpt-4o",
                                 onClick = { viewModel.setOpenAiModelName("gpt-4o") },
                                 label = { Text("GPT-4o 🧠") }
+                            )
+                        }
+                        OutlinedTextField(
+                            value = state.settings.openAiImageModelName,
+                            onValueChange = viewModel::setOpenAiImageModelName,
+                            label = { Text("Modèle Image OpenAI") },
+                            placeholder = { Text("dall-e-3") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilterChip(
+                                selected = state.settings.openAiImageModelName == "dall-e-3",
+                                onClick = { viewModel.setOpenAiImageModelName("dall-e-3") },
+                                label = { Text("DALL-E 3 ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.openAiImageModelName == "dall-e-2",
+                                onClick = { viewModel.setOpenAiImageModelName("dall-e-2") },
+                                label = { Text("DALL-E 2 ⚡") }
                             )
                         }
                     }

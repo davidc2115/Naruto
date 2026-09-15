@@ -99,8 +99,10 @@ data class EngineSettings(
     val groqModelName: String = "llama-3.3-70b-versatile",
     val geminiApiKey: String = "",
     val geminiModelName: String = "gemini-2.0-flash",
+    val geminiImageModelName: String = "imagen-3.0-generate-002",
     val openAiApiKey: String = "",
     val openAiModelName: String = "gpt-4o-mini",
+    val openAiImageModelName: String = "dall-e-3",
 )
 
 /**
@@ -135,8 +137,10 @@ class SettingsRepository(private val context: Context) {
         val GROQ_MODEL_NAME = stringPreferencesKey("groq_model_name")
         val GEMINI_API_KEY = stringPreferencesKey("gemini_api_key")
         val GEMINI_MODEL_NAME = stringPreferencesKey("gemini_model_name")
+        val GEMINI_IMAGE_MODEL_NAME = stringPreferencesKey("gemini_image_model_name")
         val OPENAI_API_KEY = stringPreferencesKey("openai_api_key")
         val OPENAI_MODEL_NAME = stringPreferencesKey("openai_model_name")
+        val OPENAI_IMAGE_MODEL_NAME = stringPreferencesKey("openai_image_model_name")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
         val CATALOG_200_SEEDED = booleanPreferencesKey("catalog_200_seeded")
@@ -215,8 +219,10 @@ class SettingsRepository(private val context: Context) {
                 ?: "llama-3.3-70b-versatile",
             geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
             geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.let(::sanitizeGeminiModel) ?: "gemini-2.0-flash",
+            geminiImageModelName = prefs[Keys.GEMINI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "imagen-3.0-generate-002",
             openAiApiKey = prefs[Keys.OPENAI_API_KEY] ?: "",
             openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
+            openAiImageModelName = prefs[Keys.OPENAI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "dall-e-3",
         )
     }
 
@@ -275,11 +281,17 @@ class SettingsRepository(private val context: Context) {
     suspend fun setGeminiModelName(model: String) = context.dataStore.edit {
         it[Keys.GEMINI_MODEL_NAME] = sanitizeGeminiModel(model)
     }
+    suspend fun setGeminiImageModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.GEMINI_IMAGE_MODEL_NAME) else it[Keys.GEMINI_IMAGE_MODEL_NAME] = model.trim()
+    }
     suspend fun setOpenAiApiKey(key: String) = context.dataStore.edit {
         if (key.isBlank()) it.remove(Keys.OPENAI_API_KEY) else it[Keys.OPENAI_API_KEY] = key.trim()
     }
     suspend fun setOpenAiModelName(model: String) = context.dataStore.edit {
         if (model.isBlank()) it.remove(Keys.OPENAI_MODEL_NAME) else it[Keys.OPENAI_MODEL_NAME] = model.trim()
+    }
+    suspend fun setOpenAiImageModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.OPENAI_IMAGE_MODEL_NAME) else it[Keys.OPENAI_IMAGE_MODEL_NAME] = model.trim()
     }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->
