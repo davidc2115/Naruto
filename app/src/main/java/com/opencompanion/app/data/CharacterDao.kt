@@ -25,8 +25,17 @@ interface CharacterDao {
     @Update
     suspend fun update(character: CharacterEntity)
 
+    @Update
+    suspend fun updateAll(characters: List<CharacterEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(characters: List<CharacterEntity>)
+
     @Delete
     suspend fun delete(character: CharacterEntity)
+
+    @Delete
+    suspend fun deleteAll(characters: List<CharacterEntity>)
 
     @Query("SELECT COUNT(*) FROM characters")
     suspend fun count(): Int

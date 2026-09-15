@@ -122,7 +122,8 @@ private fun loadAssetAvatar(context: Context, avatarPath: String?, name: String,
             candidates.add("avatars/$cleanPath")
         }
     }
-    val normalized = java.text.Normalizer.normalize(name, java.text.Normalizer.Form.NFD)
+    val cleanName = name.replace(Regex("""\s+\d+$"""), "").replace(Regex("""\s*\(.*?\)$"""), "").trim()
+    val normalized = java.text.Normalizer.normalize(cleanName, java.text.Normalizer.Form.NFD)
         .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
     val sanitized = normalized.lowercase()
         .replace(".", "")

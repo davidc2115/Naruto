@@ -37,6 +37,20 @@ class OpenCompanionApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Purge immédiate et automatique de tous les caches d'images dès la mise à jour de l'APK
+        // pour garantir que les nouveaux assets embarqués s'affichent instantanément sans résidu d'anciennes versions
+        val prefs = getSharedPreferences("app_version_cache", android.content.Context.MODE_PRIVATE)
+        val lastVersion = prefs.getInt("last_version_code", -1)
+        if (lastVersion != BuildConfig.VERSION_CODE) {
+            runCatching {
+                java.io.File(cacheDir, "bundled_media").deleteRecursively()
+                java.io.File(cacheDir, "avatar_cache").deleteRecursively()
+                java.io.File(cacheDir, "network_media").deleteRecursively()
+            }
+            prefs.edit().putInt("last_version_code", BuildConfig.VERSION_CODE).apply()
+        }
+
         applicationScope.launch {
             // Synchronisation intelligente non destructrice : préserve 100% des conversations et des notes
             characterRepository.syncMomAndStepmomCatalog()

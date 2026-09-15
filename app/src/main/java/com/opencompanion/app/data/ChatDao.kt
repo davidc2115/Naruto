@@ -30,4 +30,7 @@ interface ChatDao {
 
     @Query("UPDATE chat_messages SET characterId = :targetId WHERE characterId = :sourceId")
     suspend fun migrateMessages(sourceId: Long, targetId: Long)
+
+    @Query("SELECT DISTINCT characterId FROM chat_messages")
+    suspend fun getCharacterIdsWithMessages(): List<Long>
 }

@@ -99,71 +99,95 @@ class CharacterRepository(
         ExtendedCatalog.characters.forEach { characterDao.upsert(it) }
     }
 
+    private fun normalizeCharacterName(raw: String): String =
+        java.text.Normalizer.normalize(raw, java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
+            .replace(Regex("""\s+\d+$"""), "") // Retire les suffixes numériques comme " 1", " 2", " 3"
+            .replace(Regex("""\s*\(.*?\)$"""), "") // Retire les suffixes de rôle comme "(Belle-Sœur)", "(Mère)"
+            .trim()
+            .lowercase()
+
     /**
      * Synchronise intelligemment le grand catalogue sans JAMAIS supprimer les personnages
      * ni les conversations existantes. Conserve scrupuleusement l'ID, le niveau d'affection,
-     * les notes de mémoire, le persona actif et l'intégralité de l'historique de discussion.
+     * les notes de mémoire, le persona actif et l'intégralité de l'historique de discussion,
+     * tout en migrant les messages des anciens doublons et en mettant à jour immédiatement
+     * les avatars, galeries et tempéraments frais.
      */
     suspend fun syncMomAndStepmomCatalog() {
         val existingCharacters = characterDao.getAll()
+        val activeIdsWithMessages = chatDao.getCharacterIdsWithMessages().toSet()
 
-        // 1. Dédoublonnage par nom : fusionner les doublons ayant le même nom exact
-        val byExactName = existingCharacters.groupBy { it.name.trim() }
-        for ((_, duplicates) in byExactName) {
-            if (duplicates.size > 1) {
-                val primary = duplicates.maxByOrNull { chatDao.countMessagesForCharacter(it.id) }
-                    ?: duplicates.first()
-                for (other in duplicates) {
-                    if (other.id != primary.id) {
-                        chatDao.migrateMessages(sourceId = other.id, targetId = primary.id)
-                        characterDao.delete(other)
+        // Regroupement par nom normalisé pour attraper toutes les variantes ("Léonie Roussel", "Léonie Roussel 1", etc.)
+        val existingByNormalized = existingCharacters.groupBy { normalizeCharacterName(it.name) }
+
+        val toUpdate = mutableListOf<CharacterEntity>()
+        val toInsert = mutableListOf<CharacterEntity>()
+        val toDelete = mutableListOf<CharacterEntity>()
+        val processedExistingIds = mutableSetOf<Long>()
+
+        for (newChar in MomAndStepmomCatalog.characters) {
+            val normName = normalizeCharacterName(newChar.name)
+            val matchedList = existingByNormalized[normName].orEmpty()
+
+            if (matchedList.isNotEmpty()) {
+                // Choisir le personnage principal : celui qui a des messages, ou le premier
+                val primary = matchedList.maxByOrNull { if (activeIdsWithMessages.contains(it.id)) 1000 else 0 } ?: matchedList.first()
+                processedExistingIds.add(primary.id)
+
+                // Pour tous les doublons orphelins (ex: "Léonie Roussel 1"), migrer les messages vers le personnage officiel
+                for (dup in matchedList) {
+                    if (dup.id != primary.id) {
+                        processedExistingIds.add(dup.id)
+                        if (activeIdsWithMessages.contains(dup.id)) {
+                            chatDao.migrateMessages(sourceId = dup.id, targetId = primary.id)
+                        }
+                        toDelete.add(dup)
                     }
                 }
-            }
-        }
 
-        // Recharger la liste après dédoublonnage
-        val cleanExisting = characterDao.getAll()
-        val existingByName = cleanExisting.associateBy { it.name.trim() }
-        val catalogNames = MomAndStepmomCatalog.characters.map { it.name.trim() }.toSet()
-
-        // 2. Nettoyage des anciens personnages orphelins (ex: anciens Cassandra Vidal 1, 2, 3...)
-        // S'ils ont 0 message et ne font pas partie du catalogue officiel, on les supprime.
-        // S'ils ont des messages créés par l'utilisateur, on les conserve scrupuleusement avec une image valide !
-        for (oldChar in cleanExisting) {
-            if (!catalogNames.contains(oldChar.name.trim())) {
-                val msgCount = chatDao.countMessagesForCharacter(oldChar.id)
-                if (msgCount == 0 && oldChar.isBundledSample) {
-                    characterDao.delete(oldChar)
-                } else if (msgCount > 0 && (oldChar.avatarPath.isNullOrBlank() || !oldChar.avatarPath.orEmpty().startsWith("asset:///avatars/"))) {
-                    // Réparer l'avatar si manquant
-                    val fallback = MomAndStepmomCatalog.characters.firstOrNull()?.avatarPath ?: "asset:///avatars/valerie_mercier.jpg"
-                    characterDao.update(oldChar.copy(avatarPath = fallback))
-                }
-            }
-        }
-
-        // 3. Synchronisation et mise à jour des 410 personnages officiels
-        for (newChar in MomAndStepmomCatalog.characters) {
-            val existing = existingByName[newChar.name.trim()]
-            if (existing != null) {
-                val hasMessages = chatDao.countMessagesForCharacter(existing.id) > 0
-                val updated = existing.copy(
+                val hasMessages = activeIdsWithMessages.contains(primary.id)
+                val updated = primary.copy(
+                    name = newChar.name, // Nom officiel propre sans chiffre
                     description = newChar.description,
                     personality = newChar.personality,
                     scenario = newChar.scenario,
-                    firstMessage = if (!hasMessages) newChar.firstMessage else existing.firstMessage,
+                    firstMessage = if (!hasMessages) newChar.firstMessage else primary.firstMessage,
                     exampleDialogue = newChar.exampleDialogue,
-                    avatarPath = newChar.avatarPath,
+                    avatarPath = newChar.avatarPath, // Force l'avatar officiel frais
                     tagsCsv = newChar.tagsCsv,
                     creator = newChar.creator,
                     isBundledSample = true,
-                    galleryMediaJson = newChar.galleryMediaJson,
+                    galleryMediaJson = newChar.galleryMediaJson, // Force la galerie officielle fraîche
                 )
-                characterDao.update(updated)
+                toUpdate.add(updated)
             } else {
-                characterDao.upsert(newChar)
+                toInsert.add(newChar)
             }
+        }
+
+        // Nettoyage des personnages orphelins restants qui ne correspondent à aucun personnage officiel
+        for (orphan in existingCharacters) {
+            if (!processedExistingIds.contains(orphan.id)) {
+                val hasMessages = activeIdsWithMessages.contains(orphan.id)
+                if (!hasMessages && orphan.isBundledSample) {
+                    toDelete.add(orphan)
+                } else if (hasMessages && (orphan.avatarPath.isNullOrBlank() || !orphan.avatarPath.orEmpty().startsWith("asset:///avatars/"))) {
+                    val fallback = MomAndStepmomCatalog.characters.firstOrNull()?.avatarPath ?: "asset:///avatars/valerie_mercier.jpg"
+                    toUpdate.add(orphan.copy(avatarPath = fallback))
+                }
+            }
+        }
+
+        // Exécution en batch
+        if (toDelete.isNotEmpty()) {
+            characterDao.deleteAll(toDelete)
+        }
+        if (toUpdate.isNotEmpty()) {
+            characterDao.updateAll(toUpdate)
+        }
+        if (toInsert.isNotEmpty()) {
+            characterDao.insertAll(toInsert)
         }
     }
 

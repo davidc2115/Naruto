@@ -431,15 +431,21 @@ private suspend fun resolveMediaFile(context: Context, path: String): File? = wi
             val cacheDir = File(context.cacheDir, "bundled_media").apply { mkdirs() }
             val cleanName = assetRel.replace('/', '_')
             val cached = File(cacheDir, cleanName)
-            if (cached.exists() && cached.length() > 0L) {
+
+            val assetBytes = runCatching {
+                context.assets.open(assetRel).use { it.readBytes() }
+            }.getOrNull()
+
+            if (assetBytes != null) {
+                // Si le fichier en cache est absent ou d'une taille différente du nouvel asset APK, on l'écrase immédiatement
+                if (!cached.exists() || cached.length() != assetBytes.size.toLong()) {
+                    cached.writeBytes(assetBytes)
+                }
+                return@withContext cached
+            } else if (cached.exists() && cached.length() > 0L) {
                 return@withContext cached
             }
-            context.assets.open(assetRel).use { input ->
-                cached.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            return@withContext cached
+            return@withContext null
         }
 
         if (path.startsWith("http://") || path.startsWith("https://")) {
