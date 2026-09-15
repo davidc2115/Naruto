@@ -905,9 +905,10 @@ $customPrompt
 
 REQUIREMENTS:
 - Strictly maintain the character's exact facial structure, hair color/style, eye color, age, body proportions for absolute character consistency across photos.
+- Strongly incorporate the character's profession, role, temperament, and signature métier scenes and postures described above (e.g. professional workplace setting, clinic, law office, atelier, salon, or refined boudoir/cocktail postures).
 - Accurately capture dynamic and varied postures (e.g. leaning forward, looking back over shoulder, sitting alluringly, relaxing on bed/sofa, confident sensual stance).
-- Set the scene in authentic varied environments matching the dialogue or request (e.g. cozy bedroom, chic living room, luxury car interior, hotel suite, modern kitchen, scenic balcony).
-- Render diverse stylish or intimate outfits matching the situation (e.g. elegant form-fitting dress, mini-skirt, silk satin robe, delicate lingerie, nightgown, or boudoir styling).
+- Set the scene in authentic varied environments matching the dialogue, role, or request (e.g. professional office, classroom, kitchen, cozy bedroom, chic living room, luxury car interior, hotel suite, scenic balcony).
+- Render diverse stylish or intimate outfits matching the situation and profession (e.g. professional blouse and pencil skirt, elegant form-fitting dress, mini-skirt, silk satin robe, delicate lingerie, nightgown, or boudoir styling).
 - Format as a photographic raw prompt: 'photorealistic candid photo of [character details], [pose and scene details], 8k resolution, authentic detailed skin texture, cinematic soft natural lighting, masterpiece, shallow depth of field, 35mm photography'.
 - Output ONLY the final prompt in English with no explanations.
                 """.trimIndent()
@@ -959,6 +960,11 @@ REQUIREMENTS:
             val phys = character.description.substringAfter("Description physique détaillée :", "").substringBefore("\n\n").trim()
             if (phys.isNotBlank()) {
                 append("$phys, ")
+            }
+            val scenes = character.description.substringAfter("• Scènes & Postures :", "").substringBefore("\n").trim()
+            if (scenes.isNotBlank()) {
+                val firstScene = scenes.split(";").firstOrNull()?.trim() ?: scenes
+                append("$firstScene, ")
             }
             if (!userCustomInstruction.isNullOrBlank()) {
                 append("$userCustomInstruction, ")
