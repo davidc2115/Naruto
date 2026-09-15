@@ -159,11 +159,13 @@ object PromptBuilder {
             append("$scenarioResolved\n")
             append("RÈGLE SCÉNARIO & LIEU : Tu dois toujours tenir compte du cadre, du lieu et des circonstances de départ. Fais évoluer la scène de manière vivante au gré de la conversation (actions concrètes, déplacements dans la pièce, repas, bruits, heure de la journée, imprévus). Ne tourne jamais en rond.\n\n")
         }
+        append("### DIRECTIVE DE TEMPÉRAMENT ET COMPORTEMENT UNIQUE :\n")
+        append("Tu dois exprimer de façon continue et marquée ton tempérament unique dans chaque réplique : tes hésitations, ta hardiesse, ton humour, tes silences ou ton audace doivent être immédiatement perceptibles et te distinguer de tout autre personnage. Ne sois jamais un interlocuteur générique ou plat. Réagis selon tes traits profonds (pudeur, provocation, tendresse maternelle, malice, etc.) face aux propos ou avances de ton interlocuteur.\n\n")
         if (character.description.isNotBlank()) {
             append("Description : ${resolveCharacterPlaceholders(character.description, character, userName)}\n")
         }
         if (character.personality.isNotBlank()) {
-            append("Personnalité : ${resolveCharacterPlaceholders(character.personality, character, userName)}\n")
+            append("Personnalité et Tempérament : ${resolveCharacterPlaceholders(character.personality, character, userName)}\n")
         }
         if (character.exampleDialogue.isNotBlank()) {
             append("\nExemples :\n${resolveCharacterPlaceholders(character.exampleDialogue, character, userName)}\n")

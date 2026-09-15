@@ -904,9 +904,11 @@ $contextHistory
 $customPrompt
 
 REQUIREMENTS:
-- Strictly maintain the character's exact facial structure, hair color/style, eye color, age, body proportions.
-- Accurately capture the current outfit and pose from the recent scene dialogue.
-- Format as a photographic raw prompt: 'photorealistic candid portrait photo of ..., 8k resolution, authentic detailed skin texture, cinematic soft natural lighting, masterpiece, shallow depth of field'.
+- Strictly maintain the character's exact facial structure, hair color/style, eye color, age, body proportions for absolute character consistency across photos.
+- Accurately capture dynamic and varied postures (e.g. leaning forward, looking back over shoulder, sitting alluringly, relaxing on bed/sofa, confident sensual stance).
+- Set the scene in authentic varied environments matching the dialogue or request (e.g. cozy bedroom, chic living room, luxury car interior, hotel suite, modern kitchen, scenic balcony).
+- Render diverse stylish or intimate outfits matching the situation (e.g. elegant form-fitting dress, mini-skirt, silk satin robe, delicate lingerie, nightgown, or boudoir styling).
+- Format as a photographic raw prompt: 'photorealistic candid photo of [character details], [pose and scene details], 8k resolution, authentic detailed skin texture, cinematic soft natural lighting, masterpiece, shallow depth of field, 35mm photography'.
 - Output ONLY the final prompt in English with no explanations.
                 """.trimIndent()
 
@@ -953,7 +955,7 @@ REQUIREMENTS:
 
         // Repli déterministe immédiat en cas d'indisponibilité de la synthèse texte
         buildString {
-            append("photorealistic raw 8k portrait photo of a woman named ${character.name}, ")
+            append("photorealistic raw 8k photo of a woman named ${character.name}, ")
             val phys = character.description.substringAfter("Description physique détaillée :", "").substringBefore("\n\n").trim()
             if (phys.isNotBlank()) {
                 append("$phys, ")
@@ -961,7 +963,7 @@ REQUIREMENTS:
             if (!userCustomInstruction.isNullOrBlank()) {
                 append("$userCustomInstruction, ")
             } else {
-                append("in casual elegant setting, looking towards camera, warm subtle expression, ")
+                append("alluring natural posture, attractive styling, authentic environment, looking towards camera, warm subtle expression, ")
             }
             append("natural authentic skin texture, cinematic soft lighting, masterpiece, 35mm photography")
         }
