@@ -103,6 +103,7 @@ data class EngineSettings(
     val openAiApiKey: String = "",
     val openAiModelName: String = "gpt-4o-mini",
     val openAiImageModelName: String = "dall-e-3",
+    val cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
 )
 
 /**
@@ -141,6 +142,7 @@ class SettingsRepository(private val context: Context) {
         val OPENAI_API_KEY = stringPreferencesKey("openai_api_key")
         val OPENAI_MODEL_NAME = stringPreferencesKey("openai_model_name")
         val OPENAI_IMAGE_MODEL_NAME = stringPreferencesKey("openai_image_model_name")
+        val CLOUD_IMAGE_MODEL_NAME = stringPreferencesKey("cloud_image_model_name")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
         val CATALOG_200_SEEDED = booleanPreferencesKey("catalog_200_seeded")
@@ -223,6 +225,7 @@ class SettingsRepository(private val context: Context) {
             openAiApiKey = prefs[Keys.OPENAI_API_KEY] ?: "",
             openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
             openAiImageModelName = prefs[Keys.OPENAI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "dall-e-3",
+            cloudImageModelName = prefs[Keys.CLOUD_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/flux-1-schnell",
         )
     }
 
@@ -292,6 +295,9 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setOpenAiImageModelName(model: String) = context.dataStore.edit {
         if (model.isBlank()) it.remove(Keys.OPENAI_IMAGE_MODEL_NAME) else it[Keys.OPENAI_IMAGE_MODEL_NAME] = model.trim()
+    }
+    suspend fun setCloudImageModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.CLOUD_IMAGE_MODEL_NAME) else it[Keys.CLOUD_IMAGE_MODEL_NAME] = model.trim()
     }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->

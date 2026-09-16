@@ -247,6 +247,7 @@ class SettingsViewModel(
     fun setOpenAiApiKey(key: String) = viewModelScope.launch { settingsRepository.setOpenAiApiKey(key) }
     fun setOpenAiModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiModelName(model) }
     fun setOpenAiImageModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiImageModelName(model) }
+    fun setCloudImageModelName(model: String) = viewModelScope.launch { settingsRepository.setCloudImageModelName(model) }
     fun setAllowNsfwMode(enabled: Boolean) = viewModelScope.launch { settingsRepository.setAllowNsfwMode(enabled) }
 
     fun refreshGroqModels() {

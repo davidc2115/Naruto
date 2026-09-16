@@ -989,6 +989,7 @@ REQUIREMENTS:
         cloudApiKey: String? = null,
         geminiImageModelName: String = "imagen-3.0-generate-002",
         openAiImageModelName: String = "dall-e-3",
+        cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
         character: CharacterEntity,
         recentMessages: List<ChatMessageEntity>,
         userCustomInstruction: String? = null,
@@ -1004,24 +1005,39 @@ REQUIREMENTS:
                 allGeminiKeys.addAll(parseApiKeys(cloudApiKey))
             }
 
-            // Collecter toutes les clés OpenAI / OpenRouter possibles
+            // Collecter toutes les clés OpenAI
             val allOpenAiKeys = mutableListOf<String>()
             if (!openAiApiKey.isNullOrBlank()) allOpenAiKeys.addAll(parseApiKeys(openAiApiKey))
-            if (!cloudApiKey.isNullOrBlank() && (cloudApiKey.trim().startsWith("sk-") || cloudApiKey.trim().startsWith("Bearer "))) {
-                allOpenAiKeys.addAll(parseApiKeys(cloudApiKey))
+
+            // Collecter toutes les clés OpenRouter / Cloud
+            val allCloudKeys = mutableListOf<String>()
+            if (!cloudApiKey.isNullOrBlank() && (cloudApiKey.trim().startsWith("sk-or-") || cloudApiKey.trim().startsWith("sk-") || cloudApiKey.trim().startsWith("Bearer "))) {
+                allCloudKeys.addAll(parseApiKeys(cloudApiKey))
+            }
+            if (allCloudKeys.isEmpty() && allOpenAiKeys.isNotEmpty()) {
+                allCloudKeys.addAll(allOpenAiKeys)
             }
 
             var lastError: String? = null
+            var hadGemini404 = false
 
-            if (allGeminiKeys.isEmpty() && allOpenAiKeys.isEmpty()) {
-                error("Pour générer des photos, veuillez renseigner votre clé API Google Gemini dans Réglages → Moteur d'IA (clé gratuite sur aistudio.google.com/apikey).")
+            if (allGeminiKeys.isEmpty() && allOpenAiKeys.isEmpty() && allCloudKeys.isEmpty()) {
+                error("Pour générer des photos, configurez une clé API dans Réglages → Moteur d'IA : soit OpenRouter (FLUX.1 Schnell photoréaliste et gratuit/abordable), soit OpenAI (DALL-E 3), soit Google Gemini (compte avec facturation).")
             }
 
-            val cleanedGeminiModel = geminiImageModelName.trim().removePrefix("models/").ifBlank { "gemini-3.1-flash-image" }
+            // Correction automatique des fautes de frappe sur le modèle Imagen (ex: imagen-4.0-generate-0001 -> imagen-4.0-generate-001)
+            var normalizedGeminiModel = geminiImageModelName.trim().removePrefix("models/")
+            if (normalizedGeminiModel.contains("imagen-4.0-generate-0001")) {
+                normalizedGeminiModel = normalizedGeminiModel.replace("imagen-4.0-generate-0001", "imagen-4.0-generate-001")
+            }
+            if (normalizedGeminiModel.contains("imagen-3.0-generate-0001")) {
+                normalizedGeminiModel = normalizedGeminiModel.replace("imagen-3.0-generate-0001", "imagen-3.0-generate-002")
+            }
+            val cleanedGeminiModel = normalizedGeminiModel.ifBlank { "gemini-3.1-flash-image" }
 
             // 1. Tentative avec Google Gemini API
             for (key in allGeminiKeys.distinct()) {
-                // Tentative A : generateContent avec responseModalities: ["IMAGE"] (Norme moderne officielle Gemini API)
+                // Tentative A : generateContent avec responseModalities: ["IMAGE"] (Gemini 2.0 / 2.5 / 3.x)
                 val generateContentModels = listOf(
                     cleanedGeminiModel,
                     "gemini-3.1-flash-image",
@@ -1074,6 +1090,7 @@ REQUIREMENTS:
                             }
                         } else {
                             val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            if (code == 404) hadGemini404 = true
                             lastError = "Google Gemini ($code avec $model): ${err.take(200)}"
                             conn.disconnect()
                         }
@@ -1135,6 +1152,7 @@ REQUIREMENTS:
                             }
                         } else {
                             val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            if (code == 404) hadGemini404 = true
                             lastError = "Google Gemini Imagen ($code avec $model): ${err.take(200)}"
                             conn.disconnect()
                         }
@@ -1144,7 +1162,71 @@ REQUIREMENTS:
                 }
             }
 
-            // 2. Repli éventuel sur OpenAI DALL-E si clé OpenAI disponible
+            // 2. Repli OpenRouter (FLUX.1 Schnell / SDXL photoréaliste) si clé Cloud / OpenRouter disponible
+            for (key in allCloudKeys.distinct()) {
+                val endpoints = listOf(
+                    "https://openrouter.ai/api/v1/images/generations",
+                    "https://openrouter.ai/api/v1/images"
+                )
+                val chosenCloudModel = cloudImageModelName.trim().ifBlank { "black-forest-labs/flux-1-schnell" }
+
+                for (ep in endpoints) {
+                    try {
+                        val url = URL(ep)
+                        val conn = (url.openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            connectTimeout = 30_000
+                            readTimeout = 90_000
+                            doOutput = true
+                            setRequestProperty("Authorization", "Bearer $key")
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                        }
+
+                        val payload = mapOf(
+                            "model" to chosenCloudModel,
+                            "prompt" to prompt,
+                            "n" to 1,
+                            "response_format" to "b64_json"
+                        )
+
+                        conn.outputStream.use { os ->
+                            os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                            os.flush()
+                        }
+
+                        val code = conn.responseCode
+                        if (code in 200..299) {
+                            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                            conn.disconnect()
+                            val root = jsonParser.parseToJsonElement(resp).jsonObject
+                            val data = root["data"]?.jsonArray
+                            val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
+                            if (!b64.isNullOrBlank()) {
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                val file = File(outputDir, "openrouter_${character.id}_${System.currentTimeMillis()}.jpg")
+                                file.writeBytes(bytes)
+                                return@runCatching file
+                            }
+                            val imgUrl = data?.firstOrNull()?.jsonObject?.get("url")?.jsonPrimitive?.content
+                            if (!imgUrl.isNullOrBlank()) {
+                                val imgBytes = URL(imgUrl).readBytes()
+                                val file = File(outputDir, "openrouter_${character.id}_${System.currentTimeMillis()}.jpg")
+                                file.writeBytes(imgBytes)
+                                return@runCatching file
+                            }
+                        } else {
+                            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            lastError = "OpenRouter Image ($code): ${err.take(200)}"
+                            conn.disconnect()
+                        }
+                    } catch (e: Exception) {
+                        lastError = "Erreur réseau OpenRouter Image: ${e.message}"
+                    }
+                }
+            }
+
+            // 3. Repli éventuel sur OpenAI DALL-E si clé OpenAI disponible
             for (key in allOpenAiKeys.distinct()) {
                 try {
                     val url = URL("https://api.openai.com/v1/images/generations")
@@ -1195,7 +1277,11 @@ REQUIREMENTS:
                 }
             }
 
-            error(lastError ?: "Échec de génération de la photo. Vérifiez votre clé API Google Gemini (aistudio.google.com) ou OpenAI dans les Réglages.")
+            if (hadGemini404 && allCloudKeys.isEmpty() && allOpenAiKeys.isEmpty()) {
+                error("Erreur Google 404 : Votre clé API Google Gemini gratuite ne dispose pas des droits Imagen (Google réserve la génération d'images aux comptes avec facturation activée). Ajoutez une clé OpenRouter (FLUX.1 Schnell) ou OpenAI (DALL-E 3) dans Réglages → Moteur d'IA.")
+            }
+
+            error(lastError ?: "Échec de génération de la photo. Vérifiez votre clé API OpenRouter (FLUX), OpenAI (DALL-E) ou Google Gemini dans les Réglages.")
         }
     }
 }

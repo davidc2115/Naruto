@@ -718,6 +718,7 @@ class ChatViewModel(
                 cloudApiKey = cloudKey.takeIf { it.isNotBlank() },
                 geminiImageModelName = settings.geminiImageModelName,
                 openAiImageModelName = settings.openAiImageModelName,
+                cloudImageModelName = settings.cloudImageModelName,
                 character = character,
                 recentMessages = recentMessages,
                 userCustomInstruction = customPrompt,

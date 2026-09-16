@@ -473,6 +473,26 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             label = "Clé(s) API",
                             placeholder = "sk-or-v1-...",
                         )
+                        OutlinedTextField(
+                            value = state.settings.cloudImageModelName,
+                            onValueChange = viewModel::setCloudImageModelName,
+                            label = { Text("Modèle Image (OpenRouter / Cloud)") },
+                            placeholder = { Text("black-forest-labs/flux-1-schnell") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilterChip(
+                                selected = state.settings.cloudImageModelName == "black-forest-labs/flux-1-schnell",
+                                onClick = { viewModel.setCloudImageModelName("black-forest-labs/flux-1-schnell") },
+                                label = { Text("FLUX.1 Schnell ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.cloudImageModelName == "stabilityai/stable-diffusion-xl-base-1.0",
+                                onClick = { viewModel.setCloudImageModelName("stabilityai/stable-diffusion-xl-base-1.0") },
+                                label = { Text("SDXL 🎨") }
+                            )
+                        }
                     }
                 }
                 EngineCategory.ANONYMOUS -> Card(Modifier.fillMaxWidth().padding(top = 4.dp)) {
