@@ -1017,119 +1017,129 @@ REQUIREMENTS:
                 error("Pour générer des photos, veuillez renseigner votre clé API Google Gemini dans Réglages → Moteur d'IA (clé gratuite sur aistudio.google.com/apikey).")
             }
 
-            val cleanedGeminiModel = geminiImageModelName.trim().removePrefix("models/").ifBlank { "imagen-3.0-generate-002" }
+            val cleanedGeminiModel = geminiImageModelName.trim().removePrefix("models/").ifBlank { "gemini-3.1-flash-image" }
 
-            // 1. Tentative avec Google Gemini Imagen (predict & generateImages sur modèle choisi + replis récents)
+            // 1. Tentative avec Google Gemini API
             for (key in allGeminiKeys.distinct()) {
-                val candidateModels = listOf(
+                // Tentative A : generateContent avec responseModalities: ["IMAGE"] (Norme moderne officielle Gemini API)
+                val generateContentModels = listOf(
+                    cleanedGeminiModel,
+                    "gemini-3.1-flash-image",
+                    "gemini-2.5-flash-image",
+                    "gemini-2.0-flash"
+                ).distinct()
+
+                for (model in generateContentModels) {
+                    val urlStr = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$key"
+                    try {
+                        val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            connectTimeout = 25_000
+                            readTimeout = 60_000
+                            doOutput = true
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                        }
+
+                        val payload = mapOf(
+                            "contents" to listOf(
+                                mapOf("parts" to listOf(mapOf("text" to prompt)))
+                            ),
+                            "generationConfig" to mapOf(
+                                "responseModalities" to listOf("IMAGE")
+                            )
+                        )
+
+                        conn.outputStream.use { os ->
+                            os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                            os.flush()
+                        }
+
+                        val code = conn.responseCode
+                        if (code in 200..299) {
+                            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                            conn.disconnect()
+                            val root = jsonParser.parseToJsonElement(resp).jsonObject
+                            val parts = root["candidates"]?.jsonArray?.firstOrNull()?.jsonObject
+                                ?.get("content")?.jsonObject
+                                ?.get("parts")?.jsonArray
+                            val b64 = parts?.firstOrNull()?.jsonObject
+                                ?.get("inlineData")?.jsonObject
+                                ?.get("data")?.jsonPrimitive?.content
+                            if (!b64.isNullOrBlank()) {
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
+                                file.writeBytes(bytes)
+                                return@runCatching file
+                            }
+                        } else {
+                            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            lastError = "Google Gemini ($code avec $model): ${err.take(200)}"
+                            conn.disconnect()
+                        }
+                    } catch (e: Exception) {
+                        lastError = "Erreur réseau Gemini: ${e.message}"
+                    }
+                }
+
+                // Tentative B : Endpoint predict v1beta pour modèles Imagen (Imagen 3 / 4)
+                val predictModels = listOf(
                     cleanedGeminiModel,
                     "imagen-3.0-generate-002",
                     "imagen-3.0-fast-generate-002",
-                    "imagen-4.0-generate-001",
-                    "imagen-3.0"
+                    "imagen-4.0-generate-001"
                 ).distinct()
 
-                for (model in candidateModels) {
-                    // Tentative A : Endpoint predict (Format officiel Google AI Studio Generative Language)
-                    for (apiVersion in listOf("v1beta", "v1")) {
-                        val predictUrl = "https://generativelanguage.googleapis.com/$apiVersion/models/$model:predict?key=$key"
-                        try {
-                            val conn = (URL(predictUrl).openConnection() as HttpURLConnection).apply {
-                                requestMethod = "POST"
-                                connectTimeout = 25_000
-                                readTimeout = 45_000
-                                doOutput = true
-                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
-                            }
-
-                            val payload = mapOf(
-                                "instances" to listOf(
-                                    mapOf("prompt" to prompt)
-                                ),
-                                "parameters" to mapOf(
-                                    "sampleCount" to 1,
-                                    "aspectRatio" to "1:1",
-                                    "outputMimeType" to "image/jpeg",
-                                    "personGeneration" to "ALLOW_ADULT"
-                                )
-                            )
-
-                            conn.outputStream.use { os ->
-                                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
-                                os.flush()
-                            }
-
-                            val code = conn.responseCode
-                            if (code in 200..299) {
-                                val resp = conn.inputStream.bufferedReader().use { it.readText() }
-                                conn.disconnect()
-                                val root = jsonParser.parseToJsonElement(resp).jsonObject
-                                val predictions = root["predictions"]?.jsonArray
-                                val b64 = predictions?.firstOrNull()?.jsonObject?.get("bytesBase64Encoded")?.jsonPrimitive?.content
-                                if (!b64.isNullOrBlank()) {
-                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
-                                    val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
-                                    file.writeBytes(bytes)
-                                    return@runCatching file
-                                }
-                            } else {
-                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                                lastError = "Google Gemini Imagen ($code avec $model): ${err.take(200)}"
-                                conn.disconnect()
-                            }
-                        } catch (e: Exception) {
-                            lastError = "Erreur réseau Gemini: ${e.message}"
+                for (model in predictModels) {
+                    val predictUrl = "https://generativelanguage.googleapis.com/v1beta/models/$model:predict?key=$key"
+                    try {
+                        val conn = (URL(predictUrl).openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            connectTimeout = 25_000
+                            readTimeout = 60_000
+                            doOutput = true
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("x-goog-api-key", key)
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
                         }
-                    }
 
-                    // Tentative B : Endpoint generateImages
-                    for (apiVersion in listOf("v1beta", "v1")) {
-                        val generateUrl = "https://generativelanguage.googleapis.com/$apiVersion/models/$model:generateImages?key=$key"
-                        try {
-                            val conn = (URL(generateUrl).openConnection() as HttpURLConnection).apply {
-                                requestMethod = "POST"
-                                connectTimeout = 25_000
-                                readTimeout = 45_000
-                                doOutput = true
-                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
-                            }
-
-                            val payload = mapOf(
-                                "prompt" to prompt,
-                                "number_of_images" to 1,
-                                "output_mime_type" to "image/jpeg",
-                                "aspect_ratio" to "1:1",
-                                "person_generation" to "ALLOW_ADULT"
+                        val payload = mapOf(
+                            "instances" to listOf(
+                                mapOf("prompt" to prompt)
+                            ),
+                            "parameters" to mapOf(
+                                "sampleCount" to 1,
+                                "aspectRatio" to "1:1",
+                                "outputMimeType" to "image/jpeg",
+                                "personGeneration" to "ALLOW_ADULT"
                             )
+                        )
 
-                            conn.outputStream.use { os ->
-                                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
-                                os.flush()
-                            }
-
-                            val code = conn.responseCode
-                            if (code in 200..299) {
-                                val resp = conn.inputStream.bufferedReader().use { it.readText() }
-                                conn.disconnect()
-                                val root = jsonParser.parseToJsonElement(resp).jsonObject
-                                val images = root["generatedImages"]?.jsonArray
-                                val b64 = images?.firstOrNull()?.jsonObject?.get("image")?.jsonObject?.get("imageBytes")?.jsonPrimitive?.content
-                                if (!b64.isNullOrBlank()) {
-                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
-                                    val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
-                                    file.writeBytes(bytes)
-                                    return@runCatching file
-                                }
-                            } else {
-                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                                lastError = "Google Gemini Imagen ($code avec $model): ${err.take(200)}"
-                                conn.disconnect()
-                            }
-                        } catch (e: Exception) {
-                            lastError = "Erreur réseau Gemini: ${e.message}"
+                        conn.outputStream.use { os ->
+                            os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                            os.flush()
                         }
+
+                        val code = conn.responseCode
+                        if (code in 200..299) {
+                            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                            conn.disconnect()
+                            val root = jsonParser.parseToJsonElement(resp).jsonObject
+                            val predictions = root["predictions"]?.jsonArray
+                            val b64 = predictions?.firstOrNull()?.jsonObject?.get("bytesBase64Encoded")?.jsonPrimitive?.content
+                            if (!b64.isNullOrBlank()) {
+                                val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
+                                file.writeBytes(bytes)
+                                return@runCatching file
+                            }
+                        } else {
+                            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                            lastError = "Google Gemini Imagen ($code avec $model): ${err.take(200)}"
+                            conn.disconnect()
+                        }
+                    } catch (e: Exception) {
+                        lastError = "Erreur réseau Gemini Imagen: ${e.message}"
                     }
                 }
             }

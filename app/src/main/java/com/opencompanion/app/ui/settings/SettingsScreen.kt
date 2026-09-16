@@ -313,25 +313,25 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                             value = state.settings.geminiImageModelName,
                             onValueChange = viewModel::setGeminiImageModelName,
                             label = { Text("Modèle Génération d'Image (Gemini / Imagen)") },
-                            placeholder = { Text("imagen-3.0-generate-002") },
+                            placeholder = { Text("gemini-3.1-flash-image") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                         )
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             FilterChip(
+                                selected = state.settings.geminiImageModelName == "gemini-3.1-flash-image",
+                                onClick = { viewModel.setGeminiImageModelName("gemini-3.1-flash-image") },
+                                label = { Text("Gemini Image ⭐") }
+                            )
+                            FilterChip(
+                                selected = state.settings.geminiImageModelName == "gemini-2.5-flash-image",
+                                onClick = { viewModel.setGeminiImageModelName("gemini-2.5-flash-image") },
+                                label = { Text("Gemini 2.5 ⚡") }
+                            )
+                            FilterChip(
                                 selected = state.settings.geminiImageModelName == "imagen-3.0-generate-002",
                                 onClick = { viewModel.setGeminiImageModelName("imagen-3.0-generate-002") },
-                                label = { Text("Imagen 3 ⭐") }
-                            )
-                            FilterChip(
-                                selected = state.settings.geminiImageModelName == "imagen-3.0-fast-generate-002",
-                                onClick = { viewModel.setGeminiImageModelName("imagen-3.0-fast-generate-002") },
-                                label = { Text("Imagen 3 Fast ⚡") }
-                            )
-                            FilterChip(
-                                selected = state.settings.geminiImageModelName == "imagen-4.0-generate-001",
-                                onClick = { viewModel.setGeminiImageModelName("imagen-4.0-generate-001") },
-                                label = { Text("Imagen 4 🚀") }
+                                label = { Text("Imagen 3") }
                             )
                         }
                     }
