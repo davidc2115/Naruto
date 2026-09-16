@@ -260,6 +260,16 @@ class CharacterRepository(
         characterDao.update(character.copy(affectionLevel = (character.affectionLevel + amount).coerceIn(0, 100)))
     }
 
+    suspend fun updateAvatar(characterId: Long, newAvatarPath: String) {
+        val character = characterDao.getById(characterId) ?: return
+        val currentGallery = character.galleryMedia.toMutableList()
+        if (!currentGallery.contains(newAvatarPath)) {
+            currentGallery.add(0, newAvatarPath)
+        }
+        val json = kotlinx.serialization.json.Json.encodeToString(currentGallery)
+        characterDao.update(character.copy(avatarPath = newAvatarPath, galleryMediaJson = json))
+    }
+
     suspend fun addGalleryMedia(characterId: Long, mediaPathOrUrl: String) {
         val character = characterDao.getById(characterId) ?: return
         val current = character.galleryMedia.toMutableList()

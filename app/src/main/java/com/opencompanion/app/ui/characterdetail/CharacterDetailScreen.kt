@@ -47,14 +47,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -75,6 +79,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.opencompanion.app.data.resolveCharacterPlaceholders
@@ -105,6 +110,10 @@ fun CharacterDetailScreen(
     var lightboxIndex by remember { mutableIntStateOf(0) }
     var showAddMediaDialog by remember { mutableStateOf(false) }
     var mediaUrlInput by remember { mutableStateOf("") }
+    var showGeneratePhotoDialog by remember { mutableStateOf(false) }
+    var selectedPhotoStyle by remember { mutableStateOf(CharacterPhotoStyle.PORTRAIT) }
+    var customPromptInput by remember { mutableStateOf("") }
+    var setAsAvatarOption by remember { mutableStateOf(true) }
 
     val mediaPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -320,6 +329,69 @@ fun CharacterDetailScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         )
                     }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Bouton / État de régénération d'avatar IA
+                    if (state.isGeneratingImage) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                            shape = RoundedCornerShape(14.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.5.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Spacer(Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        "Génération d'avatar IA en cours...",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Text(
+                                        state.generationStatus ?: "Horde Diffusion génère votre portrait fidèle...",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                selectedPhotoStyle = CharacterPhotoStyle.PORTRAIT
+                                setAsAvatarOption = true
+                                customPromptInput = ""
+                                showGeneratePhotoDialog = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                            shape = RoundedCornerShape(14.dp),
+                        ) {
+                            Icon(
+                                Icons.Filled.AutoAwesome,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "✨ Régénérer l'avatar avec l'IA (Gratuit)",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+                    }
+
                     if (character.tags.isNotEmpty()) {
                         Spacer(Modifier.height(10.dp))
                         FlowRow(
@@ -384,13 +456,30 @@ fun CharacterDetailScreen(
                                 }
                             }
                         }
-                        TextButton(
-                            onClick = { showAddMediaDialog = true },
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                        ) {
-                            Icon(Icons.Filled.Add, contentDescription = null, Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text("Ajouter", style = MaterialTheme.typography.labelMedium)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            FilledTonalButton(
+                                onClick = {
+                                    selectedPhotoStyle = CharacterPhotoStyle.PORTRAIT
+                                    setAsAvatarOption = false
+                                    customPromptInput = ""
+                                    showGeneratePhotoDialog = true
+                                },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                enabled = !state.isGeneratingImage,
+                            ) {
+                                Icon(Icons.Filled.AutoAwesome, contentDescription = null, Modifier.size(14.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text("Générer IA", style = MaterialTheme.typography.labelMedium)
+                            }
+                            Spacer(Modifier.width(6.dp))
+                            TextButton(
+                                onClick = { showAddMediaDialog = true },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            ) {
+                                Icon(Icons.Filled.Add, contentDescription = null, Modifier.size(16.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text("Ajouter", style = MaterialTheme.typography.labelMedium)
+                            }
                         }
                     }
 
@@ -715,9 +804,165 @@ fun CharacterDetailScreen(
         MediaLightboxDialog(
             mediaList = allMedia,
             initialIndex = lightboxIndex.coerceIn(0, allMedia.size - 1),
+            characterName = character.name,
             onDismiss = { showLightbox = false },
             onDeleteMedia = { mediaToDelete ->
                 viewModel.removeGalleryMedia(mediaToDelete)
+            },
+            onSetAsAvatar = { mediaPath ->
+                viewModel.setAsAvatar(mediaPath)
+                android.widget.Toast.makeText(context, "Photo de profil mise à jour !", android.widget.Toast.LENGTH_SHORT).show()
+            },
+        )
+    }
+
+    if (showGeneratePhotoDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!state.isGeneratingImage) showGeneratePhotoDialog = false
+            },
+            icon = {
+                Icon(
+                    Icons.Filled.AutoAwesome,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp),
+                )
+            },
+            title = {
+                Text(
+                    "Générer une photo IA (Horde Diffusion)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        "⚡ 100% Gratuit • Sans clé requise • Photoréaliste & Non censuré",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        "L'IA va composer une image fidèle à la description physique détaillée de ${character.name} (cheveux, yeux, visage, morphologie, âge) :",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    CharacterPhotoStyle.entries.forEach { styleOption ->
+                        val isSelected = selectedPhotoStyle == styleOption
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedPhotoStyle = styleOption },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                }
+                            ),
+                            border = if (isSelected) {
+                                androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+                            } else null,
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                RadioButton(
+                                    selected = isSelected,
+                                    onClick = { selectedPhotoStyle = styleOption },
+                                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary),
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Column {
+                                    Text(
+                                        styleOption.title,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                                    )
+                                    Text(
+                                        styleOption.subtitle,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    if (selectedPhotoStyle == CharacterPhotoStyle.CUSTOM) {
+                        OutlinedTextField(
+                            value = customPromptInput,
+                            onValueChange = { customPromptInput = it },
+                            label = { Text("Consigne personnalisée (décor, tenue, pose)") },
+                            placeholder = { Text("Ex: assise au piano en robe du soir...") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2,
+                            maxLines = 4,
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { setAsAvatarOption = !setAsAvatarOption }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = setAsAvatarOption,
+                            onCheckedChange = { setAsAvatarOption = it },
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            "Remplacer la photo de profil par cette nouvelle image",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showGeneratePhotoDialog = false
+                        viewModel.generateCharacterImage(
+                            style = selectedPhotoStyle,
+                            customInstruction = customPromptInput.takeIf { it.isNotBlank() },
+                            setAsAvatar = setAsAvatarOption,
+                            onComplete = { success, error ->
+                                if (success) {
+                                    val msg = if (setAsAvatarOption) "Nouvel avatar généré et mis à jour !" else "Nouvelle photo ajoutée à la galerie !"
+                                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                                } else {
+                                    android.widget.Toast.makeText(context, error ?: "Erreur de génération", android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        )
+                    },
+                ) {
+                    Icon(Icons.Filled.AutoAwesome, contentDescription = null, Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Générer maintenant")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showGeneratePhotoDialog = false }) {
+                    Text("Annuler")
+                }
             },
         )
     }

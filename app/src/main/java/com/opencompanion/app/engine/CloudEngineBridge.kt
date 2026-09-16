@@ -876,6 +876,94 @@ class CloudEngineBridge {
      * 3. Des notes de mémoire persistantes et du niveau de relation
      * 4. Des éventuelles consignes directes de l'utilisateur
      */
+    /**
+     * Traduit et extrait de manière déterministe les traits physiques d'un personnage en tags Stable Diffusion (en anglais)
+     */
+    fun extractSdPhysicalTags(character: CharacterEntity): String {
+        val desc = character.description
+        val tags = mutableListOf<String>()
+
+        // 1. Âge
+        val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
+        val age = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: character.age.toString()
+        if (age.isNotBlank() && age != "0") {
+            tags.add("$age years old woman")
+        } else {
+            tags.add("mature woman")
+        }
+
+        // 2. Cheveux
+        val hairLine = desc.lines().find { it.contains("Cheveux", ignoreCase = true) } ?: ""
+        val lowerHair = hairLine.lowercase()
+        val hairDesc = mutableListOf<String>()
+        when {
+            lowerHair.contains("blond miel") -> hairDesc.add("warm honey blonde hair")
+            lowerHair.contains("blond doré") -> hairDesc.add("golden blonde hair")
+            lowerHair.contains("blond platine") -> hairDesc.add("platinum blonde hair")
+            lowerHair.contains("blond vénitien") -> hairDesc.add("strawberry blonde hair")
+            lowerHair.contains("blond") -> hairDesc.add("blonde hair")
+            lowerHair.contains("châtain foncé") -> hairDesc.add("dark chestnut hair")
+            lowerHair.contains("châtain") -> hairDesc.add("chestnut brown hair")
+            lowerHair.contains("brun chocolat") -> hairDesc.add("rich chocolate brunette hair")
+            lowerHair.contains("brun") -> hairDesc.add("brunette hair")
+            lowerHair.contains("noir ébène") || lowerHair.contains("noir") -> hairDesc.add("raven black hair")
+            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> hairDesc.add("vibrant auburn copper hair")
+            lowerHair.contains("gris") || lowerHair.contains("argenté") -> hairDesc.add("elegant silver gray hair")
+        }
+        when {
+            lowerHair.contains("carré plongeant") -> hairDesc.add("sleek inverted bob haircut")
+            lowerHair.contains("carré") -> hairDesc.add("stylish bob haircut")
+            lowerHair.contains("queue de cheval") -> hairDesc.add("high ponytail")
+            lowerHair.contains("chignon") -> hairDesc.add("sophisticated hair bun")
+            lowerHair.contains("mi-longs") -> hairDesc.add("medium length hair touching shoulders")
+            lowerHair.contains("longs") -> hairDesc.add("long flowing hair")
+            lowerHair.contains("court") -> hairDesc.add("chic short haircut")
+        }
+        when {
+            lowerHair.contains("boucl") -> hairDesc.add("voluminous bouncy curls")
+            lowerHair.contains("ondul") -> hairDesc.add("gentle natural waves")
+            lowerHair.contains("soyeux") || lowerHair.contains("lisse") -> hairDesc.add("silky smooth hair texture")
+        }
+        if (hairDesc.isNotEmpty()) {
+            tags.add(hairDesc.joinToString(", "))
+        }
+
+        // 3. Yeux & Regard
+        val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) } ?: ""
+        val lowerEyes = eyesLine.lowercase()
+        when {
+            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> tags.add("striking emerald green eyes")
+            lowerEyes.contains("bleu azur") || lowerEyes.contains("bleu profond") || lowerEyes.contains("bleu") -> tags.add("mesmerizing clear blue eyes")
+            lowerEyes.contains("noisette") -> tags.add("warm sparkling hazel eyes")
+            lowerEyes.contains("marron") -> tags.add("deep expressive brown eyes")
+            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> tags.add("dark intense sensual eyes")
+        }
+
+        // 4. Morphologie & Poitrine
+        val morphLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) || it.contains("Poitrine", ignoreCase = true) } ?: ""
+        val lowerMorph = morphLine.lowercase()
+        when {
+            lowerMorph.contains("bonnet 90d") || lowerMorph.contains("bonnet 85d") || lowerMorph.contains("généreuse") -> tags.add("voluptuous hourglass feminine body, shapely natural bust")
+            lowerMorph.contains("bonnet 90c") || lowerMorph.contains("bonnet 85c") || lowerMorph.contains("galbée") -> tags.add("shapely feminine figure, toned waist")
+            lowerMorph.contains("athlétique") || lowerMorph.contains("tonique") -> tags.add("fit toned athletic feminine body")
+            lowerMorph.contains("élancée") -> tags.add("slender elegant silhouette")
+        }
+
+        // 5. Visage & Peau
+        val faceLine = desc.lines().find { it.contains("Visage", ignoreCase = true) || it.contains("Teint", ignoreCase = true) } ?: ""
+        val lowerFace = faceLine.lowercase()
+        when {
+            lowerFace.contains("pommettes") -> tags.add("high cheekbones")
+            lowerFace.contains("sourire") -> tags.add("gentle alluring smile")
+        }
+        tags.add("soft natural skin texture, realistic facial features")
+
+        return tags.joinToString(", ")
+    }
+
+    /**
+     * Construit le prompt optimal pour la génération d'image réaliste fidèle à la description physique.
+     */
     suspend fun buildSceneImagePrompt(
         geminiApiKey: String,
         character: CharacterEntity,
@@ -957,24 +1045,17 @@ REQUIREMENTS:
             } catch (_: Exception) {}
         }
 
-        // Repli déterministe immédiat en cas d'indisponibilité de la synthèse texte
+        // Repli déterministe immédiat haute fidélité en cas d'indisponibilité de la synthèse texte LLM
+        val physicalTags = extractSdPhysicalTags(character)
         buildString {
-            append("photorealistic raw 8k photo of a woman named ${character.name}, ")
-            val phys = character.description.substringAfter("Description physique détaillée :", "").substringBefore("\n\n").trim()
-            if (phys.isNotBlank()) {
-                append("$phys, ")
-            }
-            val scenes = character.description.substringAfter("• Scènes & Postures :", "").substringBefore("\n").trim()
-            if (scenes.isNotBlank()) {
-                val firstScene = scenes.split(";").firstOrNull()?.trim() ?: scenes
-                append("$firstScene, ")
-            }
+            append("masterpiece, photorealistic raw 8k photograph of ${character.name}, ")
+            append("$physicalTags, ")
             if (!userCustomInstruction.isNullOrBlank()) {
                 append("$userCustomInstruction, ")
             } else {
-                append("alluring natural posture, attractive styling, authentic environment, looking towards camera, warm subtle expression, ")
+                append("natural posture looking towards camera, warm subtle expression, authentic natural lighting, ")
             }
-            append("natural authentic skin texture, cinematic soft lighting, masterpiece, 35mm photography")
+            append("highly detailed skin texture, cinematic soft lighting, 35mm photography, dslr")
         }
     }
 
@@ -1083,8 +1164,14 @@ REQUIREMENTS:
                     setRequestProperty("Accept", "application/json")
                 }
 
+                val hordePrompt = if (prompt.contains("###")) {
+                    prompt
+                } else {
+                    "$prompt ### deformed, distorted, disfigured, bad eyes, bad hands, missing fingers, extra limbs, bad anatomy, blurry, low quality, cartoon, 3d render, doll, anime, sketch, watermark, signature"
+                }
+
                 val payloadMap = mapOf(
-                    "prompt" to prompt,
+                    "prompt" to hordePrompt,
                     "params" to mapOf(
                         "sampler_name" to "k_euler",
                         "cfg_scale" to 7.5,

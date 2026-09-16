@@ -772,4 +772,11 @@ class ChatViewModel(
     fun consumeStatusMessage() {
         _statusMessage.value = null
     }
+
+    fun setAsAvatar(mediaPath: String) {
+        viewModelScope.launch {
+            repository.updateAvatar(characterId, mediaPath)
+            _statusMessage.value = "Photo de profil mise à jour !"
+        }
+    }
 }

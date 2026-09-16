@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
@@ -147,6 +148,7 @@ fun MediaLightboxDialog(
     characterName: String = "",
     onDismiss: () -> Unit,
     onDeleteMedia: ((String) -> Unit)? = null,
+    onSetAsAvatar: ((String) -> Unit)? = null,
 ) {
     if (mediaList.isEmpty()) {
         onDismiss()
@@ -224,6 +226,14 @@ fun MediaLightboxDialog(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (onSetAsAvatar != null) {
+                        IconButton(onClick = {
+                            onSetAsAvatar(currentMedia)
+                        }) {
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "Définir comme avatar", tint = Color.White)
+                        }
+                    }
+
                     if (onDeleteMedia != null && !currentMedia.startsWith("asset://")) {
                         IconButton(onClick = {
                             onDeleteMedia(currentMedia)

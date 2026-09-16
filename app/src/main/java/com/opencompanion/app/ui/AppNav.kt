@@ -67,7 +67,7 @@ fun AppNav(app: OpenCompanionApplication) {
             val characterId = backStackEntry.arguments?.getLong("characterId") ?: return@composable
             val vm: CharacterDetailViewModel = viewModel(
                 factory = AppViewModelFactory {
-                    CharacterDetailViewModel(characterId, app.characterRepository, app.settingsRepository)
+                    CharacterDetailViewModel(characterId, app.characterRepository, app.settingsRepository, app.cloudEngineBridge, app)
                 },
             )
             CharacterDetailScreen(

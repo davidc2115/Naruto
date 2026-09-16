@@ -322,6 +322,7 @@ fun ChatScreen(
             mediaList = listOf(path),
             characterName = state.character?.name.orEmpty(),
             onDismiss = { lightboxImage = null },
+            onSetAsAvatar = { viewModel.setAsAvatar(it) },
         )
     }
 
