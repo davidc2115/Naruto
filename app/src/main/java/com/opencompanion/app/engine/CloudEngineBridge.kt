@@ -1,11 +1,13 @@
 package com.opencompanion.app.engine
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -985,14 +987,16 @@ REQUIREMENTS:
      * ou un repli photoréaliste haute fidélité (FLUX.1), et l'enregistre dans le stockage privé de l'application.
      */
     suspend fun generateCharacterSceneImage(
-        imageEngine: com.opencompanion.app.data.ImageEngine = com.opencompanion.app.data.ImageEngine.HUGGING_FACE,
+        imageEngine: com.opencompanion.app.data.ImageEngine = com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION,
         geminiApiKey: String = "",
         openAiApiKey: String? = null,
         cloudApiKey: String? = null,
+        hordeApiKey: String? = null,
         huggingFaceApiKey: String? = null,
         geminiImageModelName: String = "imagen-3.0-generate-002",
         openAiImageModelName: String = "dall-e-3",
         cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
+        hordeImageModelName: String = "stable_diffusion",
         huggingFaceImageModelName: String = "black-forest-labs/FLUX.1-schnell",
         character: CharacterEntity,
         recentMessages: List<ChatMessageEntity>,
@@ -1007,13 +1011,6 @@ REQUIREMENTS:
                 userCustomInstruction = userCustomInstruction
             )
             
-            // Collecter toutes les clés Hugging Face (100% Gratuit sans carte bancaire)
-            val allHfKeys = mutableListOf<String>()
-            if (!huggingFaceApiKey.isNullOrBlank()) allHfKeys.addAll(parseApiKeys(huggingFaceApiKey))
-            if (!cloudApiKey.isNullOrBlank() && cloudApiKey.trim().startsWith("hf_")) allHfKeys.addAll(parseApiKeys(cloudApiKey))
-            if (geminiApiKey.trim().startsWith("hf_")) allHfKeys.addAll(parseApiKeys(geminiApiKey))
-            if (!openAiApiKey.isNullOrBlank() && openAiApiKey.trim().startsWith("hf_")) allHfKeys.addAll(parseApiKeys(openAiApiKey))
-
             // Collecter toutes les clés Gemini possibles
             val allGeminiKeys = mutableListOf<String>()
             if (geminiApiKey.isNotBlank() && !geminiApiKey.trim().startsWith("hf_")) allGeminiKeys.addAll(parseApiKeys(geminiApiKey))
@@ -1039,10 +1036,8 @@ REQUIREMENTS:
 
             // Validation préalable selon le moteur choisi par l'utilisateur
             when (imageEngine) {
-                com.opencompanion.app.data.ImageEngine.HUGGING_FACE -> {
-                    if (allHfKeys.isEmpty()) {
-                        error("Pour générer des photos gratuitement avec Hugging Face, créez un token gratuit 'hf_...' sur huggingface.co/settings/tokens (aucune carte requise) et collez-le dans Réglages → Photos.")
-                    }
+                com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION -> {
+                    // 100% Gratuit, clé anonyme "0000000000" par défaut si non renseignée
                 }
                 com.opencompanion.app.data.ImageEngine.GEMINI_IMAGEN -> {
                     if (allGeminiKeys.isEmpty()) {
@@ -1061,79 +1056,147 @@ REQUIREMENTS:
                 }
             }
 
-            // 1. Exécution Hugging Face Serverless (100% Gratuit, sans carte bancaire)
-            if (imageEngine == com.opencompanion.app.data.ImageEngine.HUGGING_FACE) {
-                for (rawKey in allHfKeys.distinct()) {
-                    val key = rawKey.trim()
-                    val hfModels = listOf(
-                        huggingFaceImageModelName.trim().ifBlank { "black-forest-labs/FLUX.1-schnell" },
-                        "black-forest-labs/FLUX.1-schnell",
-                        "stabilityai/stable-diffusion-xl-base-1.0",
-                        "runwayml/stable-diffusion-v1-5",
-                        "CompVis/stable-diffusion-v1-4"
-                    ).distinct()
+            // 1. Exécution Horde Diffusion (Stable Diffusion Horde - 100% Gratuit, Sans clé, Accepte NSFW)
+            if (imageEngine == com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION) {
+                val apiKey = hordeApiKey?.trim()?.ifBlank { "0000000000" } ?: "0000000000"
+                val selectedModel = hordeImageModelName.trim().ifBlank { "stable_diffusion" }
 
-                    for (model in hfModels) {
-                        // Seul le router est encore actif (api-inference.huggingface.co renvoie 410 Gone)
-                        val hfEndpoints = listOf(
-                            "https://router.huggingface.co/hf-inference/models/$model"
-                        )
-                        for (ep in hfEndpoints) {
-                            try {
-                                val conn = (URL(ep).openConnection() as HttpURLConnection).apply {
-                                    requestMethod = "POST"
-                                    connectTimeout = 30_000
-                                    readTimeout = 90_000
-                                    doOutput = true
-                                    setRequestProperty("Authorization", "Bearer $key")
-                                    setRequestProperty("Content-Type", "application/json")
-                                    setRequestProperty("Accept", "image/png, image/jpeg, */*")
-                                    setRequestProperty("x-wait-for-model", "true")
-                                    setRequestProperty("x-use-cache", "false")
-                                    setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                // Modèles cibles : le modèle choisi en premier, puis les modèles rapides/photoréalistes/NSFW réputés
+                val modelsList = listOf(
+                    selectedModel,
+                    "ICBINP - I Can't Believe It's Not Photography",
+                    "AbsoluteReality",
+                    "Deliberate",
+                    "stable_diffusion"
+                ).distinct()
+
+                val submitUrl = "https://aihorde.net/api/v2/generate/async"
+                val conn = (URL(submitUrl).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    connectTimeout = 25_000
+                    readTimeout = 25_000
+                    doOutput = true
+                    setRequestProperty("apikey", apiKey)
+                    setRequestProperty("Client-Agent", "OpenCompanion:1.0:user")
+                    setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    setRequestProperty("Content-Type", "application/json")
+                    setRequestProperty("Accept", "application/json")
+                }
+
+                val payloadMap = mapOf(
+                    "prompt" to prompt,
+                    "params" to mapOf(
+                        "sampler_name" to "k_euler",
+                        "cfg_scale" to 7.5,
+                        "seed" to "-1",
+                        "height" to 512,
+                        "width" to 512,
+                        "steps" to 20,
+                        "n" to 1
+                    ),
+                    "nsfw" to true,
+                    "censor_nsfw" to false,
+                    "models" to modelsList
+                )
+
+                conn.outputStream.use { os ->
+                    os.write(buildJsonString(payloadMap).toByteArray(Charsets.UTF_8))
+                    os.flush()
+                }
+
+                val code = conn.responseCode
+                if (code !in 200..299) {
+                    val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                    conn.disconnect()
+                    error("Erreur Horde Diffusion ($code) : $err")
+                }
+
+                val submitRespStr = conn.inputStream.bufferedReader().use { it.readText() }
+                conn.disconnect()
+
+                val submitJson = jsonParser.parseToJsonElement(submitRespStr).jsonObject
+                val jobId = submitJson["id"]?.jsonPrimitive?.content
+                    ?: error("ID de génération introuvable dans la réponse Horde Diffusion.")
+
+                var imageUrl: String? = null
+                var base64Img: String? = null
+
+                // Polling toutes les 2.5 secondes jusqu'à 30 tentatives (75s max)
+                for (attempt in 0 until 30) {
+                    delay(2500)
+                    try {
+                        val checkConn = (URL("https://aihorde.net/api/v2/generate/check/$jobId").openConnection() as HttpURLConnection).apply {
+                            requestMethod = "GET"
+                            connectTimeout = 15_000
+                            readTimeout = 15_000
+                            setRequestProperty("apikey", apiKey)
+                            setRequestProperty("Client-Agent", "OpenCompanion:1.0:user")
+                            setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                        }
+                        if (checkConn.responseCode in 200..299) {
+                            val checkStr = checkConn.inputStream.bufferedReader().use { it.readText() }
+                            checkConn.disconnect()
+                            val checkJson = jsonParser.parseToJsonElement(checkStr).jsonObject
+                            val done = checkJson["done"]?.jsonPrimitive?.booleanOrNull ?: false
+                            if (done) {
+                                val statusConn = (URL("https://aihorde.net/api/v2/generate/status/$jobId").openConnection() as HttpURLConnection).apply {
+                                    requestMethod = "GET"
+                                    connectTimeout = 15_000
+                                    readTimeout = 15_000
+                                    setRequestProperty("apikey", apiKey)
+                                    setRequestProperty("Client-Agent", "OpenCompanion:1.0:user")
+                                    setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
                                 }
-
-                                val payload = mapOf("inputs" to prompt)
-                                conn.outputStream.use { os ->
-                                    os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
-                                    os.flush()
-                                }
-
-                                val code = conn.responseCode
-                                if (code in 200..299) {
-                                    val contentType = conn.contentType ?: ""
-                                    val imgBytes = conn.inputStream.use { it.readBytes() }
-                                    conn.disconnect()
-                                    if (imgBytes.isNotEmpty() && !contentType.contains("application/json")) {
-                                        val ext = if (contentType.contains("png")) "png" else "jpg"
-                                        val file = File(outputDir, "hf_${character.id}_${System.currentTimeMillis()}.$ext")
-                                        file.writeBytes(imgBytes)
-                                        return@runCatching file
+                                if (statusConn.responseCode in 200..299) {
+                                    val statusStr = statusConn.inputStream.bufferedReader().use { it.readText() }
+                                    statusConn.disconnect()
+                                    val statusJson = jsonParser.parseToJsonElement(statusStr).jsonObject
+                                    val generations = statusJson["generations"]?.jsonArray
+                                    if (!generations.isNullOrEmpty()) {
+                                        val firstGen = generations[0].jsonObject
+                                        val imgField = firstGen["img"]?.jsonPrimitive?.content
+                                        if (!imgField.isNullOrBlank()) {
+                                            if (imgField.startsWith("http://") || imgField.startsWith("https://")) {
+                                                imageUrl = imgField
+                                            } else {
+                                                base64Img = imgField
+                                            }
+                                            break
+                                        }
                                     }
                                 } else {
-                                    val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                                    val parsedMessage = runCatching {
-                                        val root = jsonParser.parseToJsonElement(err).jsonObject
-                                        root["error"]?.jsonPrimitive?.content
-                                            ?: root["message"]?.jsonPrimitive?.content
-                                            ?: err
-                                    }.getOrDefault(err).take(300)
-
-                                    lastError = "Hugging Face ($code avec $model) : $parsedMessage"
-                                    conn.disconnect()
+                                    statusConn.disconnect()
                                 }
-                            } catch (e: Exception) {
-                                lastError = "Erreur réseau Hugging Face: ${e.message}"
                             }
+                        } else {
+                            checkConn.disconnect()
                         }
+                    } catch (e: Exception) {
+                        // Tolérance réseau sur le polling
                     }
                 }
-                val advice = if (lastError?.contains("400") == true) {
-                    "\n\n💡 Conseils pour Hugging Face :\n" +
-                    "1. Assurez-vous d'avoir cliqué sur 'Agree and access repository' sur https://huggingface.co/black-forest-labs/FLUX.1-schnell si demandé.\n" +
-                    "2. Sur huggingface.co/settings/tokens, vérifiez que votre token a bien les permissions 'Make calls to Inference Providers' cochées (ou créez un token de type 'Read')."
-                } else ""
-                error((lastError ?: "Échec de génération Hugging Face.") + advice)
+
+                if (imageUrl != null) {
+                    val imgConn = (URL(imageUrl).openConnection() as HttpURLConnection).apply {
+                        requestMethod = "GET"
+                        connectTimeout = 20_000
+                        readTimeout = 40_000
+                        setRequestProperty("User-Agent", "Mozilla/5.0")
+                    }
+                    val imgBytes = imgConn.inputStream.use { it.readBytes() }
+                    imgConn.disconnect()
+                    val ext = if (imageUrl.contains(".webp", ignoreCase = true)) "webp" else "jpg"
+                    val file = File(outputDir, "horde_${character.id}_${System.currentTimeMillis()}.$ext")
+                    file.writeBytes(imgBytes)
+                    return@runCatching file
+                } else if (base64Img != null) {
+                    val imgBytes = android.util.Base64.decode(base64Img, android.util.Base64.DEFAULT)
+                    val file = File(outputDir, "horde_${character.id}_${System.currentTimeMillis()}.webp")
+                    file.writeBytes(imgBytes)
+                    return@runCatching file
+                } else {
+                    error("Le cluster Horde Diffusion a pris trop de temps ou était surchargé. Veuillez relancer la génération dans un instant.")
+                }
             }
 
             // 2. Exécution Google Gemini Imagen

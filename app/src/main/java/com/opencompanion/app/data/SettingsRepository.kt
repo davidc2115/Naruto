@@ -45,7 +45,7 @@ enum class EngineBackend {
  * [OPENAI] : DALL-E 3 via OpenAI (crédits payants).
  */
 enum class ImageEngine(val displayName: String) {
-    HUGGING_FACE("🤗 Hugging Face (100% Gratuit)"),
+    HORDE_DIFFUSION("🎨 Horde Diffusion (100% Gratuit, Sans clé, NSFW)"),
     GEMINI_IMAGEN("✨ Google Gemini (Imagen)"),
     OPENROUTER("🌐 OpenRouter"),
     OPENAI("🤖 OpenAI DALL-E 3"),
@@ -118,9 +118,11 @@ data class EngineSettings(
     val openAiModelName: String = "gpt-4o-mini",
     val openAiImageModelName: String = "dall-e-3",
     val cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
+    val hordeApiKey: String = "0000000000",
+    val hordeImageModelName: String = "stable_diffusion",
     val huggingFaceApiKey: String = "",
     val huggingFaceImageModelName: String = "black-forest-labs/FLUX.1-schnell",
-    val imageEnginePreference: ImageEngine = ImageEngine.HUGGING_FACE,
+    val imageEnginePreference: ImageEngine = ImageEngine.HORDE_DIFFUSION,
 )
 
 /**
@@ -160,6 +162,8 @@ class SettingsRepository(private val context: Context) {
         val OPENAI_MODEL_NAME = stringPreferencesKey("openai_model_name")
         val OPENAI_IMAGE_MODEL_NAME = stringPreferencesKey("openai_image_model_name")
         val CLOUD_IMAGE_MODEL_NAME = stringPreferencesKey("cloud_image_model_name")
+        val HORDE_API_KEY = stringPreferencesKey("horde_api_key")
+        val HORDE_IMAGE_MODEL_NAME = stringPreferencesKey("horde_image_model_name")
         val HUGGING_FACE_API_KEY = stringPreferencesKey("hugging_face_api_key")
         val HUGGING_FACE_IMAGE_MODEL_NAME = stringPreferencesKey("hugging_face_image_model_name")
         val IMAGE_ENGINE_PREFERENCE = stringPreferencesKey("image_engine_preference")
@@ -246,11 +250,13 @@ class SettingsRepository(private val context: Context) {
             openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
             openAiImageModelName = prefs[Keys.OPENAI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "dall-e-3",
             cloudImageModelName = prefs[Keys.CLOUD_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/flux-1-schnell",
+            hordeApiKey = prefs[Keys.HORDE_API_KEY]?.takeUnless { it.isBlank() } ?: "0000000000",
+            hordeImageModelName = prefs[Keys.HORDE_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "stable_diffusion",
             huggingFaceApiKey = prefs[Keys.HUGGING_FACE_API_KEY] ?: "",
             huggingFaceImageModelName = prefs[Keys.HUGGING_FACE_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/FLUX.1-schnell",
             imageEnginePreference = prefs[Keys.IMAGE_ENGINE_PREFERENCE]?.let {
                 runCatching { ImageEngine.valueOf(it) }.getOrNull()
-            } ?: ImageEngine.HUGGING_FACE,
+            } ?: ImageEngine.HORDE_DIFFUSION,
         )
     }
 
@@ -323,6 +329,13 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setCloudImageModelName(model: String) = context.dataStore.edit {
         if (model.isBlank()) it.remove(Keys.CLOUD_IMAGE_MODEL_NAME) else it[Keys.CLOUD_IMAGE_MODEL_NAME] = model.trim()
+    }
+    suspend fun setHordeApiKey(key: String) = context.dataStore.edit {
+        val trimmed = key.trim()
+        if (trimmed.isBlank() || trimmed == "0000000000") it.remove(Keys.HORDE_API_KEY) else it[Keys.HORDE_API_KEY] = trimmed
+    }
+    suspend fun setHordeImageModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.HORDE_IMAGE_MODEL_NAME) else it[Keys.HORDE_IMAGE_MODEL_NAME] = model.trim()
     }
     suspend fun setHuggingFaceApiKey(key: String) = context.dataStore.edit {
         if (key.isBlank()) it.remove(Keys.HUGGING_FACE_API_KEY) else it[Keys.HUGGING_FACE_API_KEY] = key.trim()

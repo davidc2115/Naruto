@@ -572,7 +572,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
 
                     // Configuration spécifique selon le moteur sélectionné
                     when (state.settings.imageEnginePreference) {
-                        com.opencompanion.app.data.ImageEngine.HUGGING_FACE -> {
+                        com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION -> {
                             Card(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
@@ -586,45 +586,50 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            "🤗 Hugging Face (100% GRATUIT)",
+                                            "🎨 Horde Diffusion (100% GRATUIT & SANS CLÉ)",
                                             style = MaterialTheme.typography.titleSmall,
                                             color = MaterialTheme.colorScheme.primary
                                         )
-                                        Text("⭐ Aucune carte requise", style = MaterialTheme.typography.labelSmall)
+                                        Text("⭐ NSFW Libre", style = MaterialTheme.typography.labelSmall)
                                     }
                                     Text(
-                                        "Obtenez votre token gratuit 'hf_...' en 30 secondes sur huggingface.co/settings/tokens. Génère des photos photoréalistes avec FLUX.1 Schnell directement sans passer par Google Gemini.",
+                                        "Génération d'images et photos réalistes via le réseau décentralisé Stable Horde. 100% gratuit, sans inscription, et autorise pleinement les contenus NSFW intimes sans blocage. La clé publique gratuite '0000000000' est utilisée par défaut.",
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                     ApiKeysField(
-                                        value = state.settings.huggingFaceApiKey,
-                                        onValueChange = viewModel::setHuggingFaceApiKey,
-                                        label = "Token Hugging Face (hf_...)",
-                                        placeholder = "hf_xxxxxxxxxxxxxxxxxxxxxxxxx",
+                                        value = state.settings.hordeApiKey,
+                                        onValueChange = viewModel::setHordeApiKey,
+                                        label = "Clé API Horde (Optionnel - 0000000000 par défaut)",
+                                        placeholder = "0000000000 ou votre clé Kudos perso",
                                     )
                                     OutlinedTextField(
-                                        value = state.settings.huggingFaceImageModelName,
-                                        onValueChange = viewModel::setHuggingFaceImageModelName,
-                                        label = { Text("Modèle Hugging Face") },
-                                        placeholder = { Text("black-forest-labs/FLUX.1-schnell") },
+                                        value = state.settings.hordeImageModelName,
+                                        onValueChange = viewModel::setHordeImageModelName,
+                                        label = { Text("Modèle Stable Diffusion") },
+                                        placeholder = { Text("stable_diffusion") },
                                         singleLine = true,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                         FilterChip(
-                                            selected = state.settings.huggingFaceImageModelName == "black-forest-labs/FLUX.1-schnell",
-                                            onClick = { viewModel.setHuggingFaceImageModelName("black-forest-labs/FLUX.1-schnell") },
-                                            label = { Text("FLUX.1 Schnell ⭐") }
+                                            selected = state.settings.hordeImageModelName == "stable_diffusion",
+                                            onClick = { viewModel.setHordeImageModelName("stable_diffusion") },
+                                            label = { Text("Standard 🚀") }
                                         )
                                         FilterChip(
-                                            selected = state.settings.huggingFaceImageModelName == "stabilityai/stable-diffusion-xl-base-1.0",
-                                            onClick = { viewModel.setHuggingFaceImageModelName("stabilityai/stable-diffusion-xl-base-1.0") },
-                                            label = { Text("SDXL 🎨") }
+                                            selected = state.settings.hordeImageModelName == "ICBINP - I Can't Believe It's Not Photography",
+                                            onClick = { viewModel.setHordeImageModelName("ICBINP - I Can't Believe It's Not Photography") },
+                                            label = { Text("Photo 📸") }
                                         )
                                         FilterChip(
-                                            selected = state.settings.huggingFaceImageModelName == "runwayml/stable-diffusion-v1-5",
-                                            onClick = { viewModel.setHuggingFaceImageModelName("runwayml/stable-diffusion-v1-5") },
-                                            label = { Text("SD 1.5 🚀") }
+                                            selected = state.settings.hordeImageModelName == "Deliberate",
+                                            onClick = { viewModel.setHordeImageModelName("Deliberate") },
+                                            label = { Text("Sensuel 🔥") }
+                                        )
+                                        FilterChip(
+                                            selected = state.settings.hordeImageModelName == "AbsoluteReality",
+                                            onClick = { viewModel.setHordeImageModelName("AbsoluteReality") },
+                                            label = { Text("Réaliste ✨") }
                                         )
                                     }
                                 }

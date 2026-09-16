@@ -718,16 +718,13 @@ class ChatViewModel(
                 if (settings.cloudApiKey.trim().startsWith("sk-")) settings.cloudApiKey.trim() else ""
             }
             val cloudKey = settings.cloudApiKey.trim()
-            val hfKey = settings.huggingFaceApiKey.trim()
+            val hordeKey = settings.hordeApiKey.trim().ifBlank { "0000000000" }
 
-            if (hfKey.isBlank() && geminiKey.isBlank() && openAiKey.isBlank() && cloudKey.isBlank()) {
-                val hasGroq = settings.groqApiKey.isNotBlank() || settings.cloudApiKey.trim().startsWith("gsk_")
-                _statusMessage.value = if (hasGroq) {
-                    "Pour générer des photos gratuitement sans carte bancaire, créez un token gratuit sur huggingface.co/settings/tokens et ajoutez-le dans Réglages → Photos (FLUX.1 Schnell photoréaliste)."
-                } else {
-                    "Pour générer des photos, ajoutez un token gratuit Hugging Face (100% gratuit sans carte bancaire, FLUX.1 Schnell) ou votre clé Google Gemini dans Réglages."
+            if (settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION) {
+                if (geminiKey.isBlank() && openAiKey.isBlank() && cloudKey.isBlank()) {
+                    _statusMessage.value = "Veuillez renseigner votre clé API dans Réglages → Photos, ou sélectionnez le moteur gratuit Horde Diffusion (sans clé requise)."
+                    return@launch
                 }
-                return@launch
             }
 
             _isGeneratingImage.value = true
@@ -743,11 +740,11 @@ class ChatViewModel(
                 geminiApiKey = geminiKey,
                 openAiApiKey = openAiKey.takeIf { it.isNotBlank() },
                 cloudApiKey = cloudKey.takeIf { it.isNotBlank() },
-                huggingFaceApiKey = hfKey.takeIf { it.isNotBlank() },
+                hordeApiKey = hordeKey,
                 geminiImageModelName = settings.geminiImageModelName,
                 openAiImageModelName = settings.openAiImageModelName,
                 cloudImageModelName = settings.cloudImageModelName,
-                huggingFaceImageModelName = settings.huggingFaceImageModelName,
+                hordeImageModelName = settings.hordeImageModelName,
                 character = character,
                 recentMessages = recentMessages,
                 userCustomInstruction = customPrompt,

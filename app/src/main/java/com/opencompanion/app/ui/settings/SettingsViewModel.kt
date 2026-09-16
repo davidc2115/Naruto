@@ -248,6 +248,8 @@ class SettingsViewModel(
     fun setOpenAiModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiModelName(model) }
     fun setOpenAiImageModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiImageModelName(model) }
     fun setCloudImageModelName(model: String) = viewModelScope.launch { settingsRepository.setCloudImageModelName(model) }
+    fun setHordeApiKey(key: String) = viewModelScope.launch { settingsRepository.setHordeApiKey(key) }
+    fun setHordeImageModelName(model: String) = viewModelScope.launch { settingsRepository.setHordeImageModelName(model) }
     fun setHuggingFaceApiKey(key: String) = viewModelScope.launch { settingsRepository.setHuggingFaceApiKey(key) }
     fun setHuggingFaceImageModelName(model: String) = viewModelScope.launch { settingsRepository.setHuggingFaceImageModelName(model) }
     fun setImageEnginePreference(engine: com.opencompanion.app.data.ImageEngine) = viewModelScope.launch { settingsRepository.setImageEnginePreference(engine) }
