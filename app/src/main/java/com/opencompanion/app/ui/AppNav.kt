@@ -125,6 +125,7 @@ fun AppNav(app: OpenCompanionApplication) {
                 onBack = { navController.popBackStack() },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenPersonas = { navController.navigate(Routes.PERSONAS) },
+                onOpenProfile = { id -> navController.navigate(Routes.characterDetail(id)) },
             )
         }
 

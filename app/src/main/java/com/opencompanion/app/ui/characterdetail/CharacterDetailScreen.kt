@@ -813,6 +813,12 @@ fun CharacterDetailScreen(
                 viewModel.setAsAvatar(mediaPath)
                 android.widget.Toast.makeText(context, "Photo de profil mise à jour !", android.widget.Toast.LENGTH_SHORT).show()
             },
+            onUploadToGitHub = { mediaPath ->
+                android.widget.Toast.makeText(context, "Envoi vers GitHub en cours...", android.widget.Toast.LENGTH_SHORT).show()
+                viewModel.uploadAvatarToGitHub(mediaPath) { success, msg ->
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                }
+            },
         )
     }
 

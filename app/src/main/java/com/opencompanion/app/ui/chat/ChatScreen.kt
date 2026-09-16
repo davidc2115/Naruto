@@ -84,6 +84,7 @@ fun ChatScreen(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenPersonas: () -> Unit,
+    onOpenProfile: ((Long) -> Unit)? = null,
 ) {
     val state by viewModel.uiState.collectAsState()
     val personas by viewModel.personas.collectAsState()
@@ -117,7 +118,15 @@ fun ChatScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(enabled = state.character != null && onOpenProfile != null) {
+                                state.character?.id?.let { charId -> onOpenProfile?.invoke(charId) }
+                            }
+                            .padding(end = 8.dp)
+                    ) {
                         CharacterAvatar(
                             avatarPath = state.character?.avatarPath,
                             name = state.character?.name.orEmpty(),

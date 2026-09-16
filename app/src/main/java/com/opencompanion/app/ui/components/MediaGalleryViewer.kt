@@ -35,6 +35,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ZoomIn
@@ -149,6 +150,7 @@ fun MediaLightboxDialog(
     onDismiss: () -> Unit,
     onDeleteMedia: ((String) -> Unit)? = null,
     onSetAsAvatar: ((String) -> Unit)? = null,
+    onUploadToGitHub: ((String) -> Unit)? = null,
 ) {
     if (mediaList.isEmpty()) {
         onDismiss()
@@ -226,6 +228,14 @@ fun MediaLightboxDialog(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (onUploadToGitHub != null && !currentMedia.startsWith("asset://")) {
+                        IconButton(onClick = {
+                            onUploadToGitHub(currentMedia)
+                        }) {
+                            Icon(Icons.Filled.CloudUpload, contentDescription = "Enregistrer sur GitHub", tint = Color.White)
+                        }
+                    }
+
                     if (onSetAsAvatar != null) {
                         IconButton(onClick = {
                             onSetAsAvatar(currentMedia)
@@ -234,7 +244,7 @@ fun MediaLightboxDialog(
                         }
                     }
 
-                    if (onDeleteMedia != null && !currentMedia.startsWith("asset://")) {
+                    if (onDeleteMedia != null) {
                         IconButton(onClick = {
                             onDeleteMedia(currentMedia)
                             if (mediaList.size <= 1) {

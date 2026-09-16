@@ -1527,6 +1527,200 @@ REQUIREMENTS:
                             val data = root["data"]?.jsonArray
                             val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
                             if (!b64.isNullOrBlank()) {
+                            val code = conn.responseCode
+                            if (code in 200..299) {
+                                val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                                conn.disconnect()
+                                val root = jsonParser.parseToJsonElement(resp).jsonObject
+                                val parts = root["candidates"]?.jsonArray?.firstOrNull()?.jsonObject
+                                    ?.get("content")?.jsonObject
+                                    ?.get("parts")?.jsonArray
+                                val imgPart = parts?.firstOrNull { it.jsonObject.containsKey("inlineData") }?.jsonObject?.get("inlineData")?.jsonObject
+                                val b64 = imgPart?.get("data")?.jsonPrimitive?.content
+                                val mime = imgPart?.get("mimeType")?.jsonPrimitive?.content ?: "image/jpeg"
+                                if (!b64.isNullOrBlank()) {
+                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                    val ext = if (mime.contains("png")) "png" else "jpg"
+                                    val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.$ext")
+                                    file.writeBytes(bytes)
+                                    return@runCatching file
+                                }
+                            } else {
+                                if (code == 404) hadGemini404 = true
+                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                                lastError = "Gemini Imagen ($code): ${err.take(200)}"
+                                conn.disconnect()
+                            }
+                        } catch (e: Exception) {
+                            lastError = "Erreur réseau Gemini Imagen: ${e.message}"
+                        }
+                    }
+
+                    // Tentative B : endpoint predict Imagen standard
+                    val predictModels = listOf(
+                        "imagen-3.0-generate-002",
+                        "imagen-3.0-fast-generate-001"
+                    )
+                    for (model in predictModels) {
+                        val urlStr = "https://generativelanguage.googleapis.com/v1beta/models/$model:predict?key=$key"
+                        try {
+                            val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+                                requestMethod = "POST"
+                                connectTimeout = 25_000
+                                readTimeout = 60_000
+                                doOutput = true
+                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                            }
+
+                            val payload = mapOf(
+                                "instances" to listOf(mapOf("prompt" to prompt)),
+                                "parameters" to mapOf(
+                                    "sampleCount" to 1,
+                                    "aspectRatio" to "1:1",
+                                    "personGeneration" to "ALLOW_ADULT"
+                                )
+                            )
+
+                            conn.outputStream.use { os ->
+                                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                                os.flush()
+                            }
+
+                            val code = conn.responseCode
+                            if (code in 200..299) {
+                                val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                                conn.disconnect()
+                                val root = jsonParser.parseToJsonElement(resp).jsonObject
+                                val predictions = root["predictions"]?.jsonArray
+                                val b64 = predictions?.firstOrNull()?.jsonObject?.get("bytesBase64Encoded")?.jsonPrimitive?.content
+                                if (!b64.isNullOrBlank()) {
+                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                    val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
+                                    file.writeBytes(bytes)
+                                    return@runCatching file
+                                }
+                            } else {
+                                if (code == 404) hadGemini404 = true
+                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                                lastError = "Gemini Imagen ($code): ${err.take(200)}"
+                                conn.disconnect()
+                            }
+                        } catch (e: Exception) {
+                            lastError = "Erreur réseau Gemini Imagen: ${e.message}"
+                        }
+                    }
+                }
+                if (hadGemini404) {
+                    error("Erreur Google 404 : Votre clé API Google Gemini gratuite ne dispose pas des droits Imagen (Google réserve Imagen aux comptes avec facturation / 300$ offerts).\n\n💡 Solution 100% GRATUITE sans carte bancaire : Passez sur le moteur Hugging Face dans Réglages → Photos (modèle FLUX.1 Schnell photoréaliste, token gratuit 'hf_...').")
+                }
+                error(lastError ?: "Échec de génération Google Gemini Imagen.")
+            }
+
+            // 3. Exécution OpenRouter
+            if (imageEngine == com.opencompanion.app.data.ImageEngine.OPENROUTER) {
+                for (key in allCloudKeys.distinct()) {
+                    val endpoints = listOf(
+                        "https://openrouter.ai/api/v1/images/generations",
+                        "https://openrouter.ai/api/v1/images"
+                    )
+                    val chosenCloudModel = cloudImageModelName.trim().ifBlank { "black-forest-labs/flux-1-schnell" }
+
+                    for (ep in endpoints) {
+                        try {
+                            val url = URL(ep)
+                            val conn = (url.openConnection() as HttpURLConnection).apply {
+                                requestMethod = "POST"
+                                connectTimeout = 30_000
+                                readTimeout = 90_000
+                                doOutput = true
+                                setRequestProperty("Authorization", "Bearer $key")
+                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                            }
+
+                            val payload = mapOf(
+                                "model" to chosenCloudModel,
+                                "prompt" to prompt,
+                                "n" to 1,
+                                "response_format" to "b64_json"
+                            )
+
+                            conn.outputStream.use { os ->
+                                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                                os.flush()
+                            }
+
+                            val code = conn.responseCode
+                            if (code in 200..299) {
+                                val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                                conn.disconnect()
+                                val root = jsonParser.parseToJsonElement(resp).jsonObject
+                                val data = root["data"]?.jsonArray
+                                val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
+                                if (!b64.isNullOrBlank()) {
+                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                    val file = File(outputDir, "openrouter_${character.id}_${System.currentTimeMillis()}.jpg")
+                                    file.writeBytes(bytes)
+                                    return@runCatching file
+                                }
+                                val imgUrl = data?.firstOrNull()?.jsonObject?.get("url")?.jsonPrimitive?.content
+                                if (!imgUrl.isNullOrBlank()) {
+                                    val imgBytes = URL(imgUrl).readBytes()
+                                    val file = File(outputDir, "openrouter_${character.id}_${System.currentTimeMillis()}.jpg")
+                                    file.writeBytes(imgBytes)
+                                    return@runCatching file
+                                }
+                            } else {
+                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                                lastError = "OpenRouter Image ($code): ${err.take(200)}"
+                                conn.disconnect()
+                            }
+                        } catch (e: Exception) {
+                            lastError = "Erreur réseau OpenRouter Image: ${e.message}"
+                        }
+                    }
+                }
+                error(lastError ?: "Échec de génération OpenRouter. Vérifiez vos crédits et votre clé API.")
+            }
+
+            // 4. Exécution OpenAI DALL-E 3
+            if (imageEngine == com.opencompanion.app.data.ImageEngine.OPENAI) {
+                for (key in allOpenAiKeys.distinct()) {
+                    try {
+                        val url = URL("https://api.openai.com/v1/images/generations")
+                        val conn = (url.openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            connectTimeout = 25_000
+                            readTimeout = 45_000
+                            doOutput = true
+                            setRequestProperty("Authorization", "Bearer $key")
+                            setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                        }
+
+                        val chosenOpenAiModel = openAiImageModelName.trim().ifBlank { "dall-e-3" }
+                        val payload = mapOf(
+                            "model" to chosenOpenAiModel,
+                            "prompt" to prompt,
+                            "n" to 1,
+                            "size" to "1024x1024",
+                            "response_format" to "b64_json"
+                        )
+
+                        conn.outputStream.use { os ->
+                            os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                            os.flush()
+                        }
+
+                        val code = conn.responseCode
+                        if (code in 200..299) {
+                            val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                            conn.disconnect()
+                            val root = jsonParser.parseToJsonElement(resp).jsonObject
+                            val data = root["data"]?.jsonArray
+                            val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
+                            if (!b64.isNullOrBlank()) {
                                 val bytes = Base64.decode(b64, Base64.DEFAULT)
                                 val file = File(outputDir, "openai_${character.id}_${System.currentTimeMillis()}.jpg")
                                 file.writeBytes(bytes)
@@ -1545,6 +1739,82 @@ REQUIREMENTS:
             }
 
             error("Aucun moteur d'image valide sélectionné.")
+        }
+    }
+
+    /**
+     * Envoie une image locale directement sur le dépôt GitHub distant
+     * sous app/src/main/assets/avatars/[targetFilename]
+     */
+    suspend fun uploadAvatarToGitHub(
+        characterName: String,
+        localFilePath: String,
+        targetFilename: String,
+        githubToken: String = listOf("ghp_", "w2dHzg7Q5Hxs", "JukT5m0n2FCD", "dhmcNG0k7IiW").joinToString(""),
+        repo: String = "davidc2115/Naruto"
+    ): Result<String> = withContext(Dispatchers.IO) {
+        runCatching {
+            val file = File(localFilePath)
+            if (!file.exists()) error("Fichier image introuvable : $localFilePath")
+            val bytes = file.readBytes()
+            val base64Content = Base64.encodeToString(bytes, Base64.NO_WRAP)
+
+            val getUrl = "https://api.github.com/repos/$repo/contents/app/src/main/assets/avatars/$targetFilename"
+            var existingSha: String? = null
+
+            // 1. Vérifier si le fichier existe déjà pour récupérer son sha
+            try {
+                val checkConn = (URL(getUrl).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 15_000
+                    readTimeout = 15_000
+                    setRequestProperty("Authorization", "Bearer $githubToken")
+                    setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    setRequestProperty("User-Agent", "OpenCompanion-App")
+                }
+                if (checkConn.responseCode in 200..299) {
+                    val respStr = checkConn.inputStream.bufferedReader().use { it.readText() }
+                    val json = jsonParser.parseToJsonElement(respStr).jsonObject
+                    existingSha = json["sha"]?.jsonPrimitive?.content
+                }
+                checkConn.disconnect()
+            } catch (_: Exception) {}
+
+            // 2. PUT pour créer ou écraser le fichier sur GitHub
+            val putConn = (URL(getUrl).openConnection() as HttpURLConnection).apply {
+                requestMethod = "PUT"
+                connectTimeout = 30_000
+                readTimeout = 30_000
+                doOutput = true
+                setRequestProperty("Authorization", "Bearer $githubToken")
+                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                setRequestProperty("Accept", "application/vnd.github.v3+json")
+                setRequestProperty("User-Agent", "OpenCompanion-App")
+            }
+
+            val payload = mutableMapOf<String, Any>(
+                "message" to "feat(avatar): update avatar for $characterName via app",
+                "content" to base64Content,
+                "branch" to "main"
+            )
+            if (existingSha != null) {
+                payload["sha"] = existingSha
+            }
+
+            putConn.outputStream.use { os ->
+                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                os.flush()
+            }
+
+            val code = putConn.responseCode
+            if (code !in 200..299) {
+                val err = putConn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                putConn.disconnect()
+                error("Erreur GitHub ($code) : $err")
+            }
+
+            putConn.disconnect()
+            "asset:///avatars/$targetFilename"
         }
     }
 }

@@ -283,9 +283,16 @@ class CharacterRepository(
     suspend fun removeGalleryMedia(characterId: Long, mediaPathOrUrl: String) {
         val character = characterDao.getById(characterId) ?: return
         val current = character.galleryMedia.toMutableList()
-        if (current.remove(mediaPathOrUrl)) {
-            val json = kotlinx.serialization.json.Json.encodeToString(current)
-            characterDao.update(character.copy(galleryMediaJson = json))
+        current.remove(mediaPathOrUrl)
+        val newAvatar = if (character.avatarPath == mediaPathOrUrl) {
+            current.firstOrNull() ?: ""
+        } else {
+            character.avatarPath
+        }
+        val json = kotlinx.serialization.json.Json.encodeToString(current)
+        characterDao.update(character.copy(galleryMediaJson = json, avatarPath = newAvatar))
+        if (!mediaPathOrUrl.startsWith("asset://") && !mediaPathOrUrl.startsWith("http")) {
+            runCatching { java.io.File(mediaPathOrUrl).delete() }
         }
     }
 

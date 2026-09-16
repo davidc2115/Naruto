@@ -219,4 +219,32 @@ class CharacterDetailViewModel(
             repository.removeGalleryMedia(characterId, mediaPathOrUrl)
         }
     }
+
+    fun uploadAvatarToGitHub(
+        mediaPath: String,
+        onResult: (Boolean, String) -> Unit = { _, _ -> },
+    ) {
+        viewModelScope.launch {
+            val character = repository.getCharacter(characterId) ?: return@launch
+            val safeName = character.name
+                .lowercase()
+                .replace(Regex("[^a-z0-9]"), "_")
+                .trim('_')
+            val targetFilename = "${safeName}.jpg"
+
+            val result = cloudBridge.uploadAvatarToGitHub(
+                characterName = character.name,
+                localFilePath = mediaPath,
+                targetFilename = targetFilename,
+            )
+
+            result.onSuccess { assetPath ->
+                // Mise à jour de l'avatar avec le chemin d'asset GitHub officiel
+                repository.updateAvatar(characterId, assetPath)
+                onResult(true, "Image envoyée avec succès sur GitHub ($targetFilename) !")
+            }.onFailure { err ->
+                onResult(false, "Échec de l'envoi sur GitHub : ${err.message}")
+            }
+        }
+    }
 }
