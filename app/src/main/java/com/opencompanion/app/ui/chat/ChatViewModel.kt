@@ -693,13 +693,14 @@ class ChatViewModel(
                 if (settings.cloudApiKey.trim().startsWith("sk-")) settings.cloudApiKey.trim() else ""
             }
             val cloudKey = settings.cloudApiKey.trim()
+            val hfKey = settings.huggingFaceApiKey.trim()
 
-            if (geminiKey.isBlank() && openAiKey.isBlank()) {
+            if (hfKey.isBlank() && geminiKey.isBlank() && openAiKey.isBlank() && cloudKey.isBlank()) {
                 val hasGroq = settings.groqApiKey.isNotBlank() || settings.cloudApiKey.trim().startsWith("gsk_")
                 _statusMessage.value = if (hasGroq) {
-                    "La génération de photos utilise Google Gemini Imagen. Votre clé actuelle est configurée pour Groq (texte rapide). Ajoutez votre clé Google Gemini gratuite (aistudio.google.com) dans Réglages → Moteur d'IA."
+                    "Pour générer des photos gratuitement sans carte bancaire, créez un token gratuit sur huggingface.co/settings/tokens et ajoutez-le dans Réglages → Photos (FLUX.1 Schnell photoréaliste)."
                 } else {
-                    "Veuillez configurer votre clé API Google Gemini dans Réglages → Moteur d'IA (clé gratuite sur aistudio.google.com) pour générer des photos."
+                    "Pour générer des photos, ajoutez un token gratuit Hugging Face (100% gratuit sans carte bancaire, FLUX.1 Schnell) ou votre clé Google Gemini dans Réglages."
                 }
                 return@launch
             }
@@ -716,9 +717,11 @@ class ChatViewModel(
                 geminiApiKey = geminiKey,
                 openAiApiKey = openAiKey.takeIf { it.isNotBlank() },
                 cloudApiKey = cloudKey.takeIf { it.isNotBlank() },
+                huggingFaceApiKey = hfKey.takeIf { it.isNotBlank() },
                 geminiImageModelName = settings.geminiImageModelName,
                 openAiImageModelName = settings.openAiImageModelName,
                 cloudImageModelName = settings.cloudImageModelName,
+                huggingFaceImageModelName = settings.huggingFaceImageModelName,
                 character = character,
                 recentMessages = recentMessages,
                 userCustomInstruction = customPrompt,

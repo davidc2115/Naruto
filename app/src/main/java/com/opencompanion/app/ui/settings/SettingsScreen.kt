@@ -541,6 +541,89 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 }
             }
 
+            Divider(Modifier.padding(vertical = 4.dp))
+            SectionTitle("Génération de Photos & Scènes (Images)")
+
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+            ) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Générez des photos réalistes et scènes de vos compagnes directement dans le chat. Vous pouvez utiliser Hugging Face (100% gratuit sans carte bancaire), Google Gemini (avec facturation / 300$ offerts), ou OpenRouter / OpenAI.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+
+                    // Bloc Hugging Face (100% GRATUIT)
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "🤗 Hugging Face (100% GRATUIT)",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text("⭐ Sans carte bancaire", style = MaterialTheme.typography.labelSmall)
+                            }
+                            Text(
+                                "Obtenez votre token gratuit 'hf_...' en 30 secondes sur huggingface.co/settings/tokens (aucune carte requise). Modèle FLUX.1 Schnell photoréaliste et ultra-rapide.",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                            ApiKeysField(
+                                value = state.settings.huggingFaceApiKey,
+                                onValueChange = viewModel::setHuggingFaceApiKey,
+                                label = "Token Hugging Face (hf_...)",
+                                placeholder = "hf_xxxxxxxxxxxxxxxxxxxxxxxxx",
+                            )
+                            OutlinedTextField(
+                                value = state.settings.huggingFaceImageModelName,
+                                onValueChange = viewModel::setHuggingFaceImageModelName,
+                                label = { Text("Modèle Hugging Face") },
+                                placeholder = { Text("black-forest-labs/FLUX.1-schnell") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                FilterChip(
+                                    selected = state.settings.huggingFaceImageModelName == "black-forest-labs/FLUX.1-schnell",
+                                    onClick = { viewModel.setHuggingFaceImageModelName("black-forest-labs/FLUX.1-schnell") },
+                                    label = { Text("FLUX.1 Schnell ⭐") }
+                                )
+                                FilterChip(
+                                    selected = state.settings.huggingFaceImageModelName == "stabilityai/stable-diffusion-xl-base-1.0",
+                                    onClick = { viewModel.setHuggingFaceImageModelName("stabilityai/stable-diffusion-xl-base-1.0") },
+                                    label = { Text("SDXL 🎨") }
+                                )
+                                FilterChip(
+                                    selected = state.settings.huggingFaceImageModelName == "ByteDance/SDXL-Lightning",
+                                    onClick = { viewModel.setHuggingFaceImageModelName("ByteDance/SDXL-Lightning") },
+                                    label = { Text("SDXL Lightning ⚡") }
+                                )
+                            }
+                        }
+                    }
+
+                    Text(
+                        "ℹ️ À propos des autres moteurs d'images :\n" +
+                        "• Google Gemini (Imagen) : Nécessite obligatoirement un compte Google Cloud avec facturation activée (300$ offerts). Les clés gratuites sans facturation affichent une erreur 404 de Google.\n" +
+                        "• OpenRouter : La génération d'images via OpenRouter est payante (nécessite des crédits achetés).",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
             NanoAvailabilityRow(
                 availability = state.nanoAvailability,
                 onDownload = viewModel::downloadNano,

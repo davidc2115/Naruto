@@ -104,6 +104,8 @@ data class EngineSettings(
     val openAiModelName: String = "gpt-4o-mini",
     val openAiImageModelName: String = "dall-e-3",
     val cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
+    val huggingFaceApiKey: String = "",
+    val huggingFaceImageModelName: String = "black-forest-labs/FLUX.1-schnell",
 )
 
 /**
@@ -143,6 +145,8 @@ class SettingsRepository(private val context: Context) {
         val OPENAI_MODEL_NAME = stringPreferencesKey("openai_model_name")
         val OPENAI_IMAGE_MODEL_NAME = stringPreferencesKey("openai_image_model_name")
         val CLOUD_IMAGE_MODEL_NAME = stringPreferencesKey("cloud_image_model_name")
+        val HUGGING_FACE_API_KEY = stringPreferencesKey("hugging_face_api_key")
+        val HUGGING_FACE_IMAGE_MODEL_NAME = stringPreferencesKey("hugging_face_image_model_name")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
         val CATALOG_200_SEEDED = booleanPreferencesKey("catalog_200_seeded")
@@ -226,6 +230,8 @@ class SettingsRepository(private val context: Context) {
             openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
             openAiImageModelName = prefs[Keys.OPENAI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "dall-e-3",
             cloudImageModelName = prefs[Keys.CLOUD_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/flux-1-schnell",
+            huggingFaceApiKey = prefs[Keys.HUGGING_FACE_API_KEY] ?: "",
+            huggingFaceImageModelName = prefs[Keys.HUGGING_FACE_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/FLUX.1-schnell",
         )
     }
 
@@ -298,6 +304,12 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setCloudImageModelName(model: String) = context.dataStore.edit {
         if (model.isBlank()) it.remove(Keys.CLOUD_IMAGE_MODEL_NAME) else it[Keys.CLOUD_IMAGE_MODEL_NAME] = model.trim()
+    }
+    suspend fun setHuggingFaceApiKey(key: String) = context.dataStore.edit {
+        if (key.isBlank()) it.remove(Keys.HUGGING_FACE_API_KEY) else it[Keys.HUGGING_FACE_API_KEY] = key.trim()
+    }
+    suspend fun setHuggingFaceImageModelName(model: String) = context.dataStore.edit {
+        if (model.isBlank()) it.remove(Keys.HUGGING_FACE_IMAGE_MODEL_NAME) else it[Keys.HUGGING_FACE_IMAGE_MODEL_NAME] = model.trim()
     }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->

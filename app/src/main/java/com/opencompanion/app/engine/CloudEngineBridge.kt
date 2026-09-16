@@ -984,34 +984,48 @@ REQUIREMENTS:
      * ou un repli photoréaliste haute fidélité (FLUX.1), et l'enregistre dans le stockage privé de l'application.
      */
     suspend fun generateCharacterSceneImage(
-        geminiApiKey: String,
+        geminiApiKey: String = "",
         openAiApiKey: String? = null,
         cloudApiKey: String? = null,
+        huggingFaceApiKey: String? = null,
         geminiImageModelName: String = "imagen-3.0-generate-002",
         openAiImageModelName: String = "dall-e-3",
         cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
+        huggingFaceImageModelName: String = "black-forest-labs/FLUX.1-schnell",
         character: CharacterEntity,
         recentMessages: List<ChatMessageEntity>,
         userCustomInstruction: String? = null,
         outputDir: File,
     ): Result<File> = withContext(Dispatchers.IO) {
         runCatching {
-            val prompt = buildSceneImagePrompt(geminiApiKey.ifBlank { cloudApiKey ?: "" }, character, recentMessages, userCustomInstruction)
+            val prompt = buildSceneImagePrompt(
+                huggingFaceApiKey ?: geminiApiKey.ifBlank { cloudApiKey ?: "" },
+                character,
+                recentMessages,
+                userCustomInstruction
+            )
             
+            // Collecter toutes les clés Hugging Face (100% Gratuit sans carte bancaire)
+            val allHfKeys = mutableListOf<String>()
+            if (!huggingFaceApiKey.isNullOrBlank()) allHfKeys.addAll(parseApiKeys(huggingFaceApiKey))
+            if (!cloudApiKey.isNullOrBlank() && cloudApiKey.trim().startsWith("hf_")) allHfKeys.addAll(parseApiKeys(cloudApiKey))
+            if (geminiApiKey.trim().startsWith("hf_")) allHfKeys.addAll(parseApiKeys(geminiApiKey))
+            if (!openAiApiKey.isNullOrBlank() && openAiApiKey.trim().startsWith("hf_")) allHfKeys.addAll(parseApiKeys(openAiApiKey))
+
             // Collecter toutes les clés Gemini possibles
             val allGeminiKeys = mutableListOf<String>()
-            if (geminiApiKey.isNotBlank()) allGeminiKeys.addAll(parseApiKeys(geminiApiKey))
-            if (!cloudApiKey.isNullOrBlank() && (cloudApiKey.trim().startsWith("AIza") || cloudApiKey.trim().length > 30 && !cloudApiKey.trim().startsWith("gsk_") && !cloudApiKey.trim().startsWith("sk-"))) {
+            if (geminiApiKey.isNotBlank() && !geminiApiKey.trim().startsWith("hf_")) allGeminiKeys.addAll(parseApiKeys(geminiApiKey))
+            if (!cloudApiKey.isNullOrBlank() && (cloudApiKey.trim().startsWith("AIza") || (cloudApiKey.trim().length > 30 && !cloudApiKey.trim().startsWith("gsk_") && !cloudApiKey.trim().startsWith("sk-") && !cloudApiKey.trim().startsWith("hf_")))) {
                 allGeminiKeys.addAll(parseApiKeys(cloudApiKey))
             }
 
             // Collecter toutes les clés OpenAI
             val allOpenAiKeys = mutableListOf<String>()
-            if (!openAiApiKey.isNullOrBlank()) allOpenAiKeys.addAll(parseApiKeys(openAiApiKey))
+            if (!openAiApiKey.isNullOrBlank() && !openAiApiKey.trim().startsWith("hf_")) allOpenAiKeys.addAll(parseApiKeys(openAiApiKey))
 
             // Collecter toutes les clés OpenRouter / Cloud
             val allCloudKeys = mutableListOf<String>()
-            if (!cloudApiKey.isNullOrBlank() && (cloudApiKey.trim().startsWith("sk-or-") || cloudApiKey.trim().startsWith("sk-") || cloudApiKey.trim().startsWith("Bearer "))) {
+            if (!cloudApiKey.isNullOrBlank() && !cloudApiKey.trim().startsWith("hf_") && (cloudApiKey.trim().startsWith("sk-or-") || cloudApiKey.trim().startsWith("sk-") || cloudApiKey.trim().startsWith("Bearer "))) {
                 allCloudKeys.addAll(parseApiKeys(cloudApiKey))
             }
             if (allCloudKeys.isEmpty() && allOpenAiKeys.isNotEmpty()) {
@@ -1021,8 +1035,65 @@ REQUIREMENTS:
             var lastError: String? = null
             var hadGemini404 = false
 
-            if (allGeminiKeys.isEmpty() && allOpenAiKeys.isEmpty() && allCloudKeys.isEmpty()) {
-                error("Pour générer des photos, configurez une clé API dans Réglages → Moteur d'IA : soit OpenRouter (FLUX.1 Schnell photoréaliste et gratuit/abordable), soit OpenAI (DALL-E 3), soit Google Gemini (compte avec facturation).")
+            if (allHfKeys.isEmpty() && allGeminiKeys.isEmpty() && allOpenAiKeys.isEmpty() && allCloudKeys.isEmpty()) {
+                error("Pour générer des photos, configurez une clé dans Réglages → Photos : soit Hugging Face (100% GRATUIT sans carte bancaire, FLUX.1 Schnell photoréaliste), soit Google Gemini (avec facturation / 300$ offerts), soit OpenRouter / OpenAI.")
+            }
+
+            // 1. Tentative Hugging Face Serverless (100% Gratuit, sans carte bancaire, FLUX.1 Schnell & SDXL)
+            for (key in allHfKeys.distinct()) {
+                val hfModels = listOf(
+                    huggingFaceImageModelName.trim().ifBlank { "black-forest-labs/FLUX.1-schnell" },
+                    "black-forest-labs/FLUX.1-schnell",
+                    "stabilityai/stable-diffusion-xl-base-1.0",
+                    "ByteDance/SDXL-Lightning"
+                ).distinct()
+
+                for (model in hfModels) {
+                    val hfEndpoints = listOf(
+                        "https://api-inference.huggingface.co/models/$model",
+                        "https://router.huggingface.co/hf-inference/models/$model"
+                    )
+                    for (ep in hfEndpoints) {
+                        try {
+                            val conn = (URL(ep).openConnection() as HttpURLConnection).apply {
+                                requestMethod = "POST"
+                                connectTimeout = 30_000
+                                readTimeout = 90_000
+                                doOutput = true
+                                setRequestProperty("Authorization", "Bearer $key")
+                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                                setRequestProperty("x-wait-for-model", "true")
+                                setRequestProperty("x-use-cache", "false")
+                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                            }
+
+                            val payload = mapOf("inputs" to prompt)
+                            conn.outputStream.use { os ->
+                                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                                os.flush()
+                            }
+
+                            val code = conn.responseCode
+                            if (code in 200..299) {
+                                val contentType = conn.contentType ?: ""
+                                val imgBytes = conn.inputStream.use { it.readBytes() }
+                                conn.disconnect()
+                                if (imgBytes.isNotEmpty() && !contentType.contains("application/json")) {
+                                    val ext = if (contentType.contains("png")) "png" else "jpg"
+                                    val file = File(outputDir, "hf_${character.id}_${System.currentTimeMillis()}.$ext")
+                                    file.writeBytes(imgBytes)
+                                    return@runCatching file
+                                }
+                            } else {
+                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                                lastError = "Hugging Face ($code avec $model): ${err.take(250)}"
+                                conn.disconnect()
+                            }
+                        } catch (e: Exception) {
+                            lastError = "Erreur réseau Hugging Face: ${e.message}"
+                        }
+                    }
+                }
             }
 
             // Correction automatique des fautes de frappe sur le modèle Imagen (ex: imagen-4.0-generate-0001 -> imagen-4.0-generate-001)
@@ -1062,7 +1133,7 @@ REQUIREMENTS:
                                 mapOf("parts" to listOf(mapOf("text" to prompt)))
                             ),
                             "generationConfig" to mapOf(
-                                "responseModalities" to listOf("IMAGE")
+                                "responseModalities" to listOf("TEXT", "IMAGE")
                             )
                         )
 
@@ -1277,11 +1348,11 @@ REQUIREMENTS:
                 }
             }
 
-            if (hadGemini404 && allCloudKeys.isEmpty() && allOpenAiKeys.isEmpty()) {
-                error("Erreur Google 404 : Votre clé API Google Gemini gratuite ne dispose pas des droits Imagen (Google réserve la génération d'images aux comptes avec facturation activée). Ajoutez une clé OpenRouter (FLUX.1 Schnell) ou OpenAI (DALL-E 3) dans Réglages → Moteur d'IA.")
+            if (hadGemini404 && allHfKeys.isEmpty() && allCloudKeys.isEmpty() && allOpenAiKeys.isEmpty()) {
+                error("Erreur Google 404 : Votre clé API Google Gemini gratuite ne dispose pas des droits Imagen (Google réserve Imagen aux comptes avec facturation / 300$ offerts).\n\n💡 Solution 100% GRATUITE sans carte bancaire : Créez un compte gratuit sur huggingface.co/settings/tokens, générez un token gratuit 'hf_...' et collez-le dans Réglages → Photos & Images (modèle FLUX.1 Schnell photoréaliste).")
             }
 
-            error(lastError ?: "Échec de génération de la photo. Vérifiez votre clé API OpenRouter (FLUX), OpenAI (DALL-E) ou Google Gemini dans les Réglages.")
+            error(lastError ?: "Échec de génération de la photo. Vérifiez votre clé Hugging Face (hf_...), Google Gemini, OpenRouter ou OpenAI dans les Réglages.")
         }
     }
 }

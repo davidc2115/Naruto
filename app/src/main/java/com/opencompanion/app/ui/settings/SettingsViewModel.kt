@@ -248,6 +248,8 @@ class SettingsViewModel(
     fun setOpenAiModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiModelName(model) }
     fun setOpenAiImageModelName(model: String) = viewModelScope.launch { settingsRepository.setOpenAiImageModelName(model) }
     fun setCloudImageModelName(model: String) = viewModelScope.launch { settingsRepository.setCloudImageModelName(model) }
+    fun setHuggingFaceApiKey(key: String) = viewModelScope.launch { settingsRepository.setHuggingFaceApiKey(key) }
+    fun setHuggingFaceImageModelName(model: String) = viewModelScope.launch { settingsRepository.setHuggingFaceImageModelName(model) }
     fun setAllowNsfwMode(enabled: Boolean) = viewModelScope.launch { settingsRepository.setAllowNsfwMode(enabled) }
 
     fun refreshGroqModels() {
