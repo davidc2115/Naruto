@@ -20,6 +20,27 @@ enum class HomeTab {
     CHATS,
 }
 
+data class TemperamentTagItem(val name: String, val emoji: String)
+
+val ALL_TEMPERAMENTS = listOf(
+    TemperamentTagItem("Timide", "🙈"),
+    TemperamentTagItem("Séductrice", "🔥"),
+    TemperamentTagItem("Taquine", "😏"),
+    TemperamentTagItem("Flirteuse", "💋"),
+    TemperamentTagItem("Joueuse", "🎲"),
+    TemperamentTagItem("Provocatrice", "⚡"),
+    TemperamentTagItem("Aguicheuse", "💄"),
+    TemperamentTagItem("Sensuelle", "✨"),
+    TemperamentTagItem("Douce", "🌸"),
+    TemperamentTagItem("Autoritaire", "👑"),
+    TemperamentTagItem("Réservée", "🤫"),
+    TemperamentTagItem("Passionnée", "🌋"),
+    TemperamentTagItem("Pétillante", "🎉"),
+    TemperamentTagItem("Épicurienne", "🍷"),
+    TemperamentTagItem("Mystérieuse", "🌙"),
+    TemperamentTagItem("Fière", "💎"),
+)
+
 class CharacterListViewModel(
     private val repository: CharacterRepository,
     private val importManager: CharacterImportManager,
@@ -39,9 +60,10 @@ class CharacterListViewModel(
 
     val searchQuery = MutableStateFlow("")
     val selectedTag = MutableStateFlow<String?>(null)
+    val selectedTemperament = MutableStateFlow<String?>(null)
 
     val filteredCharacters: StateFlow<List<CharacterEntity>> =
-        combine(characters, searchQuery, selectedTag) { list, query, tag ->
+        combine(characters, searchQuery, selectedTag, selectedTemperament) { list, query, tag, temp ->
             list.filter { char ->
                 val matchesQuery = query.isBlank() ||
                     char.name.contains(query, ignoreCase = true) ||
@@ -50,7 +72,8 @@ class CharacterListViewModel(
                     char.scenario.contains(query, ignoreCase = true) ||
                     char.tags.any { it.contains(query, ignoreCase = true) }
                 val matchesTag = tag == null || char.tags.any { it.equals(tag, ignoreCase = true) }
-                matchesQuery && matchesTag
+                val matchesTemp = temp == null || char.tags.any { it.contains(temp, ignoreCase = true) } || char.personality.contains(temp, ignoreCase = true)
+                matchesQuery && matchesTag && matchesTemp
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -73,6 +96,10 @@ class CharacterListViewModel(
 
     fun setSelectedTag(tag: String?) {
         selectedTag.value = if (selectedTag.value == tag) null else tag
+    }
+
+    fun setSelectedTemperament(temp: String?) {
+        selectedTemperament.value = if (selectedTemperament.value == temp) null else temp
     }
 
     private val _importMessage = MutableStateFlow<String?>(null)

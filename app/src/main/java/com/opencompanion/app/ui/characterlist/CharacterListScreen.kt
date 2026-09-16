@@ -106,6 +106,7 @@ fun CharacterListScreen(
     val allCharacters by viewModel.characters.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedTag by viewModel.selectedTag.collectAsState()
+    val selectedTemperament by viewModel.selectedTemperament.collectAsState()
     val popularTags by viewModel.popularTags.collectAsState()
     val importMessage by viewModel.importMessage.collectAsState()
     val activeChats by viewModel.activeChats.collectAsState()
@@ -283,6 +284,29 @@ fun CharacterListScreen(
                     .padding(horizontal = 14.dp, vertical = 6.dp),
             )
 
+            // Filtres par Tempéraments (16 tempéraments uniques avec emojis)
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedTemperament == null,
+                        onClick = { viewModel.setSelectedTemperament(null) },
+                        label = { Text("🎭 Tous (${allCharacters.size})") },
+                        shape = RoundedCornerShape(16.dp),
+                    )
+                }
+                items(ALL_TEMPERAMENTS) { item ->
+                    FilterChip(
+                        selected = selectedTemperament == item.name,
+                        onClick = { viewModel.setSelectedTemperament(item.name) },
+                        label = { Text("${item.emoji} ${item.name}") },
+                        shape = RoundedCornerShape(16.dp),
+                    )
+                }
+            }
+
             // Filtres par tags populaires
             if (popularTags.isNotEmpty()) {
                 LazyRow(
@@ -340,6 +364,7 @@ fun CharacterListScreen(
                         Button(onClick = {
                             viewModel.setSearchQuery("")
                             viewModel.setSelectedTag(null)
+                            viewModel.setSelectedTemperament(null)
                         }) {
                             Text("Réinitialiser les filtres")
                         }
@@ -482,8 +507,17 @@ private fun CharacterCard(
                 if (character.tags.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        character.tags.take(2).forEach { tag ->
-                            TagChip(tag)
+                        val matchedTemp = ALL_TEMPERAMENTS.firstOrNull { temp ->
+                            character.tags.any { it.equals(temp.name, ignoreCase = true) } ||
+                            character.personality.contains(temp.name, ignoreCase = true)
+                        }
+                        if (matchedTemp != null) {
+                            TagChip("${matchedTemp.emoji} ${matchedTemp.name}")
+                        }
+                        character.tags.firstOrNull { tag ->
+                            matchedTemp == null || !tag.equals(matchedTemp.name, ignoreCase = true)
+                        }?.let { otherTag ->
+                            TagChip(otherTag)
                         }
                     }
                 }

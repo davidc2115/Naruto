@@ -462,6 +462,14 @@ class ChatViewModel(
                         splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
                         }
+                        viewModelScope.launch(Dispatchers.IO) {
+                            com.opencompanion.app.memory.LongTermMemoryManager.updateMemoryFromInteraction(
+                                character = character,
+                                userMessage = lastUserMessage,
+                                assistantReply = text,
+                                repository = repository,
+                            )
+                        }
                     } else {
                         _statusMessage.value = "Réponse vide reçue du serveur Cloud."
                     }
@@ -513,6 +521,14 @@ class ChatViewModel(
                     if (text.isNotBlank() && !DialogueRouter.isRefusalOrEmpty(text)) {
                         splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
+                        }
+                        viewModelScope.launch(Dispatchers.IO) {
+                            com.opencompanion.app.memory.LongTermMemoryManager.updateMemoryFromInteraction(
+                                character = character,
+                                userMessage = lastUserMessage,
+                                assistantReply = text,
+                                repository = repository,
+                            )
                         }
                     } else {
                         // Refus AICore ou réponse vide -> bascule automatique sur l'IA locale non censurée
@@ -631,6 +647,14 @@ class ChatViewModel(
                     if (text.isNotBlank()) {
                         splitIntoBubbles(cleanSpeakerPrefix(text, character.name)).forEach {
                             repository.appendMessage(characterId, MessageRole.ASSISTANT, it)
+                        }
+                        viewModelScope.launch(Dispatchers.IO) {
+                            com.opencompanion.app.memory.LongTermMemoryManager.updateMemoryFromInteraction(
+                                character = character,
+                                userMessage = lastUserMessage,
+                                assistantReply = text,
+                                repository = repository,
+                            )
                         }
                     } else {
                         // Peut arriver si le modèle a épuisé tout son budget de tokens dans un
