@@ -622,9 +622,9 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                             label = { Text("SDXL 🎨") }
                                         )
                                         FilterChip(
-                                            selected = state.settings.huggingFaceImageModelName == "ByteDance/SDXL-Lightning",
-                                            onClick = { viewModel.setHuggingFaceImageModelName("ByteDance/SDXL-Lightning") },
-                                            label = { Text("SDXL Lightning ⚡") }
+                                            selected = state.settings.huggingFaceImageModelName == "runwayml/stable-diffusion-v1-5",
+                                            onClick = { viewModel.setHuggingFaceImageModelName("runwayml/stable-diffusion-v1-5") },
+                                            label = { Text("SD 1.5 🚀") }
                                         )
                                     }
                                 }

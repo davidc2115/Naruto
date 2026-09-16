@@ -1061,19 +1061,21 @@ REQUIREMENTS:
                 }
             }
 
-            // 1. Exécution Hugging Face Serverless (100% Gratuit, sans carte bancaire, FLUX.1 Schnell & SDXL)
+            // 1. Exécution Hugging Face Serverless (100% Gratuit, sans carte bancaire)
             if (imageEngine == com.opencompanion.app.data.ImageEngine.HUGGING_FACE) {
-                for (key in allHfKeys.distinct()) {
+                for (rawKey in allHfKeys.distinct()) {
+                    val key = rawKey.trim()
                     val hfModels = listOf(
                         huggingFaceImageModelName.trim().ifBlank { "black-forest-labs/FLUX.1-schnell" },
                         "black-forest-labs/FLUX.1-schnell",
                         "stabilityai/stable-diffusion-xl-base-1.0",
-                        "ByteDance/SDXL-Lightning"
+                        "runwayml/stable-diffusion-v1-5",
+                        "CompVis/stable-diffusion-v1-4"
                     ).distinct()
 
                     for (model in hfModels) {
+                        // Seul le router est encore actif (api-inference.huggingface.co renvoie 410 Gone)
                         val hfEndpoints = listOf(
-                            "https://api-inference.huggingface.co/models/$model",
                             "https://router.huggingface.co/hf-inference/models/$model"
                         )
                         for (ep in hfEndpoints) {
@@ -1084,7 +1086,8 @@ REQUIREMENTS:
                                     readTimeout = 90_000
                                     doOutput = true
                                     setRequestProperty("Authorization", "Bearer $key")
-                                    setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                                    setRequestProperty("Content-Type", "application/json")
+                                    setRequestProperty("Accept", "image/png, image/jpeg, */*")
                                     setRequestProperty("x-wait-for-model", "true")
                                     setRequestProperty("x-use-cache", "false")
                                     setRequestProperty("User-Agent", "OpenCompanion/1.0")
@@ -1109,7 +1112,14 @@ REQUIREMENTS:
                                     }
                                 } else {
                                     val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                                    lastError = "Hugging Face ($code avec $model): ${err.take(250)}"
+                                    val parsedMessage = runCatching {
+                                        val root = jsonParser.parseToJsonElement(err).jsonObject
+                                        root["error"]?.jsonPrimitive?.content
+                                            ?: root["message"]?.jsonPrimitive?.content
+                                            ?: err
+                                    }.getOrDefault(err).take(300)
+
+                                    lastError = "Hugging Face ($code avec $model) : $parsedMessage"
                                     conn.disconnect()
                                 }
                             } catch (e: Exception) {
@@ -1118,7 +1128,12 @@ REQUIREMENTS:
                         }
                     }
                 }
-                error(lastError ?: "Échec de génération Hugging Face. Vérifiez que votre token 'hf_...' sur huggingface.co/settings/tokens est valide (type Read).")
+                val advice = if (lastError?.contains("400") == true) {
+                    "\n\n💡 Conseils pour Hugging Face :\n" +
+                    "1. Assurez-vous d'avoir cliqué sur 'Agree and access repository' sur https://huggingface.co/black-forest-labs/FLUX.1-schnell si demandé.\n" +
+                    "2. Sur huggingface.co/settings/tokens, vérifiez que votre token a bien les permissions 'Make calls to Inference Providers' cochées (ou créez un token de type 'Read')."
+                } else ""
+                error((lastError ?: "Échec de génération Hugging Face.") + advice)
             }
 
             // 2. Exécution Google Gemini Imagen
