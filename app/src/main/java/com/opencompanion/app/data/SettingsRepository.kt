@@ -37,6 +37,20 @@ enum class EngineBackend {
     CLOUD_OPENAI,
 }
 
+/**
+ * Moteur dédié à la génération de photos et scènes (images).
+ * [HUGGING_FACE] : 100% Gratuit sans carte bancaire, FLUX.1 Schnell photoréaliste.
+ * [GEMINI_IMAGEN] : Google Gemini (Imagen 3 / flash-image), requiert compte avec facturation.
+ * [OPENROUTER] : FLUX / SDXL via OpenRouter (crédits payants).
+ * [OPENAI] : DALL-E 3 via OpenAI (crédits payants).
+ */
+enum class ImageEngine(val displayName: String) {
+    HUGGING_FACE("🤗 Hugging Face (100% Gratuit)"),
+    GEMINI_IMAGEN("✨ Google Gemini (Imagen)"),
+    OPENROUTER("🌐 OpenRouter"),
+    OPENAI("🤖 OpenAI DALL-E 3"),
+}
+
 /** Genre déclaré par l'utilisateur, injecté dans le prompt système (voir PromptBuilder) pour
  *  que le personnage puisse s'adresser à lui de façon cohérente (accords, tournures...).
  *  [NON_PRECISE] : aucune information n'est ajoutée au prompt, le modèle reste neutre. */
@@ -106,6 +120,7 @@ data class EngineSettings(
     val cloudImageModelName: String = "black-forest-labs/flux-1-schnell",
     val huggingFaceApiKey: String = "",
     val huggingFaceImageModelName: String = "black-forest-labs/FLUX.1-schnell",
+    val imageEnginePreference: ImageEngine = ImageEngine.HUGGING_FACE,
 )
 
 /**
@@ -147,6 +162,7 @@ class SettingsRepository(private val context: Context) {
         val CLOUD_IMAGE_MODEL_NAME = stringPreferencesKey("cloud_image_model_name")
         val HUGGING_FACE_API_KEY = stringPreferencesKey("hugging_face_api_key")
         val HUGGING_FACE_IMAGE_MODEL_NAME = stringPreferencesKey("hugging_face_image_model_name")
+        val IMAGE_ENGINE_PREFERENCE = stringPreferencesKey("image_engine_preference")
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
         val CATALOG_200_SEEDED = booleanPreferencesKey("catalog_200_seeded")
@@ -232,6 +248,9 @@ class SettingsRepository(private val context: Context) {
             cloudImageModelName = prefs[Keys.CLOUD_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/flux-1-schnell",
             huggingFaceApiKey = prefs[Keys.HUGGING_FACE_API_KEY] ?: "",
             huggingFaceImageModelName = prefs[Keys.HUGGING_FACE_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/FLUX.1-schnell",
+            imageEnginePreference = prefs[Keys.IMAGE_ENGINE_PREFERENCE]?.let {
+                runCatching { ImageEngine.valueOf(it) }.getOrNull()
+            } ?: ImageEngine.HUGGING_FACE,
         )
     }
 
@@ -310,6 +329,9 @@ class SettingsRepository(private val context: Context) {
     }
     suspend fun setHuggingFaceImageModelName(model: String) = context.dataStore.edit {
         if (model.isBlank()) it.remove(Keys.HUGGING_FACE_IMAGE_MODEL_NAME) else it[Keys.HUGGING_FACE_IMAGE_MODEL_NAME] = model.trim()
+    }
+    suspend fun setImageEnginePreference(engine: ImageEngine) = context.dataStore.edit {
+        it[Keys.IMAGE_ENGINE_PREFERENCE] = engine.name
     }
 
     val userProfile: Flow<UserProfile> = context.dataStore.data.map { prefs ->

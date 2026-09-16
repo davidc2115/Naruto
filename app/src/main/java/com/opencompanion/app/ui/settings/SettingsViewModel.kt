@@ -250,6 +250,7 @@ class SettingsViewModel(
     fun setCloudImageModelName(model: String) = viewModelScope.launch { settingsRepository.setCloudImageModelName(model) }
     fun setHuggingFaceApiKey(key: String) = viewModelScope.launch { settingsRepository.setHuggingFaceApiKey(key) }
     fun setHuggingFaceImageModelName(model: String) = viewModelScope.launch { settingsRepository.setHuggingFaceImageModelName(model) }
+    fun setImageEnginePreference(engine: com.opencompanion.app.data.ImageEngine) = viewModelScope.launch { settingsRepository.setImageEnginePreference(engine) }
     fun setAllowNsfwMode(enabled: Boolean) = viewModelScope.launch { settingsRepository.setAllowNsfwMode(enabled) }
 
     fun refreshGroqModels() {

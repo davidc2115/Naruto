@@ -739,6 +739,7 @@ class ChatViewModel(
             val outputDir = java.io.File(context.filesDir, "chat_images").apply { mkdirs() }
 
             val result = cloudBridge.generateCharacterSceneImage(
+                imageEngine = settings.imageEnginePreference,
                 geminiApiKey = geminiKey,
                 openAiApiKey = openAiKey.takeIf { it.isNotBlank() },
                 cloudApiKey = cloudKey.takeIf { it.isNotBlank() },

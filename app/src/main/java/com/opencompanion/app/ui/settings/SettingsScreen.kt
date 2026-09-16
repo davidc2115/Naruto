@@ -552,75 +552,176 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
             ) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Générez des photos réalistes et scènes de vos compagnes directement dans le chat. Vous pouvez utiliser Hugging Face (100% gratuit sans carte bancaire), Google Gemini (avec facturation / 300$ offerts), ou OpenRouter / OpenAI.",
+                        "Choisissez votre moteur préféré pour générer les photos de vos compagnes dans le chat :",
                         style = MaterialTheme.typography.bodySmall,
                     )
 
-                    // Bloc Hugging Face (100% GRATUIT)
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
-                        ),
-                        modifier = Modifier.fillMaxWidth()
+                    // Sélecteur de moteur d'image
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    "🤗 Hugging Face (100% GRATUIT)",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text("⭐ Sans carte bancaire", style = MaterialTheme.typography.labelSmall)
-                            }
-                            Text(
-                                "Obtenez votre token gratuit 'hf_...' en 30 secondes sur huggingface.co/settings/tokens (aucune carte requise). Modèle FLUX.1 Schnell photoréaliste et ultra-rapide.",
-                                style = MaterialTheme.typography.bodySmall,
+                        com.opencompanion.app.data.ImageEngine.entries.forEach { engine ->
+                            FilterChip(
+                                selected = state.settings.imageEnginePreference == engine,
+                                onClick = { viewModel.setImageEnginePreference(engine) },
+                                label = { Text(engine.displayName) }
                             )
-                            ApiKeysField(
-                                value = state.settings.huggingFaceApiKey,
-                                onValueChange = viewModel::setHuggingFaceApiKey,
-                                label = "Token Hugging Face (hf_...)",
-                                placeholder = "hf_xxxxxxxxxxxxxxxxxxxxxxxxx",
-                            )
-                            OutlinedTextField(
-                                value = state.settings.huggingFaceImageModelName,
-                                onValueChange = viewModel::setHuggingFaceImageModelName,
-                                label = { Text("Modèle Hugging Face") },
-                                placeholder = { Text("black-forest-labs/FLUX.1-schnell") },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                FilterChip(
-                                    selected = state.settings.huggingFaceImageModelName == "black-forest-labs/FLUX.1-schnell",
-                                    onClick = { viewModel.setHuggingFaceImageModelName("black-forest-labs/FLUX.1-schnell") },
-                                    label = { Text("FLUX.1 Schnell ⭐") }
-                                )
-                                FilterChip(
-                                    selected = state.settings.huggingFaceImageModelName == "stabilityai/stable-diffusion-xl-base-1.0",
-                                    onClick = { viewModel.setHuggingFaceImageModelName("stabilityai/stable-diffusion-xl-base-1.0") },
-                                    label = { Text("SDXL 🎨") }
-                                )
-                                FilterChip(
-                                    selected = state.settings.huggingFaceImageModelName == "ByteDance/SDXL-Lightning",
-                                    onClick = { viewModel.setHuggingFaceImageModelName("ByteDance/SDXL-Lightning") },
-                                    label = { Text("SDXL Lightning ⚡") }
-                                )
-                            }
                         }
                     }
 
-                    Text(
-                        "ℹ️ À propos des autres moteurs d'images :\n" +
-                        "• Google Gemini (Imagen) : Nécessite obligatoirement un compte Google Cloud avec facturation activée (300$ offerts). Les clés gratuites sans facturation affichent une erreur 404 de Google.\n" +
-                        "• OpenRouter : La génération d'images via OpenRouter est payante (nécessite des crédits achetés).",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    // Configuration spécifique selon le moteur sélectionné
+                    when (state.settings.imageEnginePreference) {
+                        com.opencompanion.app.data.ImageEngine.HUGGING_FACE -> {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Row(
+                                        Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            "🤗 Hugging Face (100% GRATUIT)",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text("⭐ Aucune carte requise", style = MaterialTheme.typography.labelSmall)
+                                    }
+                                    Text(
+                                        "Obtenez votre token gratuit 'hf_...' en 30 secondes sur huggingface.co/settings/tokens. Génère des photos photoréalistes avec FLUX.1 Schnell directement sans passer par Google Gemini.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                    ApiKeysField(
+                                        value = state.settings.huggingFaceApiKey,
+                                        onValueChange = viewModel::setHuggingFaceApiKey,
+                                        label = "Token Hugging Face (hf_...)",
+                                        placeholder = "hf_xxxxxxxxxxxxxxxxxxxxxxxxx",
+                                    )
+                                    OutlinedTextField(
+                                        value = state.settings.huggingFaceImageModelName,
+                                        onValueChange = viewModel::setHuggingFaceImageModelName,
+                                        label = { Text("Modèle Hugging Face") },
+                                        placeholder = { Text("black-forest-labs/FLUX.1-schnell") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        FilterChip(
+                                            selected = state.settings.huggingFaceImageModelName == "black-forest-labs/FLUX.1-schnell",
+                                            onClick = { viewModel.setHuggingFaceImageModelName("black-forest-labs/FLUX.1-schnell") },
+                                            label = { Text("FLUX.1 Schnell ⭐") }
+                                        )
+                                        FilterChip(
+                                            selected = state.settings.huggingFaceImageModelName == "stabilityai/stable-diffusion-xl-base-1.0",
+                                            onClick = { viewModel.setHuggingFaceImageModelName("stabilityai/stable-diffusion-xl-base-1.0") },
+                                            label = { Text("SDXL 🎨") }
+                                        )
+                                        FilterChip(
+                                            selected = state.settings.huggingFaceImageModelName == "ByteDance/SDXL-Lightning",
+                                            onClick = { viewModel.setHuggingFaceImageModelName("ByteDance/SDXL-Lightning") },
+                                            label = { Text("SDXL Lightning ⚡") }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        com.opencompanion.app.data.ImageEngine.GEMINI_IMAGEN -> {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text("✨ Google Gemini (Imagen 3)", style = MaterialTheme.typography.titleSmall)
+                                    Text(
+                                        "⚠️ Important : Les clés gratuites Google AI Studio ne supportent PAS Imagen (erreur 404 de Google). Ce mode requiert obligatoirement un compte Google Cloud avec facturation activée (300$ offerts).",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                    ApiKeysField(
+                                        value = state.settings.geminiApiKey,
+                                        onValueChange = viewModel::setGeminiApiKey,
+                                        label = "Clé API Gemini (avec facturation)",
+                                        placeholder = "AIzaSy...",
+                                    )
+                                    OutlinedTextField(
+                                        value = state.settings.geminiImageModelName,
+                                        onValueChange = viewModel::setGeminiImageModelName,
+                                        label = { Text("Modèle Imagen") },
+                                        placeholder = { Text("imagen-3.0-generate-002") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+                        }
+                        com.opencompanion.app.data.ImageEngine.OPENROUTER -> {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text("🌐 OpenRouter", style = MaterialTheme.typography.titleSmall)
+                                    Text(
+                                        "La génération d'images via OpenRouter nécessite des crédits payants.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                    ApiKeysField(
+                                        value = state.settings.cloudApiKey,
+                                        onValueChange = viewModel::setCloudApiKey,
+                                        label = "Clé API OpenRouter",
+                                        placeholder = "sk-or-...",
+                                    )
+                                    OutlinedTextField(
+                                        value = state.settings.cloudImageModelName,
+                                        onValueChange = viewModel::setCloudImageModelName,
+                                        label = { Text("Modèle OpenRouter") },
+                                        placeholder = { Text("black-forest-labs/flux-1-schnell") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+                        }
+                        com.opencompanion.app.data.ImageEngine.OPENAI -> {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text("🤖 OpenAI (DALL-E 3)", style = MaterialTheme.typography.titleSmall)
+                                    Text(
+                                        "Nécessite un compte OpenAI avec crédits prépayés.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                    ApiKeysField(
+                                        value = state.settings.openAiApiKey,
+                                        onValueChange = viewModel::setOpenAiApiKey,
+                                        label = "Clé API OpenAI",
+                                        placeholder = "sk-...",
+                                    )
+                                    OutlinedTextField(
+                                        value = state.settings.openAiImageModelName,
+                                        onValueChange = viewModel::setOpenAiImageModelName,
+                                        label = { Text("Modèle OpenAI") },
+                                        placeholder = { Text("dall-e-3") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
