@@ -885,9 +885,9 @@ class CloudEngineBridge {
 
         // 1. Âge
         val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
-        val age = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: character.age.toString()
+        val age = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: ""
         if (age.isNotBlank() && age != "0") {
-            tags.add("$age years old woman")
+            tags.add("($age years old mature woman:1.2)")
         } else {
             tags.add("mature woman")
         }
@@ -902,51 +902,51 @@ class CloudEngineBridge {
             lowerHair.contains("blond platine") -> hairDesc.add("platinum blonde hair")
             lowerHair.contains("blond vénitien") -> hairDesc.add("strawberry blonde hair")
             lowerHair.contains("blond") -> hairDesc.add("blonde hair")
-            lowerHair.contains("châtain foncé") -> hairDesc.add("dark chestnut hair")
+            lowerHair.contains("châtain foncé") -> hairDesc.add("dark chestnut brown hair")
             lowerHair.contains("châtain") -> hairDesc.add("chestnut brown hair")
-            lowerHair.contains("brun chocolat") -> hairDesc.add("rich chocolate brunette hair")
+            lowerHair.contains("brun chocolat") -> hairDesc.add("rich dark chocolate brunette hair")
             lowerHair.contains("brun") -> hairDesc.add("brunette hair")
             lowerHair.contains("noir ébène") || lowerHair.contains("noir") -> hairDesc.add("raven black hair")
-            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> hairDesc.add("vibrant auburn copper hair")
+            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> hairDesc.add("vibrant copper auburn hair")
             lowerHair.contains("gris") || lowerHair.contains("argenté") -> hairDesc.add("elegant silver gray hair")
         }
         when {
-            lowerHair.contains("carré plongeant") -> hairDesc.add("sleek inverted bob haircut")
+            lowerHair.contains("carré plongeant") -> hairDesc.add("inverted sleek bob haircut")
             lowerHair.contains("carré") -> hairDesc.add("stylish bob haircut")
             lowerHair.contains("queue de cheval") -> hairDesc.add("high ponytail")
             lowerHair.contains("chignon") -> hairDesc.add("sophisticated hair bun")
-            lowerHair.contains("mi-longs") -> hairDesc.add("medium length hair touching shoulders")
+            lowerHair.contains("mi-longs") -> hairDesc.add("shoulder length medium hair")
             lowerHair.contains("longs") -> hairDesc.add("long flowing hair")
             lowerHair.contains("court") -> hairDesc.add("chic short haircut")
         }
         when {
-            lowerHair.contains("boucl") -> hairDesc.add("voluminous bouncy curls")
-            lowerHair.contains("ondul") -> hairDesc.add("gentle natural waves")
-            lowerHair.contains("soyeux") || lowerHair.contains("lisse") -> hairDesc.add("silky smooth hair texture")
+            lowerHair.contains("boucl") -> hairDesc.add("voluminous curls")
+            lowerHair.contains("ondul") -> hairDesc.add("gentle wavy texture")
+            lowerHair.contains("soyeux") || lowerHair.contains("lisse") -> hairDesc.add("silky smooth hair")
         }
         if (hairDesc.isNotEmpty()) {
-            tags.add(hairDesc.joinToString(", "))
+            tags.add("(${hairDesc.joinToString(", ")}:1.3)")
         }
 
         // 3. Yeux & Regard
         val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) } ?: ""
         val lowerEyes = eyesLine.lowercase()
         when {
-            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> tags.add("striking emerald green eyes")
-            lowerEyes.contains("bleu azur") || lowerEyes.contains("bleu profond") || lowerEyes.contains("bleu") -> tags.add("mesmerizing clear blue eyes")
-            lowerEyes.contains("noisette") -> tags.add("warm sparkling hazel eyes")
-            lowerEyes.contains("marron") -> tags.add("deep expressive brown eyes")
-            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> tags.add("dark intense sensual eyes")
+            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> tags.add("(striking emerald green eyes:1.2)")
+            lowerEyes.contains("bleu azur") || lowerEyes.contains("bleu profond") || lowerEyes.contains("bleu") -> tags.add("(mesmerizing deep blue eyes:1.2)")
+            lowerEyes.contains("noisette") -> tags.add("(warm sparkling hazel eyes:1.2)")
+            lowerEyes.contains("marron") -> tags.add("(deep expressive brown eyes:1.2)")
+            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> tags.add("(dark intense sensual eyes:1.2)")
         }
 
         // 4. Morphologie & Poitrine
         val morphLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) || it.contains("Poitrine", ignoreCase = true) } ?: ""
         val lowerMorph = morphLine.lowercase()
         when {
-            lowerMorph.contains("bonnet 90d") || lowerMorph.contains("bonnet 85d") || lowerMorph.contains("généreuse") -> tags.add("voluptuous hourglass feminine body, shapely natural bust")
-            lowerMorph.contains("bonnet 90c") || lowerMorph.contains("bonnet 85c") || lowerMorph.contains("galbée") -> tags.add("shapely feminine figure, toned waist")
-            lowerMorph.contains("athlétique") || lowerMorph.contains("tonique") -> tags.add("fit toned athletic feminine body")
-            lowerMorph.contains("élancée") -> tags.add("slender elegant silhouette")
+            lowerMorph.contains("bonnet 90d") || lowerMorph.contains("bonnet 85d") || lowerMorph.contains("généreuse") -> tags.add("(voluptuous hourglass feminine body, large shapely natural bust:1.2)")
+            lowerMorph.contains("bonnet 90c") || lowerMorph.contains("bonnet 85c") || lowerMorph.contains("galbée") -> tags.add("(shapely curvy feminine figure, toned waist:1.1)")
+            lowerMorph.contains("athlétique") || lowerMorph.contains("tonique") -> tags.add("(fit toned athletic feminine body:1.1)")
+            lowerMorph.contains("élancée") -> tags.add("(slender elegant graceful silhouette:1.1)")
         }
 
         // 5. Visage & Peau
@@ -1048,14 +1048,16 @@ REQUIREMENTS:
         // Repli déterministe immédiat haute fidélité en cas d'indisponibilité de la synthèse texte LLM
         val physicalTags = extractSdPhysicalTags(character)
         buildString {
-            append("masterpiece, photorealistic raw 8k photograph of ${character.name}, ")
-            append("$physicalTags, ")
+            append("masterpiece, photorealistic raw candid 8k photo, (1woman:1.1), ")
+            if (physicalTags.isNotBlank()) {
+                append("$physicalTags, ")
+            }
             if (!userCustomInstruction.isNullOrBlank()) {
                 append("$userCustomInstruction, ")
             } else {
-                append("natural posture looking towards camera, warm subtle expression, authentic natural lighting, ")
+                append("natural posture looking towards camera, subtle warm alluring expression, authentic lighting, ")
             }
-            append("highly detailed skin texture, cinematic soft lighting, 35mm photography, dslr")
+            append("highly detailed eyes and facial features, authentic skin texture, cinematic soft lighting, 35mm photography, dslr, high quality")
         }
     }
 

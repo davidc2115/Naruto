@@ -113,10 +113,15 @@ class CharacterDetailViewModel(
             _generationStatus.value = "Préparation du prompt IA..."
             _generationError.value = null
 
-            val geminiKey = settingsRepository.getActiveGeminiApiKey()
-            val openAiKey = settingsRepository.getActiveOpenAiApiKey()
-            val cloudKey = settingsRepository.getActiveCloudApiKey()
-            val hordeKey = settingsRepository.getActiveHordeApiKey()
+            var geminiKey = settings.geminiApiKey.trim()
+            if (geminiKey.isBlank() && (settings.cloudApiKey.trim().startsWith("AIza") || settings.cloudApiKey.trim().length > 30 && !settings.cloudApiKey.trim().startsWith("gsk_") && !settings.cloudApiKey.trim().startsWith("sk-"))) {
+                geminiKey = settings.cloudApiKey.trim()
+            }
+            val openAiKey = settings.openAiApiKey.trim().ifBlank {
+                if (settings.cloudApiKey.trim().startsWith("sk-")) settings.cloudApiKey.trim() else ""
+            }
+            val cloudKey = settings.cloudApiKey.trim()
+            val hordeKey = settings.hordeApiKey.trim().ifBlank { "0000000000" }
 
             val outputDir = File(context.filesDir, "character_photos").apply { mkdirs() }
 
@@ -140,7 +145,7 @@ class CharacterDetailViewModel(
                 cloudImageModelName = settings.cloudImageModelName,
                 hordeImageModelName = settings.hordeImageModelName,
                 character = character,
-                recentMessages = emptyList(),
+                recentMessages = emptyList<ChatMessageEntity>(),
                 userCustomInstruction = instruction,
                 outputDir = outputDir,
             )
