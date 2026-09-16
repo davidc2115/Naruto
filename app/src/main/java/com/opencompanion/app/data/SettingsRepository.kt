@@ -166,7 +166,7 @@ class SettingsRepository(private val context: Context) {
         val EXPANDED_CATALOG_SEEDED = booleanPreferencesKey("expanded_catalog_seeded")
         val FAMILY_PACK_SEEDED = booleanPreferencesKey("family_pack_seeded")
         val CATALOG_200_SEEDED = booleanPreferencesKey("catalog_200_seeded")
-        val MOM_STEPMOM_SEEDED = booleanPreferencesKey("mom_stepmom_catalog_seeded_v8")
+        val MOM_STEPMOM_SEEDED = booleanPreferencesKey("mom_stepmom_catalog_seeded_v9")
     }
 
     val momStepmomCatalogSeeded: Flow<Boolean> = context.dataStore.data.map { prefs ->

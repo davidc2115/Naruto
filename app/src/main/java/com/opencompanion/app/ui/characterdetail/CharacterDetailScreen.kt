@@ -509,8 +509,34 @@ fun CharacterDetailScreen(
                 }
             }
 
-            // Description / Biographie
-            if (character.description.isNotBlank()) {
+            val profile = remember(character.description, character.personality) {
+                parseCharacterProfile(character.description, character.personality)
+            }
+
+            // 1. Présentation & Rôle
+            if (profile.presentation.isNotBlank()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Column(Modifier.padding(14.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Person, contentDescription = null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Présentation & Rôle", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            profile.presentation,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+
+            // 2. Description physique détaillée
+            if (profile.statBadges.isNotEmpty() || profile.physicalTraits.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -519,20 +545,102 @@ fun CharacterDetailScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Info, contentDescription = null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                             Spacer(Modifier.width(8.dp))
-                            Text("Présentation", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                            Text("Description physique détaillée", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                         }
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            character.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
+
+                        // Badges pour mensurations clés (Âge, Taille, Poids, Poitrine, etc.)
+                        if (profile.statBadges.isNotEmpty()) {
+                            Spacer(Modifier.height(10.dp))
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                profile.statBadges.forEach { badge ->
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                                        shape = RoundedCornerShape(8.dp),
+                                    ) {
+                                        Text(
+                                            text = badge,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // Traits physiques détaillés (Morphologie, Cheveux, Yeux, Style, Postures)
+                        if (profile.physicalTraits.isNotEmpty()) {
+                            Spacer(Modifier.height(10.dp))
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                profile.physicalTraits.forEach { trait ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.Top,
+                                    ) {
+                                        Text("• ", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                                        Text(
+                                            text = trait,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            // Personnalité
-            if (character.personality.isNotBlank()) {
+            // 3. Tempérament & Caractère
+            if (profile.temperamentTitle.isNotBlank() || profile.temperamentDirective.isNotBlank()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
+                ) {
+                    Column(Modifier.padding(14.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.AutoAwesome, contentDescription = null, Modifier.size(18.dp), tint = AccentPink)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Tempérament & Caractère", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                        }
+
+                        if (profile.temperamentTitle.isNotBlank()) {
+                            Spacer(Modifier.height(10.dp))
+                            Surface(
+                                color = AccentPink.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(8.dp),
+                            ) {
+                                Text(
+                                    text = "✨ ${profile.temperamentTitle}",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AccentPink,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                )
+                            }
+                        }
+
+                        if (profile.temperamentDirective.isNotBlank()) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = profile.temperamentDirective,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 4. Personnalité & Comportement
+            if (profile.personality.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -545,7 +653,7 @@ fun CharacterDetailScreen(
                         }
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            character.personality,
+                            profile.personality,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -553,7 +661,7 @@ fun CharacterDetailScreen(
                 }
             }
 
-            // Scénario
+            // 5. Scénario de départ
             if (character.scenario.isNotBlank()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -561,7 +669,7 @@ fun CharacterDetailScreen(
                 ) {
                     Column(Modifier.padding(14.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.AutoAwesome, contentDescription = null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.Filled.PlayArrow, contentDescription = null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                             Spacer(Modifier.width(8.dp))
                             Text("Scénario de départ", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                         }
@@ -575,7 +683,7 @@ fun CharacterDetailScreen(
                 }
             }
 
-            // Premier message d'accroche
+            // 6. Message d'introduction
             if (character.firstMessage.isNotBlank()) {
                 val greeting = resolveCharacterPlaceholders(character.firstMessage, character, state.userName)
                 Card(
@@ -673,3 +781,75 @@ fun CharacterDetailScreen(
         )
     }
 }
+
+data class ParsedCharacterProfile(
+    val presentation: String,
+    val statBadges: List<String>,
+    val physicalTraits: List<String>,
+    val temperamentTitle: String,
+    val temperamentDirective: String,
+    val personality: String,
+)
+
+fun parseCharacterProfile(rawDescription: String, rawPersonality: String): ParsedCharacterProfile {
+    val (presentation, rawPhysical) = if (rawDescription.contains("Description physique", ignoreCase = true)) {
+        val parts = rawDescription.split(Regex("Description physique[^\n]*", RegexOption.IGNORE_CASE), limit = 2)
+        parts[0].trim() to (parts.getOrNull(1)?.trim() ?: "")
+    } else {
+        rawDescription.trim() to ""
+    }
+
+    val statBadges = mutableListOf<String>()
+    val physicalTraits = mutableListOf<String>()
+
+    if (rawPhysical.isNotBlank()) {
+        val lines = rawPhysical.split("\n")
+        for (line in lines) {
+            val clean = line.trim()
+            if (clean.isBlank()) continue
+            if (clean.startsWith("• Temp", ignoreCase = true) || clean.startsWith("- Temp", ignoreCase = true)) {
+                continue
+            }
+            if (clean.contains("|") && (clean.contains("Taille", ignoreCase = true) || clean.contains("Poitrine", ignoreCase = true))) {
+                val stats = clean.removePrefix("•").removePrefix("-").split("|")
+                for (s in stats) {
+                    val st = s.trim()
+                    if (st.isNotBlank()) {
+                        statBadges.add(st)
+                    }
+                }
+            } else {
+                val trait = clean.removePrefix("•").removePrefix("-").trim()
+                if (trait.isNotBlank()) {
+                    physicalTraits.add(trait)
+                }
+            }
+        }
+    }
+
+    val tempRegex = Regex("""Temp[ée]rament\s+([^:]+):\s*(.*)""", setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE))
+    val tempMatch = tempRegex.find(rawPersonality)
+
+    val (purePersonality, tempTitle, tempDirective) = if (tempMatch != null) {
+        val persBefore = rawPersonality.substring(0, tempMatch.range.first).trim()
+        val title = tempMatch.groupValues[1].trim()
+        var dir = tempMatch.groupValues[2].trim()
+        val subIndex = dir.indexOf("Temp", ignoreCase = true)
+        if (subIndex > 0) {
+            dir = dir.substring(0, subIndex).trim()
+        }
+        Triple(persBefore, title, dir)
+    } else {
+        Triple(rawPersonality.trim(), "", "")
+    }
+
+    return ParsedCharacterProfile(
+        presentation = presentation,
+        statBadges = statBadges,
+        physicalTraits = physicalTraits,
+        temperamentTitle = tempTitle,
+        temperamentDirective = tempDirective,
+        personality = purePersonality,
+    )
+}
+
