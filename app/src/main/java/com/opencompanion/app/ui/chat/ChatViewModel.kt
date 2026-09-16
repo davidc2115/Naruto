@@ -22,6 +22,7 @@ import com.opencompanion.app.engine.DialogueMode
 import com.opencompanion.app.engine.DialogueRouter
 import com.opencompanion.app.engine.parseApiKeys
 import com.opencompanion.app.prompt.PromptBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
