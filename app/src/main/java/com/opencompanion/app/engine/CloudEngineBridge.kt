@@ -974,7 +974,7 @@ class CloudEngineBridge {
 
         return ParsedHair(
             primaryPromptTag = primaryPrompt,
-            negativeHairTag = negativeHairTag,
+            negativeHairTag = negativeTag,
             lengthAndCut = lengthAndCut,
             texture = texture
         )
