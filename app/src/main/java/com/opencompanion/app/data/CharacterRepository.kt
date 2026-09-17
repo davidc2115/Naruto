@@ -14,6 +14,7 @@ class CharacterRepository(
     private val characterDao: CharacterDao,
     private val chatDao: ChatDao,
     private val personaDao: UserPersonaDao,
+    val vectorMemoryDao: VectorMemoryDao? = null,
 ) {
     fun observeCharacters(): Flow<List<CharacterEntity>> = characterDao.observeAll()
 
@@ -26,6 +27,7 @@ class CharacterRepository(
 
     suspend fun deleteCharacter(character: CharacterEntity) {
         chatDao.clearHistory(character.id)
+        vectorMemoryDao?.clearForCharacter(character.id)
         characterDao.delete(character)
     }
 
@@ -38,9 +40,43 @@ class CharacterRepository(
     suspend fun appendMessage(characterId: Long, role: MessageRole, content: String): Long =
         chatDao.insert(ChatMessageEntity(characterId = characterId, role = role, content = content))
 
-    suspend fun clearHistory(characterId: Long) = chatDao.clearHistory(characterId)
+    suspend fun clearHistory(characterId: Long) {
+        chatDao.clearHistory(characterId)
+        vectorMemoryDao?.clearForCharacter(characterId)
+    }
 
     suspend fun deleteMessage(messageId: Long) = chatDao.deleteMessage(messageId)
+
+    suspend fun indexVectorMemory(
+        characterId: Long,
+        content: String,
+        role: MessageRole? = null,
+        category: String = "DIALOGUE",
+        importance: Float = 1.0f,
+        customTags: Set<String> = emptySet(),
+    ) {
+        val dao = vectorMemoryDao ?: return
+        com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.indexMemory(
+            characterId = characterId,
+            content = content,
+            role = role,
+            category = category,
+            importance = importance,
+            customTags = customTags,
+            vectorDao = dao,
+        )
+    }
+
+    suspend fun getFormattedVectorContext(characterId: Long, queryText: String): String {
+        val dao = vectorMemoryDao ?: return ""
+        val relevant = com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.queryRelevantMemories(
+            characterId = characterId,
+            queryText = queryText,
+            vectorDao = dao,
+            topK = 4,
+        )
+        return com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.formatMemoriesForPrompt(relevant)
+    }
 
     /**
      * Observe toutes les conversations actives (personnages avec lesquels au moins un message

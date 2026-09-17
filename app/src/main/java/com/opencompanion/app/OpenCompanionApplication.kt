@@ -26,7 +26,12 @@ class OpenCompanionApplication : Application() {
 
     val database by lazy { AppDatabase.getInstance(this) }
     val characterRepository by lazy {
-        CharacterRepository(database.characterDao(), database.chatDao(), database.userPersonaDao())
+        CharacterRepository(
+            characterDao = database.characterDao(),
+            chatDao = database.chatDao(),
+            personaDao = database.userPersonaDao(),
+            vectorMemoryDao = database.vectorMemoryDao(),
+        )
     }
     val settingsRepository by lazy { SettingsRepository(this) }
     val modelManager by lazy { ModelManager(this) }

@@ -134,6 +134,7 @@ object PromptBuilder {
         character: CharacterEntity,
         userProfile: UserProfile = UserProfile(),
         allowNsfw: Boolean = true,
+        vectorMemoriesContext: String = "",
     ): String = buildString {
         append(LANGUAGE_AND_TONE_DIRECTIVE)
         append("\n\n")
@@ -149,6 +150,10 @@ object PromptBuilder {
         relationshipDirective(character).takeIf { it.isNotEmpty() }?.let {
             append("\n\n")
             append(it)
+        }
+        if (vectorMemoriesContext.isNotBlank()) {
+            append("\n\n")
+            append(vectorMemoriesContext)
         }
         append("\n\n")
         val userName = userProfile.displayName
@@ -230,8 +235,9 @@ object PromptBuilder {
         reservedForResponse: Int,
         userProfile: UserProfile = UserProfile(),
         allowNsfw: Boolean = true,
+        vectorMemoriesContext: String = "",
     ): List<ChatTurn> {
-        val systemPrompt = buildSystemPrompt(character, userProfile, allowNsfw)
+        val systemPrompt = buildSystemPrompt(character, userProfile, allowNsfw, vectorMemoriesContext)
         val budget = (contextSize - reservedForResponse - SAFETY_MARGIN_TOKENS).coerceAtLeast(256)
 
         var used = engine.tokenCount(systemPrompt) + engine.tokenCount(newUserMessage)
@@ -285,8 +291,9 @@ object PromptBuilder {
         reservedForResponse: Int,
         userProfile: UserProfile = UserProfile(),
         allowNsfw: Boolean = true,
+        vectorMemoriesContext: String = "",
     ): String {
-        val turns = buildTurns(character, history, newUserMessage, engine, contextSize, reservedForResponse, userProfile, allowNsfw)
+        val turns = buildTurns(character, history, newUserMessage, engine, contextSize, reservedForResponse, userProfile, allowNsfw, vectorMemoriesContext)
         return engine.applyChatTemplate(turns, addAssistant = true) ?: fallbackFormat(turns)
     }
 
@@ -323,11 +330,12 @@ object PromptBuilder {
         newUserMessage: String,
         maxOutputTokens: Int = 512,
         userProfile: UserProfile = UserProfile(),
+        vectorMemoriesContext: String = "",
     ): String {
         val budget = (NANO_TOKEN_BUDGET - maxOutputTokens - SAFETY_MARGIN_TOKENS).coerceAtLeast(256)
         // Pour Gemini Nano (SFW / NPU), on n'injecte jamais les mots-clés adultes/NSFW qui déclencheraient
         // immédiatement les filtres de sécurité système de Google AICore.
-        val systemPrompt = buildSystemPrompt(character, userProfile, allowNsfw = false)
+        val systemPrompt = buildSystemPrompt(character, userProfile, allowNsfw = false, vectorMemoriesContext = vectorMemoriesContext)
         val userLabel = userProfile.displayName
 
         var used = estimateTokens(systemPrompt) + estimateTokens(newUserMessage)

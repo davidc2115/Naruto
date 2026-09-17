@@ -45,6 +45,7 @@ enum class EngineBackend {
  * [OPENAI] : DALL-E 3 via OpenAI (crédits payants).
  */
 enum class ImageEngine(val displayName: String) {
+    FREE_SMARTPHONE("✨ Gratuit Sans Clé (Photoréaliste HD style Gemini / Copilot)"),
     GEMINI_IMAGEN("✨ Google Gemini (Imagen 3) - Rendu Smartphone"),
     OPENAI("🤖 Microsoft Copilot / OpenAI (DALL-E 3) - Photoréaliste"),
     HORDE_DIFFUSION("🎨 Horde Diffusion (100% Gratuit communautaire)"),
@@ -122,7 +123,7 @@ data class EngineSettings(
     val hordeImageModelName: String = "stable_diffusion",
     val huggingFaceApiKey: String = "",
     val huggingFaceImageModelName: String = "black-forest-labs/FLUX.1-schnell",
-    val imageEnginePreference: ImageEngine = ImageEngine.HORDE_DIFFUSION,
+    val imageEnginePreference: ImageEngine = ImageEngine.FREE_SMARTPHONE,
 )
 
 /**
@@ -256,7 +257,7 @@ class SettingsRepository(private val context: Context) {
             huggingFaceImageModelName = prefs[Keys.HUGGING_FACE_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/FLUX.1-schnell",
             imageEnginePreference = prefs[Keys.IMAGE_ENGINE_PREFERENCE]?.let {
                 runCatching { ImageEngine.valueOf(it) }.getOrNull()
-            } ?: ImageEngine.GEMINI_IMAGEN,
+            } ?: ImageEngine.FREE_SMARTPHONE,
         )
     }
 

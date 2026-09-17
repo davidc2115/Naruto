@@ -9,15 +9,16 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [CharacterEntity::class, ChatMessageEntity::class, UserPersonaEntity::class],
-    version = 4,
-    exportSchema = true,
+    entities = [CharacterEntity::class, ChatMessageEntity::class, UserPersonaEntity::class, VectorMemoryEntity::class],
+    version = 5,
+    exportSchema = false,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun characterDao(): CharacterDao
     abstract fun chatDao(): ChatDao
     abstract fun userPersonaDao(): UserPersonaDao
+    abstract fun vectorMemoryDao(): VectorMemoryDao
 
     companion object {
         @Volatile private var instance: AppDatabase? = null
@@ -63,13 +64,35 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Ajoute la base de données vectorielle locale et les tags de mémoire conversationnelle (v5). */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vector_memories` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`characterId` INTEGER NOT NULL, " +
+                        "`content` TEXT NOT NULL, " +
+                        "`role` TEXT, " +
+                        "`tags` TEXT NOT NULL, " +
+                        "`category` TEXT NOT NULL, " +
+                        "`vectorBlob` BLOB NOT NULL, " +
+                        "`importance` REAL NOT NULL, " +
+                        "`timestamp` INTEGER NOT NULL, " +
+                        "FOREIGN KEY(`characterId`) REFERENCES `characters`(`id`) ON DELETE CASCADE)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_vector_memories_characterId` ON `vector_memories` (`characterId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_vector_memories_category` ON `vector_memories` (`category`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_vector_memories_timestamp` ON `vector_memories` (`timestamp`)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "opencompanion.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build().also { instance = it }
             }
     }
 }

@@ -387,6 +387,7 @@ class ChatViewModel(
 
         val fullHistory = repository.getMessages(characterId)
         val lastUserMessage = fullHistory.lastOrNull { it.role == MessageRole.USER }?.content.orEmpty()
+        val vectorContext = repository.getFormattedVectorContext(characterId, lastUserMessage)
         val turns = PromptBuilder.buildTurns(
             character = character,
             history = fullHistory.dropLast(1),
@@ -396,6 +397,7 @@ class ChatViewModel(
             reservedForResponse = effectiveMaxTokens,
             userProfile = resolveUserProfile(character),
             allowNsfw = settings.allowNsfwMode || _dialogueMode.value != DialogueMode.FORCE_SFW,
+            vectorMemoriesContext = vectorContext,
         )
 
         val flow = if (backend == EngineBackend.CLOUD_FREE_NO_KEY) {
@@ -469,6 +471,7 @@ class ChatViewModel(
                                 userMessage = lastUserMessage,
                                 assistantReply = text,
                                 repository = repository,
+                                vectorDao = repository.vectorMemoryDao,
                             )
                         }
                     } else {
@@ -502,12 +505,14 @@ class ChatViewModel(
 
         val fullHistory = repository.getMessages(characterId)
         val lastUserMessage = fullHistory.lastOrNull { it.role == MessageRole.USER }?.content.orEmpty()
+        val vectorContext = repository.getFormattedVectorContext(characterId, lastUserMessage)
         val prompt = PromptBuilder.buildNanoPrompt(
             character = character,
             history = fullHistory.dropLast(1),
             newUserMessage = lastUserMessage,
             maxOutputTokens = settings.maxResponseTokens,
             userProfile = resolveUserProfile(character),
+            vectorMemoriesContext = vectorContext,
         )
 
         var nanoFailed = false
@@ -529,6 +534,7 @@ class ChatViewModel(
                                 userMessage = lastUserMessage,
                                 assistantReply = text,
                                 repository = repository,
+                                vectorDao = repository.vectorMemoryDao,
                             )
                         }
                     } else {
@@ -617,6 +623,7 @@ class ChatViewModel(
         // deux fois, et on fournit le reste comme contexte de conversation.
         val fullHistory = repository.getMessages(characterId)
         val lastUserMessage = fullHistory.lastOrNull { it.role == MessageRole.USER }?.content.orEmpty()
+        val vectorContext = repository.getFormattedVectorContext(characterId, lastUserMessage)
         val finalPrompt = PromptBuilder.buildPrompt(
             character = character,
             history = fullHistory.dropLast(1),
@@ -626,6 +633,7 @@ class ChatViewModel(
             reservedForResponse = settings.maxResponseTokens,
             userProfile = resolveUserProfile(character),
             allowNsfw = settings.allowNsfwMode || _dialogueMode.value != DialogueMode.FORCE_SFW,
+            vectorMemoriesContext = vectorContext,
         )
 
         var gpuFailed = false
@@ -655,6 +663,7 @@ class ChatViewModel(
                                 userMessage = lastUserMessage,
                                 assistantReply = text,
                                 repository = repository,
+                                vectorDao = repository.vectorMemoryDao,
                             )
                         }
                     } else {
@@ -720,9 +729,10 @@ class ChatViewModel(
             val cloudKey = settings.cloudApiKey.trim()
             val hordeKey = settings.hordeApiKey.trim().ifBlank { "0000000000" }
 
-            if (settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION) {
+            if (settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION &&
+                settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE) {
                 if (geminiKey.isBlank() && openAiKey.isBlank() && cloudKey.isBlank()) {
-                    _statusMessage.value = "Veuillez renseigner votre clé API dans Réglages → Photos, ou sélectionnez le moteur gratuit Horde Diffusion (sans clé requise)."
+                    _statusMessage.value = "Veuillez renseigner votre clé API dans Réglages → Photos, ou sélectionnez le moteur gratuit (sans clé requise)."
                     return@launch
                 }
             }

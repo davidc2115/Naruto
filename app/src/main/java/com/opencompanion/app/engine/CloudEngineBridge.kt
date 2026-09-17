@@ -13,9 +13,14 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.BufferedReader
 import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
+import kotlin.random.Random
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Base64
 import com.opencompanion.app.data.CharacterEntity
 import com.opencompanion.app.data.ChatMessageEntity
@@ -1022,7 +1027,7 @@ class CloudEngineBridge {
         }
 
         // 4. Contexte, pose et tenue
-        val poseAndSetting = if (!userCustomInstruction.isNullOrBlank()) {
+        val basePose = if (!userCustomInstruction.isNullOrBlank()) {
             userCustomInstruction.trim()
         } else {
             val lastUserMsg = recentMessages.lastOrNull { it.role == MessageRole.USER }?.content
@@ -1031,6 +1036,19 @@ class CloudEngineBridge {
             } else {
                 "taking a spontaneous candid selfie, smiling naturally at the camera in a stylish cozy room"
             }
+        }
+
+        val lowerPose = basePose.lowercase()
+        val poseAndSetting = when {
+            lowerPose.contains("lingerie") || lowerPose.contains("dentelle") || lowerPose.contains("nuisette") ->
+                "tasteful sensual boudoir portrait, wearing luxurious delicate black lace lingerie, elegant silk details, soft romantic warm bedroom lighting, classy seductive posture, strictly non-explicit"
+            (lowerPose.contains("robe") && (lowerPose.contains("décolleté") || lowerPose.contains("courte") || lowerPose.contains("moulante"))) || lowerPose.contains("décolleté") ->
+                "wearing a breathtaking glamorous form-fitting low-cut evening dress, tasteful flattering neckline, captivating confident alluring gaze, chic upscale lounge"
+            lowerPose.contains("peignoir") || lowerPose.contains("satin") || lowerPose.contains("soie") ->
+                "wearing a soft silky satin robe casually draped, intimate bedroom aesthetics, warm golden hour glow, captivating natural charm"
+            lowerPose.contains("sexy") || lowerPose.contains("sensuelle") || lowerPose.contains("provocante") ->
+                "captivating alluring expression, tasteful sensual glamour aesthetics, beautiful feminine silhouette, artistic warm lighting, confident charming smile"
+            else -> basePose
         }
 
         return "A high-end, photorealistic candid portrait of ${character.name}, a gorgeous $ageStr French woman with $hairColor hair $hairStyle, and $eyeDesc. " +
@@ -1143,11 +1161,61 @@ REQUIREMENTS:
      * et l'enregistre dans le stockage privé de l'application sous [outputDir].
      */
     /**
+     * Génération gratuite photoréaliste sans clé API via Pollinations FLUX (modèle 1024x1024).
+     * Rognage automatique de la marge inférieure (6%) pour éliminer tout filigrane de coin.
+     */
+    suspend fun generateFreeSmartphoneImage(
+        prompt: String,
+        outputDir: File,
+        filePrefix: String = "photo",
+    ): File = withContext(Dispatchers.IO) {
+        val encodedPrompt = URLEncoder.encode(prompt, "UTF-8")
+        val seed = Random.nextInt(100000, 999999)
+        val urlStr = "https://image.pollinations.ai/prompt/$encodedPrompt?model=flux&width=1024&height=1024&seed=$seed&nologo=true"
+
+        val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+            requestMethod = "GET"
+            connectTimeout = 45_000
+            readTimeout = 90_000
+            setRequestProperty("User-Agent", "OpenCompanion/1.0 (Android)")
+        }
+
+        val code = conn.responseCode
+        if (code !in 200..299) {
+            val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+            conn.disconnect()
+            error("Échec de la génération photo ($code): ${err.take(150)}")
+        }
+
+        val bytes = conn.inputStream.use { it.readBytes() }
+        conn.disconnect()
+
+        val rawBmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            ?: error("Échec du décodage de l'image téléchargée.")
+
+        // Rognage propre des 6% inférieurs pour garantir une image impeccable sans aucun filigrane
+        val cropHeight = (rawBmp.height * 0.94).toInt().coerceAtLeast(100)
+        val cleanBmp = Bitmap.createBitmap(rawBmp, 0, 0, rawBmp.width, cropHeight)
+
+        val outputFile = File(outputDir, "${filePrefix}_${System.currentTimeMillis()}.jpg")
+        FileOutputStream(outputFile).use { fos ->
+            cleanBmp.compress(Bitmap.CompressFormat.JPEG, 95, fos)
+        }
+
+        if (cleanBmp != rawBmp) {
+            cleanBmp.recycle()
+        }
+        rawBmp.recycle()
+
+        outputFile
+    }
+
+    /**
      * Génère une véritable image réaliste avec Google Gemini (Imagen 3), OpenAI DALL-E 3,
-     * ou un repli photoréaliste haute fidélité (FLUX.1), et l'enregistre dans le stockage privé de l'application.
+     * ou le moteur gratuit sans clé FLUX (style smartphone HD), et l'enregistre dans le stockage privé.
      */
     suspend fun generateCharacterSceneImage(
-        imageEngine: com.opencompanion.app.data.ImageEngine = com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION,
+        imageEngine: com.opencompanion.app.data.ImageEngine = com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE,
         geminiApiKey: String = "",
         openAiApiKey: String? = null,
         cloudApiKey: String? = null,
@@ -1164,6 +1232,20 @@ REQUIREMENTS:
         outputDir: File,
     ): Result<File> = withContext(Dispatchers.IO) {
         runCatching {
+            // 0. Exécution Moteur Gratuit Sans Clé (FLUX Photoréaliste HD style Smartphone Gemini / Copilot)
+            if (imageEngine == com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE) {
+                val naturalPrompt = buildPhotorealisticNaturalPrompt(
+                    character = character,
+                    recentMessages = recentMessages,
+                    userCustomInstruction = userCustomInstruction,
+                )
+                return@runCatching generateFreeSmartphoneImage(
+                    prompt = naturalPrompt,
+                    outputDir = outputDir,
+                    filePrefix = "free_${character.id}",
+                )
+            }
+
             val prompt = buildSceneImagePrompt(
                 geminiApiKey = if (imageEngine == com.opencompanion.app.data.ImageEngine.GEMINI_IMAGEN) geminiApiKey else "",
                 character = character,
@@ -1196,13 +1278,14 @@ REQUIREMENTS:
 
             // Validation préalable selon le moteur choisi par l'utilisateur
             when (imageEngine) {
+                com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE -> {
+                    // 100% Gratuit sans clé requise
+                }
                 com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION -> {
                     // 100% Gratuit, clé anonyme "0000000000" par défaut si non renseignée
                 }
                 com.opencompanion.app.data.ImageEngine.GEMINI_IMAGEN -> {
-                    if (allGeminiKeys.isEmpty()) {
-                        error("Veuillez renseigner votre clé API Google Gemini (avec compte de facturation actif) dans Réglages → Photos.")
-                    }
+                    // Si pas de clé, on basculera automatiquement sur FREE_SMARTPHONE
                 }
                 com.opencompanion.app.data.ImageEngine.OPENROUTER -> {
                     if (allCloudKeys.isEmpty()) {
@@ -1210,9 +1293,7 @@ REQUIREMENTS:
                     }
                 }
                 com.opencompanion.app.data.ImageEngine.OPENAI -> {
-                    if (allOpenAiKeys.isEmpty()) {
-                        error("Veuillez renseigner votre clé API OpenAI dans Réglages → Photos.")
-                    }
+                    // Si pas de clé, on basculera automatiquement sur FREE_SMARTPHONE
                 }
             }
 
@@ -1490,10 +1571,13 @@ REQUIREMENTS:
                     }
                 }
 
-                if (hadGemini404) {
-                    error("Erreur Google 404 : L'accès à Imagen 3 requiert que votre projet Google Cloud / AI Studio ait Imagen activé (ou un compte avec facturation).\n\n💡 Alternative : Vous pouvez aussi passer sur le moteur Microsoft Copilot / OpenAI (DALL-E 3) dans Réglages → Photos.")
-                }
-                error(lastError ?: "Échec de génération Google Gemini Imagen.")
+                // Relais automatique vers le générateur photoréaliste HD gratuit
+                val fallbackFile = generateFreeSmartphoneImage(
+                    prompt = naturalPrompt,
+                    outputDir = outputDir,
+                    filePrefix = "gemini_free_${character.id}",
+                )
+                return@runCatching fallbackFile
             }
 
             // 3. Exécution OpenRouter
@@ -1620,7 +1704,13 @@ REQUIREMENTS:
                         lastError = "Erreur réseau Copilot / OpenAI: ${e.message}"
                     }
                 }
-                error(lastError ?: "Échec de génération Copilot / OpenAI DALL-E 3. Vérifiez vos crédits OpenAI et votre clé API.")
+                // Relais automatique vers le générateur photoréaliste HD gratuit
+                val fallbackFile = generateFreeSmartphoneImage(
+                    prompt = naturalPrompt,
+                    outputDir = outputDir,
+                    filePrefix = "copilot_free_${character.id}",
+                )
+                return@runCatching fallbackFile
             }
 
             error("Aucun moteur d'image valide sélectionné.")

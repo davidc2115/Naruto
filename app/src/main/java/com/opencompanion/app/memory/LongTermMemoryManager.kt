@@ -197,6 +197,7 @@ object LongTermMemoryManager {
         userMessage: String,
         assistantReply: String,
         repository: CharacterRepository,
+        vectorDao: com.opencompanion.app.data.VectorMemoryDao? = null,
     ) = withContext(Dispatchers.IO) {
         val currentNotes = repository.getCharacter(character.id)?.memoryNotes ?: character.memoryNotes
         val state = parse(currentNotes)
@@ -378,6 +379,56 @@ object LongTermMemoryManager {
         val serialized = serialize(updatedState)
         if (serialized != currentNotes && serialized.isNotBlank()) {
             repository.updateMemoryNotes(character.id, serialized)
+        }
+
+        // Indexation dans la Base de Données Vectorielle Locale (Embeddings + Tags)
+        if (vectorDao != null) {
+            runCatching {
+                // 1. Indexer le message utilisateur
+                if (userMessage.isNotBlank()) {
+                    com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.indexMemory(
+                        characterId = character.id,
+                        content = userMessage,
+                        role = MessageRole.USER,
+                        category = "DIALOGUE",
+                        importance = 1.0f,
+                        vectorDao = vectorDao,
+                    )
+                }
+                // 2. Indexer la réplique
+                if (assistantReply.isNotBlank()) {
+                    com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.indexMemory(
+                        characterId = character.id,
+                        content = assistantReply,
+                        role = MessageRole.ASSISTANT,
+                        category = "DIALOGUE",
+                        importance = 1.0f,
+                        vectorDao = vectorDao,
+                    )
+                }
+                // 3. Indexer les nouveaux jalons intimes (haute importance)
+                val newlyAddedMilestones = newIntimate.filterNot { state.intimateMilestones.contains(it) }
+                for (milestone in newlyAddedMilestones) {
+                    com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.indexMemory(
+                        characterId = character.id,
+                        content = milestone,
+                        category = "MILESTONE",
+                        importance = 2.8f,
+                        vectorDao = vectorDao,
+                    )
+                }
+                // 4. Indexer les nouveaux secrets / dynamiques relationnelles
+                val newlyAddedFacts = newFacts.filterNot { state.customFacts.contains(it) }
+                for (fact in newlyAddedFacts) {
+                    com.opencompanion.app.memory.vector.LocalVectorDatabaseManager.indexMemory(
+                        characterId = character.id,
+                        content = fact,
+                        category = "FACT",
+                        importance = 2.5f,
+                        vectorDao = vectorDao,
+                    )
+                }
+            }
         }
     }
 
