@@ -127,16 +127,40 @@ class CharacterDetailViewModel(
 
             val outputDir = File(context.filesDir, "character_photos").apply { mkdirs() }
 
+            val desc = character.description
+            val scenarioText = character.scenario.trim()
+            val scenesMatch = Regex("""Scènes\s*&\s*Postures\s*:\s*([^•\n]+)""").find(desc)?.groupValues?.get(1)?.trim() ?: ""
+
             val instruction = when (style) {
-                CharacterPhotoStyle.SELFIE -> "Authentic phone selfie holding smartphone in front of mirror, reflection, direct gaze, alluring casual smile, natural smartphone camera flash, candid framing, unposed bedroom or dressing room background" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                CharacterPhotoStyle.PROVOCATIVE -> "Provocative sensual alluring posture, delicate sheer lace lingerie, plunging neckline, arched back, seductive bedroom atmosphere, soft dim moody lighting, captivating sensual gaze" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                CharacterPhotoStyle.PORTRAIT -> "Close-up headshot portrait photo, face and bust, looking directly at camera, soft lighting" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                CharacterPhotoStyle.INTIMATE -> "Sensual boudoir intimate photo, private bedroom setting, romantic dim moody lighting, silk nightwear" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                CharacterPhotoStyle.SCENARIO -> "Authentic candid lifestyle photo matching her role and scenario, natural environment" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                CharacterPhotoStyle.CUSTOM -> customInstruction?.ifBlank { "Alluring natural posture, attractive styling" } ?: "Alluring natural posture, attractive styling"
+                CharacterPhotoStyle.SELFIE -> 
+                    "Spontaneous authentic smartphone mirror selfie, holding smartphone, wearing stylish flattering attire, chic modern decorated bedroom or upscale bathroom visible in background with realistic mirrors and warm ambient lighting, candid unposed framing" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                
+                CharacterPhotoStyle.PROVOCATIVE -> 
+                    "Alluring sensual boudoir photo, wearing exquisite sheer black lace lingerie with delicate satin ribbons, arched posture, warm moody lighting in a luxurious private hotel suite with plush furnishings and ambient lamps, strictly non-explicit aesthetic glamour" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                
+                CharacterPhotoStyle.PORTRAIT -> 
+                    "Authentic photographic waist-up portrait of a real living person, seated naturally in an elegant sunlit Parisian café or charming decorated living room with visible architectural background depth, warm natural daylight, engaging warm eye contact, lifelike expression" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                
+                CharacterPhotoStyle.INTIMATE -> 
+                    "Tasteful sensual boudoir photograph, sitting comfortably on a soft bed with rumpled linen in a cozy dimly lit bedroom, wearing a delicate silk satin slip or nightgown, soft bedside table lamp lighting, romantic atmosphere, authentic rich room background, strictly non-explicit" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                
+                CharacterPhotoStyle.SCENARIO -> {
+                    val sceneTarget = when {
+                        scenesMatch.isNotBlank() -> scenesMatch
+                        scenarioText.isNotBlank() -> scenarioText
+                        character.description.contains("cuisine", ignoreCase = true) -> "in a warm rustic kitchen with marble countertops"
+                        character.description.contains("bureau", ignoreCase = true) -> "in a stylish modern private office"
+                        character.description.contains("bibliothèque", ignoreCase = true) -> "in a quiet historic university library between high wooden bookstacks"
+                        else -> "in her natural authentic lifestyle environment matching her story"
+                    }
+                    "Authentic photographic lifestyle scene: $sceneTarget, natural posture and candid interaction with the environment, detailed architectural and furniture background" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                }
+                
+                CharacterPhotoStyle.CUSTOM -> 
+                    customInstruction?.ifBlank { "Alluring natural posture, attractive styling, rich environmental background" } ?: "Alluring natural posture, attractive styling, rich environmental background"
             }
 
-            _generationStatus.value = "Génération IA en cours (Horde Diffusion)..."
+            _generationStatus.value = "Génération de la photo en cours..."
 
             val result = cloudBridge.generateCharacterSceneImage(
                 imageEngine = settings.imageEnginePreference,

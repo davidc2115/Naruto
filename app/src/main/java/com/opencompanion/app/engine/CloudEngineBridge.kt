@@ -1115,15 +1115,16 @@ class CloudEngineBridge {
 
         // 4. Lieu & Scène
         val settingScene = when {
-            currentLocation.isNotBlank() -> "Setting: authentic realistic scene in $currentLocation."
-            lowerInput.contains("plage") || lowerInput.contains("mer") -> "Setting: scenic private Mediterranean beach at golden hour."
-            lowerInput.contains("piscine") -> "Setting: luxurious private poolside lounge with turquoise water reflections."
-            lowerInput.contains("voiture") -> "Setting: interior of a premium luxury vehicle, soft natural light through tinted windows."
-            lowerInput.contains("bureau") || lowerInput.contains("travail") -> "Setting: bright contemporary upscale private office."
-            lowerInput.contains("cuisine") -> "Setting: warm rustic chic kitchen with marble countertops and warm pendant lighting."
-            lowerInput.contains("chambre") || isNudeOrIntimate -> "Setting: intimate elegant bedroom with soft linen and warm lamps."
-            lowerInput.contains("balcon") || lowerInput.contains("terrasse") || lowerInput.contains("rooftop") -> "Setting: stylish panoramic rooftop terrace overlooking the city skyline at dusk."
-            else -> "Setting: charming cozy stylish apartment with soft natural window light."
+            currentLocation.isNotBlank() -> "Setting & Environment: fully realized authentic real-life environment in $currentLocation with visible detailed furniture, architecture, and warm ambient lighting. Never a plain or neutral studio background."
+            lowerInput.contains("plage") || lowerInput.contains("mer") -> "Setting & Environment: scenic private Mediterranean beach with golden sand, gentle waves and sunset sky in the background."
+            lowerInput.contains("piscine") -> "Setting & Environment: luxurious private villa poolside terrace with sun loungers and crystal turquoise water reflections."
+            lowerInput.contains("voiture") -> "Setting & Environment: interior of a premium luxury vehicle, leather seats and city lights through tinted windows."
+            lowerInput.contains("bureau") || lowerInput.contains("travail") -> "Setting & Environment: bright executive contemporary office with large windows, mahogany desk and city view."
+            lowerInput.contains("cuisine") -> "Setting & Environment: warm rustic chic French kitchen with marble countertops, copper pots and warm pendant lighting."
+            lowerInput.contains("chambre") || isNudeOrIntimate -> "Setting & Environment: intimate luxury bedroom suite with a plush king-size bed, soft bedside lamps and warm textured wallpaper."
+            lowerInput.contains("balcon") || lowerInput.contains("terrasse") || lowerInput.contains("rooftop") -> "Setting & Environment: stylish panoramic rooftop terrace overlooking the city skyline at dusk with warm fairy lights."
+            character.scenario.isNotBlank() -> "Setting & Environment: authentic detailed environment matching: ${character.scenario.take(150)}, with realistic decor and depth."
+            else -> "Setting & Environment: charming cozy Parisian apartment with wooden parquet floor, bookshelves, large French window and soft ambient indoor lighting."
         }
 
         // 5. Posture & Action
@@ -1141,7 +1142,7 @@ class CloudEngineBridge {
                 "Outfit: $outfitDescription. " +
                 "$postureAction " +
                 "Aesthetic & Mood: $atmosphereDescription. " +
-                "Photography: Shot on 35mm f/1.8 prime lens on modern flagship camera, genuine natural skin texture with subtle pores, authentic specular highlights, cinematic depth of field, 8k photographic fidelity, completely non-explicit, masterpiece."
+                "PHOTOGRAPHIC REALISM DIRECTIVES: Raw 35mm film photograph of an actual living human person, authentic human skin pores and texture, natural lighting, sharp focus on subject with rich environmental background depth. ABSOLUTELY NO illustration, NO drawing, NO anime, NO 3D render, NO digital painting, NO cartoon, NO plastic airbrushed skin, NO plain or neutral backdrop. Completely non-explicit, masterpiece photograph."
     }
 
     /**
@@ -1260,7 +1261,7 @@ REQUIREMENTS:
     ): File = withContext(Dispatchers.IO) {
         val encodedPrompt = URLEncoder.encode(prompt, "UTF-8")
         val seed = Random.nextInt(100000, 999999)
-        val urlStr = "https://image.pollinations.ai/prompt/$encodedPrompt?model=flux&width=1024&height=1024&seed=$seed&nologo=true"
+        val urlStr = "https://image.pollinations.ai/prompt/$encodedPrompt?model=flux&width=1024&height=1024&seed=$seed&nologo=true&enhance=false"
 
         val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
             requestMethod = "GET"
