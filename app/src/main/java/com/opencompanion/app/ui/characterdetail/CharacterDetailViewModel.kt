@@ -21,11 +21,12 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 enum class CharacterPhotoStyle(val title: String, val subtitle: String) {
-    SELFIE("📱 Vrai Selfie Miroir / Caméra (POV)", "Selfie smartphone décomplexé, pose intime prise sur le vif"),
-    PROVOCATIVE("🔥 Provocante & Sensuelle (NSFW)", "Pose audacieuse, lingerie fine ou cambrure suggestive"),
-    PORTRAIT("📸 Portrait fidèle (Visage & Buste)", "Conforme aux cheveux, yeux, teint et âge du personnage"),
-    INTIMATE("💋 Photo Boudoir & Chambre", "Atmosphère feutrée, satin, ambiance tamisée"),
-    SCENARIO("🏢 Métier & Scène de vie", "Contexte professionnel ou quotidien lié à son histoire"),
+    PORTRAIT("📸 Portrait (Visage uniquement)", "Gros plan exclusif sur le visage, yeux captivants, lèvres et grain de peau"),
+    SELFIE("📱 Selfie Sexy (Visage & Torse)", "Selfie décomplexé : vue plongeante décolleté, face ou profil aléatoire"),
+    PROVOCATIVE("🔥 Provocante & Sensuelle", "Lingerie fine, nuisette transparente, corset, décolleté plongeant et pose cambrée"),
+    INTIMATE("💋 Boudoir & Chambre", "Lit ou salle de bain, peignoir satin, jambes nues, décolleté plongeant et cambrure"),
+    ELEGANT("👠 Élégante & Sexy", "Robe courte moulante décolletée, minijupe, bas nylon/résille, talons hauts ou tailleur serré"),
+    SCENARIO("🏢 Métier & Scène de vie", "Contexte professionnel ou quotidien lié à son histoire et ses scènes"),
     CUSTOM("✍️ Consigne libre / Personnalisée", "Décrivez précisément le décor, la tenue ou l'action"),
 }
 
@@ -132,18 +133,51 @@ class CharacterDetailViewModel(
             val scenesMatch = Regex("""Scènes\s*&\s*Postures\s*:\s*([^•\n]+)""").find(desc)?.groupValues?.get(1)?.trim() ?: ""
 
             val instruction = when (style) {
-                CharacterPhotoStyle.SELFIE -> 
-                    "Spontaneous authentic smartphone mirror selfie, holding smartphone, wearing stylish flattering attire, chic modern decorated bedroom or upscale bathroom visible in background with realistic mirrors and warm ambient lighting, candid unposed framing" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                
-                CharacterPhotoStyle.PROVOCATIVE -> 
-                    "Alluring sensual boudoir photo, wearing exquisite sheer black lace lingerie with delicate satin ribbons, arched posture, warm moody lighting in a luxurious private hotel suite with plush furnishings and ambient lamps, strictly non-explicit aesthetic glamour" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
-                
                 CharacterPhotoStyle.PORTRAIT -> 
-                    "Authentic photographic waist-up portrait of a real living person, seated naturally in an elegant sunlit Parisian café or charming decorated living room with visible architectural background depth, warm natural daylight, engaging warm eye contact, lifelike expression" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "Raw 35mm photograph, EXTREME CLOSE-UP HEADSHOT OF THE FACE ONLY, strictly focusing on her gorgeous facial features, captivating expressive eyes with authentic reflections, soft parted lips, lifelike skin texture and visible fine skin pores, hair perfectly framing her face, piercing direct eye contact into the camera lens, subtle blurred soft bokeh ambient background. STRICTLY FACE ONLY, NO torso, NO full body" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 
-                CharacterPhotoStyle.INTIMATE -> 
-                    "Tasteful sensual boudoir photograph, sitting comfortably on a soft bed with rumpled linen in a cozy dimly lit bedroom, wearing a delicate silk satin slip or nightgown, soft bedside table lamp lighting, romantic atmosphere, authentic rich room background, strictly non-explicit" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                CharacterPhotoStyle.SELFIE -> {
+                    val selfieAngles = listOf(
+                        "high-angle POV downward shot looking down at her enticing cleavage and shapely bust, hand holding smartphone angled downward, captivating sultry gaze looking up into the camera with a playful confident smile",
+                        "front-facing spontaneous mirror selfie, holding smartphone, wearing an alluring low-cut top hugging her curves and bust, flirtatious confident smile, warm ambient lighting in the mirror reflection",
+                        "three-quarters profile POV selfie, looking seductively over her bare shoulder toward the camera, arched back accentuating her curves, smoldering gaze, alluring teasing attitude",
+                        "spontaneous intimate bedroom or bathroom mirror selfie, leaning against the counter, slightly open silky robe revealing alluring cleavage, seductive authentic smile"
+                    )
+                    val selectedAngle = selfieAngles.random()
+                    "Spontaneous authentic smartphone mirror selfie, framing face and upper torso (bust-up), $selectedAngle, stylish flattering attire, chic modern interior in background, candid unposed lighting" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                }
                 
+                CharacterPhotoStyle.PROVOCATIVE -> {
+                    val provocativeOutfits = listOf(
+                        "wearing an exquisitely sexy sheer black floral lace lingerie set with delicate satin straps and low-cut bralette accentuating her bust",
+                        "wearing a sheer translucent babydoll nightie with a plunging neckline and delicate lace trim, highlighting her arched waist and curves",
+                        "wearing a seductive form-fitting lace-up corset accentuating her waist and cleavage, combined with sheer silk panties",
+                        "wearing an alluring teasing low-cut silk camisole and matching lace boy-shorts, provocative and glamorous"
+                    )
+                    val chosenOutfit = provocativeOutfits.random()
+                    "Alluring highly provocative and sensual aesthetic glamour photo, $chosenOutfit, provocative arched pose accentuating her curves and feminine silhouette, magnetic seductive gaze into the camera, luxurious dimly-lit private boudoir setting with soft ambient lamps, strictly non-explicit artistic glamour" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                }
+                
+                CharacterPhotoStyle.INTIMATE -> {
+                    val intimateScenes = listOf(
+                        "in an intimate luxury bedroom suite, sitting or reclining on a soft unmade king-size bed with rumpled white linen sheets, wearing a delicate open silk satin robe and lace slip, bare toned legs, leaning forward showing her alluring cleavage, warm golden bedside lamp glow",
+                        "in an upscale modern marble bathroom, sitting poised on the edge of the marble bathtub or vanity, wearing a loose silk nightgown, bare legs, arched back, alluring confident eye contact, warm candlelit ambiance",
+                        "lounging gracefully across a plush boudoir sofa, arched waist accentuating her shapely curves and bust, looking back over shoulder with a sultry gaze, cozy romantic evening mood"
+                    )
+                    val chosenScene = intimateScenes.random()
+                    "Tasteful sensual boudoir and bedroom photography, $chosenScene, authentic rich room background depth, warm moody cinematic lighting, seductive feminine allure, strictly non-explicit" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                }
+                
+                CharacterPhotoStyle.ELEGANT -> {
+                    val elegantStyles = listOf(
+                        "wearing an ultra-tight short bodycon mini-dress with a deeply plunging neckline, sheer black nylon stockings, high stiletto heels, arched posture highlighting her curves and bust",
+                        "wearing a stylish daring short mini-skirt and form-fitting cropped top accentuating her bust, paired with fishnet stockings and high-heeled boots, glamorous nightlife look",
+                        "wearing a sleek tailored pencil skirt and dangerously unbuttoned silk blouse hugging her curves, sheer stockings, high heels, chic provocative businesswoman style"
+                    )
+                    val chosenElegant = elegantStyles.random()
+                    "High-fashion glamorous and sexy shot: $chosenElegant, posing confidently in an upscale chic lounge bar or luxury hotel penthouse, confident alluring posture, seductive smile, cinematic moody lighting, masterpiece realism" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                }
+
                 CharacterPhotoStyle.SCENARIO -> {
                     val sceneTarget = when {
                         scenesMatch.isNotBlank() -> scenesMatch
@@ -153,7 +187,7 @@ class CharacterDetailViewModel(
                         character.description.contains("bibliothèque", ignoreCase = true) -> "in a quiet historic university library between high wooden bookstacks"
                         else -> "in her natural authentic lifestyle environment matching her story"
                     }
-                    "Authentic photographic lifestyle scene: $sceneTarget, natural posture and candid interaction with the environment, detailed architectural and furniture background" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "Authentic photographic lifestyle scene: $sceneTarget, natural provocative posture and candid interaction with the environment, detailed architectural and furniture background" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 }
                 
                 CharacterPhotoStyle.CUSTOM -> 

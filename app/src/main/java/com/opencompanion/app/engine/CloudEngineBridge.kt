@@ -1102,61 +1102,107 @@ class CloudEngineBridge {
         val currentLocation = memoryState.location.trim().ifBlank { character.scenario.trim() }
         val currentPosture = memoryState.posture.trim()
 
-        // 2. Déterminer la demande spécifique ou le dernier message du chat
+        // 2. Déterminer la demande spécifique et analyser en profondeur les derniers messages du chat
         val lastUserMsg = recentMessages.lastOrNull { it.role == MessageRole.USER }?.content?.trim() ?: ""
         val inputRaw = (userCustomInstruction?.trim() ?: lastUserMsg).replace("\n", " ")
         val lowerInput = inputRaw.lowercase()
 
+        // Concaténation des 8 derniers messages échangés pour extraire l'action, le lieu, la posture et la tenue en direct
+        val conversationHistorySnippet = recentMessages.takeLast(8).joinToString(" ") { it.content.lowercase().replace("\n", " ") }
+        val fullContextText = "$conversationHistorySnippet $lowerInput"
+
         // 3. Détection de demande intime / lingerie / "nude"
         // RÈGLE ABSOLUE : Si "nude", "nue", "à poil", "déshabillée" etc. -> Traduire strictement par lingerie sexy et intime, sans nudité explicite
-        val isNudeOrIntimate = lowerInput.contains("nude") || lowerInput.contains("nue") || lowerInput.contains(" à poil") ||
-                lowerInput.contains("poil") || lowerInput.contains("sans vêtement") || lowerInput.contains("déshabill") ||
-                lowerInput.contains("lingerie") || lowerInput.contains("dentelle") || lowerInput.contains("nuisette") ||
-                lowerInput.contains("peignoir") || lowerInput.contains("satin") || lowerInput.contains("culotte") ||
-                lowerInput.contains("soutien-gorge") || lowerInput.contains("intime") || lowerInput.contains("sexy") ||
+        val isNudeOrIntimate = fullContextText.contains("nude") || fullContextText.contains("nue") || fullContextText.contains(" à poil") ||
+                fullContextText.contains("poil") || fullContextText.contains("sans vêtement") || fullContextText.contains("déshabill") ||
+                fullContextText.contains("lingerie") || fullContextText.contains("dentelle") || fullContextText.contains("nuisette") ||
+                fullContextText.contains("peignoir") || fullContextText.contains("satin") || fullContextText.contains("culotte") ||
+                fullContextText.contains("soutien-gorge") || fullContextText.contains("intime") || fullContextText.contains("sexy") ||
+                fullContextText.contains("boudoir") || fullContextText.contains("corset") ||
                 currentOutfit.lowercase().contains("lingerie") || currentOutfit.lowercase().contains("dentelle") ||
                 currentOutfit.lowercase().contains("nuisette")
 
-        // 4. Tenues : TOUJOURS légèrement provocantes et sexy, parfaitement ajustées à sa morphologie et à son bonnet
+        // 4. Détection sémantique dynamique de la TENUE dans la conversation
         val outfitDescription: String
         val atmosphereDescription: String
 
         if (isNudeOrIntimate) {
             outfitDescription = "wearing an exquisitely sexy sheer black or blush-pink floral lace lingerie set, delicate low-cut lace bralette accentuating her gorgeous $bustLabel bust, matching sheer lace panties, seductive feminine silhouette, strictly non-explicit and artistic"
             atmosphereDescription = "cozy warm romantic boudoir atmosphere, soft ambient glow, sensual intimate photography, artistic low-key lighting, strictly aesthetic glamour, no explicit nudity"
+        } else if (fullContextText.contains("peignoir") || fullContextText.contains("robe de chambre")) {
+            outfitDescription = "wearing a silky satin robe loosely tied around her arched waist, partially parted in front revealing bare shoulders and a deeply enticing low-cut neckline showing her $bustLabel bust"
+            atmosphereDescription = "intimate relaxed atmosphere, warm golden indoor lighting, seductive ease"
+        } else if (fullContextText.contains("nuisette")) {
+            outfitDescription = "wearing a soft shimmering silk nightie with delicate lace embroidery, plunging neckline highlighting her $bustLabel bust, bare shoulders and arched waist"
+            atmosphereDescription = "dimly-lit romantic bedroom ambiance, warm lamp light, tender allure"
+        } else if (fullContextText.contains("robe") || fullContextText.contains("soirée") || fullContextText.contains("cocktail")) {
+            outfitDescription = "wearing an ultra-flattering glamorous form-fitting evening dress with a deeply plunging neckline accentuating her $bustLabel bust, subtle side slit, hugging her arched waist and hourglass silhouette"
+            atmosphereDescription = "chic sophisticated upscale ambiance, seductive warm flattering light"
+        } else if (fullContextText.contains("minijupe") || fullContextText.contains("jupe courte")) {
+            outfitDescription = "wearing a provocative short mini-skirt and a form-fitting low-cut top highlighting her $bustLabel bust and slender waist, long toned legs"
+            atmosphereDescription = "modern trendy indoor lighting, playful enticing energy"
+        } else if (fullContextText.contains("tailleur") || fullContextText.contains("bureau") || fullContextText.contains("chemisier")) {
+            outfitDescription = "wearing a sleek form-fitting pencil skirt and a dangerously unbuttoned silk blouse tailored to accentuate her $bustLabel bust and curves, sophisticated seductive businesswoman style"
+            atmosphereDescription = "executive stylish interior, bright soft daylight through large windows"
+        } else if (fullContextText.contains("maillot") || fullContextText.contains("bikini")) {
+            outfitDescription = "wearing an alluring elegant designer swimsuit accentuating her $bustLabel bust and toned curves, stylish sarong around her waist"
+            atmosphereDescription = "warm sunlit poolside or coastal glow, glistening water reflections"
         } else if (currentOutfit.isNotBlank()) {
             outfitDescription = "wearing a form-fitting, slightly provocative and flattering $currentOutfit, tailored to highlight her arched waist and shapely $bustLabel bust with a tasteful enticing neckline"
             atmosphereDescription = "natural authentic environment, photorealistic ambient lighting, alluring sensual charm"
-        } else if (lowerInput.contains("robe") || lowerInput.contains("soirée") || lowerInput.contains("décolleté")) {
-            outfitDescription = "wearing a breathtaking glamorous form-fitting evening dress with a deeply flattering plunging neckline showcasing her $bustLabel bust, side slit, hugging her arched waist and curves"
-            atmosphereDescription = "chic sophisticated upscale ambiance, seductive warm flattering light"
         } else {
             outfitDescription = "wearing an alluring, slightly provocative stylish outfit (fitted top with a subtle flattering neckline accentuating her $bustLabel bust, and form-fitting skirt or trousers highlighting her curves and arched waist)"
             atmosphereDescription = "natural ambient daylight, cozy stylish interior, seductive feminine aura"
         }
 
-        // 5. Lieu & Scène
+        // 5. Détection sémantique dynamique du LIEU et de l'ENVIRONNEMENT dans la conversation et l'historique
         val settingScene = when {
-            currentLocation.isNotBlank() -> "Setting & Environment: fully realized authentic real-life environment in $currentLocation with visible detailed furniture, architecture, and warm ambient lighting. Never a plain or neutral studio background."
-            lowerInput.contains("plage") || lowerInput.contains("mer") -> "Setting & Environment: scenic private Mediterranean beach with golden sand, gentle waves and sunset sky in the background."
-            lowerInput.contains("piscine") -> "Setting & Environment: luxurious private villa poolside terrace with sun loungers and crystal turquoise water reflections."
-            lowerInput.contains("voiture") -> "Setting & Environment: interior of a premium luxury vehicle, leather seats and city lights through tinted windows."
-            lowerInput.contains("bureau") || lowerInput.contains("travail") -> "Setting & Environment: bright executive contemporary office with large windows, mahogany desk and city view."
-            lowerInput.contains("cuisine") -> "Setting & Environment: warm rustic chic French kitchen with marble countertops, copper pots and warm pendant lighting."
-            lowerInput.contains("chambre") || isNudeOrIntimate -> "Setting & Environment: intimate luxury bedroom suite with a plush king-size bed, soft bedside lamps and warm textured wallpaper."
-            lowerInput.contains("balcon") || lowerInput.contains("terrasse") || lowerInput.contains("rooftop") -> "Setting & Environment: stylish panoramic rooftop terrace overlooking the city skyline at dusk with warm fairy lights."
-            character.scenario.isNotBlank() -> "Setting & Environment: authentic detailed environment matching: ${character.scenario.take(150)}, with realistic decor and depth."
-            else -> "Setting & Environment: charming cozy Parisian apartment with wooden parquet floor, bookshelves, large French window and soft ambient indoor lighting."
+            fullContextText.contains("bibliothèque") || fullContextText.contains("livre") || character.scenario.contains("bibliothèque", ignoreCase = true) ->
+                "Setting & Environment: grand historic library with tall floor-to-ceiling wooden bookshelves packed with vintage leather-bound books, rolling wooden library ladder, polished parquet floor, warm amber reading lamps, rich intellectual atmosphere."
+            fullContextText.contains("cuisine") ->
+                "Setting & Environment: warm rustic chic French kitchen with marble countertops, copper pans hanging, warm pendant lighting, fresh ingredients on the island."
+            fullContextText.contains("chambre") || fullContextText.contains("lit") || isNudeOrIntimate ->
+                "Setting & Environment: intimate luxury bedroom suite with a plush king-size bed, rumpled silk sheets, soft bedside lamps and warm textured wallpaper, cozy private sanctuary."
+            fullContextText.contains("salle de bain") || fullContextText.contains("bain") || fullContextText.contains("douche") ->
+                "Setting & Environment: opulent modern marble bathroom with a freestanding tub, large illuminated vanity mirror, scented candles and soft steam."
+            fullContextText.contains("bureau") || fullContextText.contains("travail") ->
+                "Setting & Environment: bright executive contemporary office with large windows, mahogany desk, modern artwork and city view."
+            fullContextText.contains("voiture") || fullContextText.contains("auto") ->
+                "Setting & Environment: interior of a premium luxury vehicle with supple stitched leather seats, ambient cockpit lighting and city lights through tinted windows."
+            fullContextText.contains("balcon") || fullContextText.contains("terrasse") || fullContextText.contains("rooftop") ->
+                "Setting & Environment: stylish panoramic rooftop terrace overlooking the city skyline at dusk with warm fairy lights and plush outdoor seating."
+            fullContextText.contains("piscine") ->
+                "Setting & Environment: luxurious private villa poolside terrace with sun loungers and crystal turquoise water reflections."
+            fullContextText.contains("plage") || fullContextText.contains("mer") ->
+                "Setting & Environment: scenic private Mediterranean beach with golden sand, gentle waves and sunset sky in the background."
+            fullContextText.contains("salon") || fullContextText.contains("canapé") || fullContextText.contains("sofa") ->
+                "Setting & Environment: chic Parisian apartment living room with a velvet sofa, marble coffee table, art books, tall French windows and ambient floor lamps."
+            currentLocation.isNotBlank() ->
+                "Setting & Environment: fully realized authentic real-life environment in $currentLocation with visible detailed furniture, architecture, and warm ambient lighting. Never a plain or neutral studio background."
+            character.scenario.isNotBlank() ->
+                "Setting & Environment: authentic detailed environment matching: ${character.scenario.take(150)}, with realistic decor and depth."
+            else ->
+                "Setting & Environment: charming cozy Parisian apartment with wooden parquet floor, bookshelves, large French window and soft ambient indoor lighting."
         }
 
-        // 6. Posture & Action : TOUJOURS légèrement provocante, cambrée et sexy
+        // 6. Détection sémantique dynamique de la POSTURE et de l'ACTION dans la conversation
         val postureAction = when {
-            currentPosture.isNotBlank() -> "Pose: slightly provocative sensual posture, $currentPosture, arched back, confident captivating eye contact, irresistible sensual aura."
-            lowerInput.contains("penchée") || lowerInput.contains("bureau") -> "Pose: leaning forward seductively, emphasizing her feminine cleavage and arched waist, intense smoldering gaze into the camera."
-            lowerInput.contains("allongée") || lowerInput.contains("lit") || lowerInput.contains("sofa") -> "Pose: lounging sensually on a plush bed, propped gracefully on one elbow, body curved alluringly, captivating sultry smile."
-            lowerInput.contains("dos") || lowerInput.contains("derrière") -> "Pose: looking back seductively over her bare shoulder, showcasing her arched waist and curves, intensely alluring gaze."
-            lowerInput.contains("debout") -> "Pose: provocative standing pose, hand on arched hip, emphasizing her curvaceous hourglass silhouette and bust, confident sultry attitude."
-            else -> "Pose: naturally provocative and alluring stance, arched back accentuating her bust and feminine curves, captivating direct eye contact with a flirtatious confident smile."
+            (fullContextText.contains("livre") || fullContextText.contains("étagère") || fullContextText.contains("attraper") || fullContextText.contains("haut")) ->
+                "Pose: standing gracefully on tiptoes reaching one slender arm upward toward a high wooden bookshelf, arched back highlighting her curves and bust, looking back over her shoulder with an expressive grateful and flirty smile toward the camera."
+            fullContextText.contains("penchée") || fullContextText.contains("se penche") || fullContextText.contains("sur la table") || fullContextText.contains("sur le bureau") ->
+                "Pose: leaning forward gracefully over the desk or table, elbows propped, deeply accentuating her feminine cleavage and arched waist, intense captivating gaze into the camera."
+            fullContextText.contains("allongée") || fullContextText.contains("couchée") || fullContextText.contains("sur le lit") || fullContextText.contains("sur le canapé") ->
+                "Pose: lounging sensually on a plush bed or sofa, propped gracefully on one elbow, body curved alluringly, shapely legs, captivating sultry smile."
+            fullContextText.contains("assise") || fullContextText.contains("s'assoit") ->
+                "Pose: seated gracefully with legs crossed, hand resting gently on her knee, upright poised posture emphasizing her bust and waist, warm inviting smile."
+            fullContextText.contains("dos") || fullContextText.contains("derrière") || fullContextText.contains("par-dessus l'épaule") ->
+                "Pose: looking back seductively over her bare shoulder, showcasing her arched waist and curves, intensely alluring smoldering gaze."
+            fullContextText.contains("debout") ->
+                "Pose: provocative standing pose, hand on arched hip, emphasizing her curvaceous hourglass silhouette and bust, confident sultry attitude."
+            currentPosture.isNotBlank() ->
+                "Pose: slightly provocative sensual posture, $currentPosture, arched back, confident captivating eye contact, irresistible sensual aura."
+            else ->
+                "Pose: naturally provocative and alluring stance, arched back accentuating her bust and feminine curves, captivating direct eye contact with a flirtatious confident smile."
         }
 
         return "$identityDNA " +
