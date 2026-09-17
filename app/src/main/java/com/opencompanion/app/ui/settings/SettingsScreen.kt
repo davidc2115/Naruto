@@ -645,14 +645,13 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Text("✨ Google Gemini (Imagen 3)", style = MaterialTheme.typography.titleSmall)
                                     Text(
-                                        "⚠️ Important : Les clés gratuites Google AI Studio ne supportent PAS Imagen (erreur 404 de Google). Ce mode requiert obligatoirement un compte Google Cloud avec facturation activée (300$ offerts).",
+                                        "Rendu réaliste officiel identique à l'application smartphone Google Gemini. Texture de peau naturelle, éclairage cinématographique et fidélité maximale.",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.error
                                     )
                                     ApiKeysField(
                                         value = state.settings.geminiApiKey,
                                         onValueChange = viewModel::setGeminiApiKey,
-                                        label = "Clé API Gemini (avec facturation)",
+                                        label = "Clé API Gemini (Google AI Studio / Cloud)",
                                         placeholder = "AIzaSy...",
                                     )
                                     OutlinedTextField(
@@ -663,6 +662,18 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                         singleLine = true,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        FilterChip(
+                                            selected = state.settings.geminiImageModelName == "imagen-3.0-generate-002",
+                                            onClick = { viewModel.setGeminiImageModelName("imagen-3.0-generate-002") },
+                                            label = { Text("Imagen 3 ⭐") }
+                                        )
+                                        FilterChip(
+                                            selected = state.settings.geminiImageModelName == "imagen-3.0-fast-generate-001",
+                                            onClick = { viewModel.setGeminiImageModelName("imagen-3.0-fast-generate-001") },
+                                            label = { Text("Imagen 3 Rapide ⚡") }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -704,25 +715,32 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Text("🤖 OpenAI (DALL-E 3)", style = MaterialTheme.typography.titleSmall)
+                                    Text("🤖 Microsoft Copilot / OpenAI (DALL-E 3)", style = MaterialTheme.typography.titleSmall)
                                     Text(
-                                        "Nécessite un compte OpenAI avec crédits prépayés.",
+                                        "Moteur de génération de Microsoft Copilot. Rendu haute fidélité 1024x1024 net, esthétique moderne et poses réalistes.",
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                     ApiKeysField(
                                         value = state.settings.openAiApiKey,
                                         onValueChange = viewModel::setOpenAiApiKey,
-                                        label = "Clé API OpenAI",
+                                        label = "Clé API OpenAI / Copilot",
                                         placeholder = "sk-...",
                                     )
                                     OutlinedTextField(
                                         value = state.settings.openAiImageModelName,
                                         onValueChange = viewModel::setOpenAiImageModelName,
-                                        label = { Text("Modèle OpenAI") },
+                                        label = { Text("Modèle") },
                                         placeholder = { Text("dall-e-3") },
                                         singleLine = true,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        FilterChip(
+                                            selected = state.settings.openAiImageModelName == "dall-e-3",
+                                            onClick = { viewModel.setOpenAiImageModelName("dall-e-3") },
+                                            label = { Text("DALL-E 3 ⭐") }
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -962,6 +962,83 @@ class CloudEngineBridge {
     }
 
     /**
+     * Construit un prompt photographique en langage naturel haute définition,
+     * spécialement calibré pour les modèles de pointe de Google Gemini (Imagen 3) et Microsoft Copilot (DALL-E 3).
+     * Banni tout le jargon technique Stable Diffusion (poids :1.2, tags compacts) pour produire un vrai rendu réaliste
+     * identique à l'application officielle Google Gemini ou Copilot sur smartphone.
+     */
+    fun buildPhotorealisticNaturalPrompt(
+        character: CharacterEntity,
+        recentMessages: List<ChatMessageEntity>,
+        userCustomInstruction: String? = null
+    ): String {
+        val desc = character.description
+
+        // 1. Âge
+        val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
+        val ageVal = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: "40"
+        val ageStr = "$ageVal-year-old"
+
+        // 2. Cheveux
+        val hairLine = desc.lines().find { it.contains("Cheveux", ignoreCase = true) } ?: ""
+        val lowerHair = hairLine.lowercase()
+        val hairColor = when {
+            lowerHair.contains("blond miel") -> "warm honey blonde"
+            lowerHair.contains("blond doré") -> "golden blonde"
+            lowerHair.contains("blond platine") -> "platinum blonde"
+            lowerHair.contains("blond") -> "blonde"
+            lowerHair.contains("châtain foncé") -> "dark chestnut brown"
+            lowerHair.contains("châtain") -> "chestnut brown"
+            lowerHair.contains("brun chocolat") -> "rich dark chocolate brown"
+            lowerHair.contains("brun") -> "brunette"
+            lowerHair.contains("noir") -> "silky raven black"
+            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> "vibrant copper auburn"
+            lowerHair.contains("gris") || lowerHair.contains("argenté") -> "sophisticated silver gray"
+            else -> "brunette"
+        }
+        val hairStyle = when {
+            lowerHair.contains("carré plongeant") -> "in an inverted sleek bob"
+            lowerHair.contains("carré") -> "in an elegant bob haircut"
+            lowerHair.contains("queue de cheval") -> "tied in a high ponytail"
+            lowerHair.contains("chignon") -> "styled in a classy hair bun"
+            lowerHair.contains("boucl") -> "with voluminous curls"
+            lowerHair.contains("ondul") -> "with gentle cascading waves"
+            lowerHair.contains("mi-longs") -> "shoulder-length"
+            lowerHair.contains("longs") -> "long and flowing"
+            lowerHair.contains("court") -> "in a chic modern cut"
+            else -> "beautifully styled"
+        }
+
+        // 3. Yeux
+        val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) } ?: ""
+        val lowerEyes = eyesLine.lowercase()
+        val eyeDesc = when {
+            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> "striking emerald green eyes"
+            lowerEyes.contains("bleu") -> "mesmerizing deep blue eyes"
+            lowerEyes.contains("noisette") -> "warm hazel eyes"
+            lowerEyes.contains("marron") -> "warm expressive brown eyes"
+            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> "intense dark eyes"
+            else -> "expressive warm eyes"
+        }
+
+        // 4. Contexte, pose et tenue
+        val poseAndSetting = if (!userCustomInstruction.isNullOrBlank()) {
+            userCustomInstruction.trim()
+        } else {
+            val lastUserMsg = recentMessages.lastOrNull { it.role == MessageRole.USER }?.content
+            if (!lastUserMsg.isNullOrBlank() && lastUserMsg.length in 5..120) {
+                lastUserMsg.replace("\n", " ").trim()
+            } else {
+                "taking a spontaneous candid selfie, smiling naturally at the camera in a stylish cozy room"
+            }
+        }
+
+        return "A high-end, photorealistic candid portrait of ${character.name}, a gorgeous $ageStr French woman with $hairColor hair $hairStyle, and $eyeDesc. " +
+                "Setting, outfit and pose: $poseAndSetting. " +
+                "Shot on modern smartphone camera, 35mm lens, natural soft lighting, authentic lifelike skin texture, high fidelity, genuine camera imperfections, cinematic depth of field."
+    }
+
+    /**
      * Construit le prompt optimal pour la génération d'image réaliste fidèle à la description physique.
      */
     suspend fun buildSceneImagePrompt(
@@ -1297,103 +1374,42 @@ REQUIREMENTS:
                 }
             }
 
-            // 2. Exécution Google Gemini Imagen
+            // 2. Exécution Google Gemini Imagen (Identique à l'application Gemini smartphone)
             if (imageEngine == com.opencompanion.app.data.ImageEngine.GEMINI_IMAGEN) {
-                var normalizedGeminiModel = geminiImageModelName.trim().removePrefix("models/")
-                if (normalizedGeminiModel.contains("imagen-4.0-generate-0001")) {
-                    normalizedGeminiModel = normalizedGeminiModel.replace("imagen-4.0-generate-0001", "imagen-4.0-generate-001")
-                }
-                if (normalizedGeminiModel.contains("imagen-3.0-generate-0001")) {
-                    normalizedGeminiModel = normalizedGeminiModel.replace("imagen-3.0-generate-0001", "imagen-3.0-generate-002")
-                }
-                val cleanedGeminiModel = normalizedGeminiModel.ifBlank { "gemini-3.1-flash-image" }
+                val naturalPrompt = buildPhotorealisticNaturalPrompt(
+                    character = character,
+                    recentMessages = recentMessages,
+                    userCustomInstruction = userCustomInstruction
+                )
+
+                val cleanedGeminiModel = geminiImageModelName.trim().removePrefix("models/")
+                    .ifBlank { "imagen-3.0-generate-002" }
+
+                val predictModels = listOf(
+                    cleanedGeminiModel,
+                    "imagen-3.0-generate-002",
+                    "imagen-3.0-fast-generate-001"
+                ).distinct()
 
                 for (key in allGeminiKeys.distinct()) {
-                    val generateContentModels = listOf(
-                        cleanedGeminiModel,
-                        "gemini-3.1-flash-image",
-                        "gemini-2.5-flash-image",
-                        "gemini-2.0-flash"
-                    ).distinct()
-
-                    for (model in generateContentModels) {
-                        val urlStr = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$key"
-                        try {
-                            val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
-                                requestMethod = "POST"
-                                connectTimeout = 25_000
-                                readTimeout = 60_000
-                                doOutput = true
-                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
-                            }
-
-                            val payload = mapOf(
-                                "contents" to listOf(
-                                    mapOf("parts" to listOf(mapOf("text" to prompt)))
-                                ),
-                                "generationConfig" to mapOf(
-                                    "responseModalities" to listOf("TEXT", "IMAGE")
-                                )
-                            )
-
-                            conn.outputStream.use { os ->
-                                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
-                                os.flush()
-                            }
-
-                            val code = conn.responseCode
-                            if (code in 200..299) {
-                                val resp = conn.inputStream.bufferedReader().use { it.readText() }
-                                conn.disconnect()
-                                val root = jsonParser.parseToJsonElement(resp).jsonObject
-                                val parts = root["candidates"]?.jsonArray?.firstOrNull()?.jsonObject
-                                    ?.get("content")?.jsonObject
-                                    ?.get("parts")?.jsonArray
-                                val imgPart = parts?.firstOrNull { it.jsonObject.containsKey("inlineData") }?.jsonObject?.get("inlineData")?.jsonObject
-                                val b64 = imgPart?.get("data")?.jsonPrimitive?.content
-                                val mime = imgPart?.get("mimeType")?.jsonPrimitive?.content ?: "image/jpeg"
-                                if (!b64.isNullOrBlank()) {
-                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
-                                    val ext = if (mime.contains("png")) "png" else "jpg"
-                                    val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.$ext")
-                                    file.writeBytes(bytes)
-                                    return@runCatching file
-                                }
-                            } else {
-                                if (code == 404) hadGemini404 = true
-                                val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                                lastError = "Gemini Imagen ($code): ${err.take(200)}"
-                                conn.disconnect()
-                            }
-                        } catch (e: Exception) {
-                            lastError = "Erreur réseau Gemini Imagen: ${e.message}"
-                        }
-                    }
-
-                    // Tentative B : endpoint predict Imagen standard
-                    val predictModels = listOf(
-                        "imagen-3.0-generate-002",
-                        "imagen-3.0-fast-generate-001"
-                    )
                     for (model in predictModels) {
                         val urlStr = "https://generativelanguage.googleapis.com/v1beta/models/$model:predict?key=$key"
                         try {
                             val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
                                 requestMethod = "POST"
-                                connectTimeout = 25_000
+                                connectTimeout = 30_000
                                 readTimeout = 60_000
                                 doOutput = true
+                                setRequestProperty("x-goog-api-key", key)
                                 setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                                setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                                setRequestProperty("User-Agent", "OpenCompanion/1.0 (Android)")
                             }
 
                             val payload = mapOf(
-                                "instances" to listOf(mapOf("prompt" to prompt)),
+                                "instances" to listOf(mapOf("prompt" to naturalPrompt)),
                                 "parameters" to mapOf(
                                     "sampleCount" to 1,
-                                    "aspectRatio" to "1:1",
-                                    "personGeneration" to "ALLOW_ADULT"
+                                    "aspectRatio" to "1:1"
                                 )
                             )
 
@@ -1426,8 +1442,56 @@ REQUIREMENTS:
                         }
                     }
                 }
+
+                // Relais automatique vers Copilot DALL-E 3 si Gemini échoue et qu'une clé OpenAI est configurée
+                if (allOpenAiKeys.isNotEmpty()) {
+                    for (openAiKey in allOpenAiKeys.distinct()) {
+                        try {
+                            val copilotUrl = URL("https://api.openai.com/v1/images/generations")
+                            val copilotConn = (copilotUrl.openConnection() as HttpURLConnection).apply {
+                                requestMethod = "POST"
+                                connectTimeout = 30_000
+                                readTimeout = 60_000
+                                doOutput = true
+                                setRequestProperty("Authorization", "Bearer $openAiKey")
+                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                                setRequestProperty("User-Agent", "OpenCompanion/1.0 (Android)")
+                            }
+
+                            val copilotPayload = mapOf(
+                                "model" to "dall-e-3",
+                                "prompt" to naturalPrompt,
+                                "n" to 1,
+                                "size" to "1024x1024",
+                                "response_format" to "b64_json"
+                            )
+
+                            copilotConn.outputStream.use { os ->
+                                os.write(buildJsonString(copilotPayload).toByteArray(Charsets.UTF_8))
+                                os.flush()
+                            }
+
+                            if (copilotConn.responseCode in 200..299) {
+                                val resp = copilotConn.inputStream.bufferedReader().use { it.readText() }
+                                copilotConn.disconnect()
+                                val root = jsonParser.parseToJsonElement(resp).jsonObject
+                                val data = root["data"]?.jsonArray
+                                val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
+                                if (!b64.isNullOrBlank()) {
+                                    val bytes = Base64.decode(b64, Base64.DEFAULT)
+                                    val file = File(outputDir, "copilot_${character.id}_${System.currentTimeMillis()}.jpg")
+                                    file.writeBytes(bytes)
+                                    return@runCatching file
+                                }
+                            } else {
+                                copilotConn.disconnect()
+                            }
+                        } catch (_: Exception) {}
+                    }
+                }
+
                 if (hadGemini404) {
-                    error("Erreur Google 404 : Votre clé API Google Gemini gratuite ne dispose pas des droits Imagen (Google réserve Imagen aux comptes avec facturation / 300$ offerts).\n\n💡 Solution 100% GRATUITE sans carte bancaire : Passez sur le moteur Hugging Face dans Réglages → Photos (modèle FLUX.1 Schnell photoréaliste, token gratuit 'hf_...').")
+                    error("Erreur Google 404 : L'accès à Imagen 3 requiert que votre projet Google Cloud / AI Studio ait Imagen activé (ou un compte avec facturation).\n\n💡 Alternative : Vous pouvez aussi passer sur le moteur Microsoft Copilot / OpenAI (DALL-E 3) dans Réglages → Photos.")
                 }
                 error(lastError ?: "Échec de génération Google Gemini Imagen.")
             }
@@ -1499,25 +1563,31 @@ REQUIREMENTS:
                 error(lastError ?: "Échec de génération OpenRouter. Vérifiez vos crédits et votre clé API.")
             }
 
-            // 4. Exécution OpenAI DALL-E 3
+            // 4. Exécution Microsoft Copilot / OpenAI DALL-E 3
             if (imageEngine == com.opencompanion.app.data.ImageEngine.OPENAI) {
+                val naturalPrompt = buildPhotorealisticNaturalPrompt(
+                    character = character,
+                    recentMessages = recentMessages,
+                    userCustomInstruction = userCustomInstruction
+                )
+
                 for (key in allOpenAiKeys.distinct()) {
                     try {
                         val url = URL("https://api.openai.com/v1/images/generations")
                         val conn = (url.openConnection() as HttpURLConnection).apply {
                             requestMethod = "POST"
-                            connectTimeout = 25_000
-                            readTimeout = 45_000
+                            connectTimeout = 30_000
+                            readTimeout = 60_000
                             doOutput = true
                             setRequestProperty("Authorization", "Bearer $key")
                             setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                            setRequestProperty("User-Agent", "OpenCompanion/1.0")
+                            setRequestProperty("User-Agent", "OpenCompanion/1.0 (Android)")
                         }
 
                         val chosenOpenAiModel = openAiImageModelName.trim().ifBlank { "dall-e-3" }
                         val payload = mapOf(
                             "model" to chosenOpenAiModel,
-                            "prompt" to prompt,
+                            "prompt" to naturalPrompt,
                             "n" to 1,
                             "size" to "1024x1024",
                             "response_format" to "b64_json"
@@ -1537,20 +1607,20 @@ REQUIREMENTS:
                             val b64 = data?.firstOrNull()?.jsonObject?.get("b64_json")?.jsonPrimitive?.content
                             if (!b64.isNullOrBlank()) {
                                 val bytes = Base64.decode(b64, Base64.DEFAULT)
-                                val file = File(outputDir, "openai_${character.id}_${System.currentTimeMillis()}.jpg")
+                                val file = File(outputDir, "copilot_${character.id}_${System.currentTimeMillis()}.jpg")
                                 file.writeBytes(bytes)
                                 return@runCatching file
                             }
                         } else {
                             val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                            lastError = "OpenAI ($code): ${err.take(200)}"
+                            lastError = "Copilot / OpenAI ($code): ${err.take(200)}"
                             conn.disconnect()
                         }
                     } catch (e: Exception) {
-                        lastError = "Erreur réseau OpenAI: ${e.message}"
+                        lastError = "Erreur réseau Copilot / OpenAI: ${e.message}"
                     }
                 }
-                error(lastError ?: "Échec de génération OpenAI DALL-E 3. Vérifiez vos crédits OpenAI et votre clé API.")
+                error(lastError ?: "Échec de génération Copilot / OpenAI DALL-E 3. Vérifiez vos crédits OpenAI et votre clé API.")
             }
 
             error("Aucun moteur d'image valide sélectionné.")

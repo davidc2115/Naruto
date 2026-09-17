@@ -45,10 +45,10 @@ enum class EngineBackend {
  * [OPENAI] : DALL-E 3 via OpenAI (crédits payants).
  */
 enum class ImageEngine(val displayName: String) {
-    HORDE_DIFFUSION("🎨 Horde Diffusion (100% Gratuit, Sans clé, NSFW)"),
-    GEMINI_IMAGEN("✨ Google Gemini (Imagen)"),
+    GEMINI_IMAGEN("✨ Google Gemini (Imagen 3) - Rendu Smartphone"),
+    OPENAI("🤖 Microsoft Copilot / OpenAI (DALL-E 3) - Photoréaliste"),
+    HORDE_DIFFUSION("🎨 Horde Diffusion (100% Gratuit communautaire)"),
     OPENROUTER("🌐 OpenRouter"),
-    OPENAI("🤖 OpenAI DALL-E 3"),
 }
 
 /** Genre déclaré par l'utilisateur, injecté dans le prompt système (voir PromptBuilder) pour
@@ -245,7 +245,7 @@ class SettingsRepository(private val context: Context) {
                 ?: "llama-3.3-70b-versatile",
             geminiApiKey = prefs[Keys.GEMINI_API_KEY] ?: "",
             geminiModelName = prefs[Keys.GEMINI_MODEL_NAME]?.let(::sanitizeGeminiModel) ?: "gemini-2.0-flash",
-            geminiImageModelName = prefs[Keys.GEMINI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gemini-3.1-flash-image",
+            geminiImageModelName = prefs[Keys.GEMINI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "imagen-3.0-generate-002",
             openAiApiKey = prefs[Keys.OPENAI_API_KEY] ?: "",
             openAiModelName = prefs[Keys.OPENAI_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "gpt-4o-mini",
             openAiImageModelName = prefs[Keys.OPENAI_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "dall-e-3",
@@ -256,7 +256,7 @@ class SettingsRepository(private val context: Context) {
             huggingFaceImageModelName = prefs[Keys.HUGGING_FACE_IMAGE_MODEL_NAME]?.takeUnless { it.isBlank() } ?: "black-forest-labs/FLUX.1-schnell",
             imageEnginePreference = prefs[Keys.IMAGE_ENGINE_PREFERENCE]?.let {
                 runCatching { ImageEngine.valueOf(it) }.getOrNull()
-            } ?: ImageEngine.HORDE_DIFFUSION,
+            } ?: ImageEngine.GEMINI_IMAGEN,
         )
     }
 
