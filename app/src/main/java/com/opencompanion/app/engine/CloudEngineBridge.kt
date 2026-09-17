@@ -885,20 +885,61 @@ class CloudEngineBridge {
      * Traduit et extrait de manière déterministe les traits physiques d'un personnage en tags Stable Diffusion (en anglais)
      */
     fun extractSdPhysicalTags(character: CharacterEntity): String {
-        val desc = character.description
-        val tags = mutableListOf<String>()
+        val lowerDesc = desc.lowercase()
+        val lines = desc.lines().map { it.trim() }
 
-        // 1. Âge
+        // 1. Âge & Sexe
         val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
         val age = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: ""
         if (age.isNotBlank() && age != "0") {
-            tags.add("($age years old mature woman:1.2)")
+            tags.add("($age years old mature French woman:1.2)")
         } else {
-            tags.add("mature woman")
+            tags.add("(mature French woman:1.1)")
         }
 
-        // 2. Cheveux
-        val hairLine = desc.lines().find { it.contains("Cheveux", ignoreCase = true) } ?: ""
+        // 2. Mensurations exactes : Taille, Poids, Bonnet
+        val heightMatch = Regex("""(?:Taille\s*:\s*)(\d[m,.]\d{2})""", RegexOption.IGNORE_CASE).find(desc)
+        heightMatch?.groupValues?.get(1)?.let {
+            val cm = it.replace("m", ".").toDoubleOrNull()?.let { m -> (m * 100).toInt() } ?: 168
+            tags.add("(height $it, ${cm}cm tall:1.1)")
+        }
+
+        val weightMatch = Regex("""(?:Poids\s*:\s*)(\d{2}\s*kg)""", RegexOption.IGNORE_CASE).find(desc)
+        weightMatch?.groupValues?.get(1)?.let {
+            tags.add("(weight $it:1.1)")
+        }
+
+        val bustMatch = Regex("""(?:Poitrine\s*:\s*|Bonnet\s*)([0-9]{2,3}[A-G]|Bonnet\s*[0-9]{2,3}[A-G][^|•\n]*)""", RegexOption.IGNORE_CASE).find(desc)
+        val bustRaw = bustMatch?.groupValues?.get(1)?.trim() ?: ""
+        when {
+            bustRaw.isNotBlank() -> tags.add("(natural $bustRaw cup bust, deep alluring cleavage:1.3)")
+            lowerDesc.contains("95e") -> tags.add("(natural 95E cup bust, generous feminine cleavage:1.3)")
+            lowerDesc.contains("90d") -> tags.add("(natural 90D cup bust, deep alluring cleavage:1.3)")
+            lowerDesc.contains("95d") -> tags.add("(natural 95D cup bust, generous cleavage:1.3)")
+            lowerDesc.contains("85d") -> tags.add("(natural 85D cup bust, shapely seductive cleavage:1.2)")
+            lowerDesc.contains("90c") -> tags.add("(natural 90C cup bust, flattering cleavage:1.2)")
+            lowerDesc.contains("85c") -> tags.add("(natural 85C cup bust, flattering cleavage:1.2)")
+            else -> tags.add("(shapely natural feminine bust, alluring cleavage:1.1)")
+        }
+
+        // 3. Morphologie (cambrure, hanches, taille fine)
+        val morphLine = lines.find { it.contains("Morphologie", ignoreCase = true) } ?: ""
+        val lowerMorph = morphLine.lowercase()
+        when {
+            lowerMorph.contains("cambrée") || lowerMorph.contains("rebondi") ->
+                tags.add("(provocative hourglass figure, arched slender waist, rounded hips:1.2)")
+            lowerMorph.contains("galbée") || lowerMorph.contains("courbes") ->
+                tags.add("(voluptuous feminine hourglass silhouette, narrow waist, sculpted curves:1.2)")
+            lowerMorph.contains("athlétique") || lowerMorph.contains("tonique") ->
+                tags.add("(toned athletic feminine silhouette, slender waist:1.1)")
+            lowerMorph.contains("élancée") ->
+                tags.add("(slender elongated graceful feminine silhouette:1.1)")
+            else ->
+                tags.add("(feminine hourglass figure, arched waist, attractive natural curves:1.1)")
+        }
+
+        // 4. Cheveux : Couleur, Coupe, Texture
+        val hairLine = lines.find { it.contains("Cheveux", ignoreCase = true) } ?: ""
         val lowerHair = hairLine.lowercase()
         val hairDesc = mutableListOf<String>()
         when {
@@ -914,167 +955,218 @@ class CloudEngineBridge {
             lowerHair.contains("noir ébène") || lowerHair.contains("noir") -> hairDesc.add("raven black hair")
             lowerHair.contains("roux") || lowerHair.contains("cuivré") -> hairDesc.add("vibrant copper auburn hair")
             lowerHair.contains("gris") || lowerHair.contains("argenté") -> hairDesc.add("elegant silver gray hair")
+            else -> hairDesc.add("natural silky hair")
         }
         when {
-            lowerHair.contains("carré plongeant") -> hairDesc.add("inverted sleek bob haircut")
-            lowerHair.contains("carré") -> hairDesc.add("stylish bob haircut")
-            lowerHair.contains("queue de cheval") -> hairDesc.add("high ponytail")
-            lowerHair.contains("chignon") -> hairDesc.add("sophisticated hair bun")
-            lowerHair.contains("mi-longs") -> hairDesc.add("shoulder length medium hair")
-            lowerHair.contains("longs") -> hairDesc.add("long flowing hair")
-            lowerHair.contains("court") -> hairDesc.add("chic short haircut")
+            lowerHair.contains("carré plongeant") -> hairDesc.add("inverted sleek chic bob haircut")
+            lowerHair.contains("carré") -> hairDesc.add("stylish bob haircut grazing collarbones")
+            lowerHair.contains("queue de cheval") -> hairDesc.add("high ponytail with face-framing wisps")
+            lowerHair.contains("chignon") -> hairDesc.add("sophisticated loose romantic hair bun")
+            lowerHair.contains("mi-longs") -> hairDesc.add("medium shoulder-length hair")
+            lowerHair.contains("très longs") -> hairDesc.add("extra-long flowing hair past mid-back")
+            lowerHair.contains("longs") -> hairDesc.add("long cascading hair over shoulders")
+            lowerHair.contains("court") -> hairDesc.add("chic modern short feminine haircut")
         }
         when {
-            lowerHair.contains("boucl") -> hairDesc.add("voluminous curls")
-            lowerHair.contains("ondul") -> hairDesc.add("gentle wavy texture")
-            lowerHair.contains("soyeux") || lowerHair.contains("lisse") -> hairDesc.add("silky smooth hair")
+            lowerHair.contains("boucl") -> hairDesc.add("voluminous bouncy curls")
+            lowerHair.contains("ondul") -> hairDesc.add("gentle wavy texture with realistic movement")
+            lowerHair.contains("soyeux") || lowerHair.contains("lisse") -> hairDesc.add("silky smooth texture")
         }
         if (hairDesc.isNotEmpty()) {
             tags.add("(${hairDesc.joinToString(", ")}:1.3)")
         }
 
-        // 3. Yeux & Regard
-        val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) } ?: ""
+        // 5. Yeux & Regard
+        val eyesLine = lines.find { it.contains("Yeux", ignoreCase = true) || it.contains("Visage & Yeux", ignoreCase = true) } ?: ""
         val lowerEyes = eyesLine.lowercase()
         when {
-            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> tags.add("(striking emerald green eyes:1.2)")
-            lowerEyes.contains("bleu azur") || lowerEyes.contains("bleu profond") || lowerEyes.contains("bleu") -> tags.add("(mesmerizing deep blue eyes:1.2)")
-            lowerEyes.contains("noisette") -> tags.add("(warm sparkling hazel eyes:1.2)")
-            lowerEyes.contains("marron") -> tags.add("(deep expressive brown eyes:1.2)")
-            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> tags.add("(dark intense sensual eyes:1.2)")
+            lowerEyes.contains("bleu lagon") -> tags.add("(crystalline lagoon-blue iris, deep reflections, long dark eyelashes:1.2)")
+            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> tags.add("(striking emerald green eyes with golden flecks, radiant gaze:1.2)")
+            lowerEyes.contains("bleu azur") || lowerEyes.contains("bleu") -> tags.add("(mesmerizing deep luminous blue eyes:1.2)")
+            lowerEyes.contains("noisette") -> tags.add("(warm sparkling hazel-amber eyes, tender captivating gaze:1.2)")
+            lowerEyes.contains("marron") -> tags.add("(deep velvety warm brown eyes, intense expressive gaze:1.2)")
+            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> tags.add("(dark intense smoldering sensual eyes:1.2)")
+            else -> tags.add("(captivating expressive eyes, realistic corneal reflections:1.1)")
         }
 
-        // 4. Morphologie & Poitrine
-        val morphLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) || it.contains("Poitrine", ignoreCase = true) } ?: ""
-        val lowerMorph = morphLine.lowercase()
+        // 6. Visage & Pommettes & Lèvres
         when {
-            lowerMorph.contains("bonnet 90d") || lowerMorph.contains("bonnet 85d") || lowerMorph.contains("généreuse") -> tags.add("(voluptuous hourglass feminine body, large shapely natural bust:1.2)")
-            lowerMorph.contains("bonnet 90c") || lowerMorph.contains("bonnet 85c") || lowerMorph.contains("galbée") -> tags.add("(shapely curvy feminine figure, toned waist:1.1)")
-            lowerMorph.contains("athlétique") || lowerMorph.contains("tonique") -> tags.add("(fit toned athletic feminine body:1.1)")
-            lowerMorph.contains("élancée") -> tags.add("(slender elegant graceful silhouette:1.1)")
+            lowerDesc.contains("pommettes") && lowerDesc.contains("lèvre") ->
+                tags.add("(high sculpted cheekbones, naturally plump soft lips with subtle gloss, alluring smile:1.2)")
+            lowerDesc.contains("lèvre") ->
+                tags.add("(alluringly full natural lips, engaging magnetic smile:1.1)")
+            lowerDesc.contains("pommettes") ->
+                tags.add("(refined high cheekbones, elegant jawline:1.1)")
+            else ->
+                tags.add("(harmonious elegant facial features, captivating warm smile:1.1)")
         }
 
-        // 5. Visage & Peau
-        val faceLine = desc.lines().find { it.contains("Visage", ignoreCase = true) || it.contains("Teint", ignoreCase = true) } ?: ""
-        val lowerFace = faceLine.lowercase()
+        // 7. Teint & Micro-texture de peau
+        val skinLine = lines.find { it.contains("Teint", ignoreCase = true) || it.contains("Peau", ignoreCase = true) } ?: ""
+        val lowerSkin = skinLine.lowercase()
         when {
-            lowerFace.contains("pommettes") -> tags.add("high cheekbones")
-            lowerFace.contains("sourire") -> tags.add("gentle alluring smile")
+            lowerSkin.contains("porcelaine") || lowerSkin.contains("laiteux") ->
+                tags.add("(porcelain fair skin, subtle rosy blush, visible microscopic pores, skin translucency:1.2)")
+            lowerSkin.contains("doré") || lowerSkin.contains("hâlé") || lowerSkin.contains("soleil") ->
+                tags.add("(radiant warm sun-kissed golden skin tone, glowing warmth, microscopic skin texture:1.2)")
+            lowerSkin.contains("mat") || lowerSkin.contains("méditerranéen") ->
+                tags.add("(velvety olive Mediterranean skin tone, natural microscopic skin texture:1.2)")
+            lowerSkin.contains("ébène") || lowerSkin.contains("noir") ->
+                tags.add("(luminous rich ebony skin tone, golden undertones, realistic microscopic pores:1.2)")
+            else ->
+                tags.add("(authentic human skin texture, visible microscopic pores, natural skin subsurface scattering:1.2)")
         }
-        tags.add("soft natural skin texture, realistic facial features")
+
+        // 8. Benchmark Hyper-réalisme Hasselblad & Rendu photographique brut
+        tags.add("(Hasselblad H6D-100c medium format camera, 85mm f/1.4 lens, candid raw 35mm DSLR photography:1.3)")
+        tags.add("(masterpiece, photorealistic, sharp focus on subject, authentic environmental background:1.2)")
 
         return tags.joinToString(", ")
     }
 
     /**
      * Extrait l'ADN visuel complet et immuable du personnage depuis sa fiche pour garantir
-     * une consistance visuelle absolue (même visage, mêmes yeux, mêmes cheveux, même corps)
-     * à travers toutes les photographies générées.
+     * une consistance visuelle absolue et un hyper-réalisme photographique total :
+     * Taille, Poids, Poitrine / Bonnet exact, Morphologie, Couleur, Longueur et Texture de cheveux,
+     * Visage, Pommettes, Lèvres, Yeux et Regard, Teint et Grain de peau, Âge et Sexe.
      */
     fun extractVisualIdentityDNA(character: CharacterEntity): String {
         val desc = character.description
         val lowerDesc = desc.lowercase()
+        val lines = desc.lines().map { it.trim() }
 
-        // 1. Âge
+        // 1. Sexe & Âge
         val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
-        val ageVal = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: "35"
-        val ageStr = "$ageVal-year-old"
+        val ageVal = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: "38"
+        val isMature = ageVal.toIntOrNull()?.let { it >= 35 } ?: true
+        val genderStr = if (lowerDesc.contains("homme") && !lowerDesc.contains("femme")) "man" else "French woman"
+        val maturityStr = if (isMature) "gorgeous attractive mature $ageVal-year-old $genderStr" else "stunning $ageVal-year-old young $genderStr"
 
-        // 2. Cheveux complets
-        val hairLine = desc.lines().find { it.contains("Cheveux", ignoreCase = true) } ?: ""
-        val lowerHair = hairLine.lowercase()
-        val hairDetails = when {
-            lowerHair.contains("blond vénitien") -> "luminous strawberry honey-blonde hair with golden and honey highlights, silky flowing long tresses"
-            lowerHair.contains("blond miel") -> "warm honey blonde hair with natural radiant reflections, silky soft texture"
-            lowerHair.contains("blond doré") -> "radiant golden blonde hair, lustrous and glossy"
-            lowerHair.contains("blond platine") -> "striking platinum blonde hair, perfectly sleek"
-            lowerHair.contains("blond") -> "beautiful blonde hair with natural radiant highlights"
-            lowerHair.contains("châtain foncé") -> "rich dark chestnut brown hair with warm amber reflections"
-            lowerHair.contains("châtain") -> "soft chestnut brown hair with natural volume"
-            lowerHair.contains("brun chocolat") -> "deep chocolate brown hair, silky and lustrous"
-            lowerHair.contains("brun") -> "rich brunette hair, glossy and smooth"
-            lowerHair.contains("noir") -> "jet black raven hair with a brilliant silk sheen"
-            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> "gorgeous fiery copper-auburn hair, warm vibrant tones"
-            lowerHair.contains("gris") || lowerHair.contains("argenté") -> "sophisticated silver-gray hair, beautifully styled"
-            else -> "beautifully styled brunette hair"
-        }
-        val hairCut = when {
-            lowerHair.contains("carré plongeant") -> "cut in a modern inverted bob framing her neck"
-            lowerHair.contains("carré") -> "in a chic stylish bob haircut"
-            lowerHair.contains("queue de cheval") -> "gathered in an elegant high ponytail"
-            lowerHair.contains("chignon") -> "styled in a classy loose bun with delicate wisps"
-            lowerHair.contains("boucl") -> "falling in rich voluminous bouncy curls"
-            lowerHair.contains("ondul") -> "cascading down in gentle natural wavy layers"
-            lowerHair.contains("mi-longs") -> "shoulder-length, falling gently past her collarbones"
-            lowerHair.contains("longs") -> "long and voluminous, cascading gracefully over her shoulders"
-            lowerHair.contains("court") -> "in a chic modern pixie-bob cut"
-            else -> "cascading naturally over her shoulders"
-        }
-
-        // 3. Yeux & Regard
-        val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) || it.contains("Visage & Yeux", ignoreCase = true) } ?: ""
-        val lowerEyes = eyesLine.lowercase()
-        val eyeDetails = when {
-            lowerEyes.contains("bleu lagon") -> "striking lagoon-blue eyes framed by long dark eyelashes, intensely expressive gaze"
-            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> "magnetic emerald-green eyes with golden flecks, captivating warm gaze"
-            lowerEyes.contains("bleu") -> "deep crystalline blue eyes, luminous and captivating"
-            lowerEyes.contains("noisette") -> "warm hazel eyes with golden-brown honey tones"
-            lowerEyes.contains("marron") -> "velvety warm brown eyes, deeply expressive and tender"
-            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> "intense dark magnetic eyes, smoldering expressive depth"
-            else -> "expressive captivating eyes"
-        }
-
-        // 4. Visage & Teint de peau
-        val skinLine = desc.lines().find { it.contains("Teint", ignoreCase = true) || it.contains("Peau", ignoreCase = true) } ?: ""
-        val lowerSkin = skinLine.lowercase()
-        val skinDetails = when {
-            lowerSkin.contains("porcelaine") || lowerSkin.contains("laiteux") -> "immaculate milky porcelain skin, ultra-fine velvety texture"
-            lowerSkin.contains("doré") || lowerSkin.contains("hâlé") || lowerSkin.contains("soleil") -> "radiant sunkissed golden skin tone, smooth and warm"
-            lowerSkin.contains("mat") || lowerSkin.contains("méditerranéen") -> "warm olive Mediterranean complexion, flawless velvety tone"
-            lowerSkin.contains("ébène") || lowerSkin.contains("noir") -> "luminous rich ebony skin, flawless radiant glow"
-            lowerSkin.contains("diaphane") || lowerSkin.contains("clair") -> "delicate fair alabaster skin, naturally flushed cheeks"
-            else -> "radiant healthy skin, natural realistic skin pores and texture"
-        }
-
-        val faceDetails = when {
-            lowerDesc.contains("pommettes") && lowerDesc.contains("lèvre") -> "expressive warm facial features, delicately sculpted cheekbones, soft full natural lips"
-            lowerDesc.contains("lèvre") -> "harmonious facial contours, naturally alluring full lips"
-            lowerDesc.contains("pommettes") -> "delicately sculpted high cheekbones, elegant refined facial structure"
-            else -> "harmonious elegant facial features, naturally captivating smile"
-        }
-
-        // 5. Mensurations complètes : Taille, Poids, Poitrine / Bonnet exact & Morphologie cambrée
+        // 2. Mensurations exactes : Taille, Poids, Poitrine / Bonnet exact
         val heightMatch = Regex("""(?:Taille\s*:\s*)(\d[m,.]\d{2})""", RegexOption.IGNORE_CASE).find(desc)
-        val heightStr = heightMatch?.groupValues?.get(1)?.let { "height $it" } ?: ""
+        val heightStr = heightMatch?.groupValues?.get(1)?.let { "height $it (${it.replace("m", ".").toDoubleOrNull()?.let { m -> (m * 100).toInt() } ?: 168} cm tall, slender elongated feminine posture)" } 
+            ?: "height 1m68 (168 cm, slender graceful posture)"
 
         val weightMatch = Regex("""(?:Poids\s*:\s*)(\d{2}\s*kg)""", RegexOption.IGNORE_CASE).find(desc)
-        val weightStr = weightMatch?.groupValues?.get(1)?.let { "weighing $it" } ?: ""
+        val weightStr = weightMatch?.groupValues?.get(1)?.let { "weight $it (balanced harmonious feminine proportions)" }
+            ?: "weight 56 kg (harmonious feminine proportions)"
 
         val bustMatch = Regex("""(?:Poitrine\s*:\s*|Bonnet\s*)([0-9]{2,3}[A-G]|Bonnet\s*[0-9]{2,3}[A-G][^|•\n]*)""", RegexOption.IGNORE_CASE).find(desc)
         val bustRaw = bustMatch?.groupValues?.get(1)?.trim() ?: ""
         val bustStr = when {
-            bustRaw.isNotBlank() -> "magnificent full natural $bustRaw bust, deeply alluring cleavage"
-            lowerDesc.contains("90d") -> "full natural 90D cup bust, deeply alluring cleavage"
-            lowerDesc.contains("95d") -> "generous natural 95D cup bust, deeply alluring cleavage"
-            lowerDesc.contains("90c") -> "shapely natural 90C cup bust, flattering cleavage"
-            lowerDesc.contains("85c") -> "beautiful natural 85C cup bust, flattering cleavage"
-            else -> "full shapely natural feminine bust, attractive cleavage"
+            bustRaw.isNotBlank() -> "bust: magnificent natural firm $bustRaw cup bust with deeply alluring natural feminine cleavage"
+            lowerDesc.contains("95e") -> "bust: generous natural 95E cup bust with deep feminine cleavage"
+            lowerDesc.contains("90d") -> "bust: full natural 90D cup bust with deeply alluring cleavage"
+            lowerDesc.contains("95d") -> "bust: generous natural 95D cup bust with deep feminine cleavage"
+            lowerDesc.contains("85d") -> "bust: shapely natural 85D cup bust with seductive cleavage"
+            lowerDesc.contains("90c") -> "bust: shapely natural 90C cup bust with attractive cleavage"
+            lowerDesc.contains("85c") -> "bust: beautiful natural 85C cup bust with flattering cleavage"
+            else -> "bust: full shapely natural feminine bust with alluring cleavage"
         }
 
-        val morphoLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) } ?: ""
+        // 3. Morphologie complète (taille, cambrure, hanches, fesses, silhouette)
+        val morphoLine = lines.find { it.contains("Morphologie", ignoreCase = true) } ?: ""
+        val lowerMorph = morphoLine.lowercase()
         val morphoStr = when {
-            morphoLine.contains("cambrée", ignoreCase = true) || morphoLine.contains("rebondi", ignoreCase = true) ->
-                "provocative feminine hourglass silhouette, slender arched waist, prominent shapely curves and rounded hips"
-            morphoLine.contains("galbée", ignoreCase = true) || morphoLine.contains("courbes", ignoreCase = true) ->
-                "gorgeous curvaceous feminine silhouette, toned narrow waist, voluptuous feminine contours"
+            lowerMorph.contains("cambrée") || lowerMorph.contains("rebondi") ->
+                "body morphology: provocative feminine hourglass silhouette, slender arched waist, prominent shapely curves, rounded natural hips and arched lower back"
+            lowerMorph.contains("galbée") || lowerMorph.contains("courbes") ->
+                "body morphology: gorgeous curvaceous feminine silhouette, toned narrow waist, voluptuous feminine contours, arched posture"
+            lowerMorph.contains("athlétique") || lowerMorph.contains("tonique") ->
+                "body morphology: toned athletic feminine silhouette, flat stomach, shapely curves and arched waist"
+            lowerMorph.contains("élancée") || lowerMorph.contains("aristocratique") ->
+                "body morphology: tall slender elegant silhouette, slender arched waist, graceful feminine contours"
             else ->
-                "provocative feminine hourglass silhouette, slender arched waist, feminine curves"
+                "body morphology: provocative feminine hourglass silhouette, slender arched waist, feminine curves and arched back"
         }
 
-        val measurementsList = listOfNotNull(heightStr.takeIf { it.isNotBlank() }, weightStr.takeIf { it.isNotBlank() }, bustStr, morphoStr)
-        val bodyDetails = measurementsList.joinToString(", ")
+        // 4. Cheveux complets : Couleur, Longueur, Texture, Mèches
+        val hairLine = lines.find { it.contains("Cheveux", ignoreCase = true) } ?: ""
+        val lowerHair = hairLine.lowercase()
+        val hairColor = when {
+            lowerHair.contains("blond vénitien") -> "luminous strawberry honey-blonde with warm golden and copper highlights"
+            lowerHair.contains("blond miel") -> "warm honey blonde with natural soft radiant reflections"
+            lowerHair.contains("blond doré") -> "radiant golden blonde, lustrous and glossy"
+            lowerHair.contains("blond platine") -> "platinum blonde, sleek and brilliant"
+            lowerHair.contains("blond") -> "natural multi-tonal blonde with sunlit highlights"
+            lowerHair.contains("châtain foncé") -> "rich dark chestnut brown with deep chocolate amber undertones"
+            lowerHair.contains("châtain clair") -> "light warm chestnut brown with golden honey strands"
+            lowerHair.contains("châtain") -> "rich chestnut brown with subtle warm highlights"
+            lowerHair.contains("brun chocolat") -> "deep rich chocolate brown, lustrous and glossy"
+            lowerHair.contains("brun") -> "luxurious deep brunette hair with soft satin shine"
+            lowerHair.contains("noir") -> "jet black raven hair with natural silk reflections"
+            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> "fiery natural copper-auburn with rich warm tones"
+            lowerHair.contains("gris") || lowerHair.contains("argenté") -> "sophisticated silver-gray, lustrous and elegant"
+            else -> "natural rich brunette hair with soft highlights"
+        }
 
-        return "Photorealistic portrait of the exact recurring individual: ${character.name}, gorgeous $ageStr French woman. Facial & Physical Identity DNA: $skinDetails, $faceDetails, $eyeDetails, $hairDetails $hairCut, Body & Measurements: $bodyDetails. Absolute visual and facial consistency across all photographs."
+        val hairLengthAndStyle = when {
+            lowerHair.contains("carré plongeant") -> "in an ultra-chic inverted bob cut framing her jawline and elongating her neck, silky texture with softly tapered ends"
+            lowerHair.contains("carré") -> "in a stylish Parisian bob haircut gently grazing her collarbones"
+            lowerHair.contains("queue de cheval") -> "styled in a sleek high ponytail, leaving delicate wisps caressing her temples and cheekbones"
+            lowerHair.contains("chignon") -> "gathered in a sophisticated loose bun with soft loose romantic tendrils framing her face"
+            lowerHair.contains("mi-longs") -> "medium shoulder-length, cascading softly past her collarbones with natural volume"
+            lowerHair.contains("très longs") -> "extra-long cascading down past the middle of her back in luxurious waves"
+            lowerHair.contains("longs") -> "long flowing hair cascading gracefully over her shoulders and upper back"
+            lowerHair.contains("court") -> "in an elegant modern short feminine haircut"
+            else -> "shoulder-length cascading naturally with soft volume"
+        }
+
+        val hairTexture = when {
+            lowerHair.contains("boucl") -> "rich voluminous bouncy curls, touchably soft texture"
+            lowerHair.contains("ondul") -> "gentle natural wavy layers with realistic movement and strand separation"
+            lowerHair.contains("soyeux") || lowerHair.contains("lisse") -> "silky smooth glass-hair texture, soft and flowing"
+            else -> "silky natural texture with realistic loose hair strands catching ambient light"
+        }
+
+        // 5. Visage & Yeux complets : Forme, Pommettes, Lèvres, Iris, Regard
+        val eyesLine = lines.find { it.contains("Yeux", ignoreCase = true) || it.contains("Visage & Yeux", ignoreCase = true) } ?: ""
+        val lowerEyes = eyesLine.lowercase()
+        val eyeDetails = when {
+            lowerEyes.contains("bleu lagon") -> "striking lagoon-blue iris with deep crystalline reflections, framed by long natural dark eyelashes"
+            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> "magnetic emerald-green eyes with delicate golden flecks, radiant and piercing gaze"
+            lowerEyes.contains("bleu azur") || lowerEyes.contains("bleu") -> "deep luminous blue eyes with realistic pupil reflections and warm emotional depth"
+            lowerEyes.contains("noisette") -> "warm hazel eyes with rich honey-amber swirls, sparkling with affection and playful complicity"
+            lowerEyes.contains("marron chaud") || lowerEyes.contains("marron") -> "deep velvety warm brown eyes, intensely expressive, tender and captivating"
+            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> "intense dark magnetic eyes with deep sensual allure and smoldering gaze"
+            else -> "expressive captivating eyes with realistic wet corneal reflections"
+        }
+
+        val faceDetails = when {
+            lowerDesc.contains("pommettes") && lowerDesc.contains("lèvre") ->
+                "harmonious feminine face, delicately sculpted high cheekbones, naturally plump soft parted lips with subtle gloss, captivating warm smile"
+            lowerDesc.contains("lèvre") ->
+                "delicate feminine facial features, alluringly full natural lips, engaging magnetic facial expression"
+            lowerDesc.contains("pommettes") ->
+                "refined facial structure with high sculpted cheekbones and elegant jawline, soft alluring expression"
+            else ->
+                "harmonious elegant French facial features, naturally captivating smile, soft feminine contours"
+        }
+
+        // 6. Teint & Grain de peau
+        val skinLine = lines.find { it.contains("Teint", ignoreCase = true) || it.contains("Peau", ignoreCase = true) } ?: ""
+        val lowerSkin = skinLine.lowercase()
+        val skinDetails = when {
+            lowerSkin.contains("porcelaine") || lowerSkin.contains("laiteux") ->
+                "complexion: immaculate milky porcelain fair skin tone, natural subtle rosy blush on cheekbones, ultra-detailed real skin texture with visible microscopic pores and natural skin translucency"
+            lowerSkin.contains("doré") || lowerSkin.contains("hâlé") || lowerSkin.contains("soleil") ->
+                "complexion: radiant warm sun-kissed golden skin tone, glowing healthy warmth, authentic natural skin texture with microscopic pores"
+            lowerSkin.contains("mat") || lowerSkin.contains("méditerranéen") ->
+                "complexion: warm velvety olive Mediterranean skin tone, smooth healthy radiance, authentic realistic skin texture"
+            lowerSkin.contains("ébène") || lowerSkin.contains("noir") ->
+                "complexion: luminous rich ebony skin tone with golden undertones, glowing and radiant with authentic microscopic skin texture"
+            lowerSkin.contains("diaphane") || lowerSkin.contains("clair") ->
+                "complexion: luminous delicate fair skin tone with natural soft warmth, realistic skin texture with visible fine pores"
+            else ->
+                "complexion: radiant healthy natural skin tone, authentic human skin pores and microscopic texture"
+        }
+
+        return "Photorealistic portrait of the exact recurring individual: ${character.name}, $maturityStr. " +
+                "PHYSICAL IDENTITY DNA & MEASUREMENTS: $heightStr, $weightStr, $bustStr, $morphoStr. " +
+                "HAIR DNA: hair color $hairColor, length and cut $hairLengthAndStyle, texture $hairTexture. " +
+                "FACE & EYES DNA: $faceDetails, $eyeDetails. " +
+                "SKIN DNA: $skinDetails. " +
+                "Absolute facial, physical, and morphological consistency across all photographs."
     }
 
     /**
@@ -1210,7 +1302,7 @@ class CloudEngineBridge {
                 "Outfit: $outfitDescription. " +
                 "$postureAction " +
                 "Aesthetic & Mood: $atmosphereDescription. " +
-                "PHOTOGRAPHIC REALISM DIRECTIVES: Raw 35mm film photograph of an actual living human person, authentic human skin pores and texture, natural lighting, sharp focus on subject with rich environmental background depth. ABSOLUTELY NO illustration, NO drawing, NO anime, NO 3D render, NO digital painting, NO cartoon, NO plastic airbrushed skin, NO plain or neutral backdrop. Completely non-explicit, masterpiece photograph."
+                "PHOTOGRAPHIC REALISM DIRECTIVES: Hasselblad H6D-100c medium format camera, 85mm f/1.4 lens, authentic candid unretouched photograph of an actual real living human woman. Razor-sharp photographic realism, visible microscopic skin pores, fine natural peach fuzz, genuine subsurface skin scattering, authentic corneal catchlights and moist eye reflections, individual natural hair strands catching warm ambient light. Rich photographic depth with authentic interior decor and tangible environment in background. ABSOLUTELY NO illustration, NO drawing, NO anime, NO 3D render, NO CGI, NO digital art, NO cartoon, NO plastic airbrushed smooth skin, NO wax figure, NO empty or neutral studio backdrop. Masterpiece photograph, completely non-explicit."
     }
 
     /**
