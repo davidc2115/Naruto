@@ -741,7 +741,8 @@ class ChatViewModel(
             val hordeKey = settings.hordeApiKey.trim().ifBlank { "0000000000" }
 
             if (settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.HORDE_DIFFUSION &&
-                settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE) {
+                settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE &&
+                settings.imageEnginePreference != com.opencompanion.app.data.ImageEngine.POLLINATIONS_FLUX) {
                 if (geminiKey.isBlank() && openAiKey.isBlank() && cloudKey.isBlank()) {
                     _statusMessage.value = "Veuillez renseigner votre clé API dans Réglages → Photos, ou sélectionnez le moteur gratuit (sans clé requise)."
                     return@launch

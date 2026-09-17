@@ -573,6 +573,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
 
                     // Configuration spécifique selon le moteur sélectionné
                     when (state.settings.imageEnginePreference) {
+                        com.opencompanion.app.data.ImageEngine.POLLINATIONS_FLUX,
                         com.opencompanion.app.data.ImageEngine.FREE_SMARTPHONE -> {
                             Card(
                                 colors = CardDefaults.cardColors(
@@ -587,14 +588,14 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            "✨ Gratuit Sans Clé (HD Style Smartphone)",
+                                            "🌸 Pollinations AI (FLUX 1024x1024 Photoréaliste HD)",
                                             style = MaterialTheme.typography.titleSmall,
                                             color = MaterialTheme.colorScheme.primary
                                         )
                                         Text("⚡ Recommandé", style = MaterialTheme.typography.labelSmall)
                                     }
                                     Text(
-                                        "Génération directe et illimitée de photos photoréalistes, tenues glamour/lingerie et portraits (FLUX.1). Aucune clé API, aucun compte ni carte bancaire requis. Fonctionne instantanément !",
+                                        "Génération directe et illimitée de photos photoréalistes, scènes détaillées et arrière-plans fidèles au scénario, tenues élégantes/lingerie et portraits (moteur FLUX via Pollinations AI). Totalement gratuit, aucune clé API ni compte requis !",
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }

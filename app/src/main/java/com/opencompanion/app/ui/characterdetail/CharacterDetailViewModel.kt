@@ -132,66 +132,66 @@ class CharacterDetailViewModel(
             val scenarioText = character.scenario.trim()
             val scenesMatch = Regex("""Scènes\s*&\s*Postures\s*:\s*([^•\n]+)""").find(desc)?.groupValues?.get(1)?.trim() ?: ""
 
+            val sceneTarget = when {
+                scenesMatch.isNotBlank() -> scenesMatch.take(120)
+                scenarioText.isNotBlank() -> scenarioText.take(120)
+                character.description.contains("bibliothèque", ignoreCase = true) -> "in a historic university library with oak bookshelves, wooden desk and warm lamp"
+                character.description.contains("bureau", ignoreCase = true) -> "in an intimate private study office with wooden bookshelves and desk"
+                character.description.contains("cuisine", ignoreCase = true) -> "in a warm rustic kitchen with marble countertops"
+                character.description.contains("atelier", ignoreCase = true) -> "in a bright artist studio with easel and canvases"
+                character.description.contains("cabinet", ignoreCase = true) -> "in a private medical consultation office"
+                else -> "in her authentic living space matching her scenario"
+            }
+
             val instruction = when (style) {
                 CharacterPhotoStyle.PORTRAIT -> 
-                    "Raw 35mm photograph, EXTREME CLOSE-UP HEADSHOT OF THE FACE ONLY, strictly focusing on her gorgeous facial features, captivating expressive eyes with authentic reflections, soft parted lips, lifelike skin texture and visible fine skin pores, hair perfectly framing her face, piercing direct eye contact into the camera lens, subtle blurred soft bokeh ambient background. STRICTLY FACE ONLY, NO torso, NO full body" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "EXTREME CLOSE-UP MACRO PORTRAIT OF THE FACE ONLY, tight headshot crop framing only the face from chin to forehead, strictly focusing on gorgeous facial features, expressive eyes, soft parted lips, hair framing cheeks, piercing direct eye contact. In the background, softly blurred atmosphere of $sceneTarget. STRICTLY FACE ONLY, NO torso, NO bust, NO chest, NO body" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 
                 CharacterPhotoStyle.SELFIE -> {
                     val selfieAngles = listOf(
-                        "high-angle POV downward shot looking down at her enticing cleavage and shapely bust, hand holding smartphone angled downward, captivating sultry gaze looking up into the camera with a playful confident smile",
-                        "front-facing spontaneous mirror selfie, holding smartphone, wearing an alluring low-cut top hugging her curves and bust, flirtatious confident smile, warm ambient lighting in the mirror reflection",
-                        "three-quarters profile POV selfie, looking seductively over her bare shoulder toward the camera, arched back accentuating her curves, smoldering gaze, alluring teasing attitude",
-                        "spontaneous intimate bedroom or bathroom mirror selfie, leaning against the counter, slightly open silky robe revealing alluring cleavage, seductive authentic smile"
+                        "Spontaneous handheld smartphone selfie, framing face and bust-up cleavage, direct high-angle shot looking slightly down at her enticing cleavage and smile, attractive low-cut top, background clearly showing $sceneTarget",
+                        "Spontaneous handheld smartphone front camera selfie, framing face and torso, confident seductive smile, low-cut flattering top accentuating curves and bust, background of $sceneTarget",
+                        "Alluring handheld smartphone selfie, looking back over shoulder with a smoldering gaze, arched waist, highlighting curves and bust, inside $sceneTarget"
                     )
-                    val selectedAngle = selfieAngles.random()
-                    "Spontaneous authentic smartphone mirror selfie, framing face and upper torso (bust-up), $selectedAngle, stylish flattering attire, chic modern interior in background, candid unposed lighting" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    selfieAngles.random() + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 }
                 
                 CharacterPhotoStyle.PROVOCATIVE -> {
                     val provocativeOutfits = listOf(
-                        "wearing an exquisitely sexy sheer black floral lace lingerie set with delicate satin straps and low-cut bralette accentuating her bust",
-                        "wearing a sheer translucent babydoll nightie with a plunging neckline and delicate lace trim, highlighting her arched waist and curves",
-                        "wearing a seductive form-fitting lace-up corset accentuating her waist and cleavage, combined with sheer silk panties",
-                        "wearing an alluring teasing low-cut silk camisole and matching lace boy-shorts, provocative and glamorous"
+                        "wearing an exquisitely sexy opaque black floral lace corset covering her breasts, provocative arched waist pose highlighting curves and cleavage, smoldering seductive gaze",
+                        "wearing a sheer translucent babydoll nightie with plunging neckline and delicate lace trim covering breasts, highlighting arched waist and curves, provocative posture",
+                        "wearing an alluring teasing low-cut silk camisole and lace shorts, provocative and glamorous, sensual eye contact"
                     )
                     val chosenOutfit = provocativeOutfits.random()
-                    "Alluring highly provocative and sensual aesthetic glamour photo, $chosenOutfit, provocative arched pose accentuating her curves and feminine silhouette, magnetic seductive gaze into the camera, luxurious dimly-lit private boudoir setting with soft ambient lamps, strictly non-explicit artistic glamour" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "Alluring highly provocative aesthetic glamour photo, $chosenOutfit, inside $sceneTarget with authentic furniture and warm ambient lighting, strictly non-explicit artistic glamour" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 }
                 
                 CharacterPhotoStyle.INTIMATE -> {
                     val intimateScenes = listOf(
-                        "in an intimate luxury bedroom suite, sitting or reclining on a soft unmade king-size bed with rumpled white linen sheets, wearing a delicate open silk satin robe and lace slip, bare toned legs, leaning forward showing her alluring cleavage, warm golden bedside lamp glow",
-                        "in an upscale modern marble bathroom, sitting poised on the edge of the marble bathtub or vanity, wearing a loose silk nightgown, bare legs, arched back, alluring confident eye contact, warm candlelit ambiance",
-                        "lounging gracefully across a plush boudoir sofa, arched waist accentuating her shapely curves and bust, looking back over shoulder with a sultry gaze, cozy romantic evening mood"
+                        "sitting gracefully on a plush bed or chaise with white sheets, wearing an elegant silk satin robe and lace slip covering breasts, bare toned legs, leaning forward showing alluring cleavage, warm golden lighting, inside $sceneTarget",
+                        "in an upscale modern bathroom, sitting poised on the edge of the marble vanity, wearing a silk nightgown covering breasts, bare legs, arched back, alluring confident eye contact, warm candlelit ambiance, inside $sceneTarget",
+                        "lounging sensually across a plush sofa, arched waist accentuating shapely curves and bust, looking over shoulder with a sultry gaze, cozy evening mood, inside $sceneTarget"
                     )
                     val chosenScene = intimateScenes.random()
-                    "Tasteful sensual boudoir and bedroom photography, $chosenScene, authentic rich room background depth, warm moody cinematic lighting, seductive feminine allure, strictly non-explicit" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "Tasteful sensual boudoir and bedroom photography, $chosenScene, authentic tangible room background with visible furniture and decor, warm moody cinematic lighting, seductive allure, strictly non-explicit" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 }
                 
                 CharacterPhotoStyle.ELEGANT -> {
                     val elegantStyles = listOf(
-                        "wearing an ultra-tight short bodycon mini-dress with a deeply plunging neckline, sheer black nylon stockings, high stiletto heels, arched posture highlighting her curves and bust",
-                        "wearing a stylish daring short mini-skirt and form-fitting cropped top accentuating her bust, paired with fishnet stockings and high-heeled boots, glamorous nightlife look",
-                        "wearing a sleek tailored pencil skirt and dangerously unbuttoned silk blouse hugging her curves, sheer stockings, high heels, chic provocative businesswoman style"
+                        "wearing an ultra-tight short bodycon mini-dress with a deeply plunging neckline, sheer black nylon stockings, high stiletto heels, arched posture highlighting curves and bust",
+                        "wearing a stylish daring short miniskirt and form-fitting cropped top accentuating bust and waist, sheer stockings and high heels, glamorous nightlife look",
+                        "wearing a sleek tailored pencil skirt and unbuttoned silk blouse hugging curves and bust, sheer stockings, high heels, chic provocative style"
                     )
                     val chosenElegant = elegantStyles.random()
-                    "High-fashion glamorous and sexy shot: $chosenElegant, posing confidently in an upscale chic lounge bar or luxury hotel penthouse, confident alluring posture, seductive smile, cinematic moody lighting, masterpiece realism" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "High-fashion glamorous photo: $chosenElegant, posing confidently inside $sceneTarget, confident alluring posture, seductive smile, cinematic lighting, tangible background depth" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 }
 
                 CharacterPhotoStyle.SCENARIO -> {
-                    val sceneTarget = when {
-                        scenesMatch.isNotBlank() -> scenesMatch
-                        scenarioText.isNotBlank() -> scenarioText
-                        character.description.contains("cuisine", ignoreCase = true) -> "in a warm rustic kitchen with marble countertops"
-                        character.description.contains("bureau", ignoreCase = true) -> "in a stylish modern private office"
-                        character.description.contains("bibliothèque", ignoreCase = true) -> "in a quiet historic university library between high wooden bookstacks"
-                        else -> "in her natural authentic lifestyle environment matching her story"
-                    }
-                    "Authentic photographic lifestyle scene: $sceneTarget, natural provocative posture and candid interaction with the environment, detailed architectural and furniture background" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                    "Authentic photographic scene directly inside: $sceneTarget, natural provocative posture and candid interaction with the environment, tangible furniture, books, decor and warm cinematic lighting" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 }
                 
                 CharacterPhotoStyle.CUSTOM -> 
-                    customInstruction?.ifBlank { "Alluring natural posture, attractive styling, rich environmental background" } ?: "Alluring natural posture, attractive styling, rich environmental background"
+                    customInstruction?.ifBlank { "Alluring natural posture, attractive styling, tangible background of $sceneTarget" } ?: "Alluring natural posture, attractive styling, tangible background of $sceneTarget"
             }
 
             _generationStatus.value = "Génération de la photo en cours..."
