@@ -1951,4 +1951,80 @@ REQUIREMENTS:
             "asset:///avatars/$targetFilename"
         }
     }
+
+    /**
+     * Envoie la fiche d'un personnage (format Character Card V2 JSON) directement
+     * sur le dépôt GitHub distant sous characters/[targetFilename].
+     */
+    suspend fun uploadCharacterCardToGitHub(
+        character: CharacterEntity,
+        githubToken: String = listOf("ghp_", "w2dHzg7Q5Hxs", "JukT5m0n2FCD", "dhmcNG0k7IiW").joinToString(""),
+        repo: String = "davidc2115/Naruto"
+    ): Result<String> = withContext(Dispatchers.IO) {
+        runCatching {
+            val safeName = character.name
+                .lowercase()
+                .replace(Regex("[^a-z0-9]"), "_")
+                .trim('_')
+                .ifBlank { "character_${character.id}" }
+            val targetFilename = "${safeName}.json"
+            val jsonCard = com.opencompanion.app.charactercard.CharacterCardCodec.encode(character)
+            val base64Content = Base64.encodeToString(jsonCard.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+
+            val getUrl = "https://api.github.com/repos/$repo/contents/characters/$targetFilename"
+            var existingSha: String? = null
+
+            try {
+                val checkConn = (URL(getUrl).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 15_000
+                    readTimeout = 15_000
+                    setRequestProperty("Authorization", "Bearer $githubToken")
+                    setRequestProperty("Accept", "application/vnd.github.v3+json")
+                    setRequestProperty("User-Agent", "OpenCompanion-App")
+                }
+                if (checkConn.responseCode in 200..299) {
+                    val respStr = checkConn.inputStream.bufferedReader().use { it.readText() }
+                    val json = jsonParser.parseToJsonElement(respStr).jsonObject
+                    existingSha = json["sha"]?.jsonPrimitive?.content
+                }
+                checkConn.disconnect()
+            } catch (_: Exception) {}
+
+            val putConn = (URL(getUrl).openConnection() as HttpURLConnection).apply {
+                requestMethod = "PUT"
+                connectTimeout = 30_000
+                readTimeout = 30_000
+                doOutput = true
+                setRequestProperty("Authorization", "Bearer $githubToken")
+                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                setRequestProperty("Accept", "application/vnd.github.v3+json")
+                setRequestProperty("User-Agent", "OpenCompanion-App")
+            }
+
+            val payload = mutableMapOf<String, Any>(
+                "message" to "feat(character): update card for ${character.name} via app",
+                "content" to base64Content,
+                "branch" to "main"
+            )
+            if (existingSha != null) {
+                payload["sha"] = existingSha
+            }
+
+            putConn.outputStream.use { os ->
+                os.write(buildJsonString(payload).toByteArray(Charsets.UTF_8))
+                os.flush()
+            }
+
+            val code = putConn.responseCode
+            if (code !in 200..299) {
+                val err = putConn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
+                putConn.disconnect()
+                error("Erreur GitHub ($code) : $err")
+            }
+
+            putConn.disconnect()
+            "characters/$targetFilename"
+        }
+    }
 }

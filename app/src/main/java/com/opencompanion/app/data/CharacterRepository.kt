@@ -22,8 +22,18 @@ class CharacterRepository(
 
     suspend fun getCharacter(id: Long): CharacterEntity? = characterDao.getById(id)
 
-    suspend fun saveCharacter(character: CharacterEntity): Long =
-        characterDao.upsert(character.copy(updatedAt = System.currentTimeMillis()))
+    suspend fun saveCharacter(character: CharacterEntity): Long {
+        val toSave = character.copy(
+            isCustomizedByUser = true,
+            updatedAt = System.currentTimeMillis(),
+        )
+        return if (toSave.id > 0L) {
+            characterDao.update(toSave)
+            toSave.id
+        } else {
+            characterDao.upsert(toSave)
+        }
+    }
 
     suspend fun deleteCharacter(character: CharacterEntity) {
         chatDao.clearHistory(character.id)
@@ -183,19 +193,53 @@ class CharacterRepository(
                 }
 
                 val hasMessages = activeIdsWithMessages.contains(primary.id)
-                val updated = primary.copy(
-                    name = newChar.name, // Nom officiel propre sans chiffre
-                    description = newChar.description,
-                    personality = newChar.personality,
-                    scenario = newChar.scenario,
-                    firstMessage = if (!hasMessages) newChar.firstMessage else primary.firstMessage,
-                    exampleDialogue = newChar.exampleDialogue,
-                    avatarPath = newChar.avatarPath, // Force l'avatar officiel frais
-                    tagsCsv = newChar.tagsCsv,
-                    creator = newChar.creator,
-                    isBundledSample = true,
-                    galleryMediaJson = newChar.galleryMediaJson, // Force la galerie officielle fraîche
-                )
+                val isCustomized = primary.isCustomizedByUser || (primary.description.isNotBlank() && primary.description != newChar.description)
+
+                // Préserver la galerie existante (dont les photos générées IA et importées par l'utilisateur)
+                val existingMediaList = primary.galleryMedia.toMutableList()
+                val deletedSet = primary.deletedMedia
+
+                if (existingMediaList.isEmpty()) {
+                    for (m in newChar.galleryMedia) {
+                        if (!deletedSet.contains(m) && !existingMediaList.contains(m)) {
+                            existingMediaList.add(m)
+                        }
+                    }
+                } else {
+                    for (m in newChar.galleryMedia) {
+                        if (!deletedSet.contains(m) && !existingMediaList.contains(m)) {
+                            existingMediaList.add(m)
+                        }
+                    }
+                }
+
+                val finalGalleryJson = kotlinx.serialization.json.Json.encodeToString(existingMediaList)
+
+                val updated = if (isCustomized) {
+                    // SANCTUARISÉ : Ne jamais écraser les modifications de l'utilisateur !
+                    primary.copy(
+                        name = newChar.name,
+                        tagsCsv = newChar.tagsCsv,
+                        creator = newChar.creator,
+                        isBundledSample = true,
+                        isCustomizedByUser = true,
+                        galleryMediaJson = finalGalleryJson,
+                    )
+                } else {
+                    primary.copy(
+                        name = newChar.name,
+                        description = newChar.description,
+                        personality = newChar.personality,
+                        scenario = newChar.scenario,
+                        firstMessage = if (!hasMessages) newChar.firstMessage else primary.firstMessage,
+                        exampleDialogue = newChar.exampleDialogue,
+                        avatarPath = if (primary.avatarPath.isNullOrBlank()) newChar.avatarPath else primary.avatarPath,
+                        tagsCsv = newChar.tagsCsv,
+                        creator = newChar.creator,
+                        isBundledSample = true,
+                        galleryMediaJson = finalGalleryJson,
+                    )
+                }
                 toUpdate.add(updated)
             } else {
                 toInsert.add(newChar)
@@ -299,34 +343,67 @@ class CharacterRepository(
     suspend fun updateAvatar(characterId: Long, newAvatarPath: String) {
         val character = characterDao.getById(characterId) ?: return
         val currentGallery = character.galleryMedia.toMutableList()
+        val deleted = character.deletedMedia.toMutableSet()
+        deleted.remove(newAvatarPath)
+
         if (!currentGallery.contains(newAvatarPath)) {
             currentGallery.add(0, newAvatarPath)
         }
         val json = kotlinx.serialization.json.Json.encodeToString(currentGallery)
-        characterDao.update(character.copy(avatarPath = newAvatarPath, galleryMediaJson = json))
+        val jsonDeleted = kotlinx.serialization.json.Json.encodeToString(deleted.toList())
+        characterDao.update(
+            character.copy(
+                avatarPath = newAvatarPath,
+                galleryMediaJson = json,
+                deletedMediaJson = jsonDeleted,
+                updatedAt = System.currentTimeMillis(),
+            )
+        )
     }
 
     suspend fun addGalleryMedia(characterId: Long, mediaPathOrUrl: String) {
         val character = characterDao.getById(characterId) ?: return
         val current = character.galleryMedia.toMutableList()
+        val deleted = character.deletedMedia.toMutableSet()
+        deleted.remove(mediaPathOrUrl)
+
         if (!current.contains(mediaPathOrUrl)) {
             current.add(mediaPathOrUrl)
-            val json = kotlinx.serialization.json.Json.encodeToString(current)
-            characterDao.update(character.copy(galleryMediaJson = json))
         }
+        val json = kotlinx.serialization.json.Json.encodeToString(current)
+        val jsonDeleted = kotlinx.serialization.json.Json.encodeToString(deleted.toList())
+        characterDao.update(
+            character.copy(
+                galleryMediaJson = json,
+                deletedMediaJson = jsonDeleted,
+                updatedAt = System.currentTimeMillis(),
+            )
+        )
     }
 
     suspend fun removeGalleryMedia(characterId: Long, mediaPathOrUrl: String) {
         val character = characterDao.getById(characterId) ?: return
         val current = character.galleryMedia.toMutableList()
         current.remove(mediaPathOrUrl)
+
+        val deleted = character.deletedMedia.toMutableSet()
+        deleted.add(mediaPathOrUrl)
+
         val newAvatar = if (character.avatarPath == mediaPathOrUrl) {
             current.firstOrNull() ?: ""
         } else {
             character.avatarPath
         }
         val json = kotlinx.serialization.json.Json.encodeToString(current)
-        characterDao.update(character.copy(galleryMediaJson = json, avatarPath = newAvatar))
+        val jsonDeleted = kotlinx.serialization.json.Json.encodeToString(deleted.toList())
+        characterDao.update(
+            character.copy(
+                galleryMediaJson = json,
+                deletedMediaJson = jsonDeleted,
+                avatarPath = newAvatar,
+                updatedAt = System.currentTimeMillis(),
+            )
+        )
         if (!mediaPathOrUrl.startsWith("asset://") && !mediaPathOrUrl.startsWith("http")) {
             runCatching { java.io.File(mediaPathOrUrl).delete() }
         }

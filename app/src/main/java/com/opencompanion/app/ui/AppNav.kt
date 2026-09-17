@@ -98,7 +98,7 @@ fun AppNav(app: OpenCompanionApplication) {
         ) { backStackEntry ->
             val characterId = backStackEntry.arguments?.getLong("characterId")?.takeIf { it > 0 }
             val vm: CharacterEditorViewModel = viewModel(
-                factory = AppViewModelFactory { CharacterEditorViewModel(app.characterRepository, characterId) },
+                factory = AppViewModelFactory { CharacterEditorViewModel(app.characterRepository, characterId, app.cloudEngineBridge) },
             )
             CharacterEditorScreen(viewModel = vm, onBack = { navController.popBackStack() })
         }

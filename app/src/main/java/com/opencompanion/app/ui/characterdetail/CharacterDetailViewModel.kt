@@ -275,4 +275,18 @@ class CharacterDetailViewModel(
             }
         }
     }
+
+    fun uploadCharacterCardToGitHub(
+        onResult: (Boolean, String) -> Unit = { _, _ -> },
+    ) {
+        viewModelScope.launch {
+            val character = repository.getCharacter(characterId) ?: return@launch
+            val result = cloudBridge.uploadCharacterCardToGitHub(character)
+            result.onSuccess { path ->
+                onResult(true, "Fiche de ${character.name} sauvegardée sur GitHub ($path) !")
+            }.onFailure { err ->
+                onResult(false, "Échec de l'envoi sur GitHub : ${err.message}")
+            }
+        }
+    }
 }

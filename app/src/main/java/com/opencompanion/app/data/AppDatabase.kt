@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [CharacterEntity::class, ChatMessageEntity::class, UserPersonaEntity::class, VectorMemoryEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -86,13 +86,21 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Ajoute deletedMediaJson et isCustomizedByUser pour sanctuariser les modifications utilisateur (v6). */
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `characters` ADD COLUMN `deletedMediaJson` TEXT NOT NULL DEFAULT '[]'")
+                db.execSQL("ALTER TABLE `characters` ADD COLUMN `isCustomizedByUser` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "opencompanion.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build().also { instance = it }
             }
     }
 }

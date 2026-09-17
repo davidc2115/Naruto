@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FileUpload
@@ -122,44 +123,16 @@ fun CharacterDetailScreen(
     }
 
     val character = state.character
-    val allMedia = remember(character?.avatarPath, character?.galleryMedia, character?.name) {
+    val allMedia = remember(character?.avatarPath, character?.galleryMediaJson, character?.deletedMediaJson) {
         val list = mutableListOf<String>()
-        character?.avatarPath?.takeIf { it.isNotBlank() }?.let { list.add(it) }
-        character?.galleryMedia?.let { list.addAll(it) }
-
-        // Découverte automatique des photos du pack embarqué si absentes de galleryMedia
-        val safeName = character?.name
-            ?.replace(Regex("""\s+\d+$"""), "")
-            ?.replace(Regex("""\s*\(.*?\)$"""), "")
-            ?.trim()
-            ?.let { java.text.Normalizer.normalize(it, java.text.Normalizer.Form.NFD) }
-            ?.replace(Regex("\\p{InCombiningDiacriticalMarks}+"), "")
-            ?.lowercase()
-            ?.replace(".", "")
-            ?.replace(Regex("[^a-z0-9_]+"), "_")
-            ?.trim('_')
-
-        if (!safeName.isNullOrBlank()) {
-            listOf(
-                "asset:///avatars/${safeName}.jpg",
-                "asset:///avatars/${safeName}_photo.jpg",
-                "asset:///avatars/${safeName}_sexy.jpg",
-                "asset:///avatars/${safeName}_intime.jpg",
-                "asset:///avatars/${safeName}_cuisine.jpg",
-                "asset:///avatars/${safeName}_voiture.jpg",
-                "asset:///avatars/${safeName}_hotel.jpg",
-            ).forEach { candidate ->
-                val assetPath = candidate.removePrefix("asset:///")
-                val exists = runCatching {
-                    context.assets.open(assetPath).use { true }
-                }.getOrDefault(false)
-                if (exists && !list.contains(candidate)) {
-                    list.add(candidate)
-                }
+        val deleted = character?.deletedMedia ?: emptySet()
+        character?.avatarPath?.takeIf { it.isNotBlank() && !deleted.contains(it) }?.let { list.add(it) }
+        character?.galleryMedia?.forEach { media ->
+            if (!deleted.contains(media) && !list.contains(media)) {
+                list.add(media)
             }
         }
-
-        list.distinct()
+        list
     }
     if (character == null) {
         Scaffold(
@@ -233,6 +206,14 @@ fun CharacterDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        android.widget.Toast.makeText(context, "Sauvegarde sur GitHub...", android.widget.Toast.LENGTH_SHORT).show()
+                        viewModel.uploadCharacterCardToGitHub { ok, msg ->
+                            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }) {
+                        Icon(Icons.Filled.CloudUpload, contentDescription = "Sauvegarder sur GitHub")
+                    }
                     IconButton(onClick = { onEditCharacter(character.id) }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Modifier la fiche")
                     }

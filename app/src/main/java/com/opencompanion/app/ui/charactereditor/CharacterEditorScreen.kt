@@ -7,12 +7,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,8 +111,27 @@ fun CharacterEditorScreen(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
             )
-            Button(onClick = viewModel::save, enabled = state.isValid, modifier = Modifier.fillMaxWidth()) {
+            val context = LocalContext.current
+            Button(
+                onClick = { viewModel.save() },
+                enabled = state.isValid,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Text("Enregistrer")
+            }
+            OutlinedButton(
+                onClick = {
+                    android.widget.Toast.makeText(context, "Sauvegarde locale et synchronisation GitHub...", android.widget.Toast.LENGTH_SHORT).show()
+                    viewModel.save(alsoPushToGitHub = true) { ok, msg ->
+                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                },
+                enabled = state.isValid,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Filled.CloudUpload, contentDescription = null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Enregistrer & Sauvegarder sur GitHub")
             }
         }
     }

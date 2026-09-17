@@ -28,6 +28,7 @@ data class CharacterEditorState(
 class CharacterEditorViewModel(
     private val repository: CharacterRepository,
     private val characterId: Long?,
+    private val cloudBridge: com.opencompanion.app.engine.CloudEngineBridge? = null,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CharacterEditorState())
@@ -62,24 +63,35 @@ class CharacterEditorViewModel(
         _state.value = transform(_state.value)
     }
 
-    fun save() {
+    fun save(
+        alsoPushToGitHub: Boolean = false,
+        onGitHubResult: (Boolean, String) -> Unit = { _, _ -> },
+    ) {
         val s = _state.value
         if (!s.isValid) return
         viewModelScope.launch {
             val base = originalEntity ?: CharacterEntity(name = s.name)
-            repository.saveCharacter(
-                base.copy(
-                    id = s.id,
-                    name = s.name.trim(),
-                    description = s.description,
-                    personality = s.personality,
-                    scenario = s.scenario,
-                    firstMessage = s.firstMessage,
-                    exampleDialogue = s.exampleDialogue,
-                    systemPromptOverride = s.systemPromptOverride,
-                    avatarPath = s.avatarPath,
-                )
+            val toSave = base.copy(
+                id = s.id,
+                name = s.name.trim(),
+                description = s.description,
+                personality = s.personality,
+                scenario = s.scenario,
+                firstMessage = s.firstMessage,
+                exampleDialogue = s.exampleDialogue,
+                systemPromptOverride = s.systemPromptOverride,
+                avatarPath = s.avatarPath,
+                isCustomizedByUser = true,
             )
+            val newId = repository.saveCharacter(toSave)
+            if (alsoPushToGitHub && cloudBridge != null) {
+                val gitRes = cloudBridge.uploadCharacterCardToGitHub(toSave.copy(id = if (toSave.id > 0) toSave.id else newId))
+                gitRes.onSuccess { path ->
+                    onGitHubResult(true, "Sauvegardé localement et envoyé sur GitHub ($path) !")
+                }.onFailure { err ->
+                    onGitHubResult(false, "Sauvegardé en local. Échec GitHub : ${err.message}")
+                }
+            }
             _state.value = s.copy(saved = true)
         }
     }

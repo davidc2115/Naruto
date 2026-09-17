@@ -49,6 +49,10 @@ data class CharacterEntity(
     val affectionLevel: Int = 0,
     /** Liste JSON des médias (photos, GIFs, vidéos) associés à la galerie de ce personnage. */
     val galleryMediaJson: String = "[]",
+    /** Liste JSON des médias supprimés explicitement par l'utilisateur (pour ne jamais les réinjecter). */
+    val deletedMediaJson: String = "[]",
+    /** Indique si la fiche a été modifiée/personnalisée par l'utilisateur (sanctuarise les textes et images). */
+    val isCustomizedByUser: Boolean = false,
 ) {
     val tags: List<String>
         get() = tagsCsv.split(",").map { it.trim() }.filter { it.isNotEmpty() }
@@ -64,6 +68,18 @@ data class CharacterEntity(
                 emptyList()
             }
         }.getOrDefault(emptyList())
+
+    val deletedMedia: Set<String>
+        get() = runCatching {
+            val trimmed = deletedMediaJson.trim()
+            if (trimmed.startsWith("[")) {
+                kotlinx.serialization.json.Json.decodeFromString<List<String>>(trimmed).toSet()
+            } else if (trimmed.isNotBlank()) {
+                trimmed.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+            } else {
+                emptySet()
+            }
+        }.getOrDefault(emptySet())
 
     /** Étiquette qualitative dérivée de [affectionLevel], pour l'affichage et pour le prompt
      *  système — des seuils simples plutôt qu'une échelle continue, plus lisibles d'un coup
