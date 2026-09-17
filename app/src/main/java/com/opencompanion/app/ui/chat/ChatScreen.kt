@@ -591,6 +591,15 @@ private fun formatRoleplayText(raw: String, isUser: Boolean): AnnotatedString {
                 is MessageSegment.Thought -> withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = thoughtColor)) {
                     append("‹${segment.text}›")
                 }
+                is MessageSegment.Speaker -> {
+                    val speakerColor = if (isUser) androidx.compose.ui.graphics.Color(0xFFFFD54F) else MaterialTheme.colorScheme.primary
+                    if (length > 0 && !endsWith('\n')) {
+                        append("\n")
+                    }
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = speakerColor)) {
+                        append("👤 ${segment.name} : ")
+                    }
+                }
             }
         }
     }

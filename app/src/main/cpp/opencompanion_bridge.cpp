@@ -340,7 +340,7 @@ Java_com_opencompanion_app_engine_LlamaBridge_nativeGenerate(
         // cet appel (voir llama_sampler_accept plus bas) : elles ne peuvent rien contre la
         // répétition d'un tour à l'autre, gérée côté prompt par VARIETY_DIRECTIVE (PromptBuilder.kt).
         llama_sampler_chain_add(sampler, llama_sampler_init_penalties(
-                llama_vocab_n_tokens(session->vocab), 64, repeatPenalty, 0.3f, 0.3f));
+                llama_vocab_n_tokens(session->vocab), 256, repeatPenalty, 0.4f, 0.4f));
         if (topK > 0) {
             llama_sampler_chain_add(sampler, llama_sampler_init_top_k(topK));
         }

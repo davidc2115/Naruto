@@ -21,6 +21,7 @@ sealed class MessageSegment {
     data class Dialogue(val text: String) : MessageSegment()
     data class Action(val text: String) : MessageSegment()
     data class Thought(val text: String) : MessageSegment()
+    data class Speaker(val name: String) : MessageSegment()
 }
 
 fun parseMessageSegments(raw: String): List<MessageSegment> {
@@ -37,6 +38,56 @@ fun parseMessageSegments(raw: String): List<MessageSegment> {
     var i = 0
     val n = raw.length
     while (i < n) {
+        // 1. Détection des noms de locuteurs multi-personnages : **Nom** : ou [Nom] :
+        if (raw.startsWith("**", i)) {
+            val close = raw.indexOf("**", i + 2)
+            if (close in (i + 3)..(i + 35)) {
+                val candidateName = raw.substring(i + 2, close).trim()
+                var after = close + 2
+                while (after < n && raw[after] == ' ') after++
+                if (after < n && raw[after] == ':') {
+                    flushDialogue()
+                    segments.add(MessageSegment.Speaker(candidateName))
+                    i = after + 1
+                    while (i < n && (raw[i] == ' ' || raw[i] == '\t')) i++
+                    continue
+                }
+            }
+        }
+
+        if (raw[i] == '[') {
+            val close = raw.indexOf(']', i + 1)
+            if (close in (i + 2)..(i + 35)) {
+                val candidateName = raw.substring(i + 1, close).trim()
+                var after = close + 1
+                while (after < n && raw[after] == ' ') after++
+                if (after < n && raw[after] == ':') {
+                    flushDialogue()
+                    segments.add(MessageSegment.Speaker(candidateName))
+                    i = after + 1
+                    while (i < n && (raw[i] == ' ' || raw[i] == '\t')) i++
+                    continue
+                }
+            }
+        }
+
+        // 2. Détection d'un nom de locuteur en début de ligne : Nom :
+        if (i == 0 || raw[i - 1] == '\n') {
+            val lineEnd = raw.indexOf('\n', i).let { if (it < 0) n else it }
+            val colon = raw.indexOf(':', i)
+            if (colon in (i + 2) until lineEnd && (colon - i) <= 30) {
+                val candidate = raw.substring(i, colon).trim()
+                if (candidate.matches(Regex("""^[A-ZÉÈÀÂÇÎÏÔ][a-zA-Z0-9À-ÿ\s.'-]{1,27}$""")) &&
+                    !candidate.contains('*') && !candidate.contains('(') && !candidate.contains(')')) {
+                    flushDialogue()
+                    segments.add(MessageSegment.Speaker(candidate))
+                    i = colon + 1
+                    while (i < n && (raw[i] == ' ' || raw[i] == '\t')) i++
+                    continue
+                }
+            }
+        }
+
         when (val c = raw[i]) {
             '*' -> {
                 val close = raw.indexOf('*', i + 1)

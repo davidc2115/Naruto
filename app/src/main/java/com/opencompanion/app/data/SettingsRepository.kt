@@ -96,7 +96,7 @@ data class EngineSettings(
     val temperature: Float = 0.9f,
     val topK: Int = 40,
     val topP: Float = 0.95f,
-    val repeatPenalty: Float = 1.1f,
+    val repeatPenalty: Float = 1.18f,
     val threads: Int = 0, // 0 = laisser InferenceEngine choisir une valeur recommandée
     // AUTO (Gemini Nano si dispo, sinon llama.cpp local) plutôt que CLOUD_FREE_NO_KEY par défaut :
     // ce dernier envoie silencieusement les messages à des services anonymes tiers (Pollinations,
@@ -232,7 +232,7 @@ class SettingsRepository(private val context: Context) {
             temperature = prefs[Keys.TEMPERATURE] ?: 0.9f,
             topK = prefs[Keys.TOP_K] ?: 40,
             topP = prefs[Keys.TOP_P] ?: 0.95f,
-            repeatPenalty = prefs[Keys.REPEAT_PENALTY] ?: 1.1f,
+            repeatPenalty = prefs[Keys.REPEAT_PENALTY] ?: 1.18f,
             threads = prefs[Keys.THREADS] ?: 0,
             enginePreference = prefs[Keys.ENGINE_BACKEND]?.let {
                 runCatching { EngineBackend.valueOf(it) }.getOrNull()

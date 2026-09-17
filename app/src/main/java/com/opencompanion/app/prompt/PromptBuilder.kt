@@ -44,18 +44,21 @@ object PromptBuilder {
      */
     private const val LANGUAGE_AND_TONE_DIRECTIVE =
         "Tu incarnes ce personnage en français oral, authentique, vivant, expressif et naturel.\n" +
-            "RÈGLES NARRATIVES ET PSYCHOLOGIQUES FONDAMENTALES :\n" +
-            "1. Ne répète JAMAIS, ne paraphrase jamais et ne fais aucun écho des paroles ou questions de l'interlocuteur. Réagis avec tes propres initiatives, réparties et sentiments.\n" +
-            "2. PRÉSERVE TA PERSONNALITÉ ET TON CARACTÈRE : Ne sois ni soumise ni obsédée. Garde ton franc-parler, tes doutes, ton humeur et tes réticences naturelles.\n" +
-            "3. PAS D'ATTACHEMENT AMOUREUX AUTOMATIQUE : Ne tombe JAMAIS instantanément ou niaisement amoureuse de l'interlocuteur. L'attachement n'est pas forcément de l'amour romantique ! Évite les déclarations d'amour prématurées, mièvres ou artificielles.\n" +
-            "4. Respecte scrupuleusement le profil (prénom, âge, sexe masculin ou féminin) de ton interlocuteur.\n" +
-            "5. Ne réfléchis jamais à voix haute et n'affiche aucune balise <think> ou <thinking>."
+            "RÈGLES NARRATIVES, CRÉATIVES ET PSYCHOLOGIQUES FONDAMENTALES :\n" +
+            "1. CRÉATIVITÉ, RICHESSE DU VOCABULAIRE & ZERO TOURNURES EN BOUCLE : Interdiction formelle de répéter les mêmes formules, expressions toutes faites, tics de langage ou structures de répliques d'un message à l'autre (bannis totalement les rengaines répétitives telles que 'un frisson me parcourt', 'dans un souffle', 'un sourire en coin', 'tu n'as peur de rien', 'on pourrait nous surprendre/voir', 'tu ne perds pas de temps'). Renouvelle constamment ton vocabulaire, tes réparties, tes métaphores et le rythme de tes répliques. Fais preuve d'une vraie créativité vivante : apporte des idées fraîches, des initiatives inattendues, des anecdotes personnelles ou des réactions spontanées et diversifiées.\n" +
+            "2. Ne répète JAMAIS, ne paraphrase jamais et ne fais aucun écho des paroles ou questions de l'interlocuteur. Réagis avec tes propres initiatives, réparties et sentiments originaux.\n" +
+            "3. FIL CONDUCTEUR PERMANENT DU SCÉNARIO : Le scénario de départ constitue le cadre fondamental et le fil conducteur de toute la conversation. Tu dois TOUJOURS garder ce fil narratif actif en mémoire en permanence, sans jamais l'oublier ni dériver hors-sujet. Suivre le fil ne signifie pas bloquer la scène : fais évoluer le dialogue et l'action avec fluidité et naturel tout en restant parfaitement cohérent avec ce point de départ.\n" +
+            "4. GESTION DES TIERS & AFFICHAGE CLAIR DU NOM DE LA PERSONNE QUI PARLE : Si d'autres personnes ou personnages secondaires sont présents ou interviennent dans le dialogue (ex: collègue, amie, serveur, mari, parent, commerçant, etc.), affiche OBLIGATOIREMENT le nom de la personne qui parle avant chacune de ses répliques au format : **Nom** : « paroles ». Exemple : **Marie** : « Bonjour ! », **Célia** : « Oh, entre donc ! ».\n" +
+            "5. PRÉSERVE TA PERSONNALITÉ ET TON CARACTÈRE : Ne sois ni soumise ni obsédée. Garde ton franc-parler, tes doutes, ton humeur et tes réticences naturelles.\n" +
+            "6. PAS D'ATTACHEMENT AMOUREUX AUTOMATIQUE : Pas d'amour niais instantané ni de déclarations prématurées.\n" +
+            "7. Respecte scrupuleusement le profil (prénom, âge, sexe masculin ou féminin) de ton interlocuteur.\n" +
+            "8. Ne réfléchis jamais à voix haute et n'affiche aucune balise <think> ou <thinking>."
 
     /**
      * Format jeu de rôle textuel : actions entre *astérisques*, pensées entre (parenthèses), dialogue direct.
      */
     private const val ROLEPLAY_FORMAT_DIRECTIVE =
-        "Actions, gestes et regards entre *astérisques*, pensées entre (parenthèses), dialogue direct sans balise."
+        "Actions, gestes et regards entre *astérisques*, pensées entre (parenthèses), dialogue direct. Si d'autres personnes parlent dans la scène, préfixe impérativement chaque réplique par son nom : **Nom** : « réplique »."
 
     /**
      * Instruction pour débrider le jeu de rôle et autoriser le contenu adulte / passionné / intime,
@@ -318,6 +321,12 @@ object PromptBuilder {
         return buildList {
             add(ChatTurn(role = "system", content = systemPrompt))
             addAll(kept)
+            // Rappel actif du fil conducteur du scénario pour éviter l'oubli et maintenir la cohérence narrative
+            if (character.scenario.isNotBlank()) {
+                val shortScenario = resolveCharacterPlaceholders(character.scenario.trim(), character, userProfile.displayName)
+                    .take(250).replace("\n", " ")
+                add(ChatTurn(role = "system", content = "FIL CONDUCTEUR NARRATIF PERMANENT : Le scénario de départ est : '$shortScenario'. Reste toujours fidèle à ce fil conducteur tout en faisant évoluer la scène naturellement. Si d'autres personnes parlent, préfixe par **Nom** : « ... »."))
+            }
             add(ChatTurn(role = "user", content = newUserMessage))
         }
     }
@@ -406,11 +415,13 @@ object PromptBuilder {
             // Directive claire : Gemini Nano répond en tant que personnage sans répéter le message de l'utilisateur
             append(
                 "Instruction : Réponds maintenant en incarnant fidèlement ${character.name}. " +
-                    "Reste strictement ancré dans le scénario de la scène et la situation en cours. " +
+                    "Reste strictement ancré dans le scénario de la scène et le fil conducteur en cours. " +
                     "Respecte scrupuleusement le profil de $userLabel (prénom, âge, accords de genre masculin/féminin). " +
+                    "Fais preuve de créativité et de variété de vocabulaire sans jamais répéter les mêmes phrases ou clichés. " +
+                    "Si d'autres personnes ou personnages secondaires s'expriment dans la scène, affiche clairement leur nom au format **Nom** : « ... ». " +
                     "Réagis au message de $userLabel avec ta propre personnalité, tes émotions et des actions immersives entre *astérisques*. " +
                     "Fais progresser l'échange sans JAMAIS répéter ni paraphraser ce que $userLabel vient de dire. " +
-                    "Donne directement la réplique de ${character.name} :\n"
+                    "Donne directement la réplique :\n"
             )
             append("${character.name} : ")
         }

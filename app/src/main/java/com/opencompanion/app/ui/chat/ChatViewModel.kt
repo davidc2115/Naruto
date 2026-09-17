@@ -55,6 +55,17 @@ internal fun splitIntoBubbles(text: String): List<String> {
 
 internal fun cleanSpeakerPrefix(text: String, characterName: String): String {
     var result = text.trim()
+    // Si le message contient des répliques multi-personnages (plusieurs locuteurs ou tiers identifiés),
+    // on préserve tous les préfixes de nom pour que chaque prise de parole soit clairement identifiée.
+    val hasMultipleSpeakers = result.lines().count { line ->
+        val trimmed = line.trim()
+        (trimmed.startsWith("**") && trimmed.contains(":")) ||
+        Regex("""^[A-ZÉÈÀÂÇÎÏÔ][a-zA-Z0-9À-ÿ\s.'-]{1,25}\s*:""").containsMatchIn(trimmed)
+    } > 1
+    if (hasMultipleSpeakers) {
+        return result
+    }
+
     val prefixes = listOf(
         "$characterName :",
         "$characterName:",
