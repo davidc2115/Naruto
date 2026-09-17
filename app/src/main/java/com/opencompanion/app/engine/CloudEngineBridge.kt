@@ -1055,9 +1055,9 @@ REQUIREMENTS:
             if (!userCustomInstruction.isNullOrBlank()) {
                 append("$userCustomInstruction, ")
             } else {
-                append("natural posture looking towards camera, subtle warm alluring expression, authentic lighting, ")
+                append("natural alluring posture, expressive gaze, authentic lighting, ")
             }
-            append("highly detailed eyes and facial features, authentic skin texture, cinematic soft lighting, 35mm photography, dslr, high quality")
+            append("highly detailed eyes and facial features, authentic skin texture, subtle depth of field, 35mm photography, dslr, high quality")
         }
     }
 
@@ -1172,15 +1172,24 @@ REQUIREMENTS:
                     "$prompt ### deformed, distorted, disfigured, bad eyes, bad hands, missing fingers, extra limbs, bad anatomy, blurry, low quality, cartoon, 3d render, doll, anime, sketch, watermark, signature"
                 }
 
+                val isVertical = prompt.contains("selfie", ignoreCase = true) ||
+                    prompt.contains("lingerie", ignoreCase = true) ||
+                    prompt.contains("full body", ignoreCase = true) ||
+                    prompt.contains("standing", ignoreCase = true) ||
+                    prompt.contains("mirror", ignoreCase = true) ||
+                    prompt.contains("boudoir", ignoreCase = true)
+                val imgWidth = if (isVertical) 512 else 512
+                val imgHeight = if (isVertical) 768 else 512
+
                 val payloadMap = mapOf(
                     "prompt" to hordePrompt,
                     "params" to mapOf(
-                        "sampler_name" to "k_euler",
-                        "cfg_scale" to 7.5,
+                        "sampler_name" to "k_dpmpp_2m",
+                        "cfg_scale" to 7.0,
                         "seed" to "-1",
-                        "height" to 512,
-                        "width" to 512,
-                        "steps" to 20,
+                        "height" to imgHeight,
+                        "width" to imgWidth,
+                        "steps" to 25,
                         "n" to 1
                     ),
                     "nsfw" to true,

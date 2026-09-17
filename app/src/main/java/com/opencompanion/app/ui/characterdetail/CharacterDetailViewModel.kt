@@ -21,8 +21,10 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 enum class CharacterPhotoStyle(val title: String, val subtitle: String) {
+    SELFIE("📱 Vrai Selfie Miroir / Caméra (POV)", "Selfie smartphone décomplexé, pose intime prise sur le vif"),
+    PROVOCATIVE("🔥 Provocante & Sensuelle (NSFW)", "Pose audacieuse, lingerie fine ou cambrure suggestive"),
     PORTRAIT("📸 Portrait fidèle (Visage & Buste)", "Conforme aux cheveux, yeux, teint et âge du personnage"),
-    INTIMATE("💋 Photo Boudoir / Intime (NSFW)", "Pose sensuelle mettant en valeur sa morphologie et ses atours"),
+    INTIMATE("💋 Photo Boudoir & Chambre", "Atmosphère feutrée, satin, ambiance tamisée"),
     SCENARIO("🏢 Métier & Scène de vie", "Contexte professionnel ou quotidien lié à son histoire"),
     CUSTOM("✍️ Consigne libre / Personnalisée", "Décrivez précisément le décor, la tenue ou l'action"),
 }
@@ -126,6 +128,8 @@ class CharacterDetailViewModel(
             val outputDir = File(context.filesDir, "character_photos").apply { mkdirs() }
 
             val instruction = when (style) {
+                CharacterPhotoStyle.SELFIE -> "Authentic phone selfie holding smartphone in front of mirror, reflection, direct gaze, alluring casual smile, natural smartphone camera flash, candid framing, unposed bedroom or dressing room background" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
+                CharacterPhotoStyle.PROVOCATIVE -> "Provocative sensual alluring posture, delicate sheer lace lingerie, plunging neckline, arched back, seductive bedroom atmosphere, soft dim moody lighting, captivating sensual gaze" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 CharacterPhotoStyle.PORTRAIT -> "Close-up headshot portrait photo, face and bust, looking directly at camera, soft lighting" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 CharacterPhotoStyle.INTIMATE -> "Sensual boudoir intimate photo, private bedroom setting, romantic dim moody lighting, silk nightwear" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
                 CharacterPhotoStyle.SCENARIO -> "Authentic candid lifestyle photo matching her role and scenario, natural environment" + (if (!customInstruction.isNullOrBlank()) ", $customInstruction" else "")
