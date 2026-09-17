@@ -885,6 +885,8 @@ class CloudEngineBridge {
      * Traduit et extrait de manière déterministe les traits physiques d'un personnage en tags Stable Diffusion (en anglais)
      */
     fun extractSdPhysicalTags(character: CharacterEntity): String {
+        val desc = character.description
+        val tags = mutableListOf<String>()
         val lowerDesc = desc.lowercase()
         val lines = desc.lines().map { it.trim() }
 
