@@ -1043,21 +1043,38 @@ class CloudEngineBridge {
             else -> "harmonious elegant facial features, naturally captivating smile"
         }
 
-        // 5. Morphologie, Poitrine & Silhouette
-        val morphoLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) || it.contains("Poitrine", ignoreCase = true) || it.contains("Taille", ignoreCase = true) } ?: ""
-        val lowerMorpho = (morphoLine + " " + desc).lowercase()
-        val bodyDetails = when {
-            lowerMorpho.contains("90d") || lowerMorpho.contains("95d") || lowerMorpho.contains("généreuse") || lowerMorpho.contains("voluptueuse") ->
-                "gorgeous hourglass feminine silhouette, slender arched waist, full natural bust, shapely curves"
-            lowerMorpho.contains("85c") || lowerMorpho.contains("90c") || lowerMorpho.contains("galbée") ->
-                "graceful curvaceous feminine silhouette, toned waist, nicely proportioned natural bust, elegant feminine contours"
-            lowerMorpho.contains("élancée") || lowerMorpho.contains("fine") ->
-                "slender toned graceful feminine physique, slender waist, delicate feminine posture"
-            else ->
-                "naturally attractive feminine silhouette, well-proportioned body"
+        // 5. Mensurations complètes : Taille, Poids, Poitrine / Bonnet exact & Morphologie cambrée
+        val heightMatch = Regex("""(?:Taille\s*:\s*)(\d[m,.]\d{2})""", RegexOption.IGNORE_CASE).find(desc)
+        val heightStr = heightMatch?.groupValues?.get(1)?.let { "height $it" } ?: ""
+
+        val weightMatch = Regex("""(?:Poids\s*:\s*)(\d{2}\s*kg)""", RegexOption.IGNORE_CASE).find(desc)
+        val weightStr = weightMatch?.groupValues?.get(1)?.let { "weighing $it" } ?: ""
+
+        val bustMatch = Regex("""(?:Poitrine\s*:\s*|Bonnet\s*)([0-9]{2,3}[A-G]|Bonnet\s*[0-9]{2,3}[A-G][^|•\n]*)""", RegexOption.IGNORE_CASE).find(desc)
+        val bustRaw = bustMatch?.groupValues?.get(1)?.trim() ?: ""
+        val bustStr = when {
+            bustRaw.isNotBlank() -> "magnificent full natural $bustRaw bust, deeply alluring cleavage"
+            lowerDesc.contains("90d") -> "full natural 90D cup bust, deeply alluring cleavage"
+            lowerDesc.contains("95d") -> "generous natural 95D cup bust, deeply alluring cleavage"
+            lowerDesc.contains("90c") -> "shapely natural 90C cup bust, flattering cleavage"
+            lowerDesc.contains("85c") -> "beautiful natural 85C cup bust, flattering cleavage"
+            else -> "full shapely natural feminine bust, attractive cleavage"
         }
 
-        return "Photorealistic portrait of the exact recurring individual: ${character.name}, gorgeous $ageStr French woman. Facial & Physical Identity DNA: $skinDetails, $faceDetails, $eyeDetails, $hairDetails $hairCut, $bodyDetails. Absolute visual and facial consistency across all photographs."
+        val morphoLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) } ?: ""
+        val morphoStr = when {
+            morphoLine.contains("cambrée", ignoreCase = true) || morphoLine.contains("rebondi", ignoreCase = true) ->
+                "provocative feminine hourglass silhouette, slender arched waist, prominent shapely curves and rounded hips"
+            morphoLine.contains("galbée", ignoreCase = true) || morphoLine.contains("courbes", ignoreCase = true) ->
+                "gorgeous curvaceous feminine silhouette, toned narrow waist, voluptuous feminine contours"
+            else ->
+                "provocative feminine hourglass silhouette, slender arched waist, feminine curves"
+        }
+
+        val measurementsList = listOfNotNull(heightStr.takeIf { it.isNotBlank() }, weightStr.takeIf { it.isNotBlank() }, bustStr, morphoStr)
+        val bodyDetails = measurementsList.joinToString(", ")
+
+        return "Photorealistic portrait of the exact recurring individual: ${character.name}, gorgeous $ageStr French woman. Facial & Physical Identity DNA: $skinDetails, $faceDetails, $eyeDetails, $hairDetails $hairCut, Body & Measurements: $bodyDetails. Absolute visual and facial consistency across all photographs."
     }
 
     /**
@@ -1074,6 +1091,10 @@ class CloudEngineBridge {
         userCustomInstruction: String? = null
     ): String {
         val identityDNA = extractVisualIdentityDNA(character)
+
+        // Extraction spécifique du bonnet/poitrine pour adaptation des tenues et décolletés
+        val bustMatch = Regex("""(?:Poitrine\s*:\s*|Bonnet\s*)([0-9]{2,3}[A-G]|Bonnet\s*[0-9]{2,3}[A-G][^|•\n]*)""", RegexOption.IGNORE_CASE).find(character.description)
+        val bustLabel = bustMatch?.groupValues?.get(1)?.trim() ?: if (character.description.contains("90D", ignoreCase = true)) "90D" else "full natural bust"
 
         // 1. Extraction du contexte de mémoire à long terme (Tenue, Scène, Posture actuelles)
         val memoryState = com.opencompanion.app.memory.LongTermMemoryManager.parse(character.memoryNotes)
@@ -1096,24 +1117,25 @@ class CloudEngineBridge {
                 currentOutfit.lowercase().contains("lingerie") || currentOutfit.lowercase().contains("dentelle") ||
                 currentOutfit.lowercase().contains("nuisette")
 
+        // 4. Tenues : TOUJOURS légèrement provocantes et sexy, parfaitement ajustées à sa morphologie et à son bonnet
         val outfitDescription: String
         val atmosphereDescription: String
 
         if (isNudeOrIntimate) {
-            outfitDescription = "wearing exquisite luxury sheer black or blush pink lace lingerie, delicate matching floral lace bralette and satin panties, tasteful feminine coverage, elegant silhouette, strictly non-explicit and artistic"
+            outfitDescription = "wearing an exquisitely sexy sheer black or blush-pink floral lace lingerie set, delicate low-cut lace bralette accentuating her gorgeous $bustLabel bust, matching sheer lace panties, seductive feminine silhouette, strictly non-explicit and artistic"
             atmosphereDescription = "cozy warm romantic boudoir atmosphere, soft ambient glow, sensual intimate photography, artistic low-key lighting, strictly aesthetic glamour, no explicit nudity"
         } else if (currentOutfit.isNotBlank()) {
-            outfitDescription = "wearing $currentOutfit"
-            atmosphereDescription = "natural authentic environment, photorealistic ambient lighting"
+            outfitDescription = "wearing a form-fitting, slightly provocative and flattering $currentOutfit, tailored to highlight her arched waist and shapely $bustLabel bust with a tasteful enticing neckline"
+            atmosphereDescription = "natural authentic environment, photorealistic ambient lighting, alluring sensual charm"
         } else if (lowerInput.contains("robe") || lowerInput.contains("soirée") || lowerInput.contains("décolleté")) {
-            outfitDescription = "wearing a stunning glamorous form-fitting evening dress with a tasteful flattering neckline"
-            atmosphereDescription = "chic sophisticated upscale ambiance, warm flattering light"
+            outfitDescription = "wearing a breathtaking glamorous form-fitting evening dress with a deeply flattering plunging neckline showcasing her $bustLabel bust, side slit, hugging her arched waist and curves"
+            atmosphereDescription = "chic sophisticated upscale ambiance, seductive warm flattering light"
         } else {
-            outfitDescription = "wearing a stylish, elegant flattering outfit complementing her natural beauty"
-            atmosphereDescription = "natural ambient daylight, cozy stylish interior"
+            outfitDescription = "wearing an alluring, slightly provocative stylish outfit (fitted top with a subtle flattering neckline accentuating her $bustLabel bust, and form-fitting skirt or trousers highlighting her curves and arched waist)"
+            atmosphereDescription = "natural ambient daylight, cozy stylish interior, seductive feminine aura"
         }
 
-        // 4. Lieu & Scène
+        // 5. Lieu & Scène
         val settingScene = when {
             currentLocation.isNotBlank() -> "Setting & Environment: fully realized authentic real-life environment in $currentLocation with visible detailed furniture, architecture, and warm ambient lighting. Never a plain or neutral studio background."
             lowerInput.contains("plage") || lowerInput.contains("mer") -> "Setting & Environment: scenic private Mediterranean beach with golden sand, gentle waves and sunset sky in the background."
@@ -1127,14 +1149,14 @@ class CloudEngineBridge {
             else -> "Setting & Environment: charming cozy Parisian apartment with wooden parquet floor, bookshelves, large French window and soft ambient indoor lighting."
         }
 
-        // 5. Posture & Action
+        // 6. Posture & Action : TOUJOURS légèrement provocante, cambrée et sexy
         val postureAction = when {
-            currentPosture.isNotBlank() -> "Pose & Action: $currentPosture, natural posture, looking towards the camera with a captivating authentic expression."
-            lowerInput.contains("penchée") || lowerInput.contains("bureau") -> "Pose: leaning forward gracefully, engaging captivating eye contact, relaxed natural posture."
-            lowerInput.contains("allongée") || lowerInput.contains("lit") || lowerInput.contains("sofa") -> "Pose: relaxing comfortably on a plush bed, propped on one elbow, gentle alluring smile."
-            lowerInput.contains("dos") || lowerInput.contains("derrière") -> "Pose: looking back gracefully over her shoulder, captivating direct gaze at the viewer."
-            lowerInput.contains("debout") -> "Pose: confident upright standing posture, hand casually on hip, natural poise."
-            else -> "Pose: candid relaxed posture, genuine spontaneous smile, gentle direct eye contact."
+            currentPosture.isNotBlank() -> "Pose: slightly provocative sensual posture, $currentPosture, arched back, confident captivating eye contact, irresistible sensual aura."
+            lowerInput.contains("penchée") || lowerInput.contains("bureau") -> "Pose: leaning forward seductively, emphasizing her feminine cleavage and arched waist, intense smoldering gaze into the camera."
+            lowerInput.contains("allongée") || lowerInput.contains("lit") || lowerInput.contains("sofa") -> "Pose: lounging sensually on a plush bed, propped gracefully on one elbow, body curved alluringly, captivating sultry smile."
+            lowerInput.contains("dos") || lowerInput.contains("derrière") -> "Pose: looking back seductively over her bare shoulder, showcasing her arched waist and curves, intensely alluring gaze."
+            lowerInput.contains("debout") -> "Pose: provocative standing pose, hand on arched hip, emphasizing her curvaceous hourglass silhouette and bust, confident sultry attitude."
+            else -> "Pose: naturally provocative and alluring stance, arched back accentuating her bust and feminine curves, captivating direct eye contact with a flirtatious confident smile."
         }
 
         return "$identityDNA " +
