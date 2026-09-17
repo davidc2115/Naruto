@@ -967,93 +967,181 @@ class CloudEngineBridge {
     }
 
     /**
+     * Extrait l'ADN visuel complet et immuable du personnage depuis sa fiche pour garantir
+     * une consistance visuelle absolue (même visage, mêmes yeux, mêmes cheveux, même corps)
+     * à travers toutes les photographies générées.
+     */
+    fun extractVisualIdentityDNA(character: CharacterEntity): String {
+        val desc = character.description
+        val lowerDesc = desc.lowercase()
+
+        // 1. Âge
+        val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
+        val ageVal = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: "35"
+        val ageStr = "$ageVal-year-old"
+
+        // 2. Cheveux complets
+        val hairLine = desc.lines().find { it.contains("Cheveux", ignoreCase = true) } ?: ""
+        val lowerHair = hairLine.lowercase()
+        val hairDetails = when {
+            lowerHair.contains("blond vénitien") -> "luminous strawberry honey-blonde hair with golden and honey highlights, silky flowing long tresses"
+            lowerHair.contains("blond miel") -> "warm honey blonde hair with natural radiant reflections, silky soft texture"
+            lowerHair.contains("blond doré") -> "radiant golden blonde hair, lustrous and glossy"
+            lowerHair.contains("blond platine") -> "striking platinum blonde hair, perfectly sleek"
+            lowerHair.contains("blond") -> "beautiful blonde hair with natural radiant highlights"
+            lowerHair.contains("châtain foncé") -> "rich dark chestnut brown hair with warm amber reflections"
+            lowerHair.contains("châtain") -> "soft chestnut brown hair with natural volume"
+            lowerHair.contains("brun chocolat") -> "deep chocolate brown hair, silky and lustrous"
+            lowerHair.contains("brun") -> "rich brunette hair, glossy and smooth"
+            lowerHair.contains("noir") -> "jet black raven hair with a brilliant silk sheen"
+            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> "gorgeous fiery copper-auburn hair, warm vibrant tones"
+            lowerHair.contains("gris") || lowerHair.contains("argenté") -> "sophisticated silver-gray hair, beautifully styled"
+            else -> "beautifully styled brunette hair"
+        }
+        val hairCut = when {
+            lowerHair.contains("carré plongeant") -> "cut in a modern inverted bob framing her neck"
+            lowerHair.contains("carré") -> "in a chic stylish bob haircut"
+            lowerHair.contains("queue de cheval") -> "gathered in an elegant high ponytail"
+            lowerHair.contains("chignon") -> "styled in a classy loose bun with delicate wisps"
+            lowerHair.contains("boucl") -> "falling in rich voluminous bouncy curls"
+            lowerHair.contains("ondul") -> "cascading down in gentle natural wavy layers"
+            lowerHair.contains("mi-longs") -> "shoulder-length, falling gently past her collarbones"
+            lowerHair.contains("longs") -> "long and voluminous, cascading gracefully over her shoulders"
+            lowerHair.contains("court") -> "in a chic modern pixie-bob cut"
+            else -> "cascading naturally over her shoulders"
+        }
+
+        // 3. Yeux & Regard
+        val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) || it.contains("Visage & Yeux", ignoreCase = true) } ?: ""
+        val lowerEyes = eyesLine.lowercase()
+        val eyeDetails = when {
+            lowerEyes.contains("bleu lagon") -> "striking lagoon-blue eyes framed by long dark eyelashes, intensely expressive gaze"
+            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> "magnetic emerald-green eyes with golden flecks, captivating warm gaze"
+            lowerEyes.contains("bleu") -> "deep crystalline blue eyes, luminous and captivating"
+            lowerEyes.contains("noisette") -> "warm hazel eyes with golden-brown honey tones"
+            lowerEyes.contains("marron") -> "velvety warm brown eyes, deeply expressive and tender"
+            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> "intense dark magnetic eyes, smoldering expressive depth"
+            else -> "expressive captivating eyes"
+        }
+
+        // 4. Visage & Teint de peau
+        val skinLine = desc.lines().find { it.contains("Teint", ignoreCase = true) || it.contains("Peau", ignoreCase = true) } ?: ""
+        val lowerSkin = skinLine.lowercase()
+        val skinDetails = when {
+            lowerSkin.contains("porcelaine") || lowerSkin.contains("laiteux") -> "immaculate milky porcelain skin, ultra-fine velvety texture"
+            lowerSkin.contains("doré") || lowerSkin.contains("hâlé") || lowerSkin.contains("soleil") -> "radiant sunkissed golden skin tone, smooth and warm"
+            lowerSkin.contains("mat") || lowerSkin.contains("méditerranéen") -> "warm olive Mediterranean complexion, flawless velvety tone"
+            lowerSkin.contains("ébène") || lowerSkin.contains("noir") -> "luminous rich ebony skin, flawless radiant glow"
+            lowerSkin.contains("diaphane") || lowerSkin.contains("clair") -> "delicate fair alabaster skin, naturally flushed cheeks"
+            else -> "radiant healthy skin, natural realistic skin pores and texture"
+        }
+
+        val faceDetails = when {
+            lowerDesc.contains("pommettes") && lowerDesc.contains("lèvre") -> "expressive warm facial features, delicately sculpted cheekbones, soft full natural lips"
+            lowerDesc.contains("lèvre") -> "harmonious facial contours, naturally alluring full lips"
+            lowerDesc.contains("pommettes") -> "delicately sculpted high cheekbones, elegant refined facial structure"
+            else -> "harmonious elegant facial features, naturally captivating smile"
+        }
+
+        // 5. Morphologie, Poitrine & Silhouette
+        val morphoLine = desc.lines().find { it.contains("Morphologie", ignoreCase = true) || it.contains("Poitrine", ignoreCase = true) || it.contains("Taille", ignoreCase = true) } ?: ""
+        val lowerMorpho = (morphoLine + " " + desc).lowercase()
+        val bodyDetails = when {
+            lowerMorpho.contains("90d") || lowerMorpho.contains("95d") || lowerMorpho.contains("généreuse") || lowerMorpho.contains("voluptueuse") ->
+                "gorgeous hourglass feminine silhouette, slender arched waist, full natural bust, shapely curves"
+            lowerMorpho.contains("85c") || lowerMorpho.contains("90c") || lowerMorpho.contains("galbée") ->
+                "graceful curvaceous feminine silhouette, toned waist, nicely proportioned natural bust, elegant feminine contours"
+            lowerMorpho.contains("élancée") || lowerMorpho.contains("fine") ->
+                "slender toned graceful feminine physique, slender waist, delicate feminine posture"
+            else ->
+                "naturally attractive feminine silhouette, well-proportioned body"
+        }
+
+        return "Photorealistic portrait of the exact recurring individual: ${character.name}, gorgeous $ageStr French woman. Facial & Physical Identity DNA: $skinDetails, $faceDetails, $eyeDetails, $hairDetails $hairCut, $bodyDetails. Absolute visual and facial consistency across all photographs."
+    }
+
+    /**
      * Construit un prompt photographique en langage naturel haute définition,
-     * spécialement calibré pour les modèles de pointe de Google Gemini (Imagen 3) et Microsoft Copilot (DALL-E 3).
+     * spécialement calibré pour les modèles Google Gemini (Gemini 2.5 Flash Image, Nano Banana 2).
      * Banni tout le jargon technique Stable Diffusion (poids :1.2, tags compacts) pour produire un vrai rendu réaliste
-     * identique à l'application officielle Google Gemini ou Copilot sur smartphone.
+     * identique à l'application officielle Google Gemini sur smartphone.
+     * Prend en compte la tenue, la scène, la position de la conversation, et traduit toute demande intime/nude
+     * en lingerie intime élégante sans jamais verser dans l'explicite.
      */
     fun buildPhotorealisticNaturalPrompt(
         character: CharacterEntity,
         recentMessages: List<ChatMessageEntity>,
         userCustomInstruction: String? = null
     ): String {
-        val desc = character.description
+        val identityDNA = extractVisualIdentityDNA(character)
 
-        // 1. Âge
-        val ageMatch = Regex("""(?:Âge\s*:\s*|âge de\s*|\((\d{2})\s*ans\))(\d{2})?""").find(desc)
-        val ageVal = ageMatch?.groupValues?.drop(1)?.firstOrNull { it.isNotBlank() } ?: "40"
-        val ageStr = "$ageVal-year-old"
+        // 1. Extraction du contexte de mémoire à long terme (Tenue, Scène, Posture actuelles)
+        val memoryState = com.opencompanion.app.memory.LongTermMemoryManager.parse(character.memoryNotes)
+        val currentOutfit = memoryState.outfit.trim()
+        val currentLocation = memoryState.location.trim().ifBlank { character.scenario.trim() }
+        val currentPosture = memoryState.posture.trim()
 
-        // 2. Cheveux
-        val hairLine = desc.lines().find { it.contains("Cheveux", ignoreCase = true) } ?: ""
-        val lowerHair = hairLine.lowercase()
-        val hairColor = when {
-            lowerHair.contains("blond miel") -> "warm honey blonde"
-            lowerHair.contains("blond doré") -> "golden blonde"
-            lowerHair.contains("blond platine") -> "platinum blonde"
-            lowerHair.contains("blond") -> "blonde"
-            lowerHair.contains("châtain foncé") -> "dark chestnut brown"
-            lowerHair.contains("châtain") -> "chestnut brown"
-            lowerHair.contains("brun chocolat") -> "rich dark chocolate brown"
-            lowerHair.contains("brun") -> "brunette"
-            lowerHair.contains("noir") -> "silky raven black"
-            lowerHair.contains("roux") || lowerHair.contains("cuivré") -> "vibrant copper auburn"
-            lowerHair.contains("gris") || lowerHair.contains("argenté") -> "sophisticated silver gray"
-            else -> "brunette"
-        }
-        val hairStyle = when {
-            lowerHair.contains("carré plongeant") -> "in an inverted sleek bob"
-            lowerHair.contains("carré") -> "in an elegant bob haircut"
-            lowerHair.contains("queue de cheval") -> "tied in a high ponytail"
-            lowerHair.contains("chignon") -> "styled in a classy hair bun"
-            lowerHair.contains("boucl") -> "with voluminous curls"
-            lowerHair.contains("ondul") -> "with gentle cascading waves"
-            lowerHair.contains("mi-longs") -> "shoulder-length"
-            lowerHair.contains("longs") -> "long and flowing"
-            lowerHair.contains("court") -> "in a chic modern cut"
-            else -> "beautifully styled"
-        }
+        // 2. Déterminer la demande spécifique ou le dernier message du chat
+        val lastUserMsg = recentMessages.lastOrNull { it.role == MessageRole.USER }?.content?.trim() ?: ""
+        val inputRaw = (userCustomInstruction?.trim() ?: lastUserMsg).replace("\n", " ")
+        val lowerInput = inputRaw.lowercase()
 
-        // 3. Yeux
-        val eyesLine = desc.lines().find { it.contains("Yeux", ignoreCase = true) } ?: ""
-        val lowerEyes = eyesLine.lowercase()
-        val eyeDesc = when {
-            lowerEyes.contains("vert émeraude") || lowerEyes.contains("vert") -> "striking emerald green eyes"
-            lowerEyes.contains("bleu") -> "mesmerizing deep blue eyes"
-            lowerEyes.contains("noisette") -> "warm hazel eyes"
-            lowerEyes.contains("marron") -> "warm expressive brown eyes"
-            lowerEyes.contains("sombre") || lowerEyes.contains("noir") -> "intense dark eyes"
-            else -> "expressive warm eyes"
-        }
+        // 3. Détection de demande intime / lingerie / "nude"
+        // RÈGLE ABSOLUE : Si "nude", "nue", "à poil", "déshabillée" etc. -> Traduire strictement par lingerie sexy et intime, sans nudité explicite
+        val isNudeOrIntimate = lowerInput.contains("nude") || lowerInput.contains("nue") || lowerInput.contains(" à poil") ||
+                lowerInput.contains("poil") || lowerInput.contains("sans vêtement") || lowerInput.contains("déshabill") ||
+                lowerInput.contains("lingerie") || lowerInput.contains("dentelle") || lowerInput.contains("nuisette") ||
+                lowerInput.contains("peignoir") || lowerInput.contains("satin") || lowerInput.contains("culotte") ||
+                lowerInput.contains("soutien-gorge") || lowerInput.contains("intime") || lowerInput.contains("sexy") ||
+                currentOutfit.lowercase().contains("lingerie") || currentOutfit.lowercase().contains("dentelle") ||
+                currentOutfit.lowercase().contains("nuisette")
 
-        // 4. Contexte, pose et tenue
-        val basePose = if (!userCustomInstruction.isNullOrBlank()) {
-            userCustomInstruction.trim()
+        val outfitDescription: String
+        val atmosphereDescription: String
+
+        if (isNudeOrIntimate) {
+            outfitDescription = "wearing exquisite luxury sheer black or blush pink lace lingerie, delicate matching floral lace bralette and satin panties, tasteful feminine coverage, elegant silhouette, strictly non-explicit and artistic"
+            atmosphereDescription = "cozy warm romantic boudoir atmosphere, soft ambient glow, sensual intimate photography, artistic low-key lighting, strictly aesthetic glamour, no explicit nudity"
+        } else if (currentOutfit.isNotBlank()) {
+            outfitDescription = "wearing $currentOutfit"
+            atmosphereDescription = "natural authentic environment, photorealistic ambient lighting"
+        } else if (lowerInput.contains("robe") || lowerInput.contains("soirée") || lowerInput.contains("décolleté")) {
+            outfitDescription = "wearing a stunning glamorous form-fitting evening dress with a tasteful flattering neckline"
+            atmosphereDescription = "chic sophisticated upscale ambiance, warm flattering light"
         } else {
-            val lastUserMsg = recentMessages.lastOrNull { it.role == MessageRole.USER }?.content
-            if (!lastUserMsg.isNullOrBlank() && lastUserMsg.length in 5..120) {
-                lastUserMsg.replace("\n", " ").trim()
-            } else {
-                "taking a spontaneous candid selfie, smiling naturally at the camera in a stylish cozy room"
-            }
+            outfitDescription = "wearing a stylish, elegant flattering outfit complementing her natural beauty"
+            atmosphereDescription = "natural ambient daylight, cozy stylish interior"
         }
 
-        val lowerPose = basePose.lowercase()
-        val poseAndSetting = when {
-            lowerPose.contains("lingerie") || lowerPose.contains("dentelle") || lowerPose.contains("nuisette") ->
-                "tasteful sensual boudoir portrait, wearing luxurious delicate black lace lingerie, elegant silk details, soft romantic warm bedroom lighting, classy seductive posture, strictly non-explicit"
-            (lowerPose.contains("robe") && (lowerPose.contains("décolleté") || lowerPose.contains("courte") || lowerPose.contains("moulante"))) || lowerPose.contains("décolleté") ->
-                "wearing a breathtaking glamorous form-fitting low-cut evening dress, tasteful flattering neckline, captivating confident alluring gaze, chic upscale lounge"
-            lowerPose.contains("peignoir") || lowerPose.contains("satin") || lowerPose.contains("soie") ->
-                "wearing a soft silky satin robe casually draped, intimate bedroom aesthetics, warm golden hour glow, captivating natural charm"
-            lowerPose.contains("sexy") || lowerPose.contains("sensuelle") || lowerPose.contains("provocante") ->
-                "captivating alluring expression, tasteful sensual glamour aesthetics, beautiful feminine silhouette, artistic warm lighting, confident charming smile"
-            else -> basePose
+        // 4. Lieu & Scène
+        val settingScene = when {
+            currentLocation.isNotBlank() -> "Setting: authentic realistic scene in $currentLocation."
+            lowerInput.contains("plage") || lowerInput.contains("mer") -> "Setting: scenic private Mediterranean beach at golden hour."
+            lowerInput.contains("piscine") -> "Setting: luxurious private poolside lounge with turquoise water reflections."
+            lowerInput.contains("voiture") -> "Setting: interior of a premium luxury vehicle, soft natural light through tinted windows."
+            lowerInput.contains("bureau") || lowerInput.contains("travail") -> "Setting: bright contemporary upscale private office."
+            lowerInput.contains("cuisine") -> "Setting: warm rustic chic kitchen with marble countertops and warm pendant lighting."
+            lowerInput.contains("chambre") || isNudeOrIntimate -> "Setting: intimate elegant bedroom with soft linen and warm lamps."
+            lowerInput.contains("balcon") || lowerInput.contains("terrasse") || lowerInput.contains("rooftop") -> "Setting: stylish panoramic rooftop terrace overlooking the city skyline at dusk."
+            else -> "Setting: charming cozy stylish apartment with soft natural window light."
         }
 
-        return "A high-end, photorealistic candid portrait of ${character.name}, a gorgeous $ageStr French woman with $hairColor hair $hairStyle, and $eyeDesc. " +
-                "Setting, outfit and pose: $poseAndSetting. " +
-                "Shot on modern smartphone camera, 35mm lens, natural soft lighting, authentic lifelike skin texture, high fidelity, genuine camera imperfections, cinematic depth of field."
+        // 5. Posture & Action
+        val postureAction = when {
+            currentPosture.isNotBlank() -> "Pose & Action: $currentPosture, natural posture, looking towards the camera with a captivating authentic expression."
+            lowerInput.contains("penchée") || lowerInput.contains("bureau") -> "Pose: leaning forward gracefully, engaging captivating eye contact, relaxed natural posture."
+            lowerInput.contains("allongée") || lowerInput.contains("lit") || lowerInput.contains("sofa") -> "Pose: relaxing comfortably on a plush bed, propped on one elbow, gentle alluring smile."
+            lowerInput.contains("dos") || lowerInput.contains("derrière") -> "Pose: looking back gracefully over her shoulder, captivating direct gaze at the viewer."
+            lowerInput.contains("debout") -> "Pose: confident upright standing posture, hand casually on hip, natural poise."
+            else -> "Pose: candid relaxed posture, genuine spontaneous smile, gentle direct eye contact."
+        }
+
+        return "$identityDNA " +
+                "$settingScene " +
+                "Outfit: $outfitDescription. " +
+                "$postureAction " +
+                "Aesthetic & Mood: $atmosphereDescription. " +
+                "Photography: Shot on 35mm f/1.8 prime lens on modern flagship camera, genuine natural skin texture with subtle pores, authentic specular highlights, cinematic depth of field, 8k photographic fidelity, completely non-explicit, masterpiece."
     }
 
     /**
@@ -1095,6 +1183,7 @@ REQUIREMENTS:
 - Accurately capture dynamic and varied postures (e.g. leaning forward, looking back over shoulder, sitting alluringly, relaxing on bed/sofa, confident sensual stance).
 - Set the scene in authentic varied environments matching the dialogue, role, or request (e.g. professional office, classroom, kitchen, cozy bedroom, chic living room, luxury car interior, hotel suite, scenic balcony).
 - Render diverse stylish or intimate outfits matching the situation and profession (e.g. professional blouse and pencil skirt, elegant form-fitting dress, mini-skirt, silk satin robe, delicate lingerie, nightgown, or boudoir styling).
+- Strictly non-explicit, zero pornography, and no full frontal nudity: if an intimate, nude, or boudoir setting is requested, depict the character wearing tasteful, exquisite luxury lace lingerie or a silk robe with sensual aesthetic glamour.
 - Format as a photographic raw prompt: 'photorealistic candid photo of [character details], [pose and scene details], 8k resolution, authentic detailed skin texture, cinematic soft natural lighting, masterpiece, shallow depth of field, 35mm photography'.
 - Output ONLY the final prompt in English with no explanations.
                 """.trimIndent()
@@ -1469,11 +1558,10 @@ REQUIREMENTS:
                 val predictModels = listOf(
                     cleanedGeminiModel,
                     "gemini-2.5-flash-image",
-                    "nano-banana-2",
-                    "gemini-2.0-flash",
-                    "imagen-3.0-generate-002",
-                    "imagen-3.0-fast-generate-001"
-                ).distinct()
+                    "nano-banana-2"
+                ).filter { it == "gemini-2.5-flash-image" || it == "nano-banana-2" }
+                    .ifEmpty { listOf("gemini-2.5-flash-image", "nano-banana-2") }
+                    .distinct()
 
                 for (key in allGeminiKeys.distinct()) {
                     for (model in predictModels) {

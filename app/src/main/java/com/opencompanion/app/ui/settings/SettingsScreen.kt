@@ -685,8 +685,8 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                     OutlinedTextField(
                                         value = state.settings.geminiImageModelName,
                                         onValueChange = viewModel::setGeminiImageModelName,
-                                        label = { Text("Modèle Imagen") },
-                                        placeholder = { Text("imagen-3.0-generate-002") },
+                                        label = { Text("Modèle d'image Gemini") },
+                                        placeholder = { Text("gemini-2.5-flash-image") },
                                         singleLine = true,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
@@ -694,27 +694,12 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                                         FilterChip(
                                             selected = state.settings.geminiImageModelName == "gemini-2.5-flash-image",
                                             onClick = { viewModel.setGeminiImageModelName("gemini-2.5-flash-image") },
-                                            label = { Text("2.5 Flash Image ⚡") }
+                                            label = { Text("Gemini 2.5 Flash Image ⚡") }
                                         )
                                         FilterChip(
                                             selected = state.settings.geminiImageModelName == "nano-banana-2",
                                             onClick = { viewModel.setGeminiImageModelName("nano-banana-2") },
                                             label = { Text("Nano Banana 2 🍌") }
-                                        )
-                                        FilterChip(
-                                            selected = state.settings.geminiImageModelName == "gemini-2.0-flash",
-                                            onClick = { viewModel.setGeminiImageModelName("gemini-2.0-flash") },
-                                            label = { Text("2.0 Flash 🚀") }
-                                        )
-                                        FilterChip(
-                                            selected = state.settings.geminiImageModelName == "imagen-3.0-generate-002",
-                                            onClick = { viewModel.setGeminiImageModelName("imagen-3.0-generate-002") },
-                                            label = { Text("Imagen 3 ⭐") }
-                                        )
-                                        FilterChip(
-                                            selected = state.settings.geminiImageModelName == "imagen-3.0-fast-generate-001",
-                                            onClick = { viewModel.setGeminiImageModelName("imagen-3.0-fast-generate-001") },
-                                            label = { Text("Imagen 3 Fast ⚡") }
                                         )
                                     }
                                 }
