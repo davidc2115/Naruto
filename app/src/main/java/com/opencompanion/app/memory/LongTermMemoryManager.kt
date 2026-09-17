@@ -151,9 +151,21 @@ object LongTermMemoryManager {
 
     /**
      * Formate la mémoire pour injection directe dans le prompt système du personnage.
+     * Si la mémoire est encore vierge, pré-initialise automatiquement le lieu depuis [character.scenario]
+     * et la posture / action en cours depuis [character.firstMessage].
      */
-    fun formatForSystemPrompt(memoryNotes: String): String {
-        val state = parse(memoryNotes)
+    fun formatForSystemPrompt(memoryNotes: String, character: CharacterEntity? = null): String {
+        var state = parse(memoryNotes)
+        if (state.location.isBlank() && !character?.scenario.isNullOrBlank()) {
+            state = state.copy(location = character!!.scenario.trim())
+        }
+        if (state.posture.isBlank() && !character?.firstMessage.isNullOrBlank()) {
+            val actionInGreeting = character!!.firstMessage.substringAfter("*", "").substringBefore("*", "").trim()
+            if (actionInGreeting.isNotBlank()) {
+                state = state.copy(posture = "$actionInGreeting (action physique immédiate en cours à poursuivre et résoudre)")
+            }
+        }
+
         if (state.outfit.isBlank() && state.location.isBlank() && state.posture.isBlank() &&
             state.presence.isBlank() && state.intimateMilestones.isEmpty() && state.customFacts.isEmpty()
         ) {

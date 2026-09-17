@@ -1464,16 +1464,64 @@ REQUIREMENTS:
                 )
 
                 val cleanedGeminiModel = geminiImageModelName.trim().removePrefix("models/")
-                    .ifBlank { "imagen-3.0-generate-002" }
+                    .ifBlank { "gemini-2.5-flash-image" }
 
                 val predictModels = listOf(
                     cleanedGeminiModel,
+                    "gemini-2.5-flash-image",
+                    "nano-banana-2",
+                    "gemini-2.0-flash",
                     "imagen-3.0-generate-002",
                     "imagen-3.0-fast-generate-001"
                 ).distinct()
 
                 for (key in allGeminiKeys.distinct()) {
                     for (model in predictModels) {
+                        // 1. Essayer d'abord l'endpoint multimodal generateContent (clés gratuites Google AI Studio)
+                        try {
+                            val contentUrl = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$key"
+                            val contentConn = (URL(contentUrl).openConnection() as HttpURLConnection).apply {
+                                requestMethod = "POST"
+                                connectTimeout = 30_000
+                                readTimeout = 60_000
+                                doOutput = true
+                                setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                                setRequestProperty("User-Agent", "OpenCompanion/1.0 (Android)")
+                            }
+                            val contentPayload = mapOf(
+                                "contents" to listOf(
+                                    mapOf("parts" to listOf(mapOf("text" to "Generate a high resolution photorealistic photograph: $naturalPrompt")))
+                                ),
+                                "generationConfig" to mapOf(
+                                    "responseModalities" to listOf("IMAGE", "TEXT")
+                                )
+                            )
+                            contentConn.outputStream.use { os ->
+                                os.write(buildJsonString(contentPayload).toByteArray(Charsets.UTF_8))
+                                os.flush()
+                            }
+                            val cCode = contentConn.responseCode
+                            if (cCode in 200..299) {
+                                val cResp = contentConn.inputStream.bufferedReader().use { it.readText() }
+                                contentConn.disconnect()
+                                val cRoot = jsonParser.parseToJsonElement(cResp).jsonObject
+                                val cParts = cRoot["candidates"]?.jsonArray?.firstOrNull()?.jsonObject
+                                    ?.get("content")?.jsonObject?.get("parts")?.jsonArray
+                                val imgB64 = cParts?.mapNotNull { part ->
+                                    part.jsonObject["inlineData"]?.jsonObject?.get("data")?.jsonPrimitive?.content
+                                }?.firstOrNull()
+                                if (!imgB64.isNullOrBlank()) {
+                                    val bytes = Base64.decode(imgB64, Base64.DEFAULT)
+                                    val file = File(outputDir, "gemini_${character.id}_${System.currentTimeMillis()}.jpg")
+                                    file.writeBytes(bytes)
+                                    return@runCatching file
+                                }
+                            } else {
+                                contentConn.disconnect()
+                            }
+                        } catch (_: Exception) {}
+
+                        // 2. Essayer l'endpoint Vertex / Imagen predict
                         val urlStr = "https://generativelanguage.googleapis.com/v1beta/models/$model:predict?key=$key"
                         try {
                             val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
@@ -1515,11 +1563,11 @@ REQUIREMENTS:
                             } else {
                                 if (code == 404) hadGemini404 = true
                                 val err = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                                lastError = "Gemini Imagen ($code): ${err.take(200)}"
+                                lastError = "Gemini ($code): ${err.take(200)}"
                                 conn.disconnect()
                             }
                         } catch (e: Exception) {
-                            lastError = "Erreur réseau Gemini Imagen: ${e.message}"
+                            lastError = "Erreur réseau Gemini: ${e.message}"
                         }
                     }
                 }
